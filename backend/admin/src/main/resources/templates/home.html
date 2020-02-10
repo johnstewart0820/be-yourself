@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Be Your Self Application</title>
+
+    <div th:replace="fragments/header :: header-setting"/>
+
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"/>
+
+<div class="container">
+
+    <div class="starter-template">
+        <h1>Be Your Self Application</h1>
+        <h2>1. Visit <a th:href="@{/admin}">Admin page</a></h2>
+        <h2>2. Visit <a th:href="@{/user}">User page</a></h2>
+        <h2>3. Visit <a th:href="@{/about}">Normal page</a></h2>
+        <h2>4. API <a th:href="@{/api/test}">Test API</a></h2>
+    </div>
+
+</div>
+<!-- /.container -->
+
+<div th:replace="fragments/footer :: footer"/>
+
+</body>
+</html>
