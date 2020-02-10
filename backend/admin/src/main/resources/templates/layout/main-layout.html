@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+	th:with="lang=${#locale.language}" th:lang="${lang}">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Be Your Self Application</title>
+
+	<!-- Favicon -->
+	<link type="image/png" th:href="@{/images/favicon.png}" rel="icon">
+
+	<!-- Fonts -->
+	<link href="" rel="stylesheet">
+
+	<!-- Icons -->
+	<link type="text/css" th:href="@{/css/nucleo.css}" rel="stylesheet" />
+	<!-- 
+	<link type="text/css" th:href="@{/css/fontawesome.css}" rel="stylesheet" />
+	-->
+	
+	<!--  CSS -->
+	<link type="text/css" th:href="@{/css/argon.min.css}" rel="stylesheet" />
+
+	<link type="text/css" th:href="@{/css/main.css}" rel="stylesheet" />
+	
+	<!-- Core -->
+	<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</head>
+<body>
+	<nav th:insert="layout/main-side-nav :: side-nav" 
+		class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light bg-white" id="sidenav-main">
+	</nav>
+
+	<div class="main-content">
+		<nav th:insert="layout/main-header :: header" 
+			class="navbar navbar-top navbar-expand-md navbar-dark bg-gradient-primary" id="navbar-main">
+		</nav>
+		
+		<div class="pb-7"></div>
+				
+		<div class="container-fluid">
+			<th:block layout:fragment="content"></th:block>		
+			
+			<footer th:insert="layout/main-footer :: footer" class="footer"></footer>
+		</div>
+	</div>
+
+	<script th:src="@{/js/argon.min.js}"></script>
+
+	<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

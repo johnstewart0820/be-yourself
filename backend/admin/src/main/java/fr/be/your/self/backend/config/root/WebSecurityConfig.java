@@ -101,6 +101,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         		"/images/**", 
         		"/css/**",
         		"/js/**",
+        		"/fonts/**",
         		"/assets/**",
         		"/api/image/**",
         		"/api/notoken/**",

@@ -16,6 +16,11 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import org.thymeleaf.spring5.ISpringTemplateEngine;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 
 @Configuration
 @EnableWebMvc
@@ -25,8 +30,6 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 })
 public class WebMvcConfig implements WebMvcConfigurer {
 	
-	/* Time, in seconds, to have the browser cache static resources (one week). */
-    //private static final int BROWSER_CACHE_CONTROL = 604800;
     private static final String DEFAULT_LOCALE = "en";
     
     @Override
@@ -44,26 +47,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return new PropertySourcesPlaceholderConfigurer();
 	}
     
-    /*
-	@Bean
-	public ContentNegotiatingViewResolver contentViewResolver() throws Exception {
-		ContentNegotiationManagerFactoryBean contentNegotiationManager = new ContentNegotiationManagerFactoryBean();
-		contentNegotiationManager.addMediaType("json", MediaType.APPLICATION_JSON);
-
-		InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-		viewResolver.setPrefix("/templates/");
-		viewResolver.setSuffix(".html");
-
-		MappingJackson2JsonView defaultView = new MappingJackson2JsonView();
-		defaultView.setExtractValueFromSingleKeyModel(true);
-
-		ContentNegotiatingViewResolver contentViewResolver = new ContentNegotiatingViewResolver();
-		contentViewResolver.setContentNegotiationManager(contentNegotiationManager.getObject());
-		contentViewResolver.setViewResolvers(Arrays.<ViewResolver> asList(viewResolver));
-		contentViewResolver.setDefaultViews(Arrays.<View> asList(defaultView));
-		return contentViewResolver;
-	}
-    */
+    @Bean
+    public ISpringTemplateEngine templateEngine() {
+        final SpringTemplateEngine engine = new SpringTemplateEngine();
+        engine.addDialect(new LayoutDialect());
+        engine.addDialect(new Java8TimeDialect());
+        engine.setTemplateEngineMessageSource(messageSource());
+        
+        return engine;
+    }
     
 	@Bean(name = "multipartResolver")
 	public CommonsMultipartResolver createMultipartResolver() {
@@ -71,16 +63,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	    resolver.setDefaultEncoding("utf-8");
 	    return resolver;
 	}
-	
-	/*
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-	    registry.addResourceHandler("/css/**")
-	            .addResourceLocations("/css/")
-	            .setCachePeriod(BROWSER_CACHE_CONTROL)
-	            ;
-	}
-	*/
 	
 	@Bean
     public LocaleResolver localeResolver() {
