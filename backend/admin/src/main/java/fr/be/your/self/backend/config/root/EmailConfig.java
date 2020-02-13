@@ -12,6 +12,9 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import fr.be.your.self.backend.engine.DefaultEmailSender;
+import fr.be.your.self.engine.EmailSender;
+
 @Configuration
 public class EmailConfig {
 
@@ -39,10 +42,29 @@ public class EmailConfig {
 	@Value("#{'${mail.smtp.properties}'.split(';')}")
 	private Set<String> smtpProperties;
 	
+	@Value("${mail.activate.user.subject}")
+	private String activateUserSubject;
+	
+	@Value("${mail.activate.user.body}")
+	private String activateUserBody;
+	
+	@Value("${mail.forget.password.subject}")
+	private String forgetPasswordSubject;
+	
+	@Value("${mail.forget.password.body}")
+	private String forgetPasswordBody;
+	
 	@Bean 
 	public MailSender javaMailSender() {
-		Properties properties = new Properties();
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setProtocol(JavaMailSenderImpl.DEFAULT_PROTOCOL);
+		mailSender.setDefaultEncoding("UTF-8");
+		mailSender.setHost(smtpHost);
+		mailSender.setPort(smtpPort);
+		mailSender.setUsername(smtpUsername);
+		mailSender.setPassword(smtpPassword);
 		
+		Properties properties = mailSender.getJavaMailProperties();
 		for (String smtpProperty : smtpProperties) {
 			String[] itemProperties = smtpProperty.split(":");
 			
@@ -56,15 +78,6 @@ public class EmailConfig {
 				}
 			}
 		}
-		
-		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-		mailSender.setProtocol(JavaMailSenderImpl.DEFAULT_PROTOCOL);
-		mailSender.setDefaultEncoding("UTF-8");
-		mailSender.setHost(smtpHost);
-		mailSender.setPort(smtpPort);
-		mailSender.setUsername(smtpUsername);
-		mailSender.setPassword(smtpPassword);
-		mailSender.setJavaMailProperties(properties);
 		
 		return mailSender;
 	}
@@ -83,5 +96,12 @@ public class EmailConfig {
 		}
 		
 		return message;
+	}
+	
+	@Bean
+	public EmailSender emailSender() {
+		return new DefaultEmailSender(
+				this.activateUserSubject, this.activateUserBody, 
+				this.forgetPasswordSubject, this.forgetPasswordBody);
 	}
 }

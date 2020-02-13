@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
     layout:decorate="~{layout/main-layout.html}">
 <head>
     <title>About</title>
@@ -8,6 +9,12 @@
 <body>
     <div layout:fragment="content">
         <h1>Normal page (No need login)</h1>
+        
+        <span sec:authorize="isAuthenticated()">
+					| Logged user: <span sec:authentication="name"></span>
+					| Roles: <span sec:authentication="principal.authorities"></span>
+					| <a th:href="@{/logout}">Sign Out</a>
+				</span>
     </div>
 </body>
 </html>

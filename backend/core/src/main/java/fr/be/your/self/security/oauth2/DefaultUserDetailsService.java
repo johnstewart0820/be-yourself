@@ -1,8 +1,11 @@
-package fr.be.your.self.security.jwt;
+package fr.be.your.self.security.oauth2;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,7 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import fr.be.your.self.model.User;
 import fr.be.your.self.repository.UserRepository;
 
-public class JwtUserDetailsService implements UserDetailsService {
+public class DefaultUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private UserRepository userRepository;
@@ -22,15 +25,19 @@ public class JwtUserDetailsService implements UserDetailsService {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
 		
-		final JwtUserDetails jwtUser = new JwtUserDetails(
-				user.getId(), user.getEmail(), 
-				user.getPassword(), new ArrayList<>());
+		final List<GrantedAuthority> roles = Arrays.asList(
+				new SimpleGrantedAuthority("ROLE_ADMIN"), 
+				new SimpleGrantedAuthority("ROLE_USER"));
 		
-		jwtUser.setFullname(user.getFullname());
+		final AuthenticationUserDetails authenticationUser = new AuthenticationUserDetails(
+				user.getId(), user.getEmail(), 
+				user.getPassword(), roles);
+		
+		authenticationUser.setFullname(user.getFullname());
 		
 		// TODO
-		jwtUser.setAvatar(null);
+		authenticationUser.setAvatar(null);
 		
-		return jwtUser;
+		return authenticationUser;
 	}
 }

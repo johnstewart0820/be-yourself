@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.be.your.self.security.jwt.JwtUserDetails;
+import fr.be.your.self.security.oauth2.AuthenticationUserDetails;
 
 @RestController(value = "DemoController")
 @RequestMapping(value = "/test")
@@ -27,8 +27,8 @@ public class HelloController {
 			result.put("username", authentication.getName());
 			
 			final Object principal = authentication.getPrincipal();
-			if (principal instanceof JwtUserDetails) {
-				final JwtUserDetails userDetails = (JwtUserDetails) principal;
+			if (principal instanceof AuthenticationUserDetails) {
+				final AuthenticationUserDetails userDetails = (AuthenticationUserDetails) principal;
 				
 				result.put("userId", userDetails.getUserId());
 				result.put("fullName", userDetails.getFullname());

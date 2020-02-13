@@ -15,6 +15,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 import fr.be.your.self.backend.config.rest.RestConfig;
 import fr.be.your.self.backend.config.web.WebMvcConfig;
+import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.model.User;
 import fr.be.your.self.repository.UserRepository;
 
@@ -23,6 +24,9 @@ import fr.be.your.self.repository.UserRepository;
 @EntityScan(basePackages = { "fr.be.your.self.model" })
 @EnableJpaRepositories(basePackages = { "fr.be.your.self.repository" })
 public class AdminApplication implements CommandLineRunner {
+	
+	private static final String WEB_URL_PATTERN = "/";
+	private static final String API_URL_PATTERN = Constants.PATH.API_PREFIX + "/*";
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -42,7 +46,7 @@ public class AdminApplication implements CommandLineRunner {
 				userRepository.save(adminUser);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
@@ -61,7 +65,7 @@ public class AdminApplication implements CommandLineRunner {
 		ServletRegistrationBean<DispatcherServlet> apiServletRegistration = new ServletRegistrationBean<>();
 		apiServletRegistration.setName("apiDispatcherServlet");
 		apiServletRegistration.setServlet(apiDispatcherServlet);
-		apiServletRegistration.addUrlMappings("/api/*");
+		apiServletRegistration.addUrlMappings(API_URL_PATTERN);
         apiServletRegistration.setLoadOnStartup(1);
         apiServletRegistration.setAsyncSupported(true);
         
@@ -79,7 +83,7 @@ public class AdminApplication implements CommandLineRunner {
 		ServletRegistrationBean<DispatcherServlet> webServletRegistration = new ServletRegistrationBean<>();
 		webServletRegistration.setName("webDispatcherServlet");
 		webServletRegistration.setServlet(webDispatcherServlet);
-		webServletRegistration.addUrlMappings("/");
+		webServletRegistration.addUrlMappings(WEB_URL_PATTERN);
         webServletRegistration.setLoadOnStartup(2);
         webServletRegistration.setAsyncSupported(true);
         

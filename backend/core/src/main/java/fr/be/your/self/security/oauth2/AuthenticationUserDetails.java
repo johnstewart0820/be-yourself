@@ -1,10 +1,10 @@
-package fr.be.your.self.security.jwt;
+package fr.be.your.self.security.oauth2;
 
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public class JwtUserDetails extends org.springframework.security.core.userdetails.User {
+public class AuthenticationUserDetails extends org.springframework.security.core.userdetails.User {
 	/**
 	 * 
 	 */
@@ -14,7 +14,7 @@ public class JwtUserDetails extends org.springframework.security.core.userdetail
 	private String fullname;
 	private String avatar;
 	
-	public JwtUserDetails(Integer userId, String username, 
+	public AuthenticationUserDetails(Integer userId, String username, 
 			String password, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
 		
