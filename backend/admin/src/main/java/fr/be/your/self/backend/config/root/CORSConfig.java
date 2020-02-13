@@ -33,11 +33,11 @@ public class CORSConfig {
 	private String allowedOrigins;
 	
 	@Bean
-	public SimpleCORSFilter corsFilter() {
+	public Filter corsFilter() {
 		List<String> staticAllowedOrgins = null;
 		
-		if (!StringUtils.isNullOrSpace(allowedOrigins)) {
-			staticAllowedOrgins = Arrays.asList(allowedOrigins.split(","));
+		if (!StringUtils.isNullOrSpace(this.allowedOrigins)) {
+			staticAllowedOrgins = Arrays.asList(this.allowedOrigins.split(","));
 		}
 		
 		return new SimpleCORSFilter(staticAllowedOrgins);
@@ -63,6 +63,7 @@ public class CORSConfig {
 			}
 		}
 
+		@Override
 		public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 			// If does not allow CORS for any origin, do not add any CORS header
 			if (this.sameDomainOnly) {
@@ -71,14 +72,16 @@ public class CORSConfig {
 			}
 			
 			// Add CORS headers for allowed origins
-			HttpServletResponse httpResponse = (HttpServletResponse) res;
-			HttpServletRequest httpRequest = ((HttpServletRequest) req);
-			String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
-			if (isPathAllowedForCors(path)) {
-				String origin = httpRequest.getHeader("Origin");
-				if (isOriginAllowed(origin)) {
+			final HttpServletResponse httpResponse = (HttpServletResponse) res;
+			final HttpServletRequest httpRequest = ((HttpServletRequest) req);
+			
+			final String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
+			if (this.isPathAllowedForCors(path)) {
+				final String origin = httpRequest.getHeader("Origin");
+				if (this.isOriginAllowed(origin)) {
 					httpResponse.setHeader("Access-Control-Allow-Origin", origin);
 				}
+				
 				httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
 				httpResponse.setHeader("Access-Control-Max-Age", "3600");
 				httpResponse.setHeader("Access-Control-Allow-Headers", "x-requested-with, accept, authorization, content-type, x-csrf-token, range");
@@ -98,8 +101,10 @@ public class CORSConfig {
 	        }
 		}
 
-		public void init(FilterConfig filterConfig) {}
+		@Override
+		public void init(FilterConfig filterConfig) throws ServletException {}
 
+		@Override
 		public void destroy() {}
 		
 		private boolean isOriginAllowed(String origin) {
@@ -107,7 +112,7 @@ public class CORSConfig {
 				return false;
 			}
 			
-			for (String allowedOrigin : allowedOrigins) {
+			for (String allowedOrigin : this.allowedOrigins) {
 				if (allowedOrigin.equalsIgnoreCase(origin)) {
 					return true;
 				}

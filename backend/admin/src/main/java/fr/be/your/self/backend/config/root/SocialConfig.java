@@ -18,6 +18,9 @@ public class SocialConfig {
 	@Value("${google.client.id}")
 	private String googleClientId;
 	
+	@Value("${facebook.client.id}")
+	private String facebookClientId;
+	
 	@Bean
 	public GoogleIdTokenVerifier googleIdTokenVerifier() {
 		final HttpTransport transport = new NetHttpTransport();

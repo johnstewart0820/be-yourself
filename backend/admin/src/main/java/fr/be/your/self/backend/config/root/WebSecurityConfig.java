@@ -26,19 +26,38 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.header.writers.frameoptions.AllowFromStrategy;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
-import fr.be.your.self.security.jwt.JwtAuthenticationEntryPoint;
-import fr.be.your.self.security.jwt.JwtRequestFilter;
-import fr.be.your.self.security.jwt.JwtToken;
-import fr.be.your.self.security.jwt.JwtUserDetailsService;
+import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.security.oauth2.DefaultAccessDeniedHandler;
+import fr.be.your.self.security.oauth2.DefaultAuthenticationEntryPoint;
+import fr.be.your.self.security.oauth2.DefaultLoginSuccessHandler;
+import fr.be.your.self.security.oauth2.DefaultLogoutSuccessHandler;
+import fr.be.your.self.security.oauth2.DefaultUserDetailsService;
 import fr.be.your.self.util.StringUtils;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	private static final String LOGIN_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGIN;
+	private static final String LOGOUT_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGOUT;
+	private static final String AUTHORIZE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.AUTHORIZE;
+	private static final String ACCESS_DENIED_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACCESS_DENIED;
+	
+	private static final String API_URL_PREFIX = Constants.PATH.API_PREFIX + "/";
+	
+	@Value("${url.webview}")
+    private String defaultRedirectUrl;
 	
 	@Value("${cors.allowed.origins}")
 	private String allowedOrigins;
@@ -48,7 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
     public AllowFromStrategy allowFromStrategy() {
-    	List<String> listAllowedOrgins = Arrays.asList(allowedOrigins.split(","));
+    	List<String> listAllowedOrgins = Arrays.asList(this.allowedOrigins.split(","));
 		return new AllowFromStrategyImpl(listAllowedOrgins);
 	}
 
@@ -59,39 +78,44 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	@Override
+	public UserDetailsService userDetailsService() {
+		return new DefaultUserDetailsService();
+	}
+	
+	@Bean
+	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
 	
-	/*@Bean
+	/********************* URL Configuration ********************/
+	@Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-    	return new LoginSuccessHandler();
-    }*/
+    	return new DefaultLoginSuccessHandler();
+    }
 	
-	/********************* JWT Configuration ********************/
 	@Bean
-	public JwtToken jwtToken() {
-		return new JwtToken(this.secret);
+	public LogoutSuccessHandler logoutSuccessHandler() {
+		return new DefaultLogoutSuccessHandler();
 	}
 	
 	@Bean
-	public UserDetailsService jwtUserDetailsService() {
-		return new JwtUserDetailsService();
+	public AccessDeniedHandler accessDeniedHandler() {
+		return new DefaultAccessDeniedHandler(ACCESS_DENIED_URL);
 	}
 	
 	@Bean
-	public JwtAuthenticationEntryPoint jwtAuthenticationEntryPointBean() throws Exception {
-		return new JwtAuthenticationEntryPoint();
-	}
-	
-	@Bean
-	public JwtRequestFilter jwtRequestFilter() {
-		return new JwtRequestFilter(this.jwtUserDetailsService(), this.jwtToken());
+	public AuthenticationEntryPoint authenticationEntryPoint() throws Exception {
+		return new DefaultAuthenticationEntryPoint(LOGIN_URL, API_URL_PREFIX);
 	}
 	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(this.jwtUserDetailsService()).passwordEncoder(passwordEncoder());
+		// @formatter:off
+		auth
+			.userDetailsService(this.userDetailsService())
+			.passwordEncoder(this.passwordEncoder());
+		// @formatter:on
 	}
 	
 	/********************* Security Configuration **************/
@@ -103,6 +127,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         		"/js/**",
         		"/fonts/**",
         		"/assets/**",
+        		"/error",
         		"/api/image/**",
         		"/api/notoken/**",
         		"/api/service/**",
@@ -111,89 +136,79 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     		);
     }
     
-    /*
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-    	// Note: Role should not start with ROLE_ because it
-    	// will be inserted automatically
-    	
-        // @formatter:off
-    	http
-        	.authorizeRequests().antMatchers("/account/login", "/account/ping").permitAll()
-	        .and()
-	        	.authorizeRequests().anyRequest().hasRole("USER")
-	        .and()
-	        	.exceptionHandling()
-	            	.accessDeniedPage("/account/login?authorization_error=true")
-	            	.authenticationEntryPoint(new LoginAuthenticationEntryPoint("/account/login"))
-	        // XXX: put CSRF protection back into this endpoint
-	        .and()
-	        	.csrf()
-	            	.requireCsrfProtectionMatcher(new AntPathRequestMatcher("/oauth/authorize")).disable()
-	        .logout()
-	            .logoutSuccessUrl("/account/login")
-	            .logoutUrl("/account/logout")
-	            .deleteCookies("JSESSIONID", CookieLocaleResolver.DEFAULT_COOKIE_NAME)
-	            .logoutSuccessHandler(new LogoutSuccessHandler())
-	            .permitAll()
-	        .and()
-	        	.formLogin()
-	        		.usernameParameter("j_username")
-	        		.passwordParameter("j_password")
-	        		.failureUrl("/account/login?authentication_error=true")
-	        		.loginPage("/account/login")
-	        		.loginProcessingUrl("/account/login")
-	        		.defaultSuccessUrl(defaultRedirectUrl)
-	        		//.successHandler(authenticationSuccessHandler())
-	        ;
-        
-        // If no allowed origin, mean only allow from same domain
-        if (!StringUtils.isNullOrSpace(allowedOrigins)) {
-        	http.headers().addHeaderWriter(new XFrameOptionsHeaderWriter(allowFromStrategy()));
-        } else {
-        	http.headers().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN));
-        }
-        // @formatter:on
-    }
-    */
-    
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		// roles admin allow to access /admin/**
-	    // roles user allow to access /user/**
-	    // custom 403 access denied handler
+		// @formatter:off
 		httpSecurity
+			.authorizeRequests()
+				.antMatchers(LOGIN_URL, ACCESS_DENIED_URL, "/oauth/test").permitAll()
+				.antMatchers("/", "/home", "/about", "/error", "/test").permitAll()
+			.and()
+        		.authorizeRequests()
+        			.antMatchers("/admin/**").hasRole("ADMIN")
+        			.antMatchers("/user/**").hasRole("USER")
+        			.anyRequest().hasRole("USER")
+        	.and()
+        		.exceptionHandling()
+            		.accessDeniedHandler(this.accessDeniedHandler())
+            		.authenticationEntryPoint(this.authenticationEntryPoint())
+    		// XXX: put CSRF protection back into this endpoint
+            .and()
+	        	.csrf()
+	            	.requireCsrfProtectionMatcher(new AntPathRequestMatcher(AUTHORIZE_URL)).disable()
+	        .logout()
+	            .logoutSuccessUrl(LOGIN_URL)
+	            .logoutUrl(LOGOUT_URL)
+	            .deleteCookies("JSESSIONID", CookieLocaleResolver.DEFAULT_COOKIE_NAME)
+	            .logoutSuccessHandler(this.logoutSuccessHandler())
+	            .permitAll()
+	        .and()
+		        .formLogin()
+					.loginPage(LOGIN_URL)
+					.defaultSuccessUrl(this.defaultRedirectUrl)
+					.failureUrl(LOGIN_URL + "?authentication_error=true")
+					.permitAll()
+			.and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+			; 
+			/*
 			.csrf().disable()
 				.authorizeRequests()
-					.antMatchers("/", "/authenticate", "/home", "/about", "/greeting", "/test", "/user","/userform").permitAll()
-					.antMatchers("/admin/**").hasAnyRole("ADMIN")
-					//TODO TVA: temporarily disable login//.antMatchers("/user/**").hasAnyRole("USER")
 					.antMatchers("/api/**").authenticated()
-					//.anyRequest().authenticated()
+				.and()
+				.authorizeRequests()
+					.antMatchers("/", "/authenticate", "/home", "/about", "/greeting", "/test").permitAll()
+					.antMatchers("/admin/**").hasAnyRole("ADMIN")
+					.antMatchers("/user/**").hasAnyRole("USER")
+					
+					.anyRequest().authenticated()
 		        .and()
 			        .formLogin()
-						.loginPage("/login")
+						.loginPage(LOGIN_URL)
+						.defaultSuccessUrl("/")
+						.failureUrl(LOGIN_URL + "?authentication_error=true")
 						.permitAll()
 				.and()
 			        .logout()
 						.permitAll()
 				.and()
 		        	.exceptionHandling()
-		        		.authenticationEntryPoint(this.jwtAuthenticationEntryPointBean())
-		        .and()
-		    		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		        		//.authenticationEntryPoint(this.jwtAuthenticationEntryPointBean())
+		        		.accessDeniedHandler(accessDeniedHandler())
+		        //.and()
+				//	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			;
-			
-			//.authorizeRequests()
-			//	.antMatchers("/authenticate", "/user").permitAll()
-			//	.antMatchers("/api/**").authenticated()
-			//	.antMatchers("/**").permitAll()
-			//.and()
-			//	.exceptionHandling().authenticationEntryPoint(this.jwtAuthenticationEntryPointBean())
-			//.and()
-			//	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-		httpSecurity.addFilterBefore(this.jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
+			*/
+		// @formatter:on
+		
+		// If no allowed origin, mean only allow from same domain
+        if (!StringUtils.isNullOrSpace(allowedOrigins)) {
+        	httpSecurity.headers().addHeaderWriter(new XFrameOptionsHeaderWriter(allowFromStrategy()));
+        } else {
+        	httpSecurity.headers().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsMode.SAMEORIGIN));
+        }
+        
+		//httpSecurity.addFilterBefore(this.jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
     
     private class AllowFromStrategyImpl implements AllowFromStrategy {

@@ -12,7 +12,7 @@ import fr.be.your.self.backend.setting.DataSetting;
 
 @Configuration
 @ComponentScan(basePackages = {
-		"fr.be.your.self.backend.exception",
+		"fr.be.your.self.backend.startup",
         "fr.be.your.self.service",
         "fr.be.your.self.util" })
 public class ApplicationConfig {

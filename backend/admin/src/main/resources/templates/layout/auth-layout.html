@@ -26,29 +26,20 @@
 	
 	<!--  CSS -->
 	<link type="text/css" th:href="@{/css/argon.min.css}" rel="stylesheet" />
+
 	<link type="text/css" th:href="@{/css/main.css}" rel="stylesheet" />
 	
-	<!-- JS Core -->
+	<!-- Core -->
 	<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </head>
-<body>
-	<nav th:insert="layout/main-side-nav :: side-nav" 
-		class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light bg-white" id="sidenav-main">
-	</nav>
-
+<body class="bg-default">
 	<div class="main-content">
-		<nav th:insert="layout/main-header :: header" 
-			class="navbar navbar-top navbar-expand-md navbar-dark bg-gradient-primary" id="navbar-main">
-		</nav>
+		<nav th:insert="layout/auth-header :: header" class="navbar navbar-top navbar-horizontal navbar-expand-md navbar-dark"></nav>
 		
-		<div class="pb-7"></div>
-				
-		<div class="container-fluid">
-			<th:block layout:fragment="content"></th:block>		
-			
-			<footer th:insert="layout/main-footer :: footer" class="footer"></footer>
-		</div>
+		<th:block layout:fragment="content"></th:block>
+		
+		<footer th:insert="layout/auth-footer :: footer" class="footer"></footer>
 	</div>
 
 	<script th:src="@{/js/argon.min.js}"></script>
