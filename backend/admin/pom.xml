@@ -46,7 +46,7 @@
 
 		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-security</artifactId> 
 			</dependency> -->
-		
+
 		<!-- UI Thymeleaf -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -81,7 +81,7 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- Social -->
 		<dependency>
 			<groupId>com.google.api-client</groupId>
@@ -112,6 +112,13 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- CSV utils -->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>4.5</version>
 		</dependency>
 	</dependencies>
 

@@ -5,5 +5,7 @@ import fr.be.your.self.model.User;
 public interface UserService extends BaseService<User> {
 	
 	public boolean existsEmail(String email);
-	
+			
+	public void saveOrUpdate(User user);
+
 }

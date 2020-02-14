@@ -34,6 +34,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 				? this.repository.findAll()
 				: this.repository.findAllByEmailOrFullname(text, text);
 	}
+	
+	@Override
+	public Iterable<User> findAll() {
+		return this.repository.findAll();
+	}
 
 	@Override
 	protected Page<User> findPage(String text, Pageable pageable) {
@@ -41,6 +46,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 				? this.repository.findAll(pageable)
 				: this.repository.findAllByEmailOrFullname(text, text, pageable);
 	}
+	
+	 public Page<User> getPaginatedUsers(Pageable pageable) {
+	        return this.repository.findAll(pageable);
+	 }
+	
 
 	@Override
 	@Transactional(readOnly = true)
@@ -51,6 +61,17 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 		
 		return this.repository.countByEmailOrFullname(text, text);
 	}
-
 	
+	
+	@Override
+	public void saveOrUpdate(User user) {
+		this.repository.save(user); //TODO TVA check this do both save and update
+	}
+
+	@Override
+	public <S extends User> Iterable<S> saveAll(Iterable<S> entities) {
+		return this.repository.saveAll(entities);
+	}
+
+
 }

@@ -30,6 +30,9 @@ public class User {
     
     private String socialId;
     
+    private String referralCode;
+
+    
     public User() {
     }
 
@@ -95,4 +98,12 @@ public class User {
     public void setFullname(String fullname) {
         this.fullname = fullname;
     }
+
+	public String getReferralCode() {
+		return referralCode;
+	}
+
+	public void setReferralCode(String referralCode) {
+		this.referralCode = referralCode;
+	}
 }
