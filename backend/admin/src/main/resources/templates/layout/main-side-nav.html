@@ -18,6 +18,7 @@
 		</a>
 		  
 		<!-- User -->
+		<!-- 
 		<ul class="nav align-items-center d-md-none">
 			<li class="nav-item dropdown">
 				<a class="nav-link nav-link-icon" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -67,7 +68,8 @@
 		  		</div>
 			</li>
 	  	</ul>
-
+		-->
+		
 	  	<!-- Collapse -->
 	  	<div class="collapse navbar-collapse" id="sidenav-collapse-main">
 			<!-- Collapse header -->
@@ -106,16 +108,19 @@
 			  			<i class="ni ni-tv-2 text-primary"></i> Home
 					</a>
 		  		</li>
-		  		<li class="nav-item">
-					<a class="nav-link" href="../examples/icons.html">
-			  			<i class="ni ni-planet text-blue"></i> Icons
-					</a>
-		  		</li>
-		  		<li class="nav-item">
-					<a class="nav-link " href="../examples/maps.html">
-			  			<i class="ni ni-pin-3 text-orange"></i> Maps
-					</a>
-		  		</li>
+		  		<th:block sec:authorize="hasAnyRole('ROLE_SAM', 'ROLE_ADM')">
+			  		<li class="nav-item" sec:authorize="hasAnyRole('ROLE_SAM')">
+						<a class="nav-link" th:href="@{/admin-user}">
+				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.admin-user}"></span>
+						</a>
+			  		</li>
+			  		<li class="nav-item">
+						<a class="nav-link " href="../examples/maps.html">
+				  			<i class="ni ni-pin-3 text-orange"></i> <span th:text="#{greeting}"></span>
+						</a>
+			  		</li>
+			  	</th:block>
+			  	
 		  		<li class="nav-item">
 					<a class="nav-link " href="../examples/profile.html">
 			  			<i class="ni ni-single-02 text-yellow"></i> User profile

@@ -22,4 +22,7 @@ public interface BaseService<T> {
 	
 	public boolean delete(Integer id);
 	
+	public boolean activate(Integer id);
+	
+	public boolean deactivate(Integer id);
 }

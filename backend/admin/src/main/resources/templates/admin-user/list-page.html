@@ -3,77 +3,57 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/main-layout.html}">
 <head>
-<title>User management</title>
+	<title th:text="#{title.admin-user}"></title>
 </head>
 <body>
 	<th:block layout:fragment="content">
-		<h1>User page</h1>
-
-		<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
-		<form th:action="@{/oauth/logout}" method="post">
-			<input type="submit" value="Sign Out" />
-		</form>
-
 		<!-- Table -->
 		<div class="row">
 			<div class="col">
 				<div class="card shadow">
+					<!-- 
 					<div class="card-header border-0">
 						<h3 class="mb-0">Card tables</h3>
 					</div>
+					-->
 					<div class="table-responsive">
 						<table class="table align-items-center table-flush">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col">Project</th>
-									<th scope="col">Budget</th>
+									<th scope="col" width="20%">Display Name</th>
+									<th scope="col" width="30%">Email</th>
+									<th scope="col">Role</th>
 									<th scope="col">Status</th>
-									<th scope="col">Users</th>
 									<th scope="col">Completion</th>
 									<th scope="col"></th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<th scope="row">
+								<tr th:each="item : ${result.items}">
+									<th scope="row" nowrap>
 										<div class="media align-items-center">
-											<a href="#" class="avatar rounded-circle mr-3"> <img
-												alt="Image placeholder"
-												src="../assets/img/theme/bootstrap.jpg">
+											<a href="#" class="avatar rounded-circle mr-3">
+												<img th:if="${item.avatar == null || item.avatar == ''}" 
+													th:alt="${item.fullname}" th:src="@{/images/avatar/default.png}">
+												<img th:if="${item.avatar != null && item.avatar != ''}" 
+													th:alt="${item.fullname}" th:src="${baseAvatarURL + '/' + item.avatar}">
 											</a>
 											<div class="media-body">
-												<span class="mb-0 text-sm">Argon Design System</span>
+												<span class="mb-0 text-sm" th:text="${item.fullname}"></span>
 											</div>
 										</div>
 									</th>
-									<td>$2,500 USD</td>
-									<td><span class="badge badge-dot mr-4"> <i
-											class="bg-warning"></i> pending
-									</span></td>
+									<td th:text="${item.email}" nowrap></td>
+									<td th:text="#{'user.type.' + ${item.userType}}" nowrap></td>
 									<td>
-										<div class="avatar-group">
-											<a href="#" class="avatar avatar-sm" data-toggle="tooltip"
-												data-original-title="Ryan Tompson"> <img
-												alt="Image placeholder"
-												src="../assets/img/theme/team-1-800x800.jpg"
-												class="rounded-circle">
-											</a> <a href="#" class="avatar avatar-sm" data-toggle="tooltip"
-												data-original-title="Romina Hadid"> <img
-												alt="Image placeholder"
-												src="../assets/img/theme/team-2-800x800.jpg"
-												class="rounded-circle">
-											</a> <a href="#" class="avatar avatar-sm" data-toggle="tooltip"
-												data-original-title="Alexander Smith"> <img
-												alt="Image placeholder"
-												src="../assets/img/theme/team-3-800x800.jpg"
-												class="rounded-circle">
-											</a> <a href="#" class="avatar avatar-sm" data-toggle="tooltip"
-												data-original-title="Jessica Doe"> <img
-												alt="Image placeholder"
-												src="../assets/img/theme/team-4-800x800.jpg"
-												class="rounded-circle">
-											</a>
-										</div>
+										<span class="badge badge-dot mr-4">
+											<th:block th:switch="${item.userStatus}">
+												<i th:case="0" class="bg-warning"></i>
+												<i th:case="1" class="bg-success"></i>
+												<i th:case="*"></i>
+											</th:block>
+											<th:block th:text="#{'user.status.' + ${item.userStatus}}"></th:block>
+										</span>
 									</td>
 									<td>
 										<div class="d-flex align-items-center">
@@ -88,18 +68,17 @@
 										</div>
 									</td>
 									<td class="text-right">
-										<div class="dropdown">
-											<a class="btn btn-sm btn-icon-only text-light" href="#"
-												role="button" data-toggle="dropdown" aria-haspopup="true"
-												aria-expanded="false"> <i class="fas fa-ellipsis-v"></i>
-											</a>
-											<div
-												class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-												<a class="dropdown-item" href="#">Action</a> <a
-													class="dropdown-item" href="#">Another action</a> <a
-													class="dropdown-item" href="#">Something else here</a>
-											</div>
-										</div>
+										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.userId}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-edit"></i>
+											</span>
+										</a>
+										
+										<a class="btn btn-icon btn-2 btn-danger" th:href="${baseURL + '/delete/' + item.userId}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-times"></i>
+											</span>
+										</a>
 									</td>
 								</tr>
 								<tr>

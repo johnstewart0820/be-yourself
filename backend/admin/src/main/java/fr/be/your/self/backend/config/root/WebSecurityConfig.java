@@ -37,6 +37,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.UserType;
 import fr.be.your.self.security.oauth2.DefaultAccessDeniedHandler;
 import fr.be.your.self.security.oauth2.DefaultAuthenticationEntryPoint;
 import fr.be.your.self.security.oauth2.DefaultLoginSuccessHandler;
@@ -145,9 +146,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/", "/home", "/about", "/error", "/test").permitAll()
 			.and()
         		.authorizeRequests()
-        			.antMatchers("/admin/**").hasRole("ADMIN")
-        			.antMatchers("/user/**").hasRole("USER")
-        			.anyRequest().hasRole("USER")
+        			.antMatchers("/admin/**").hasAnyRole(UserType.SUPER_ADMIN.getValue(), UserType.ADMIN.getValue())
+        			.antMatchers("/user/**").hasAnyRole(UserType.USER.getValue())
+        			.anyRequest().permitAll() // .hasRole("USER")
         	.and()
         		.exceptionHandling()
             		.accessDeniedHandler(this.accessDeniedHandler())

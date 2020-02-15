@@ -1,34 +1,21 @@
 package fr.be.your.self.backend.rest;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.api.client.auth.openidconnect.IdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
-import fr.be.your.self.backend.dto.AuthenticatedUserResponse;
-import fr.be.your.self.backend.dto.TokenRequest;
-import fr.be.your.self.backend.dto.TokenResponse;
 import fr.be.your.self.backend.dto.UserCreateRequest;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.common.AuthenticationStrategy;
 import fr.be.your.self.common.StatusCode;
+import fr.be.your.self.common.UserType;
 import fr.be.your.self.dto.StatusResponse;
 import fr.be.your.self.exception.InvalidException;
 import fr.be.your.self.exception.ValidationException;
@@ -73,9 +60,10 @@ public class AuthController {
 
 		final String password = body.getPassword();
 		final String encodedPassword = this.passwordEncoder.encode(password);
-		final String fullname = body.getFullname();
+		final String firstname = body.getFirstname();
+		final String lastname = body.getLastname();
 		
-		final User domain = new User(email, encodedPassword, fullname);
+		final User domain = new User(email, encodedPassword, UserType.B2C, firstname, lastname);
 		final User savedDomain = this.userService.create(domain);
 		
 		final StatusResponse result = new StatusResponse(true);

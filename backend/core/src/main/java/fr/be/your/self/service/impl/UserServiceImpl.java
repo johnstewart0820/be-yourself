@@ -7,6 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.model.User;
 import fr.be.your.self.repository.UserRepository;
 import fr.be.your.self.service.UserService;
@@ -32,14 +33,14 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	protected Iterable<User> findAll(String text) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll()
-				: this.repository.findAllByEmailOrFullname(text, text);
+				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text);
 	}
 
 	@Override
 	protected Page<User> findPage(String text, Pageable pageable) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll(pageable)
-				: this.repository.findAllByEmailOrFullname(text, text, pageable);
+				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text, pageable);
 	}
 
 	@Override
@@ -49,8 +50,16 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 			return this.repository.count();
 		}
 		
-		return this.repository.countByEmailOrFullname(text, text);
+		return this.repository.countByEmailOrFirstNameOrLastName(text, text, text);
 	}
 
-	
+	@Override
+	public boolean activate(Integer id) {
+		return this.repository.updateStatus(id, UserStatus.ACTIVE.getValue()) > 0;
+	}
+
+	@Override
+	public boolean deactivate(Integer id) {
+		return this.repository.updateStatus(id, UserStatus.DENIED.getValue()) > 0;
+	}
 }
