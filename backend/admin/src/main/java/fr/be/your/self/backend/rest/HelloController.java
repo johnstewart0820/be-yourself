@@ -31,7 +31,7 @@ public class HelloController {
 				final AuthenticationUserDetails userDetails = (AuthenticationUserDetails) principal;
 				
 				result.put("userId", userDetails.getUserId());
-				result.put("fullName", userDetails.getFullname());
+				result.put("fullName", userDetails.getFullName());
 				result.put("avatar", userDetails.getAvatar());
 			}
 			

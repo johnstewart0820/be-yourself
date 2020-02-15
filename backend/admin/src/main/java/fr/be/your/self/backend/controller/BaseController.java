@@ -42,11 +42,11 @@ public abstract class BaseController {
 			
 			if (principal instanceof AuthenticationUserDetails) {
 				final AuthenticationUserDetails userDetails = (AuthenticationUserDetails) principal;
-				final String fullname = userDetails.getFullname();
+				final String fullName = userDetails.getFullName();
 				
 				displayName = oauth.getName();
-				if (!StringUtils.isNullOrSpace(fullname)) {
-					displayName = fullname;
+				if (!StringUtils.isNullOrSpace(fullName)) {
+					displayName = fullName;
 				}
 				
 				userId = userDetails.getUserId();

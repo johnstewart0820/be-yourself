@@ -39,13 +39,13 @@
 											<a href="#" class="avatar rounded-circle mr-3">
 												<!-- 
 												<img th:if="${item.avatar == null || item.avatar == ''}" 
-													th:alt="${item.fullname}" th:src="@{/images/avatar/default.png}">
+													th:alt="${item.fullName}" th:src="@{/images/avatar/default.png}">
 												<img th:if="${item.avatar != null && item.avatar != ''}" 
-													th:alt="${item.fullname}" th:src="${baseAvatarURL + '/' + item.avatar}">
+													th:alt="${item.fullName}" th:src="${baseAvatarURL + '/' + item.avatar}">
 												-->
 											</a>
 											<div class="media-body">
-												<span class="mb-0 text-sm" th:text="${item.fullname}"></span>
+												<span class="mb-0 text-sm" th:text="${item.fullName}"></span>
 											</div>
 										</div>
 									</th>
@@ -53,22 +53,22 @@
 									<td th:text="#{'user.type.' + ${item.userType}}" nowrap></td>
 									<td>
 										<span class="badge badge-dot mr-4">
-											<th:block th:switch="${item.userStatus}">
+											<th:block th:switch="${item.status}">
 												<i th:case="0" class="bg-warning"></i>
 												<i th:case="1" class="bg-success"></i>
 												<i th:case="*"></i>
 											</th:block>
-											<th:block th:text="#{'user.status.' + ${item.userStatus}}"></th:block>
+											<th:block th:text="#{'user.status.' + ${item.status}}"></th:block>
 										</span>
 									</td>
 									<td class="text-right">
-										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.userId}">
+										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}">
 											<span class="btn-inner--icon">
 												<i class="fas fa-edit"></i>
 											</span>
 										</a>
 										
-										<a class="btn btn-icon btn-2 btn-danger" th:href="${baseURL + '/delete/' + item.userId}">
+										<a class="btn btn-icon btn-2 btn-danger" th:href="${baseURL + '/delete/' + item.id}">
 											<span class="btn-inner--icon">
 												<i class="fas fa-times"></i>
 											</span>

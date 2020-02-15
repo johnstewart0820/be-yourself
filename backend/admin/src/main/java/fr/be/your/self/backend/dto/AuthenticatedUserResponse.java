@@ -9,7 +9,7 @@ public class AuthenticatedUserResponse implements Serializable {
 	private static final long serialVersionUID = -1782443355025075836L;
 
 	private String email;
-	private String fullname;
+	private String fullName;
 	private String avatar;
 	private String role;
 
@@ -21,12 +21,12 @@ public class AuthenticatedUserResponse implements Serializable {
 		this.email = email;
 	}
 
-	public String getFullname() {
-		return fullname;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setFullname(String fullname) {
-		this.fullname = fullname;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
 	public String getAvatar() {

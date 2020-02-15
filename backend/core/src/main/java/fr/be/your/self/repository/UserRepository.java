@@ -29,6 +29,6 @@ public interface UserRepository extends PagingAndSortingRepository<User,Integer>
     Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable);
     
     @Modifying
-    @Query("UPDATE User SET userStatus = ?2 WHERE userId = ?1")
+    @Query("UPDATE User SET status = ?2 WHERE id = ?1")
     int updateStatus(Integer id, Integer status);
 }
