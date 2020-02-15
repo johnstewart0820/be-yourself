@@ -16,8 +16,13 @@ import org.springframework.web.servlet.DispatcherServlet;
 import fr.be.your.self.backend.config.rest.RestConfig;
 import fr.be.your.self.backend.config.web.WebMvcConfig;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserType;
+import fr.be.your.self.model.Functionality;
+import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.User;
+import fr.be.your.self.repository.FunctionalityRepository;
+import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.repository.UserRepository;
 
 @SpringBootApplication
@@ -35,6 +40,12 @@ public class AdminApplication implements CommandLineRunner {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private FunctionalityRepository functionalityRepository;
+	
+	@Autowired
+	private PermissionRepository permissionRepository;
+	
 	@Override
 	public void run(String... args) throws Exception {
 		final String email = "admin@gmail.com";
@@ -44,7 +55,23 @@ public class AdminApplication implements CommandLineRunner {
 				String password = this.passwordEncoder.encode("123456");
 				
 				User adminUser = new User(email, password, UserType.SUPER_ADMIN, "Administrator", "");
-				userRepository.save(adminUser);
+				User savedUser = userRepository.save(adminUser);
+				
+				Functionality adminUserFunc = new Functionality();
+				adminUserFunc.setPath("/admin-user");
+				adminUserFunc.setName("Admin User");
+				Functionality savedAdminUserFunc = this.functionalityRepository.save(adminUserFunc);
+				
+				Functionality tempFunc = new Functionality();
+				tempFunc.setPath("/temp");
+				tempFunc.setName("Temp function");
+				Functionality savedTempFunc = this.functionalityRepository.save(tempFunc);
+				
+				Permission adminUserPermission = new Permission();
+				adminUserPermission.setUserId(savedUser.getUserId());
+				adminUserPermission.setFunctionality(savedAdminUserFunc);
+				adminUserPermission.setPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(adminUserPermission);
 			}
 		} catch (Exception e) {
 			//e.printStackTrace();

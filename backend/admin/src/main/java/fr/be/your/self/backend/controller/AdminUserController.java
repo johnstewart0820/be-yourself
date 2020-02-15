@@ -20,7 +20,7 @@ import fr.be.your.self.service.UserService;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + AdminUserController.NAME)
-public class AdminUserController extends BaseController<User> {
+public class AdminUserController extends BaseResourceController<User> {
 	
 	public static final String NAME = "admin-user";
 	
