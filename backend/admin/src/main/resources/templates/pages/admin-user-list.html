@@ -37,10 +37,12 @@
 									<th scope="row" nowrap>
 										<div class="media align-items-center">
 											<a href="#" class="avatar rounded-circle mr-3">
+												<!-- 
 												<img th:if="${item.avatar == null || item.avatar == ''}" 
 													th:alt="${item.fullname}" th:src="@{/images/avatar/default.png}">
 												<img th:if="${item.avatar != null && item.avatar != ''}" 
 													th:alt="${item.fullname}" th:src="${baseAvatarURL + '/' + item.avatar}">
+												-->
 											</a>
 											<div class="media-body">
 												<span class="mb-0 text-sm" th:text="${item.fullname}"></span>
