@@ -37,7 +37,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
 				user.getId(), user.getEmail(), 
 				user.getPassword(), roles);
 		
-		authenticationUser.setFullname(user.getFullname());
+		authenticationUser.setFullname(user.getFullName());
 		
 		// TODO
 		authenticationUser.setAvatar(null);

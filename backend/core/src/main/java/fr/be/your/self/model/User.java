@@ -4,9 +4,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import fr.be.your.self.common.ConnectType;
+import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 
 @Entity
@@ -16,82 +19,154 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     
-    /**
-     * {@link UserType#getValue() }
-     **/
-    private int type;
+    private int status; 
     
-    private String email;
+
+    private String firstName;
+    
+    private String lastName;
+    
+    private String civility;
+        
+
+	private String email;
     
     @JsonIgnore
     private String password;
     
-    private String fullname;
+    private String socialLogin;
     
-    private String socialId;
+    private int connectType;
     
     private String referralCode;
 
+    private String userType;
     
     public User() {
     }
+    
+    public User(String email, String encodedPassword, String userType, String firstName, String lastName) {
+		this.email = email;
+		this.password = encodedPassword;
+		this.userType = userType;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
 
-    public User(String email, String password, String fullname) {
-    	//this.type = SocialType.INTERNAL.getValue();
-        this.email = email;
-        this.password = password;
-        this.fullname = fullname;
+    
+    public String getFullName() {
+    	return firstName + " " + lastName;
     }
     
-    public User(UserType type, String socialId, String email, String password, String fullname) {
-    	//this.type = type.getValue();
-        this.email = email;
-        this.password = password;
-        this.fullname = fullname;
-        this.socialId = socialId;
-    }
+    
     
     public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getType() {
-		return type;
+		return id;
 	}
 
-	public void setType(int type) {
-		this.type = type;
+
+	public void setId(int id) {
+		this.id = id;
 	}
+
+
+	public int getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+
+	public String getLastName() {
+		return lastName;
+	}
+
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+
+	public String getCivility() {
+		return civility;
+	}
+
+
+	public void setCivility(String civility) {
+		this.civility = civility;
+	}
+
 
 	public String getEmail() {
 		return email;
 	}
 
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
 
 	public String getPassword() {
 		return password;
 	}
 
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
-    }
+
+	public String getSocialLogin() {
+		return socialLogin;
+	}
+
+
+	public void setSocialId(String socialLogin) {
+		this.socialLogin = socialLogin;
+	}
+
+
+	public int getConnectType() {
+		return connectType;
+	}
+
+
+	public void setConnectType(int connectType) {
+		this.connectType = connectType;
+	}
+
 
 	public String getReferralCode() {
 		return referralCode;
 	}
 
+
 	public void setReferralCode(String referralCode) {
 		this.referralCode = referralCode;
 	}
+
+
+	public String getUserType() {
+		return userType;
+	}
+
+
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+
 }

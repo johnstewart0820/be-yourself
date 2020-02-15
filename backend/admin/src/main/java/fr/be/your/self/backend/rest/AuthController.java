@@ -63,7 +63,7 @@ public class AuthController {
 		final String firstname = body.getFirstname();
 		final String lastname = body.getLastname();
 		
-		final User domain = new User(email, encodedPassword, UserType.B2C, firstname, lastname);
+		final User domain = new User(email, encodedPassword, UserType.B2C.getValue(), firstname, lastname);
 		final User savedDomain = this.userService.create(domain);
 		
 		final StatusResponse result = new StatusResponse(true);

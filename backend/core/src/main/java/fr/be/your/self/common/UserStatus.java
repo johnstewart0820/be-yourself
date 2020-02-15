@@ -3,7 +3,7 @@ package fr.be.your.self.common;
 public enum UserStatus {
 	DRAFT(0),
 	ACTIVE(1),
-	DENIED(2),
+	INACTIVE(2),
 	UNKNOWN(-1);
 	
 	private final int value;

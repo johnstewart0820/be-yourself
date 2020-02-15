@@ -80,6 +80,6 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
 	@Override
 	public boolean deactivate(Integer id) {
-		return this.repository.updateStatus(id, UserStatus.DENIED.getValue()) > 0;
+		return this.repository.updateStatus(id, UserStatus.INACTIVE.getValue()) > 0;
 	}
 }
