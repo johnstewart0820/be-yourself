@@ -49,12 +49,12 @@ public class UserController {
 	// 1. @ModelAttribute bind form value
 	// 2. @Validated form validator
 	// 3. RedirectAttributes for flash value
-	@RequestMapping(value = "/users/save", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/save", method = RequestMethod.POST)
 	public String saveOrUpdateUser(@ModelAttribute @Validated User user, BindingResult result, Model model,
 			final RedirectAttributes redirectAttributes) {
 
 		if (result.hasErrors()) {
-			return "users/userform";
+			return "user/userform";
 		} else {
 			// Add message to flash scope. TODO TVA: check if we need to keep this
 			redirectAttributes.addFlashAttribute("css", "success");
@@ -66,37 +66,37 @@ public class UserController {
 
 			userService.saveOrUpdate(user);
 
-			return "redirect:/users/list/page/1"; // back to list of users
+			return "redirect:/user/list/page/1"; // back to list of users
 		}
 
 	}
 
 	// show add user form
-	@RequestMapping(value = "/users/add")
+	@RequestMapping(value = "/user/add")
 	public String showAddUserForm(Model model) {
 		model.addAttribute("user", new User());
-		return "users/userform";
+		return "user/userform";
 	}
 
 	// show update form
-	@RequestMapping(value = "/users/{id}/update", method = RequestMethod.GET)
+	@RequestMapping(value = "/user/{id}/update", method = RequestMethod.GET)
 	public String showUpdateUserForm(@PathVariable("id") int id, Model model) {
 		User user = userService.getById(id);
 		model.addAttribute("user", user);
 
-		return "users/userform";
+		return "user/userform";
 	}
 
 	// delete user
-	@RequestMapping(value = "/users/{id}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/user/{id}/delete", method = RequestMethod.GET)
 	public String deleteUser(@PathVariable("id") int id, Model model) {
 		userService.delete(id);
 
-		return "redirect:/users/list/page/1"; // back to list of users
+		return "redirect:/user/list/page/1"; // back to list of users
 	}
 
 	
-	@RequestMapping(value = "/users/list/page/{page}")
+	@RequestMapping(value = "/user/list/page/{page}")
 	public String listUserPageByPage(@PathVariable("page") int page, Model model) {
 		PageRequest pageable = PageRequest.of(page - 1, 2); //TODO TVA check this
 		Page<User> userPage = userService.getPaginatedUsers(pageable);
@@ -108,10 +108,10 @@ public class UserController {
 		}
 		model.addAttribute("activeUserList", true);
 		model.addAttribute("users", userPage.getContent());
-		return "users/userlist";
+		return "user/userlist";
 	}
 	
-	@GetMapping("/users/exportcsv")
+	@GetMapping("/user/exportcsv")
     public void exportCSV(HttpServletResponse response) throws Exception {
 
         //set file name and content type
@@ -136,7 +136,7 @@ public class UserController {
     }
 	
 	
-	@RequestMapping(value = "/users/importcsv",method= RequestMethod.POST)
+	@RequestMapping(value = "/user/importcsv",method= RequestMethod.POST)
     public String fileUpload (@RequestParam("file") MultipartFile file, 
                               RedirectAttributes redirectAttributes) throws IOException
     {
@@ -161,7 +161,7 @@ public class UserController {
 	    	       .build();
 		List<User> users = csvToBean.parse();
 	      
-		System.out.println(users);
+		System.out.println(users); //TODO TVA delete this line
 		
 		userService.saveAll(users);
 
@@ -170,14 +170,14 @@ public class UserController {
                 + " and added " + users.size() + " users");
 
 
-        return "/users/upload_status";
+        return "/user/upload_status";
     }
 	
 	// show upload user form
-	@RequestMapping(value = "/users/uploadform")
+	@RequestMapping(value = "/user/uploadform")
 	public String showUploadUserForm(Model model) {
 		model.addAttribute("user", new User());
-		return "users/upload_form";
+		return "user/upload_form";
 	}
 
 	

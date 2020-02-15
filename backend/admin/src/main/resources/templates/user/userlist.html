@@ -8,9 +8,9 @@
 <body>
 	<div layout:fragment="content">
 		<div>
-			<a href="/users/add" class="btn btn-sm btn-primary">+ Ajouter</a>
-			<a href="/users/exportcsv" class="btn btn-sm btn-primary">Export CSV</a>
-			<a href="/users/uploadform" class="btn btn-sm btn-primary">Import CSV</a>
+			<a href="/user/add" class="btn btn-sm btn-primary">+ Add User</a>
+			<a href="/user/exportcsv" class="btn btn-sm btn-primary">Export CSV</a>
+			<a href="/user/uploadform" class="btn btn-sm btn-primary">Import CSV</a>
 		</div>
 		<!-- Table -->
 		<div class="row">
@@ -36,10 +36,8 @@
 									<td><span th:text="${user.id}"> ID </span></td>
 									<td><span th:text="${user.email}"> Email </span></td>
 									<td><span th:text="${user.fullName}"> Fullname </span></td>
-									<td>Status
-									</th>
-									<td>Role
-									</th>
+									<td>Status</td>
+									<td>Role</td>
 									<td class="text-right">
 										<div class="dropdown">
 											<a class="btn btn-sm btn-icon-only text-light" href="#"
@@ -49,9 +47,9 @@
 											<div
 												class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
 												<a class="dropdown-item"
-													th:href="@{/users/{id}/update(id=${user.id})}">Update</a> <a
+													th:href="@{/user/{id}/update(id=${user.id})}">Update</a> <a
 													class="dropdown-item"
-													th:href="@{/users/{id}/delete(id=${user.id})}">Delete</a> <a
+													th:href="@{/user/{id}/delete(id=${user.id})}">Delete</a> <a
 													class="dropdown-item" href="#">Something else here</a>
 											</div>
 										</div>
@@ -60,7 +58,7 @@
 							</tbody>
 						</table>
 					</div>
-					<!-- Begin card-footer -->
+					<!-- Begin paging -->
 					<div class="card-footer py-4">
 							<nav aria-label="...">
 								<ul class="pagination justify-content-end mb-0">
@@ -71,7 +69,7 @@
 
 									<li class="page-item" th:each="pageNumber : ${pageNumbers}">
 										<a class="page-link"
-										th:href="@{|/users/list/page/${pageNumber}|}"
+										th:href="@{|/user/list/page/${pageNumber}|}"
 										th:text=${pageNumber}>1</a>
 									</li>
 
@@ -81,9 +79,7 @@
 								</ul>
 							</nav>
 					</div>
-
-
-					<!-- End card-footer -->
+					<!-- End paging -->
 				</div>
 			</div>
 		</div>
