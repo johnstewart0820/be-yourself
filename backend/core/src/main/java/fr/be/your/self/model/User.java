@@ -20,7 +20,7 @@ public class User {
 
 	private String lastName;
 
-	private String civility;
+	private String title;
 
 	private String email;
 
@@ -82,12 +82,12 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public String getCivility() {
-		return civility;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setCivility(String civility) {
-		this.civility = civility;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getEmail() {

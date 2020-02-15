@@ -3,6 +3,7 @@ package fr.be.your.self.backend.controller;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -75,6 +76,8 @@ public class UserController {
 	@RequestMapping(value = "/user/add")
 	public String showAddUserForm(Model model) {
 		model.addAttribute("user", new User());
+		model.addAttribute("isUpdating", false);
+
 		return "user/userform";
 	}
 
@@ -83,7 +86,7 @@ public class UserController {
 	public String showUpdateUserForm(@PathVariable("id") int id, Model model) {
 		User user = userService.getById(id);
 		model.addAttribute("user", user);
-
+		model.addAttribute("isUpdating", true);
 		return "user/userform";
 	}
 
@@ -160,8 +163,8 @@ public class UserController {
 	    	       .withMappingStrategy(strategy)
 	    	       .build();
 		List<User> users = csvToBean.parse();
-	      
-		System.out.println(users); //TODO TVA delete this line
+
+	    System.out.println(users); //TODO TVA delete this line
 		
 		userService.saveAll(users);
 
