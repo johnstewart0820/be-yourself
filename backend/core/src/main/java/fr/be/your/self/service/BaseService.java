@@ -28,5 +28,7 @@ public interface BaseService<T> {
     
 	public <S extends T> Iterable<S> saveAll(Iterable<S> entities);
 
+	public boolean activate(Integer id);
 	
+	public boolean deactivate(Integer id);
 }

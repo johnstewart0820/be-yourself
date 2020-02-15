@@ -2,6 +2,8 @@ package fr.be.your.self.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,15 +12,23 @@ import fr.be.your.self.model.User;
 @Repository
 public interface UserRepository extends PagingAndSortingRepository<User,Integer> {
     
+	static String getTableName() {
+		return "";
+	}
+	
 	Boolean existsByEmail(String email);
     
     User findByEmail(String email);
     
-    User findBySocialId(String socialId);
+    User findBySocialLogin(String socialLogin);
     
-    long countByEmailOrFullname(String email, String fullname);
+    long countByEmailOrFirstNameOrLastName(String email, String firstName, String lastName);
     
-    Iterable<User> findAllByEmailOrFullname(String email, String fullname);
+    Iterable<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName);
     
-    Page<User> findAllByEmailOrFullname(String email, String fullname, Pageable pageable);
+    Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable);
+    
+    @Modifying
+    @Query("UPDATE User SET userStatus = ?2 WHERE userId = ?1")
+    int updateStatus(Integer id, Integer status);
 }

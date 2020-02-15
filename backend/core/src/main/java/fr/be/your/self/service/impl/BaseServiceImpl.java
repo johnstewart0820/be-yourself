@@ -81,4 +81,14 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 		this.getRepository().deleteById(id);
 		return true;
 	}
+
+	@Override
+	public boolean activate(Integer id) {
+		return true;
+	}
+
+	@Override
+	public boolean deactivate(Integer id) {
+		return false;
+	}
 }

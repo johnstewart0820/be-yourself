@@ -106,11 +106,11 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
 				.authorizeRequests()
 					// Revoke token endpoint
 					.regexMatchers(HttpMethod.DELETE, "/oauth/users/([^/].*?)/tokens/.*")
-						.access("#oauth2.isUser() and hasRole('ROLE_USER')")
+						.access("#oauth2.isUser() and hasRole('ROLE_USR')")
 						
 					// Get user's info endpoint
 					.regexMatchers(HttpMethod.GET, "/oauth/userinfo")
-						.access("#oauth2.isUser() and hasRole('ROLE_USER')")
+						.access("#oauth2.isUser() and hasRole('ROLE_USR')")
 						
 					// List token for a user
 					//.regexMatchers(HttpMethod.GET, "/oauth/clients/([^/].*?)/users/.*")
@@ -122,18 +122,18 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
 					
 					// Endpoints for role admin
 					.regexMatchers(HttpMethod.GET, "/api/admin/.*")
-						.access("#oauth2.isUser() and hasRole('ROLE_AD')")
+						.access("#oauth2.isUser() and hasRole('ROLE_ADM')")
 					
 					.regexMatchers(HttpMethod.GET, "/api/test/.*")
-						.access("#oauth2.isUser() and hasRole('ROLE_AD')")
+						.access("#oauth2.isUser() and hasRole('ROLE_ADM')")
 					
 					// Endpoints for all user
 					.regexMatchers(HttpMethod.GET, "/api/service/.*")
-						.access("#oauth2.isUser() and hasRole('ROLE_USER')")
+						.access("#oauth2.isUser() and hasRole('ROLE_USR')")
 
 					// All other endpoint
 					.regexMatchers("/.*")
-						.access("#oauth2.isUser() and hasRole('ROLE_USER')")
+						.access("#oauth2.isUser() and hasRole('ROLE_USR')")
 			.and()
 				.addFilterAfter(this.csrfFilter(), FilterSecurityInterceptor.class)
 				.addFilterAfter(new CsrfGrantingFilter(), CsrfFilter.class)

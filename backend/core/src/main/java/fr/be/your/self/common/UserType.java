@@ -1,34 +1,39 @@
 package fr.be.your.self.common;
 
 public enum UserType {
-	INTERNAL(0),
-	GOOGLE(1),
-	FACEBOOK(2),
-	UNKNOWN(-1);
+	SUPER_ADMIN("SAM"),
+	ADMIN("ADM"),
+	B2B("B2B"),
+	B2C("B2C"),
+	PROFESSOR("PRO"),
+	USER("USR");
 	
-	private final int value;
+	private final String value;
 	
-	UserType(int value) {
+	UserType(String value) {
 		this.value = value;
 	}
 
-	public int getValue() {
+	public String getValue() {
 		return value;
 	}
 	
 	public boolean isValid() {
-		return this.value != UNKNOWN.value;
+		return this.value != USER.value;
 	}
 	
-	public static final UserType parse(int value) {
-		final UserType[] values = UserType.values();
+	public static final UserType parse(String value) {
+		if (value == null || value.isEmpty()) {
+			return USER;
+		}
 		
+		final UserType[] values = UserType.values();
 		for (int i = 0; i < values.length; i++) {
-			if (values[i].value == value) {
+			if (value.equalsIgnoreCase(values[i].value)) {
 				return values[i];
 			}
 		}
 		
-		return UNKNOWN;
+		return USER;
 	}
 }

@@ -16,6 +16,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import fr.be.your.self.backend.config.rest.RestConfig;
 import fr.be.your.self.backend.config.web.WebMvcConfig;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.UserType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.repository.UserRepository;
 
@@ -42,7 +43,7 @@ public class AdminApplication implements CommandLineRunner {
 			if (!userRepository.existsByEmail(email)) {
 				String password = this.passwordEncoder.encode("123456");
 				
-				User adminUser = new User(email, password, "Administrator");
+				User adminUser = new User(email, password, UserType.SUPER_ADMIN, "Administrator", "");
 				userRepository.save(adminUser);
 			}
 		} catch (Exception e) {
@@ -68,7 +69,7 @@ public class AdminApplication implements CommandLineRunner {
 		apiServletRegistration.addUrlMappings(API_URL_PATTERN);
         apiServletRegistration.setLoadOnStartup(1);
         apiServletRegistration.setAsyncSupported(true);
-        
+
         return apiServletRegistration;
 	}
 	

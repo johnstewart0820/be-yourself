@@ -2,8 +2,15 @@ package fr.be.your.self.backend.setting;
 
 public final class Constants {
 	
+	public static interface FOLDER {
+		public static interface MEDIA {
+			public static final String AVATAR = "/avatar";
+		}
+	}
+	
 	public static interface PATH {
 		public static final String API_PREFIX = "/api";
+		public static final String WEB_ADMIN_PREFIX = "";
 		
 		/** Never change the value when using OAuth2 */
 		public static final String AUTHENTICATION_PREFIX = "/oauth";
@@ -21,6 +28,15 @@ public final class Constants {
 			
 			public static final String REGISTER = "/register";
 			public static final String VERIFY_TOKEN_GOOGLE = "/google/verify-token";
+		}
+		
+		public static interface WEB_ADMIN {
+			public static final String MEDIA = "/media";
+			//public static final String ADMIN_USER = "/admin-user";
+			
+			public static interface MEDIA_TYPE {
+				public static final String AVATAR = "/avatar";
+			}
 		}
 	}
 }

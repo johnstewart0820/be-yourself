@@ -11,7 +11,7 @@ import fr.be.your.self.common.UserType;
 
 @Entity
 public class User {
-	
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -37,14 +37,14 @@ public class User {
     }
 
     public User(String email, String password, String fullname) {
-    	this.type = UserType.INTERNAL.getValue();
+    	//this.type = SocialType.INTERNAL.getValue();
         this.email = email;
         this.password = password;
         this.fullname = fullname;
     }
     
     public User(UserType type, String socialId, String email, String password, String fullname) {
-    	this.type = type.getValue();
+    	//this.type = type.getValue();
         this.email = email;
         this.password = password;
         this.fullname = fullname;
@@ -76,24 +76,12 @@ public class User {
 	}
 
 	public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getSocialId() {
-		return socialId;
+		return password;
 	}
 
-	public void setSocialId(String socialId) {
-		this.socialId = socialId;
+	public void setPassword(String password) {
+		this.password = password;
 	}
-	
-    public String getFullname() {
-        return fullname;
-    }
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
