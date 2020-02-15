@@ -32,7 +32,7 @@ public final class Constants {
 		
 		public static interface WEB_ADMIN {
 			public static final String MEDIA = "/media";
-			public static final String ADMIN_USER = "/admin-user";
+			//public static final String ADMIN_USER = "/admin-user";
 			
 			public static interface MEDIA_TYPE {
 				public static final String AVATAR = "/avatar";

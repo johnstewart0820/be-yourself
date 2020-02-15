@@ -1,6 +1,9 @@
 package fr.be.your.self.backend.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import fr.be.your.self.backend.setting.Constants;
@@ -37,12 +41,20 @@ public abstract class BaseController<T> {
 	
 	protected abstract BaseService<T> getService();
 	
-	protected abstract String getBaseURL();
+	protected abstract String getName();
 	
 	protected abstract String getDefaultPageTitle();
 	
+	protected abstract T newDomain();
+	
+	protected void loadDetailForm(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Model model, Integer id) {
+	}
+	
 	@ModelAttribute
-	public void initAttribute(HttpSession session, HttpServletRequest request, Model model) {
+	public void initAttribute(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Model model) {
+		
 		model.addAttribute("baseAvatarURL", BASE_AVATAR_URL);
 		model.addAttribute("baseURL", this.getBaseURL());
 		model.addAttribute("pageTitle", this.getDefaultPageTitle());
@@ -76,7 +88,8 @@ public abstract class BaseController<T> {
 	}
 	
 	@GetMapping(value = { "", "/search" })
-    public String searchPage(HttpSession session, HttpServletRequest request, Model model,
+    public String listPage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model,
     		@RequestParam(name = "q", required = false) String search,
     		@RequestParam(name = "sort", required = false) String sort,
     		@RequestParam(name = "page", required = false) Integer page,
@@ -89,9 +102,100 @@ public abstract class BaseController<T> {
 			throw new BusinessException(StatusCode.PROCESSING_ERROR);
 		}
 		
+		// Save session
+		session.setAttribute(this.getSearchSessionKey(), search);
+		session.setAttribute(this.getSortSessionKey(), sort);
+		session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
+		session.setAttribute(this.getPageSizeSessionKey(), pageable.getPageSize());
+		
+		// Store properties
+		model.addAttribute("search", search == null ? "" : search);
+		model.addAttribute("sort", search == null ? "" : search);
+		model.addAttribute("page", pageable.getPageNumber() + 1);
+		model.addAttribute("size", pageable.getPageSize());
+		
+		// Store result
 		model.addAttribute("result", result);
-        return "admin-user/list-page";
+		
+        return "pages/" + this.getName() + "-list";
     }
+	
+	@GetMapping(value = { "/page" })
+    public String changePage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model,
+    		@RequestParam(name = "page", required = false) Integer page) {
+		
+		final String search = (String) session.getAttribute(this.getSearchSessionKey());
+		final String sort = (String) session.getAttribute(this.getSortSessionKey());
+		final Integer size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
+		
+		if (page == null) {
+			page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
+		}
+		
+		final PageRequest pageable = this.getPageRequest(page, size);
+		final PageableResponse<T> result = this.getService().pageableSearch(search, pageable);
+		if (result == null) {
+			throw new BusinessException(StatusCode.PROCESSING_ERROR);
+		}
+		
+		// Save session
+		session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
+		
+		// Store properties
+		model.addAttribute("page", pageable.getPageNumber() + 1);
+		
+		// Store result
+		model.addAttribute("result", result);
+		
+        return "pages/" + this.getName() + "-list";
+	}
+	
+	@GetMapping(value = { "/addnew" })
+    public String addNewPage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model) {
+		T result = this.newDomain();
+		
+		if (result == null) {
+			try {
+				response.sendRedirect(this.getBaseURL() + "/page");
+			} catch (IOException e) {}
+			
+			return null;
+		}
+		
+		this.loadDetailForm(session, request, response, model, null);
+		
+		// Store result
+		model.addAttribute("action", "create");
+		model.addAttribute("domain", result);
+		
+		return "pages/" + this.getName() + "-form";
+	}
+	
+	@GetMapping(value = { "/edit/{id}" })
+    public String editPage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model,
+    		@PathVariable(name = "id", required = true) Integer id) {
+		
+		T result = this.getService().getById(id);
+		
+		if (result == null) {
+			try {
+				response.sendRedirect(this.getBaseURL() + "/page");
+			} catch (IOException e) {}
+			
+			return null;
+		}
+		
+		this.loadDetailForm(session, request, response, model, id);
+		
+		// Store result
+		model.addAttribute("action", "update/" + id);
+		model.addAttribute("domain", result);
+		
+		return "pages/" + this.getName() + "-form";
+	}
 	
 	/*
 	public final User getCurrentUser(HttpSession session, Model model) {
@@ -115,6 +219,26 @@ public abstract class BaseController<T> {
 		return null;
 	}
 	*/
+	
+	protected final String getBaseURL() {
+		return Constants.PATH.WEB_ADMIN_PREFIX + "/" + this.getName();
+	}
+	
+	protected final String getSearchSessionKey() {
+		return this.getName() + "_SEARCH";
+	}
+	
+	protected final String getSortSessionKey() {
+		return this.getName() + "_SORT";
+	}
+	
+	protected final String getPageIndexSessionKey() {
+		return this.getName() + "_PAGE_INDEX";
+	}
+	
+	protected final String getPageSizeSessionKey() {
+		return this.getName() + "_PASE_SIZE";
+	}
 	
 	protected final PageRequest getPageRequest(Integer page, Integer size) {
         if (page == null || page < 1) {
