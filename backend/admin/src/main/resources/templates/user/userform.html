@@ -4,6 +4,27 @@
 	layout:decorate="~{layout/main-layout.html}">
 <head>
 <title>Home</title>
+<script>
+	function selectLoginType() {
+		var selectedLoginType = $("select#loginType").children("option:selected").val();
+		if (selectedLoginType == 0) {
+			$("#password_div").show();			
+			$("#reset_pwd_email_div").show();
+		} else {
+			$("#password").val(null);
+			$("#password_div").hide();
+			$("#reset_pwd_email_div").hide();
+		}
+	}
+	
+	$(document).ready(function() {
+		selectLoginType();
+		$("select#loginType").change(function() {
+			selectLoginType();
+		});
+
+	});
+</script>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -11,17 +32,18 @@
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-lg-5 col-md-7">
+				<!-- div class="col-lg-7 col-md-8"-->
 					<div class="card bg-secondary shadow border-0">
 						<div class="card-body px-lg-5 py-lg-5">
 							<div>
 								<div class="text-center">
-									<span th:if="${isUpdating}"><b>Update User</b></span> 
-									<span th:unless="${isUpdating}"><b>Add User</b></span>
+									<span th:if="${isUpdating}"><b>Update User</b></span> <span
+										th:unless="${isUpdating}"><b>Add User</b></span>
 								</div>
 							</div>
 							<form th:action="@{/user/save}" th:object="${user}" method="post">
 								<input type="hidden" th:field="*{id}" />
-							
+
 								<div class="form-group">
 									<div class="input-group input-group-alternative mb-3">
 										<div class="input-group-prepend">
@@ -38,8 +60,7 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text">Last Name</span>
 										</div>
-										<input class="form-control" 
-											type="text" th:field="*{lastName}">
+										<input class="form-control" type="text" th:field="*{lastName}">
 									</div>
 								</div>
 								<div class="form-group">
@@ -47,8 +68,8 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text">First Name</span>
 										</div>
-										<input class="form-control" 
-											type="text" th:field="*{firstName}">
+										<input class="form-control" type="text"
+											th:field="*{firstName}">
 									</div>
 								</div>
 
@@ -65,20 +86,21 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text">Login type</span>
 										</div>
-										<select id="title" class="form-control" th:field="*{connectType}">
+										<select id="loginType" class="form-control"
+											th:field="*{loginType}">
 											<option th:value="0" th:text="Password"></option>
 											<option th:value="1" th:text="Facebook"></option>
 											<option th:value="2" th:text="Google"></option>
 										</select>
 									</div>
 								</div>
-								<div class="form-group">
+								<div class="form-group" id="password_div">
 									<div class="input-group input-group-alternative">
 										<div class="input-group-prepend">
 											<span class="input-group-text">Password</span>
 										</div>
-										<input class="form-control" 
-											type="password" th:field="*{password}">
+										<input class="form-control" id="password" type="password"
+											th:field="*{password}">
 									</div>
 								</div>
 								<div class="form-group">
@@ -86,20 +108,21 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text">Status</span>
 										</div>
-										<select id="title" class="form-control" th:field="*{status}">
+										<select id="status" class="form-control" th:field="*{status}">
 											<option th:value="0" th:text="Draft"></option>
 											<option th:value="1" th:text="Active"></option>
 											<option th:value="2" th:text="Inactive"></option>
 										</select>
 									</div>
 								</div>
-								
+
 								<div class="form-group">
 									<div class="input-group input-group-alternative mb-3">
 										<div class="input-group-prepend">
 											<span class="input-group-text">Referral Code</span>
 										</div>
-										<input class="form-control" type="text" th:field="*{referralCode}">
+										<input class="form-control" type="text"
+											th:field="*{referralCode}">
 									</div>
 								</div>
 								<div class="form-group">
@@ -107,7 +130,8 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text">Account Type</span>
 										</div>
-										<select id="title" class="form-control" th:field="*{userType}">
+										<select id="userType" class="form-control"
+											th:field="*{userType}">
 											<option th:value="B2B">Customer B2B</option>
 											<option th:value="B2C">Customer B2C</option>
 											<option th:value="PRO">Professional</option>
@@ -118,15 +142,25 @@
 								</div>
 
 								<div class="text-center">
-									<button type="submit" class="btn btn-primary mt-4" >
-										Save changes
-									</button>
+									<button type="submit" class="btn btn-primary mt-4">
+										Save changes</button>
 								</div>
 
 							</form>
 						</div>
 					</div>
 				</div>
+				<div class="col-md-4" id="reset_pwd_email_div">
+					<div class="card bg-secondary shadow border-0">
+						<div class="card-body px-lg-5 py-lg-5">
+							<button type="button" class="btn btn-primary mt-4">
+								Reset password</button>
+							<button type="button" class="btn btn-primary mt-4">
+								Resend verification email</button>
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 

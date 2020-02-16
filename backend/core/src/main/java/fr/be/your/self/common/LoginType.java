@@ -1,6 +1,6 @@
 package fr.be.your.self.common;
 
-public enum ConnectType {
+public enum LoginType {
 	PASSWORD(0),
 	GOOGLE(1),
 	FACEBOOK(2),
@@ -8,7 +8,7 @@ public enum ConnectType {
 	
 	private final int value;
 	
-	ConnectType(int value) {
+	LoginType(int value) {
 		this.value = value;
 	}
 
@@ -20,8 +20,8 @@ public enum ConnectType {
 		return this.value != UNKNOWN.value;
 	}
 	
-	public static final ConnectType parse(int value) {
-		final ConnectType[] values = ConnectType.values();
+	public static final LoginType parse(int value) {
+		final LoginType[] values = LoginType.values();
 		
 		for (int i = 0; i < values.length; i++) {
 			if (values[i].value == value) {

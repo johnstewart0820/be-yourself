@@ -29,7 +29,7 @@ public class User {
 
 	private String socialLogin;
 
-	private int connectType;
+	private int loginType;
 
 	private String referralCode;
 
@@ -114,13 +114,6 @@ public class User {
 		this.socialLogin = socialLogin;
 	}
 
-	public int getConnectType() {
-		return connectType;
-	}
-
-	public void setConnectType(int connectType) {
-		this.connectType = connectType;
-	}
 
 	public String getReferralCode() {
 		return referralCode;
@@ -136,5 +129,13 @@ public class User {
 
 	public void setUserType(String userType) {
 		this.userType = userType;
+	}
+
+	public int getLoginType() {
+		return loginType;
+	}
+
+	public void setLoginType(int loginType) {
+		this.loginType = loginType;
 	}
 }
