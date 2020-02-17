@@ -20,15 +20,17 @@ public class Permission {
 	@Column(name = "PermissionID")
     private int permissionId;
 	
-	@Column(name = "UserID")
-    private int userId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "UserID")
+    private User user;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "FunctionalityID")
     private Functionality functionality;
 
-	@Column(name = "Permission")
-    private int permission;
+	@Column(name = "UserPermission")
+    private int userPermission;
+	
 	
 	public int getPermissionId() {
 		return permissionId;
@@ -38,12 +40,12 @@ public class Permission {
 		this.permissionId = permissionId;
 	}
 
-	public int getUserId() {
-		return userId;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(int userId) {
-		this.userId = userId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Functionality getFunctionality() {
@@ -54,11 +56,11 @@ public class Permission {
 		this.functionality = functionality;
 	}
 
-	public int getPermission() {
-		return permission;
+	public int getUserPermission() {
+		return userPermission;
 	}
 
-	public void setPermission(int permission) {
-		this.permission = permission;
+	public void setUserPermission(int userPermission) {
+		this.userPermission = userPermission;
 	}
 }

@@ -1,9 +1,9 @@
 package fr.be.your.self.common;
 
 public enum UserPermission {
-	READONLY(0),
-	WRITE(1),
-	UNKNOWN(-1);
+	DENIED(0),
+	READONLY(1),
+	WRITE(2);
 	
 	private final int value;
 	
@@ -16,7 +16,7 @@ public enum UserPermission {
 	}
 	
 	public boolean isValid() {
-		return this.value != UNKNOWN.value;
+		return this.value != DENIED.value;
 	}
 	
 	public static final UserPermission parse(int value) {
@@ -28,6 +28,6 @@ public enum UserPermission {
 			}
 		}
 		
-		return UNKNOWN;
+		return DENIED;
 	}
 }

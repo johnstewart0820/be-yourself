@@ -7,6 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.Permission;
+import fr.be.your.self.model.User;
 import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.service.PermissionService;
 
@@ -43,7 +44,7 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 
 	@Override
 	public <S extends Permission> Iterable<S> saveAll(Iterable<S> entities) {
-		return null;
+		return this.repository.saveAll(entities);
 	}
 
 	@Override
@@ -54,5 +55,10 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 	@Override
 	protected Page<Permission> findPage(String text, Pageable pageable) {
 		return null;
+	}
+	
+	@Override
+	public void saveOrUpdate(Permission permission) {
+		this.repository.save(permission); 
 	}
 }

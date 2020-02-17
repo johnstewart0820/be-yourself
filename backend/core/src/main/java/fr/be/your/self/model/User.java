@@ -1,9 +1,13 @@
 package fr.be.your.self.model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,6 +38,11 @@ public class User {
 	private String referralCode;
 
 	private String userType;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<Permission> permissions;
+
+
 
 	public User() {
 	}
@@ -50,6 +59,14 @@ public class User {
 		return firstName + " " + lastName;
 	}
 
+	public List<Permission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(List<Permission> permissions) {
+		this.permissions = permissions;
+	}
+	
 	public int getId() {
 		return id;
 	}

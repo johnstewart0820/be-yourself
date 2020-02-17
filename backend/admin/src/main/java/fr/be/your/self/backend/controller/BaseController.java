@@ -55,7 +55,7 @@ public abstract class BaseController {
 				if (userPermissions != null) {
 					for (Permission userPermission : userPermissions) {
 						final Functionality functionality = userPermission.getFunctionality();
-						permission.addPermission(functionality.getPath(), userPermission.getPermission());
+						permission.addPermission(functionality.getPath(), userPermission.getUserPermission());
 					}
 				}
 			}
