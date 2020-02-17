@@ -5,7 +5,7 @@ public enum UserType {
 	ADMIN("ADM"),
 	B2B("B2B"),
 	B2C("B2C"),
-	PROFESSOR("PRO"),
+	PROFESSIONAL("PRO"),
 	USER("USR");
 	
 	private final String value;

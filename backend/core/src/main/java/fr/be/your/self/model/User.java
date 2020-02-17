@@ -1,9 +1,13 @@
 package fr.be.your.self.model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,7 +24,7 @@ public class User extends PO<Integer> {
 
 	private String lastName;
 
-	private String civility;
+	private String title;
 
 	private String email;
 
@@ -29,11 +33,16 @@ public class User extends PO<Integer> {
 
 	private String socialLogin;
 
-	private int connectType;
+	private int loginType;
 
 	private String referralCode;
 
 	private String userType;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<Permission> permissions;
+
+
 
 	public User() {
 	}
@@ -50,7 +59,14 @@ public class User extends PO<Integer> {
 		return firstName + " " + lastName;
 	}
 
-	@Override
+	public List<Permission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(List<Permission> permissions) {
+		this.permissions = permissions;
+	}
+	
 	public Integer getId() {
 		return id;
 	}
@@ -83,12 +99,12 @@ public class User extends PO<Integer> {
 		this.lastName = lastName;
 	}
 
-	public String getCivility() {
-		return civility;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setCivility(String civility) {
-		this.civility = civility;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getEmail() {
@@ -115,13 +131,6 @@ public class User extends PO<Integer> {
 		this.socialLogin = socialLogin;
 	}
 
-	public int getConnectType() {
-		return connectType;
-	}
-
-	public void setConnectType(int connectType) {
-		this.connectType = connectType;
-	}
 
 	public String getReferralCode() {
 		return referralCode;
@@ -139,6 +148,14 @@ public class User extends PO<Integer> {
 		this.userType = userType;
 	}
 
+	public int getLoginType() {
+		return loginType;
+	}
+
+	public void setLoginType(int loginType) {
+		this.loginType = loginType;
+	}
+	
 	@Override
 	public String getDisplay() {
 		return this.getFullName();

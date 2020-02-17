@@ -43,7 +43,7 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 
 	@Override
 	public <S extends Permission> Iterable<S> saveAll(Iterable<S> entities) {
-		return null;
+		return this.repository.saveAll(entities);
 	}
 
 	@Override
@@ -54,5 +54,10 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 	@Override
 	protected Page<Permission> getListByPage(String text, Pageable pageable) {
 		return null;
+	}
+	
+	@Override
+	public void saveOrUpdate(Permission permission) {
+		this.repository.save(permission); 
 	}
 }

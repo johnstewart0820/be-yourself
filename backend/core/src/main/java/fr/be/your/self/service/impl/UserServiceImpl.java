@@ -63,8 +63,8 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	}
 	
 	@Override
-	public void saveOrUpdate(User user) {
-		this.repository.save(user); //TODO TVA check this do both save and update
+	public User saveOrUpdate(User user) {
+		return this.repository.save(user);
 	}
 
 	@Override

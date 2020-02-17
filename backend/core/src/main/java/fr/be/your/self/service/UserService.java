@@ -6,6 +6,6 @@ public interface UserService extends BaseService<User> {
 	
 	public boolean existsEmail(String email);
 			
-	public void saveOrUpdate(User user);
+	public User saveOrUpdate(User user);
 
 }

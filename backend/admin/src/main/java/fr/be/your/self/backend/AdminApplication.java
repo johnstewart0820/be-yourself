@@ -70,13 +70,19 @@ public class AdminApplication implements CommandLineRunner {
 				Functionality savedTempFunc = this.functionalityRepository.save(tempFunc);
 				
 				Permission adminUserPermission = new Permission();
-				adminUserPermission.setUserId(savedUser.getId());
+				adminUserPermission.setUser(savedUser);
 				adminUserPermission.setFunctionality(savedAdminUserFunc);
-				adminUserPermission.setPermission(UserPermission.WRITE.getValue());
+				adminUserPermission.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(adminUserPermission);
+				
+				Permission adminUserPermission2 = new Permission();
+				adminUserPermission2.setUser(savedUser);
+				adminUserPermission2.setFunctionality(savedTempFunc);
+				adminUserPermission2.setUserPermission(UserPermission.READONLY.getValue());
+				this.permissionRepository.save(adminUserPermission2);
 			}
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
