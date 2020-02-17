@@ -20,7 +20,7 @@ import fr.be.your.self.service.UserService;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + AdminUserController.NAME)
-public class AdminUserController extends BaseResourceController<User> {
+public class AdminUserController extends BaseResourceController<User, User, User> {
 	
 	public static final String NAME = "admin-user";
 	
@@ -47,6 +47,16 @@ public class AdminUserController extends BaseResourceController<User> {
 		return new User();
 	}
 	
+	@Override
+	protected User createDetailDto(User domain) {
+		return domain;
+	}
+
+	@Override
+	protected User createSimpleDto(User domain) {
+		return domain;
+	}
+
 	@PostMapping("/create")
     public String createDomain(@Valid User user, 
     		HttpSession session, HttpServletRequest request, 

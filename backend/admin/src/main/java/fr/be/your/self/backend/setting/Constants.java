@@ -5,6 +5,8 @@ public final class Constants {
 	public static interface FOLDER {
 		public static interface MEDIA {
 			public static final String AVATAR = "/avatar";
+			
+			public static final String SESSION_GROUP = "/session-group";
 		}
 	}
 	
@@ -36,6 +38,7 @@ public final class Constants {
 			
 			public static interface MEDIA_TYPE {
 				public static final String AVATAR = "/avatar";
+				public static final String SESSION_GROUP = "/session-group";
 			}
 		}
 	}

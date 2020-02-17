@@ -3,12 +3,11 @@ package fr.be.your.self.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.model.User;
+import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.UserRepository;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.StringUtils;
@@ -20,7 +19,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	private UserRepository repository;
 	
 	@Override
-	protected PagingAndSortingRepository<User, Integer> getRepository() {
+	protected BaseRepository<User> getRepository() {
 		return this.repository;
 	}
 
@@ -30,7 +29,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	}
 
 	@Override
-	protected Iterable<User> findAll(String text) {
+	protected Iterable<User> getList(String text) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll()
 				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text);
@@ -42,7 +41,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	}
 
 	@Override
-	protected Page<User> findPage(String text, Pageable pageable) {
+	protected Page<User> getListByPage(String text, Pageable pageable) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll(pageable)
 				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text, pageable);
@@ -71,15 +70,5 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	@Override
 	public <S extends User> Iterable<S> saveAll(Iterable<S> entities) {
 		return this.repository.saveAll(entities);
-	}
-
-	@Override
-	public boolean activate(Integer id) {
-		return this.repository.updateStatus(id, UserStatus.ACTIVE.getValue()) > 0;
-	}
-
-	@Override
-	public boolean deactivate(Integer id) {
-		return this.repository.updateStatus(id, UserStatus.INACTIVE.getValue()) > 0;
 	}
 }

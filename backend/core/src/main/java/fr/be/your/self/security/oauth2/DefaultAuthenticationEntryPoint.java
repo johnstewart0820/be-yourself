@@ -48,9 +48,11 @@ public class DefaultAuthenticationEntryPoint extends LoginUrlAuthenticationEntry
 			AuthenticationException authException) throws IOException, ServletException {
 		
 		if (!StringUtils.isNullOrSpace(this.apiPathPrefix)) {
+			final String contextPath = request.getContextPath().toLowerCase();
+			final String apiPath = (contextPath.endsWith("/") ? contextPath.substring(0, contextPath.length() - 1) : contextPath) + this.apiPathPrefix;
 			final String requestURL = request.getRequestURI().toLowerCase();
 			
-			if (requestURL.startsWith(this.apiPathPrefix)) {
+			if (requestURL.startsWith(apiPath)) {
 				final StatusResponse result = new StatusResponse(false);
 				result.setCode(StatusCode.UNAUTHORIZED.getValue());
 				result.setMessage("Unauthorized");

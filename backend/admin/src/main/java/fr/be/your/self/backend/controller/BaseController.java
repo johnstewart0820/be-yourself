@@ -27,8 +27,13 @@ public abstract class BaseController {
 	@Autowired
 	private PermissionService permissionService;
 	
+	protected void initAttributes(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Model model) {
+		
+	}
+	
 	@ModelAttribute
-	protected void initPermission(HttpSession session, HttpServletRequest request, 
+	protected void initModelAttribute(HttpSession session, HttpServletRequest request, 
 			HttpServletResponse response, Model model) {
 		
 		PermissionDto permission = new PermissionDto();
@@ -68,6 +73,8 @@ public abstract class BaseController {
 		model.addAttribute("userId", userId);
 		model.addAttribute("displayName", displayName);
 		model.addAttribute("permission", permission);
+		
+		this.initAttributes(session, request, response, model);
 	}
 	
 	protected String getMessage(String key, Object[] args, String defaultValue) {

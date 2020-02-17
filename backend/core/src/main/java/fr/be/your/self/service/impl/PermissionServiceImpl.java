@@ -3,10 +3,10 @@ package fr.be.your.self.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.Permission;
+import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.service.PermissionService;
 
@@ -17,7 +17,7 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 	private PermissionRepository repository;
 	
 	@Override
-	protected PagingAndSortingRepository<Permission, Integer> getRepository() {
+	protected BaseRepository<Permission> getRepository() {
 		return this.repository;
 	}
 
@@ -47,12 +47,12 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 	}
 
 	@Override
-	protected Iterable<Permission> findAll(String text) {
+	protected Iterable<Permission> getList(String text) {
 		return null;
 	}
 
 	@Override
-	protected Page<Permission> findPage(String text, Pageable pageable) {
+	protected Page<Permission> getListByPage(String text, Pageable pageable) {
 		return null;
 	}
 }

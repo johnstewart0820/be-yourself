@@ -17,4 +17,9 @@ public class AuthController {
     public String loginPage(Model model) {
         return "login";
     }
+	
+	@GetMapping(Constants.PATH.AUTHENTICATION.ACCESS_DENIED)
+    public String accessDeninedPage(Model model) {
+        return "error/403";
+    }
 }
