@@ -5,13 +5,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,7 +97,8 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 
 	@PostMapping("/create")
 	@Transactional
-    public String createDomain(@Valid SessionGroupDto dto, 
+    public String createDomain(
+    		@ModelAttribute @Validated SessionGroupDto dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         if (result.hasErrors()) {
@@ -127,6 +128,8 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         domain.setImage(uploadFileName);
         
         final SessionGroup savedDomain = this.mainService.create(domain);
+        
+        // Error, delete upload file
         if (savedDomain == null || result.hasErrors()) {
         	try {
 				Files.delete(uploadFilePath);
@@ -141,7 +144,9 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
     }
 	
 	@PostMapping("/update/{id}")
-    public String updateDomain(@PathVariable("id") Integer id, @Valid SessionGroupDto dto, 
+    public String updateDomain(
+    		@PathVariable("id") Integer id, 
+    		@ModelAttribute @Validated SessionGroupDto dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -182,6 +187,8 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         domain.setName(dto.getName());
         
         final SessionGroup savedDomain = this.mainService.update(domain);
+        
+        // Error, delete upload file
         if (savedDomain == null || result.hasErrors()) {
         	if (uploadFilePath != null) {
 	        	try {
@@ -194,6 +201,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         	return this.getFormView();
         }
         
+        // Success, delete old image file
         if (!StringUtils.isNullOrSpace(deleteMediaFileName)) {
         	final Path mediaFilePath = Paths.get(this.dataSetting.getSessionGroupFolder() + "/" + deleteMediaFileName);
         	

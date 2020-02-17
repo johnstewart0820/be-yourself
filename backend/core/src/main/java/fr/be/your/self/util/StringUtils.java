@@ -1,6 +1,7 @@
 package fr.be.your.self.util;
 
 import java.math.BigDecimal;
+import java.util.Random;
 
 public class StringUtils {
 	
@@ -26,5 +27,28 @@ public class StringUtils {
 	
 	public static final String formatFileSize(long value) {
 		return formatFileSize(value, 0);
+	}
+	
+	public static final String randomAlphabetic(int length) {
+		final int leftLimit = 97; // letter 'a'
+		final int rightLimit = 122; // letter 'z'
+		final Random random = new Random();
+	 
+	    return random.ints(leftLimit, rightLimit + 1)
+	      .limit(length)
+	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+	      .toString();
+	}
+	
+	public static final String randomAlphanumeric(int length) {
+		final int leftLimit = 48; // numeral '0'
+		final int rightLimit = 122; // letter 'z'
+		final Random random = new Random();
+	 
+	    return random.ints(leftLimit, rightLimit + 1)
+	      .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+	      .limit(length)
+	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+	      .toString();
 	}
 }

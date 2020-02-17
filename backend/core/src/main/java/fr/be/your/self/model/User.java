@@ -38,11 +38,13 @@ public class User extends PO<Integer> {
 	private String referralCode;
 
 	private String userType;
-	
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Permission> permissions;
+	private List<Permission> permissions;
 
+	private String activateCode;
 
+	private long activateTimeout;
 
 	public User() {
 	}
@@ -66,7 +68,7 @@ public class User extends PO<Integer> {
 	public void setPermissions(List<Permission> permissions) {
 		this.permissions = permissions;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -127,10 +129,9 @@ public class User extends PO<Integer> {
 		return socialLogin;
 	}
 
-	public void setSocialId(String socialLogin) {
+	public void setSocialLogin(String socialLogin) {
 		this.socialLogin = socialLogin;
 	}
-
 
 	public String getReferralCode() {
 		return referralCode;
@@ -155,7 +156,23 @@ public class User extends PO<Integer> {
 	public void setLoginType(int loginType) {
 		this.loginType = loginType;
 	}
-	
+
+	public String getActivateCode() {
+		return activateCode;
+	}
+
+	public void setActivateCode(String activateCode) {
+		this.activateCode = activateCode;
+	}
+
+	public long getActivateTimeout() {
+		return activateTimeout;
+	}
+
+	public void setActivateTimeout(long activateTimeout) {
+		this.activateTimeout = activateTimeout;
+	}
+
 	@Override
 	public String getDisplay() {
 		return this.getFullName();

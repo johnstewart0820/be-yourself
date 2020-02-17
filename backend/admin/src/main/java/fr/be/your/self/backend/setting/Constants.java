@@ -29,6 +29,8 @@ public final class Constants {
 			public static final String ACCESS_DENIED = "/403";
 			
 			public static final String REGISTER = "/register";
+			public static final String ACTIVATE = "/activate";
+			
 			public static final String VERIFY_TOKEN_GOOGLE = "/google/verify-token";
 		}
 		

@@ -50,9 +50,12 @@ import fr.be.your.self.util.StringUtils;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
+	private static final String AUTHORIZE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.AUTHORIZE;
+	
 	private static final String LOGIN_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGIN;
 	private static final String LOGOUT_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGOUT;
-	private static final String AUTHORIZE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.AUTHORIZE;
+	private static final String ACTIVATE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACTIVATE;
+	
 	private static final String ACCESS_DENIED_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACCESS_DENIED;
 	
 	private static final String API_URL_PREFIX = Constants.PATH.API_PREFIX + "/";
@@ -142,7 +145,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// @formatter:off
 		httpSecurity
 			.authorizeRequests()
-				.antMatchers(LOGIN_URL, ACCESS_DENIED_URL, "/oauth/test").permitAll()
+				.antMatchers(LOGIN_URL, ACTIVATE_URL, ACCESS_DENIED_URL, "/oauth/test").permitAll()
 				.antMatchers("/", "/home", "/about", "/error", "/test").permitAll()
 			.and()
         		.authorizeRequests()

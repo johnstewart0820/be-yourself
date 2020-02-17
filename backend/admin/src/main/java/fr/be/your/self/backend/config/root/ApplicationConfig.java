@@ -52,6 +52,18 @@ public class ApplicationConfig {
 	@Value("#{'${data.upload.video.media.type}'.split(',')}")
 	private Set<String> videoFileMediaTypes;
 	
+	@Value("${account.auto.activate:false}")
+	private boolean autoActivateNormalAccount;
+	
+	@Value("${account.admin.auto.activate:false}")
+	private boolean autoActivateAdminAccount;
+	
+	@Value("${account.activate.code.length:6}")
+	private int activateCodeLength;
+	
+	@Value("${account.activate.code.timeout}")
+	private long activateCodeTimeout;
+	
 	@Autowired
 	private MessageSource messageSource;
 	
@@ -64,6 +76,8 @@ public class ApplicationConfig {
 		setting.setUploadFileSizes(this.imageMaxFileSize, this.audioMaxFileSize, this.videoMaxFileSize);
 		setting.setUploadFileExtensions(this.imageFileExtensions, this.audioFileExtensions, this.videoFileExtensions);
 		setting.setUploadMediaTypes(this.imageFileMediaTypes, this.audioFileMediaTypes, this.videoFileMediaTypes);
+		setting.setAutoActivateAccount(this.autoActivateNormalAccount, this.autoActivateAdminAccount, 
+				this.activateCodeLength, this.activateCodeTimeout);
 		
 		return setting;
 	}

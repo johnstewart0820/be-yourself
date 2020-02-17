@@ -6,7 +6,12 @@ import java.util.Set;
 public class DataSetting {
 	
 	private int defaultPageSize;
-
+	
+	private boolean autoActivateAccount;
+	private boolean autoActivateAdminAccount;
+	private int activateCodeLength;
+	private long activateCodeTimeout;
+	
 	private String uploadFolder;
 	
 	private long imageMaxFileSize;
@@ -55,6 +60,46 @@ public class DataSetting {
 		return uploadMaxFileSize;
 	}
 
+	public boolean isAutoActivateAccount() {
+		return autoActivateAccount;
+	}
+
+	public boolean isAutoActivateAdminAccount() {
+		return autoActivateAdminAccount;
+	}
+
+	public int getActivateCodeLength() {
+		return activateCodeLength;
+	}
+
+	public long getActivateCodeTimeout() {
+		return activateCodeTimeout;
+	}
+
+	public Set<String> getImageFileExtensions() {
+		return imageFileExtensions == null ? Collections.emptySet() : this.imageFileExtensions;
+	}
+
+	public Set<String> getAudioFileExtensions() {
+		return audioFileExtensions == null ? Collections.emptySet() : this.audioFileExtensions;
+	}
+
+	public Set<String> getVideoFileExtensions() {
+		return videoFileExtensions == null ? Collections.emptySet() : this.videoFileExtensions;
+	}
+
+	public Set<String> getImageMediaTypes() {
+		return imageMediaTypes == null ? Collections.emptySet() : this.imageMediaTypes;
+	}
+
+	public Set<String> getAudioMediaTypes() {
+		return audioMediaTypes == null ? Collections.emptySet() : this.audioMediaTypes;
+	}
+
+	public Set<String> getVideoMediaTypes() {
+		return videoMediaTypes == null ? Collections.emptySet() : this.videoMediaTypes;
+	}
+
 	public void setUploadFileSizes(long imageMaxFileSize, long audioMaxFileSize, long videoMaxFileSize) {
 		this.imageMaxFileSize = imageMaxFileSize * 1024;
 		this.audioMaxFileSize = audioMaxFileSize * 1024;
@@ -82,30 +127,14 @@ public class DataSetting {
 		this.videoMediaTypes = videoMediaTypes;
 	}
 	
-	public Set<String> getImageFileExtensions() {
-		return imageFileExtensions == null ? Collections.emptySet() : this.imageFileExtensions;
+	public void setAutoActivateAccount(boolean autoActivateNormalAccount, boolean autoActivateAdminAccount, 
+			int activateAccountCodeLength, long activateCodeTimeout) {
+		this.autoActivateAccount = autoActivateNormalAccount;
+		this.autoActivateAdminAccount = autoActivateAdminAccount;
+		this.activateCodeLength = activateAccountCodeLength;
+		this.activateCodeTimeout = activateCodeTimeout;
 	}
-
-	public Set<String> getAudioFileExtensions() {
-		return audioFileExtensions == null ? Collections.emptySet() : this.audioFileExtensions;
-	}
-
-	public Set<String> getVideoFileExtensions() {
-		return videoFileExtensions == null ? Collections.emptySet() : this.videoFileExtensions;
-	}
-
-	public Set<String> getImageMediaTypes() {
-		return imageMediaTypes == null ? Collections.emptySet() : this.imageMediaTypes;
-	}
-
-	public Set<String> getAudioMediaTypes() {
-		return audioMediaTypes == null ? Collections.emptySet() : this.audioMediaTypes;
-	}
-
-	public Set<String> getVideoMediaTypes() {
-		return videoMediaTypes == null ? Collections.emptySet() : this.videoMediaTypes;
-	}
-
+	
 	public String getAvatarFolder() {
 		return this.getUploadFolder() + Constants.FOLDER.MEDIA.AVATAR;
 	}
