@@ -1,5 +1,8 @@
 package fr.be.your.self.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.model.User;
+import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.repository.UserRepository;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.StringUtils;
@@ -81,5 +85,17 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	@Override
 	public boolean deactivate(Integer id) {
 		return this.repository.updateStatus(id, UserStatus.INACTIVE.getValue()) > 0;
+	}
+
+	@Override
+	public List<UserCSV> extractUserCsv() {
+		Iterable<User> users= this.repository.findAll();
+		List<UserCSV> returnList = new ArrayList<UserCSV>();
+		for (User user: users) {
+			UserCSV userCSV = new UserCSV(user);
+			returnList.add(userCSV);
+		}
+		
+		return returnList;
 	}
 }

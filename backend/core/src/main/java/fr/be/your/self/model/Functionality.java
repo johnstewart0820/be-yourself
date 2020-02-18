@@ -1,10 +1,14 @@
 package fr.be.your.self.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Functionality extends PO<Integer> {
@@ -23,6 +27,17 @@ public class Functionality extends PO<Integer> {
 	@Column(name = "Description", length = 255)
 	private String description;
 	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "functionality")
+    private List<Permission> permissions;
+	
+	public List<Permission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(List<Permission> permissions) {
+		this.permissions = permissions;
+	}
+
 	public Functionality() {
 		super();
 	}

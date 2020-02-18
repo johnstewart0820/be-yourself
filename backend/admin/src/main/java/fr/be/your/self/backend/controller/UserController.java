@@ -44,6 +44,8 @@ import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.User;
+import fr.be.your.self.model.UserCSV;
+import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.UserService;
@@ -60,6 +62,8 @@ public class UserController {
 	FunctionalityService functionalityService;
 	
 	public static int NB_USERS_PER_PAGE = 2; // FIXME: move this to config file
+	public static String CSV_USERS_EXPORT_FILE = "users.csv";
+
 	
 	// save or update user
 	// 1. @ModelAttribute bind form value
@@ -121,6 +125,22 @@ public class UserController {
 		User user = userService.getById(id);
 		model.addAttribute("user", user);
 		model.addAttribute("isUpdating", true);
+		List<Permission> perms = user.getPermissions();
+		int editAccType = 0;
+		int editPermissions = 0;
+		for (Permission perm : perms) {
+			Functionality func = perm.getFunctionality();
+			if (UserConstants.EDIT_ACCOUNT_TYPE_PATH.equals(func.getPath())) {
+				editAccType = perm.getUserPermission();
+			}
+			if ( UserConstants.EDIT_PERMISSIONS_PATH.equals(func.getPath())) {
+				editPermissions = perm.getUserPermission();
+			}
+		}
+		
+		model.addAttribute("editAccType", editAccType);
+		model.addAttribute("editPermissions", editPermissions);
+
 		return "user/userform";
 	}
 
@@ -153,18 +173,17 @@ public class UserController {
 	public void exportCSV(HttpServletResponse response) throws Exception {
 
 		// set file name and content type
-		String filename = "users.csv";
 
 		response.setContentType("text/csv");
-		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
+		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + CSV_USERS_EXPORT_FILE + "\"");
 
 		// create a csv writer
-		StatefulBeanToCsv<User> writer = new StatefulBeanToCsvBuilder<User>(response.getWriter())
+		StatefulBeanToCsv<UserCSV> writer = new StatefulBeanToCsvBuilder<UserCSV>(response.getWriter())
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 				.withOrderedResults(false).build();
 
 		// write all users to csv file
-		List<User> usersList = StreamSupport.stream(userService.findAll().spliterator(), false)
+		List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv().spliterator(), false)
 				.collect(Collectors.toList());
 		
 		writer.write(usersList);

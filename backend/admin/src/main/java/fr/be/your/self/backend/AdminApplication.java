@@ -25,6 +25,7 @@ import fr.be.your.self.model.User;
 import fr.be.your.self.repository.FunctionalityRepository;
 import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.repository.UserRepository;
+import fr.be.your.self.model.UserConstants;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "fr.be.your.self.backend.config.root" })
@@ -69,17 +70,41 @@ public class AdminApplication implements CommandLineRunner {
 				tempFunc.setName("Temp function");
 				Functionality savedTempFunc = this.functionalityRepository.save(tempFunc);
 				
+				Functionality editAccountTypeFunc = new Functionality();
+				editAccountTypeFunc.setPath(UserConstants.EDIT_ACCOUNT_TYPE_PATH);
+				editAccountTypeFunc.setName("Edit Account Type");
+				Functionality savedEditAccountTypeFunc = this.functionalityRepository.save(editAccountTypeFunc);
+				
+				
+				Functionality editPermissionsFunc = new Functionality();
+				editPermissionsFunc.setPath(UserConstants.EDIT_PERMISSIONS_PATH);
+				editPermissionsFunc.setName("Edit Permissions");
+				Functionality savedEditPermissionsFunc = this.functionalityRepository.save(editPermissionsFunc);
+				
+				
 				Permission adminUserPermission = new Permission();
 				adminUserPermission.setUser(savedUser);
 				adminUserPermission.setFunctionality(savedAdminUserFunc);
 				adminUserPermission.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(adminUserPermission);
 				
-				Permission adminUserPermission2 = new Permission();
-				adminUserPermission2.setUser(savedUser);
-				adminUserPermission2.setFunctionality(savedTempFunc);
-				adminUserPermission2.setUserPermission(UserPermission.READONLY.getValue());
-				this.permissionRepository.save(adminUserPermission2);
+				Permission tempFuncPermission = new Permission();
+				tempFuncPermission.setUser(savedUser);
+				tempFuncPermission.setFunctionality(savedTempFunc);
+				tempFuncPermission.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(tempFuncPermission);
+				
+				Permission editAccountTypePermission = new Permission();
+				editAccountTypePermission.setUser(savedUser);
+				editAccountTypePermission.setFunctionality(savedEditAccountTypeFunc);
+				editAccountTypePermission.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(editAccountTypePermission);
+				
+				Permission editPermissions = new Permission();
+				editPermissions.setUser(savedUser);
+				editPermissions.setFunctionality(savedEditPermissionsFunc);
+				editPermissions.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(editPermissions);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

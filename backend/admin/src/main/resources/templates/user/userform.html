@@ -5,6 +5,11 @@
 <head>
 <title>Home</title>
 <script>
+	var isUpdating = [[${isUpdating}]];
+	var editAccType = [[${editAccType}]];
+	var editPermissions = [[${editPermissions}]];
+
+	
 	function selectLoginType() {
 		var selectedLoginType = $("select#loginType").children(
 				"option:selected").val();
@@ -27,9 +32,24 @@
 		}
 	}
 	
+	function selectAccountType() {
+		if (editAccType == 1 || editAccType == 0) {
+			$('#userType').css('pointer-events','none'); //Disable access to select account type
+		}
+	}
+	
+	function selectEditPermissions() {
+		if (editPermissions == 1 || editPermissions == 0) {
+			$('#admin_permissions_div').css('pointer-events','none'); //Disable access to edit permissions
+		}
+	}
+	
+	
 	$(document).ready(function() {
 		selectLoginType();
 		selectUserType();
+		selectAccountType();
+		selectEditPermissions();
 		
 		$("select#loginType").change(function() {
 			selectLoginType();
@@ -141,7 +161,7 @@
 											th:field="*{referralCode}">
 									</div>
 								</div>
-								<div class="form-group">
+								<div class="form-group" id="account_type_div">
 									<div class="input-group input-group-alternative mb-3">
 										<div class="input-group-prepend">
 											<span class="input-group-text">Account Type</span>
@@ -163,7 +183,7 @@
 
 												<div class="input-group-prepend">
 													<span class="input-group-text"
-														th:text="${permission.functionality.name}">Status</span>
+														th:text="${permission.functionality.name}">Functionality</span>
 												</div>
 
 												<input type="hidden"
@@ -183,27 +203,6 @@
 											</div>
 										</li>
 									</ul>
-									<!-- >span th:unless="${isUpdating}">
-										<ul style="list-style-type: none; margin: 0;  padding: 0">
-										<li th:each="functionality, itemStats : ${functionalities}" style="float:left; width:50%">
-											<div class="input-group input-group-alternative mb-3">
-
-												<div class="input-group-prepend">
-													<span class="input-group-text"
-														th:text="${functionality.name}">Status</span>
-												</div>
-
-
-												<select class="form-control"
-													th:field="*{user.permissions[__${itemStats.index}__].userPermission}">
-													<option th:value="0">Denied</option>
-													<option th:value="1">View Only</option>
-													<option th:value="2">Edit</option>
-												</select>
-											</div>
-										</li>
-									</ul>
-									</span-->
 								</div>
 								</span>
 
