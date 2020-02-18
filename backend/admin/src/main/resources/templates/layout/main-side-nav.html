@@ -114,6 +114,13 @@
 				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.admin-user}"></span>
 						</a>
 			  		</li>
+			  		
+			  		<li class="nav-item">
+						<a class="nav-link" th:href="@{/session-group}">
+				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.session.group}"></span>
+						</a>
+			  		</li>
+			  		
 			  		<th:block th:if="${permission != null}">
 				  		<li class="nav-item" th:if="${permission.hasPermission('/admin-user')}">
 							<a class="nav-link " href="../examples/maps.html">

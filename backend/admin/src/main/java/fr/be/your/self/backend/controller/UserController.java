@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,12 @@ import com.opencsv.bean.MappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
+import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.UserPermission;
-import fr.be.your.self.common.UserType;
+import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserUtils;
+import fr.be.your.self.engine.EmailSender;
 import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.User;
@@ -49,9 +54,14 @@ import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.UserService;
+import fr.be.your.self.util.StringUtils;
 
 @Controller
 public class UserController {
+	private static final String ACTIVATE_URL = Constants.PATH.WEB_ADMIN_PREFIX 
+			+ Constants.PATH.AUTHENTICATION_PREFIX 
+			+ Constants.PATH.AUTHENTICATION.ACTIVATE;
+	
 	@Autowired
 	UserService userService;
 
@@ -60,6 +70,12 @@ public class UserController {
 
 	@Autowired
 	FunctionalityService functionalityService;
+	
+	@Autowired
+	private EmailSender emailSender;
+	
+	@Autowired
+	private DataSetting dataSetting;
 	
 	public static int NB_USERS_PER_PAGE = 2; // FIXME: move this to config file
 	public static String CSV_USERS_EXPORT_FILE = "users.csv";
@@ -70,32 +86,67 @@ public class UserController {
 	// 2. @Validated form validator
 	// 3. RedirectAttributes for flash value
 	@RequestMapping(value = "/user/save", method = RequestMethod.POST)
-	public String saveOrUpdateUser(@ModelAttribute @Validated User user, BindingResult result, Model model,
+	public String saveOrUpdateUser(@ModelAttribute @Validated User user, 
+			HttpServletRequest request, BindingResult result, Model model,
 			final RedirectAttributes redirectAttributes) {
 
 		if (result.hasErrors()) {
 			return "user/userform";
 		} else {
+			boolean isNewUser = user.getId() == 0; 
+			boolean isAdminUser = UserUtils.isAdmin(user);
+			
+			boolean isAutoActivateAccount = isAdminUser 
+					? this.dataSetting.isAutoActivateAdminAccount() 
+					: this.dataSetting.isAutoActivateAccount();
+			
 			// Add message to flash scope. TODO TVA: check if we need to keep this
 			redirectAttributes.addFlashAttribute("css", "success");
-			if (user.getId() == 0) { // TODO TVA check this
+			if (isNewUser) { // TODO TVA check this
 				redirectAttributes.addFlashAttribute("msg", "User added successfully!");
+				
+				if (isAutoActivateAccount) {
+					user.setStatus(UserStatus.ACTIVE.getValue());
+				} else {
+					String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
+					long activateCodeTimeout = (new Date().getTime() / (60 * 1000)) + this.dataSetting.getActivateCodeTimeout();
+					
+					user.setActivateCode(activateCode);
+					user.setActivateTimeout(activateCodeTimeout);
+					user.setStatus(UserStatus.DRAFT.getValue());
+				}
 			} else {
 				redirectAttributes.addFlashAttribute("msg", "User updated successfully!");
 			}
 
 			User savedUser = userService.saveOrUpdate(user);
-			
-			if (UserUtils.isAdmin(user)) {
+			if (isAdminUser) {
 				for (Permission permission : user.getPermissions()) {
 					permission.setUser(savedUser); //We need user id of saved user
 					permissionService.saveOrUpdate(permission);
 				}
 			}
-
+			
+			if (isNewUser && !isAutoActivateAccount) {
+				String activateAccountUrl = request.getScheme() + "://" 
+						+ request.getServerName() + ":"
+						+ request.getServerPort() 
+						+ request.getContextPath();
+				
+				if (activateAccountUrl.endsWith("/")) {
+					activateAccountUrl = activateAccountUrl.substring(0, activateAccountUrl.length() - 1);
+				}
+				
+				activateAccountUrl += ACTIVATE_URL;
+				
+				boolean success = this.emailSender.sendActivateUser(savedUser.getEmail(), 
+						activateAccountUrl, savedUser.getActivateCode());
+				
+				// TODO: Use success variable?
+			}
+			
 			return "redirect:/user/list/page/1"; // back to list of users
 		}
-
 	}
 
 	// show add user form

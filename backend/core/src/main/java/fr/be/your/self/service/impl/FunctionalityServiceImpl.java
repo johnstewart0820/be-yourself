@@ -3,10 +3,10 @@ package fr.be.your.self.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.Functionality;
+import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.FunctionalityRepository;
 import fr.be.your.self.service.FunctionalityService;
 
@@ -39,24 +39,20 @@ public class FunctionalityServiceImpl extends BaseServiceImpl<Functionality> imp
 	}
 
 	@Override
-	protected PagingAndSortingRepository<Functionality, Integer> getRepository() {
+	protected BaseRepository<Functionality> getRepository() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected Iterable<Functionality> findAll(String text) {
+	protected Iterable<Functionality> getList(String text) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected Page<Functionality> findPage(String text, Pageable pageable) {
+	protected Page<Functionality> getListByPage(String text, Pageable pageable) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-
-
 }

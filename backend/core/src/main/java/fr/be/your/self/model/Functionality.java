@@ -43,6 +43,11 @@ public class Functionality extends PO<Integer> {
 	}
 
 	@Override
+	public String getDisplay() {
+		return this.name;
+	}
+
+	@Override
 	public Integer getId() {
 		return this.functionalityId;
 	}

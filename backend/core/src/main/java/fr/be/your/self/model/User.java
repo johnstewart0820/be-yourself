@@ -12,7 +12,7 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class User {
+public class User extends PO<Integer> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,11 +38,13 @@ public class User {
 	private String referralCode;
 
 	private String userType;
-	
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Permission> permissions;
+	private List<Permission> permissions;
 
+	private String activateCode;
 
+	private long activateTimeout;
 
 	public User() {
 	}
@@ -66,8 +68,8 @@ public class User {
 	public void setPermissions(List<Permission> permissions) {
 		this.permissions = permissions;
 	}
-	
-	public int getId() {
+
+	public Integer getId() {
 		return id;
 	}
 
@@ -127,10 +129,9 @@ public class User {
 		return socialLogin;
 	}
 
-	public void setSocialId(String socialLogin) {
+	public void setSocialLogin(String socialLogin) {
 		this.socialLogin = socialLogin;
 	}
-
 
 	public String getReferralCode() {
 		return referralCode;
@@ -154,5 +155,26 @@ public class User {
 
 	public void setLoginType(int loginType) {
 		this.loginType = loginType;
+	}
+
+	public String getActivateCode() {
+		return activateCode;
+	}
+
+	public void setActivateCode(String activateCode) {
+		this.activateCode = activateCode;
+	}
+
+	public long getActivateTimeout() {
+		return activateTimeout;
+	}
+
+	public void setActivateTimeout(long activateTimeout) {
+		this.activateTimeout = activateTimeout;
+	}
+
+	@Override
+	public String getDisplay() {
+		return this.getFullName();
 	}
 }

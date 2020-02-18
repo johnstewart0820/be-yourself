@@ -20,6 +20,7 @@ import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.spring5.ISpringTemplateEngine;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import fr.be.your.self.backend.setting.DataSetting;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 
 @Configuration
@@ -33,6 +34,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	
 	@Autowired
 	private MessageSource messageSource;
+	
+	@Autowired
+	private DataSetting dataSetting;
 	
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
@@ -61,9 +65,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Bean(name = "multipartResolver")
 	public CommonsMultipartResolver createMultipartResolver() {
-		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+		final long maxFileSize = dataSetting.getUploadMaxFileSize() * 1024;
+		
+		final CommonsMultipartResolver resolver = new CommonsMultipartResolver();
 		resolver.setDefaultEncoding("utf-8");
-
+		resolver.setMaxUploadSizePerFile(maxFileSize);
+		
 		return resolver;
 	}
 
@@ -72,13 +79,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		final SessionLocaleResolver resolver = new SessionLocaleResolver();
 		//final CookieLocaleResolver resolver = new CookieLocaleResolver();
 		resolver.setDefaultLocale(new Locale(DEFAULT_LOCALE));
-
+		
 		return resolver;
 	}
 	
 	@Bean
 	public LocaleChangeInterceptor localeChangeInterceptor() {
-		LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
+		final LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
 		localeChangeInterceptor.setParamName("lang");
 
 		return localeChangeInterceptor;

@@ -1,5 +1,7 @@
 package fr.be.your.self.backend.config.root;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -23,6 +25,45 @@ public class ApplicationConfig {
 	@Value("${data.upload.folder}")
 	private String uploadFolder;
 	
+	@Value("${data.upload.image.max-file-size:1024}")
+	private int imageMaxFileSize;
+	
+	@Value("${data.upload.audio.max-file-size:1024}")
+	private int audioMaxFileSize;
+	
+	@Value("${data.upload.video.max-file-size:1024}")
+	private int videoMaxFileSize;
+	
+	@Value("#{'${data.upload.image.extension}'.split(',')}")
+	private Set<String> imageFileExtensions;
+	
+	@Value("#{'${data.upload.audio.extension}'.split(',')}")
+	private Set<String> audioFileExtensions;
+	
+	@Value("#{'${data.upload.video.extension}'.split(',')}")
+	private Set<String> videoFileExtensions;
+	
+	@Value("#{'${data.upload.image.media.type}'.split(',')}")
+	private Set<String> imageFileMediaTypes;
+	
+	@Value("#{'${data.upload.audio.media.type}'.split(',')}")
+	private Set<String> audioFileMediaTypes;
+	
+	@Value("#{'${data.upload.video.media.type}'.split(',')}")
+	private Set<String> videoFileMediaTypes;
+	
+	@Value("${account.auto.activate:false}")
+	private boolean autoActivateNormalAccount;
+	
+	@Value("${account.admin.auto.activate:false}")
+	private boolean autoActivateAdminAccount;
+	
+	@Value("${account.activate.code.length:6}")
+	private int activateCodeLength;
+	
+	@Value("${account.activate.code.timeout}")
+	private long activateCodeTimeout;
+	
 	@Autowired
 	private MessageSource messageSource;
 	
@@ -30,7 +71,13 @@ public class ApplicationConfig {
 	public DataSetting dataSetting() {
 		final DataSetting setting = new DataSetting();
 		setting.setDefaultPageSize(this.defaultPageSize);
+		
 		setting.setUploadFolder(this.uploadFolder);
+		setting.setUploadFileSizes(this.imageMaxFileSize, this.audioMaxFileSize, this.videoMaxFileSize);
+		setting.setUploadFileExtensions(this.imageFileExtensions, this.audioFileExtensions, this.videoFileExtensions);
+		setting.setUploadMediaTypes(this.imageFileMediaTypes, this.audioFileMediaTypes, this.videoFileMediaTypes);
+		setting.setAutoActivateAccount(this.autoActivateNormalAccount, this.autoActivateAdminAccount, 
+				this.activateCodeLength, this.activateCodeTimeout);
 		
 		return setting;
 	}

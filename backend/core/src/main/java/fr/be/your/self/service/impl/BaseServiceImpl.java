@@ -6,19 +6,19 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.be.your.self.dto.PageableResponse;
+import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.service.BaseService;
 
 public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	
-	protected abstract PagingAndSortingRepository<T, Integer> getRepository();
+	protected abstract BaseRepository<T> getRepository();
 	
-	protected abstract Iterable<T> findAll(String text);
+	protected abstract Iterable<T> getList(String text);
 	
-	protected abstract Page<T> findPage(String text, Pageable pageable);
+	protected abstract Page<T> getListByPage(String text, Pageable pageable);
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -30,7 +30,7 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> search(String text) {
-		final Iterable<T> domains = this.findAll(text);
+		final Iterable<T> domains = this.getList(text);
 		
 		final List<T> result = new ArrayList<>();
 		domains.forEach(result::add);
@@ -45,7 +45,7 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 			return null;
 		}
 		
-		final Page<T> pageDomain = this.findPage(text, pageable);
+		final Page<T> pageDomain = this.getListByPage(text, pageable);
 		if (pageDomain == null) {
 			return null;
 		}
@@ -83,12 +83,17 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	}
 
 	@Override
-	public boolean activate(Integer id) {
-		return true;
+	public Iterable<T> findAll() {
+		return this.getRepository().findAll();
 	}
 
 	@Override
-	public boolean deactivate(Integer id) {
-		return false;
+	public Page<T> getPaginatedUsers(Pageable pageable) {
+		return this.getRepository().findAll(pageable);
+	}
+
+	@Override
+	public <S extends T> Iterable<S> saveAll(Iterable<S> entities) {
+		return this.getRepository().saveAll(entities);
 	}
 }

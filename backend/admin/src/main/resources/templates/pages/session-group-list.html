@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+	<title th:text="#{session.group.title}"></title>
+</head>
+<body>
+	<th:block layout:fragment="content">
+		<!-- Table -->
+		<div class="row">
+			<div class="col">
+				<div class="card shadow"> 
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col-6">
+								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/create'}">
+									<span class="btn-inner--icon">
+										<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
+									</span>
+								</a>
+							</div>
+							
+							<div class="col-6 text-right">
+								<h3 class="mb-0" th:text="${formTitle}"></h3>
+							</div>
+						</div>
+					</div>
+					
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush">
+							<thead class="thead-light">
+								<tr>
+									<th scope="col" width="90%" th:text="#{session.group.detail.name}"></th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item : ${result.items}">
+									<th scope="row" nowrap>
+										<div class="media align-items-center">
+											<a href="#" class="avatar rounded-circle mr-3">
+												<img th:if="${item.image != null && item.image != ''}" 
+													th:alt="${item.name}" th:src="${baseMediaURL + '/image/view/' + item.image}">
+											</a>
+											<div class="media-body">
+												<span class="mb-0 text-sm" th:text="${item.name}"></span>
+											</div>
+										</div>
+									</th>
+									<td class="text-right">
+										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-edit"></i>
+											</span>
+										</a>
+										
+										<a class="btn btn-icon btn-2 btn-danger" th:href="${baseURL + '/delete/' + item.id}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-times"></i>
+											</span>
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<div class="card-footer py-4" th:insert="fragments/data-list-pagination :: pagination"></div>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+	<th:block layout:fragment="scripts">
+	</th:block>
+</body>
+</html>

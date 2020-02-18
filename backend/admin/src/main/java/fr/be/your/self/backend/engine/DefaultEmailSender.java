@@ -3,6 +3,8 @@ package fr.be.your.self.backend.engine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,157 +15,135 @@ import fr.be.your.self.engine.EmailSender;
 import fr.be.your.self.util.StringUtils;
 
 public class DefaultEmailSender implements EmailSender {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(DefaultEmailSender.class);
+
 	@Autowired
-    private MailSender mailSender;
-    
-    @Autowired
-    private SimpleMailMessage defaultMessage;
-    
-    private String activateUserSubject;
-    private String activateUserBody;
-    
-    private String forgetPasswordSubject;
-    private String forgetPasswordBody;
-    
-    public DefaultEmailSender(String activateUserSubject, String activateUserBody, 
-    		String forgetPasswordSubject, String forgetPasswordBody) {
+	private MailSender mailSender;
+
+	@Autowired
+	private SimpleMailMessage defaultMessage;
+
+	private String activateUserSubject;
+	private String activateUserBody;
+
+	private String forgotPasswordSubject;
+	private String forgotPasswordBody;
+
+	public DefaultEmailSender(String activateUserSubject, String activateUserBody, String forgotPasswordSubject,
+			String forgotPasswordBody) {
 		this.activateUserSubject = activateUserSubject;
 		this.activateUserBody = activateUserBody;
-		this.forgetPasswordSubject = forgetPasswordSubject;
-		this.forgetPasswordBody = forgetPasswordBody;
+		this.forgotPasswordSubject = forgotPasswordSubject;
+		this.forgotPasswordBody = forgotPasswordBody;
 	}
-    
-    @Override
-    public void send(String to, String subject, String body) {
-		SimpleMailMessage message = new SimpleMailMessage();
-		defaultMessage.copyTo(message);
-		
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
-        
-        mailSender.send(message);
-    }
-    
-    @Override
-    public boolean sendActivateUser(String email, String activateUrl, String validToken) {
-    	final String realUrl = activateUrl 
-    			+ (activateUrl.indexOf("?") > 0 ? "&" : "?") 
-    			+ "activeCode=" + validToken;
-    	
-    	String mailBody = this.activateUserBody
-    			.replace("[ValidCode]", validToken)
-    			.replace("[ActivateUrl]", realUrl);
-    	
-    	if (JavaMailSender.class.isAssignableFrom(mailSender.getClass()))
-    	{
-    		try {
-	    		JavaMailSender javaMailSender = (JavaMailSender) mailSender;
-	    		
-	    		MimeMessage message = javaMailSender.createMimeMessage();
-	    		message.setSubject(this.activateUserSubject, "UTF-8");
-				
-	    		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-	            helper.setFrom(defaultMessage.getFrom());
-	            
-	            String[] bcc = defaultMessage.getBcc();
-	            if (bcc != null && bcc.length > 0 && !StringUtils.isNullOrEmpty(bcc[0])) {
-	            	helper.setBcc(bcc);
-	            }
-	            
-	            String[] cc = defaultMessage.getCc();
-	            if (cc != null && cc.length > 0 && !StringUtils.isNullOrEmpty(cc[0])) {
-	            	helper.setCc(cc);
-	            }
-				
-	            helper.setTo(email);
-	            helper.setText(mailBody, true);
-	            
-	            javaMailSender.send(message);
-	            return true;
-    		} catch (MessagingException e) {
-    			
-			} catch (Exception e) {
-				
-			}
-    	}
-    	
-    	try {
-			SimpleMailMessage message = new SimpleMailMessage();
-			defaultMessage.copyTo(message);
-			
-	        message.setTo(email);
-	        message.setSubject(this.activateUserSubject);
-	        message.setText(mailBody);
-	        
-	        mailSender.send(message);
-	        
-	        return true;
-    	} catch (Exception e) {
-			
+
+	@Override
+	public boolean send(String to, String subject, String body) {
+		try {
+			final SimpleMailMessage message = new SimpleMailMessage();
+			this.defaultMessage.copyTo(message);
+
+			message.setTo(to);
+			message.setSubject(subject);
+			message.setText(body);
+
+			this.mailSender.send(message);
+
+			return true;
+		} catch (Exception ex) {
+			logger.error("Send email error", ex);
 		}
-    	
-    	return false;
-    }
-    
-    @Override
-    public boolean sendForgotPassword(String forgotPasswordUrl, String email, String validToken) {
-    	final String realUrl = forgotPasswordUrl
-    			+ (forgotPasswordUrl.indexOf("?") > 0 ? "&" : "?")
-    			+ "validCode=" + validToken;
-    	
-    	final String mailBody = this.forgetPasswordBody
-    			.replace("[ValidCode]", validToken)
-    			.replace("[ForgotPasswordUrl]", realUrl);
-    	
-    	if (JavaMailSender.class.isAssignableFrom(mailSender.getClass()))
-    	{
-    		try {
-	    		JavaMailSender javaMailSender = (JavaMailSender) mailSender;
-	    		MimeMessage message = javaMailSender.createMimeMessage();
-	    		message.setSubject(this.forgetPasswordSubject, "UTF-8");
-				
-	    		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-	            helper.setFrom(defaultMessage.getFrom());
-	            
-	            String[] bcc = defaultMessage.getBcc();
+
+		return false;
+	}
+
+	@Override
+	public boolean sendActivateUser(String email, String activateUrl, String activateCode) {
+		final String realUrl = activateUrl + (activateUrl.indexOf("?") > 0 ? "&" : "?") + "code=" + activateCode;
+
+		final String mailBody = this.activateUserBody
+				.replace("[ActivateCode]", activateCode)
+				.replace("[ActivateUrl]", realUrl);
+
+		if (JavaMailSender.class.isAssignableFrom(this.mailSender.getClass())) {
+			try {
+				final JavaMailSender javaMailSender = (JavaMailSender) this.mailSender;
+
+				final MimeMessage message = javaMailSender.createMimeMessage();
+				message.setSubject(this.activateUserSubject, "UTF-8");
+
+				final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+				helper.setFrom(this.defaultMessage.getFrom());
+
+				final String[] bcc = this.defaultMessage.getBcc();
 				if (bcc != null && bcc.length > 0 && !StringUtils.isNullOrEmpty(bcc[0])) {
-	            	helper.setBcc(bcc);
-	            }
-	            
-	            String[] cc = defaultMessage.getCc();
+					helper.setBcc(bcc);
+				}
+
+				final String[] cc = this.defaultMessage.getCc();
 				if (cc != null && cc.length > 0 && !StringUtils.isNullOrEmpty(cc[0])) {
-	            	helper.setCc(cc);
-	            }
-	            
-	            helper.setTo(email);
-	            helper.setText(mailBody, true);
-	            
-	            javaMailSender.send(message);
-	            return true;
-    		} catch (MessagingException e) {
-				// e.printStackTrace();
-			} catch (Exception e) {
-				// e.printStackTrace();
+					helper.setCc(cc);
+				}
+
+				helper.setTo(email);
+				helper.setText(mailBody, true);
+
+				javaMailSender.send(message);
+
+				return true;
+			} catch (MessagingException ex) {
+				logger.error("Invalid email message", ex);
+			} catch (Exception ex) {
+				logger.error("Send email error", ex);
 			}
-    	}
-    	
-    	try {
-			SimpleMailMessage message = new SimpleMailMessage();
-			defaultMessage.copyTo(message);
-			
-	        message.setTo(email);
-	        message.setSubject(this.forgetPasswordSubject);
-	        message.setText(mailBody);
-	        
-	        mailSender.send(message);
-	        
-	        return true;
-    	} catch (Exception e) {
-			// e.printStackTrace();
 		}
-    	
-    	return false;
-    }
+
+		return this.send(email, this.activateUserSubject, mailBody);
+	}
+
+	@Override
+	public boolean sendForgotPassword(String forgotPasswordUrl, String email, String forgotPasswordCode) {
+		final String realUrl = forgotPasswordUrl + (forgotPasswordUrl.indexOf("?") > 0 ? "&" : "?") + "code="
+				+ forgotPasswordCode;
+
+		final String mailBody = this.forgotPasswordBody
+				.replace("[ForgotPasswordCode]", forgotPasswordCode)
+				.replace("[ForgotPasswordUrl]", realUrl);
+
+		if (JavaMailSender.class.isAssignableFrom(this.mailSender.getClass())) {
+			try {
+				final JavaMailSender javaMailSender = (JavaMailSender) this.mailSender;
+				
+				final MimeMessage message = javaMailSender.createMimeMessage();
+				message.setSubject(this.forgotPasswordSubject, "UTF-8");
+
+				final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+				helper.setFrom(defaultMessage.getFrom());
+
+				final String[] bcc = defaultMessage.getBcc();
+				if (bcc != null && bcc.length > 0 && !StringUtils.isNullOrEmpty(bcc[0])) {
+					helper.setBcc(bcc);
+				}
+
+				final String[] cc = defaultMessage.getCc();
+				if (cc != null && cc.length > 0 && !StringUtils.isNullOrEmpty(cc[0])) {
+					helper.setCc(cc);
+				}
+
+				helper.setTo(email);
+				helper.setText(mailBody, true);
+
+				javaMailSender.send(message);
+
+				return true;
+			} catch (MessagingException ex) {
+				logger.error("Invalid email message", ex);
+			} catch (Exception ex) {
+				logger.error("Send email error", ex);
+			}
+		}
+
+		return this.send(email, this.forgotPasswordSubject, mailBody);
+	}
 }
