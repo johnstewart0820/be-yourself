@@ -64,6 +64,15 @@ public class ApplicationConfig {
 	@Value("${account.activate.code.timeout}")
 	private long activateCodeTimeout;
 	
+	@Value("${auth.page.display.header:false}")
+	private boolean displayHeaderOnAuthPage;
+	
+	@Value("${auth.page.allow.register:false}")
+	private boolean allowRegisterOnAuthPage;
+	
+	@Value("${auth.page.allow.social:false}")
+	private boolean allowSocialOnAuthPage;
+	
 	@Autowired
 	private MessageSource messageSource;
 	
@@ -78,6 +87,7 @@ public class ApplicationConfig {
 		setting.setUploadMediaTypes(this.imageFileMediaTypes, this.audioFileMediaTypes, this.videoFileMediaTypes);
 		setting.setAutoActivateAccount(this.autoActivateNormalAccount, this.autoActivateAdminAccount, 
 				this.activateCodeLength, this.activateCodeTimeout);
+		setting.setAuthenticationConfiguration(this.displayHeaderOnAuthPage, this.allowRegisterOnAuthPage, this.allowSocialOnAuthPage);
 		
 		return setting;
 	}

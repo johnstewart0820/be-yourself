@@ -1,12 +1,13 @@
 package fr.be.your.self.backend.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,10 +15,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.StatusCode;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
@@ -27,14 +30,9 @@ import fr.be.your.self.util.StringUtils;
 
 public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, DetailDto> extends BaseController {
 	
-	private static final String BASE_AVATAR_URL = Constants.PATH.WEB_ADMIN_PREFIX 
-			+ Constants.PATH.WEB_ADMIN.MEDIA 
-			+ Constants.PATH.WEB_ADMIN.MEDIA_TYPE.AVATAR;
+	private static final String ACCESS_DENIED_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACCESS_DENIED;
 	
 	protected Logger logger;
-	
-	@Autowired
-	protected DataSetting dataSetting;
 	
 	public BaseResourceController() {
 		super();
@@ -65,11 +63,29 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	
 	@Override
 	public void initAttributes(HttpSession session, HttpServletRequest request, 
-			HttpServletResponse response, Model model) {
+			HttpServletResponse response, Model model, PermissionDto permission) {
 		
-		model.addAttribute("baseAvatarURL", BASE_AVATAR_URL);
-		model.addAttribute("baseURL", this.getBaseURL());
+		final String pageName = this.getName();
+		final boolean writePermission = permission.hasWritePermission(pageName);
+		final boolean readPermission = writePermission || permission.hasPermission(pageName);
+		
+		if (!readPermission) {
+			try {
+				response.sendRedirect(ACCESS_DENIED_URL);
+				
+				return;
+			} catch (IOException e) {}
+		}
+		
+		final String baseMessageKey = pageName.replace('-', '.');
+		
+		model.addAttribute("writePermission", writePermission);
+		model.addAttribute("readPermission", readPermission);
+		
+		model.addAttribute("pageName", pageName);
 		model.addAttribute("pageTitle", this.getDefaultPageTitle());
+		model.addAttribute("baseMessageKey", baseMessageKey);
+		model.addAttribute("baseURL", this.getBaseURL());
 		
 		final String baseImageURL = this.getBaseMediaURL();
 		if (!StringUtils.isNullOrSpace(baseImageURL)) {
@@ -78,12 +94,13 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	@GetMapping(value = { "", "/search" })
-    public String listPage(HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model,
+    public String listPage(
     		@RequestParam(name = "q", required = false) String search,
     		@RequestParam(name = "sort", required = false) String sort,
     		@RequestParam(name = "page", required = false) Integer page,
-    		@RequestParam(name = "size", required = false) Integer size) {
+    		@RequestParam(name = "size", required = false) Integer size,
+    		HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model) {
 		
 		final PageRequest pageable = this.getPageRequest(page, size);
 		
@@ -97,9 +114,10 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
     }
 	
 	@GetMapping(value = { "/page/{page}" })
-    public String changePage(HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model,
-    		@PathVariable(name = "page", required = true) Integer page) {
+    public String changePage(
+    		@PathVariable(name = "page", required = true) Integer page,
+    		HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model) {
 		
 		final String search = (String) session.getAttribute(this.getSearchSessionKey());
 		final String sort = (String) session.getAttribute(this.getSortSessionKey());
@@ -151,7 +169,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		}
 		
 		// Store properties
-		final String titleKey = this.getName().replace('-', '.') + ".title"; 
+		final String titleKey = this.getName().replace('-', '.') + ".page.title"; 
 		model.addAttribute("formTitle", this.getMessage(titleKey));
 		
 		model.addAttribute("search", search == null ? "" : search);
@@ -188,7 +206,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		}
 		
 		// Store result
-		final String titleKey = this.getName().replace('-', '.') + ".create.title"; 
+		final String titleKey = this.getName().replace('-', '.') + ".create.page.title"; 
 		model.addAttribute("formTitle", this.getMessage(titleKey));
 		
 		model.addAttribute("action", "create");
@@ -198,9 +216,10 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	@GetMapping(value = { "/edit/{id}" })
-    public String editPage(HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model,
-    		@PathVariable(name = "id", required = true) Integer id) {
+    public String editPage(
+    		@PathVariable(name = "id", required = true) Integer id,
+    		HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model) {
 		
 		final T domain = this.getService().getById(id);
 		if (domain == null) {
@@ -225,12 +244,53 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		}
 		
 		// Store result
-		final String titleKey = this.getName().replace('-', '.') + ".edit.title";
+		final String titleKey = this.getName().replace('-', '.') + ".edit.page.title";
 		final Object[] titleParams = new Object[] { domain.getDisplay() };
 		model.addAttribute("formTitle", this.getMessage(titleKey, titleParams));
 		
 		model.addAttribute("action", "update/" + id);
 		model.addAttribute("dto", dto);
+		
+		return this.getFormView();
+	}
+	
+	@RequestMapping(value = { "/view/{id}" }, method = { RequestMethod.GET, RequestMethod.POST })
+    public String viewPage(
+    		@PathVariable(name = "id", required = true) Integer id,
+    		HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model) {
+		
+		final T domain = this.getService().getById(id);
+		if (domain == null) {
+			return "redirect:" + this.getBaseURL() + "/current-page";
+		}
+		
+		final DetailDto dto = this.createDetailDto(domain);
+		if (dto == null) {
+			return "redirect:" + this.getBaseURL() + "/current-page";
+		}
+		
+		try {
+			this.loadDetailForm(session, request, response, model, dto);
+		} catch (BusinessException ex) {
+			this.logger.error("Business error", ex);
+			
+			return "redirect:" + this.getBaseURL() + "/current-page";
+		} catch (Exception ex) {
+			this.logger.error("Process error", ex);
+			
+			return "redirect:" + this.getBaseURL() + "/current-page";
+		}
+		
+		// Store result
+		final String titleKey = this.getName().replace('-', '.') + ".view.page.title";
+		final Object[] titleParams = new Object[] { domain.getDisplay() };
+		model.addAttribute("formTitle", this.getMessage(titleKey, titleParams));
+		
+		model.addAttribute("action", "view/" + id);
+		model.addAttribute("dto", dto);
+		
+		model.addAttribute("writePermission", false);
 		
 		return this.getFormView();
 	}

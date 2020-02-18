@@ -29,6 +29,14 @@ public class StringUtils {
 		return formatFileSize(value, 0);
 	}
 	
+	public static final String upperCaseFirst(String value) {
+		if (value == null || value.isEmpty()) {
+			return value;
+		}
+		
+		return value.substring(0, 1).toUpperCase() + value.substring(1);
+	}
+	
 	public static final String randomAlphabetic(int length) {
 		final int leftLimit = 97; // letter 'a'
 		final int rightLimit = 122; // letter 'z'

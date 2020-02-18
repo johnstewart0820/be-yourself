@@ -10,11 +10,28 @@ public class PermissionDto {
 	private Map<String, Integer> userPermissions = new HashMap<>();
 	
 	public boolean hasPermission(String path) {
-		return this.userPermissions.containsKey(path.toLowerCase());
+		if (path == null || path.isEmpty()) {
+			return false;
+		}
+		
+		final String funcPath = (path.startsWith("/") ? "" : "/") + path.toLowerCase();
+		final Integer permission = this.userPermissions.get(funcPath);
+		
+		if (permission == null) {
+			return false;
+		}
+		
+		return permission == UserPermission.READONLY.getValue() 
+				|| permission == UserPermission.WRITE.getValue();
 	}
 	
 	public boolean hasWritePermission(String path) {
-		final Integer permission = this.userPermissions.get(path.toLowerCase());
+		if (path == null || path.isEmpty()) {
+			return false;
+		}
+		
+		final String funcPath = (path.startsWith("/") ? "" : "/") + path.toLowerCase();
+		final Integer permission = this.userPermissions.get(funcPath);
 		
 		if (permission == null) {
 			return false;

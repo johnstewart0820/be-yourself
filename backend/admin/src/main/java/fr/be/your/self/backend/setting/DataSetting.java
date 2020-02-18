@@ -27,7 +27,10 @@ public class DataSetting {
 	private Set<String> audioMediaTypes;
 	private Set<String> videoMediaTypes;
 	
-	//'image/png', 'image/jpg', 'image/jpeg'
+	private boolean displayHeaderOnAuthPage;
+	private boolean allowRegisterOnAuthPage;
+	private boolean allowSocialOnAuthPage;
+	
 	public int getDefaultPageSize() {
 		return defaultPageSize;
 	}
@@ -100,6 +103,18 @@ public class DataSetting {
 		return videoMediaTypes == null ? Collections.emptySet() : this.videoMediaTypes;
 	}
 
+	public boolean isDisplayHeaderOnAuthPage() {
+		return displayHeaderOnAuthPage;
+	}
+
+	public boolean isAllowRegisterOnAuthPage() {
+		return allowRegisterOnAuthPage;
+	}
+
+	public boolean isAllowSocialOnAuthPage() {
+		return allowSocialOnAuthPage;
+	}
+
 	public void setUploadFileSizes(long imageMaxFileSize, long audioMaxFileSize, long videoMaxFileSize) {
 		this.imageMaxFileSize = imageMaxFileSize * 1024;
 		this.audioMaxFileSize = audioMaxFileSize * 1024;
@@ -133,6 +148,13 @@ public class DataSetting {
 		this.autoActivateAdminAccount = autoActivateAdminAccount;
 		this.activateCodeLength = activateAccountCodeLength;
 		this.activateCodeTimeout = activateCodeTimeout;
+	}
+	
+	public void setAuthenticationConfiguration(boolean displayHeaderOnAuthPage, boolean allowRegisterOnAuthPage, 
+			boolean allowSocialOnAuthPage) {
+		this.displayHeaderOnAuthPage = displayHeaderOnAuthPage;
+		this.allowRegisterOnAuthPage = allowRegisterOnAuthPage;
+		this.allowSocialOnAuthPage = allowSocialOnAuthPage;
 	}
 	
 	public String getAvatarFolder() {

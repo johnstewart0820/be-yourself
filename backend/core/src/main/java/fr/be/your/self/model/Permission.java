@@ -17,8 +17,7 @@ public class Permission {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "PermissionID")
-    private int permissionId;
+    private int id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "UserID")
@@ -32,12 +31,12 @@ public class Permission {
     private int userPermission;
 	
 	
-	public int getPermissionId() {
-		return permissionId;
+	public int getId() {
+		return id;
 	}
 
-	public void setPermissionId(int permissionId) {
-		this.permissionId = permissionId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public User getUser() {

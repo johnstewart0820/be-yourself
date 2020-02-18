@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/main-layout.html}">
 <head>
-	<title th:text="#{session.group.title}"></title>
+	<title th:text="#{|${baseMessageKey}.page.title|}"></title>
 </head>
 <body>
 	<th:block layout:fragment="content">
@@ -14,11 +14,13 @@
 					<div class="card-header border-0">
 						<div class="row">
 							<div class="col-6">
-								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/create'}">
-									<span class="btn-inner--icon">
-										<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
-									</span>
-								</a>
+								<th:block th:if="${writePermission}">
+									<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/create'}">
+										<span class="btn-inner--icon">
+											<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
+										</span>
+									</a>
+								</th:block>
 							</div>
 							
 							<div class="col-6 text-right">
@@ -32,32 +34,45 @@
 							<thead class="thead-light">
 								<tr>
 									<th scope="col" width="90%" th:text="#{session.group.detail.name}"></th>
-									<th scope="col"></th>
+									<th scope="col" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${result.items}">
 									<th scope="row" nowrap>
 										<div class="media align-items-center">
-											<a href="#" class="avatar rounded-circle mr-3">
-												<img th:if="${item.image != null && item.image != ''}" 
-													th:alt="${item.name}" th:src="${baseMediaURL + '/image/view/' + item.image}">
+											<a th:if="${item.image != null && item.image != ''}" 
+												th:href="${baseMediaURL + '/image/view/' + item.image}" 
+												class="avatar rounded-circle mr-3" target="_blank">
+												<img th:alt="${item.name}" th:src="${baseMediaURL + '/image/view/' + item.image}">
+											</a>
+											<a th:if="${item.image == null || item.image == ''}" 
+												href="javascript:;" class="avatar rounded-circle mr-3">
+												<img th:alt="${item.name}" th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
 											</a>
 											<div class="media-body">
 												<span class="mb-0 text-sm" th:text="${item.name}"></span>
 											</div>
 										</div>
 									</th>
-									<td class="text-right">
-										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}">
+									<td class="text-right" th:if="${writePermission}">
+										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
 											<span class="btn-inner--icon">
 												<i class="fas fa-edit"></i>
 											</span>
 										</a>
 										
-										<a class="btn btn-icon btn-2 btn-danger" th:href="${baseURL + '/delete/' + item.id}">
+										<button class="btn btn-icon btn-2 btn-danger" type="button" 
+											th:title="#{action.delete.title}" th:onclick="confirmDelete([[${item.id}]])">
 											<span class="btn-inner--icon">
 												<i class="fas fa-times"></i>
+											</span>
+										</button>
+									</td>
+									<td class="text-right" th:if="${!writePermission && readPermission}">
+										<a class="btn btn-icon btn-2 btn-info" th:href="${baseURL + '/view/' + item.id}" th:title="#{action.view.title}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-eye"></i>
 											</span>
 										</a>
 									</td>
@@ -70,9 +85,56 @@
 				</div>
 			</div>
 		</div>
+		
+		<div class="modal fade" id="confirm-delete-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="deleteConfirmModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<form id="confirm-delete-form" action="javascript:;" method="POST">
+						<div class="modal-header">
+							<h3 class="modal-title" id="confirm-delete-modal-title" th:utext="#{modal.confirm.delete.title}"></h3>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p th:utext="#{modal.confirm.delete.message(#{${baseMessageKey} + '.name'})}"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-warning" th:utext="#{modal.button.yes}">Yes</button>
+	                		<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal" th:utext="#{modal.button.no}">No</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+		<div class="toast" id="on-load-toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<img src="..." class="rounded mr-2" alt="...">
+				<strong class="mr-auto">Bootstrap</strong>
+				<small>11 mins ago</small>
+				<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="toast-body">Hello, world! This is a toast message.</div>
+		</div>
 	</th:block>
 
 	<th:block layout:fragment="scripts">
+		<script type="text/javascript">
+			function confirmDelete(id) {
+				var url = '[[${baseURL}]]/delete/' + id;
+				
+				$('#confirm-delete-form').attr('action', url);
+				showModal('confirm-delete-modal');
+			}
+			
+			$(function() {
+				$('#on-load-toast').toast('show');
+			});
+		</script>
 	</th:block>
 </body>
 </html>

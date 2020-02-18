@@ -5,14 +5,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "Func")
 public class Functionality extends PO<Integer> {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "FunctionalityID")
-    private int functionalityId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 	
 	@Column(name = "Path", length = 120)
 	private String path;
@@ -34,15 +35,11 @@ public class Functionality extends PO<Integer> {
 
 	@Override
 	public Integer getId() {
-		return this.functionalityId;
+		return id;
 	}
 
-	public int getFunctionalityId() {
-		return functionalityId;
-	}
-
-	public void setFunctionalityId(int functionalityId) {
-		this.functionalityId = functionalityId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getPath() {

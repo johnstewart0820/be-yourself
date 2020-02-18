@@ -21,9 +21,49 @@
         
         <h2>5. <span th:utext="#{lang.change}"></span>: <a th:href="@{/home?lang=en}" th:text="#{lang.eng}"></a></h2>
         <h2>6. <span th:utext="#{lang.change}"></span>: <a th:href="@{/home?lang=fr}" th:text="#{lang.fr}"></a></h2>
+        
+        <button class="btn btn-icon btn-2 btn-danger" type="button" 
+			th:title="#{action.delete.title}" onclick="confirmDelete(1)">
+			<span class="btn-inner--icon">
+				<i class="fas fa-times"></i>
+			</span>
+		</button>
+		
+		<a href="#" onclick="confirmDelete(1)">XYZZZ</a>
+		
+        <div class="modal fade" id="confirm-delete-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="deleteConfirmModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<form id="confirm-delete-form" action="javascript:;" method="POST">
+						<div class="modal-header">
+							<h3 class="modal-title" id="confirm-delete-modal-title" th:text="#{modal.confirm.delete.title}"></h3>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p th:text="#{modal.confirm.delete.message(#{'session.group.name'})}"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-white" th:text="#{modal.button.yes}">Yes</button>
+	                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal" th:text="#{modal.button.no}">No</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
     </th:block>
 
     <th:block layout:fragment="scripts">
+    	<script type="text/javascript">
+			function confirmDelete(id) {
+				var url = '[[${baseURL}]]/delete/' + id;
+				
+				$('#confirm-delete-form').attr('action', url);
+				showModal('confirm-delete-modal');
+			}
+		</script>
     </th:block>
 
 </body>
