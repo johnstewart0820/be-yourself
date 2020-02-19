@@ -27,6 +27,7 @@
 									<th scope="col">Email</th>
 									<th scope="col">FullName</th>
 									<th scope="col">Status</th>
+									<th scope="col">Subscription Type</th>
 									<th scope="col">Role</th>
 									<th scope="col">Action</th>
 								</tr>
@@ -36,8 +37,10 @@
 									<td><span th:text="${user.id}"> ID </span></td>
 									<td><span th:text="${user.email}"> Email </span></td>
 									<td><span th:text="${user.fullName}"> Fullname </span></td>
-									<td>Status</td>
-									<td>Role</td>
+									<td  th:text="${user.statusDescription}"></td>
+									
+									<td scope="col">Subscription Type</td>
+									<td  th:text="${user.userTypeDescription}"></td>
 									<td class="text-right">
 										<div class="dropdown">
 											<a class="btn btn-sm btn-icon-only text-light" href="#"
@@ -49,8 +52,7 @@
 												<a class="dropdown-item"
 													th:href="@{/user/{id}/update(id=${user.id})}">Update</a> <a
 													class="dropdown-item"
-													th:href="@{/user/{id}/delete(id=${user.id})}">Delete</a> <a
-													class="dropdown-item" href="#">Something else here</a>
+													th:href="@{/user/{id}/delete(id=${user.id})}">Delete</a> 
 											</div>
 										</div>
 									</td>

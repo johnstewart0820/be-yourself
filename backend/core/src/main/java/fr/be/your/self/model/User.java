@@ -11,6 +11,9 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import fr.be.your.self.common.UserStatus;
+import fr.be.your.self.common.UserType;
+
 @Entity
 public class User extends PO<Integer> {
 
@@ -176,5 +179,13 @@ public class User extends PO<Integer> {
 	@Override
 	public String getDisplay() {
 		return this.getFullName();
+	}
+	
+	public String getStatusDescription() {
+		return UserStatus.getStatusDescription(status);
+	}
+	
+	public String getUserTypeDescription() {
+		return UserType.getStatusDescription(userType);
 	}
 }

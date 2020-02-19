@@ -4,61 +4,7 @@
 	layout:decorate="~{layout/main-layout.html}">
 <head>
 <title>Home</title>
-<script>
-	var isUpdating = [[${isUpdating}]];
-	var editAccType = [[${editAccType}]];
-	var editPermissions = [[${editPermissions}]];
 
-	
-	function selectLoginType() {
-		var selectedLoginType = $("select#loginType").children(
-				"option:selected").val();
-		if (selectedLoginType == 0) {
-			$("#password_div").show();
-			$("#reset_pwd_email_div").show();
-		} else {
-			$("#password").val(null);
-			$("#password_div").hide();
-			$("#reset_pwd_email_div").hide();
-		}
-	}
-
-	function selectUserType() {
-		var selectedUserType = $("select#userType").children("option:selected").val();
-		if (selectedUserType == "ADM" || selectedUserType == "SAM") {
-			$("#admin_permissions_div").show();
-		} else {
-			$("#admin_permissions_div").hide();
-		}
-	}
-	
-	function selectAccountType() {
-		if (editAccType == 1 || editAccType == 0) {
-			$('#userType').css('pointer-events','none'); //Disable access to select account type
-		}
-	}
-	
-	function selectEditPermissions() {
-		if (editPermissions == 1 || editPermissions == 0) {
-			$('#admin_permissions_div').css('pointer-events','none'); //Disable access to edit permissions
-		}
-	}
-	
-	
-	$(document).ready(function() {
-		selectLoginType();
-		selectUserType();
-		selectAccountType();
-		selectEditPermissions();
-		
-		$("select#loginType").change(function() {
-			selectLoginType();
-		});
-		$("select#userType").change(function() {
-			selectUserType();
-		});
-	});
-</script>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -135,7 +81,7 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text">Password</span>
 										</div>
-										<input class="form-control" id="password" type="password"
+										<input class="form-control" id="pwd" type="password"
 											value="**********" readonly>
 									</div>
 								</div>
@@ -204,8 +150,6 @@
 										</li>
 									</ul>
 								</div>
-								</span>
-
 
 								<div class="text-center">
 									<button type="submit" class="btn btn-primary mt-4">
@@ -232,7 +176,74 @@
 
 	</div>
 
-	<section layout:fragment="scripts"></section>
+	<section layout:fragment="scripts">
+	<script>
+		var editAccType = 2;
+		var editPermissions = 2;
+	</script>
+	<div th:if="${editAccType != null}" >
+		<script>
+		   	editAccType = [[${editAccType}]];
+	   </script>
+	</div>
+	<div th:if="${editPermissions != null}" >
+		<script>
+			editPermissions = [[${editPermissions}]];
+	   </script>
+	</div>
+	<script>
+
+	var isUpdating = [[${isUpdating}]];
+
+	
+	function selectLoginType() {
+		var selectedLoginType = $("select#loginType").children(
+				"option:selected").val();
+		if (selectedLoginType == 0) {
+			$("#password_div").show();
+			$("#reset_pwd_email_div").show();
+		} else {
+			$("#password_div").hide();
+			$("#reset_pwd_email_div").hide();
+		}
+	}
+
+	function selectUserType() {
+		var selectedUserType = $("select#userType").children("option:selected").val();
+		if (selectedUserType == "ADM" || selectedUserType == "SAM") {
+			$("#admin_permissions_div").show();
+		} else {
+			$("#admin_permissions_div").hide();
+		}
+	}
+	
+	function selectAccountType() {
+		if (editAccType == 1 || editAccType == 0) {
+			$('#userType').css('pointer-events','none'); //Disable access to select account type
+		}
+	}
+	
+	function selectEditPermissions() {
+		if (editPermissions == 1 || editPermissions == 0) {
+			$('#admin_permissions_div').css('pointer-events','none'); //Disable access to edit permissions
+		}
+	}
+
+	
+	$(document).ready(function() {
+		selectLoginType();
+		selectUserType();
+		selectAccountType();
+		selectEditPermissions();
+		
+		$("select#loginType").change(function() {
+			selectLoginType();
+		});
+		$("select#userType").change(function() {
+			selectUserType();
+		});
+	});
+</script></section>
 
 </body>
 </html>

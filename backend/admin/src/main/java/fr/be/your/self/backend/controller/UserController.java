@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -51,6 +54,7 @@ import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
+import fr.be.your.self.security.oauth2.AuthenticationUserDetails;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.UserService;
@@ -76,6 +80,9 @@ public class UserController {
 	
 	@Autowired
 	private DataSetting dataSetting;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	public static int NB_USERS_PER_PAGE = 2; // FIXME: move this to config file
 	public static String CSV_USERS_EXPORT_FILE = "users.csv";
@@ -145,6 +152,8 @@ public class UserController {
 				// TODO: Use success variable?
 			}
 			
+			
+			
 			return "redirect:/user/list/page/1"; // back to list of users
 		}
 	}
@@ -164,9 +173,13 @@ public class UserController {
 			permission.setUser(user);
 			permission.setUserPermission(UserPermission.DENIED.getValue());
 			permissions.add(permission);
-			
 		}
 		user.setPermissions(permissions);
+		
+		findLoggedUserInfo(model);
+
+		model.addAttribute("editAccType", UserPermission.WRITE.getValue()); //If we are creating a new user, we need to be able to change the account type
+
 		return "user/userform";
 	}
 
@@ -176,23 +189,86 @@ public class UserController {
 		User user = userService.getById(id);
 		model.addAttribute("user", user);
 		model.addAttribute("isUpdating", true);
-		List<Permission> perms = user.getPermissions();
+		findLoggedUserInfo(model);
+
+		return "user/userform";
+	}
+
+	// save account settings
+	@RequestMapping(value = "/user/settings/save", method = RequestMethod.POST)
+	public String saveAccountSettings(@ModelAttribute @Validated User user,
+			@RequestParam(name = "current_pwd") String current_pwd,
+			@RequestParam(name = "new_pwd") String new_pwd,
+			HttpServletRequest request, BindingResult result, Model model,
+			final RedirectAttributes redirectAttributes)  {
+			
+			int userId = user.getId();
+			User currentUser = userService.getById(userId);
+			
+			//The fields we want to change
+			currentUser.setFirstName(user.getFirstName());
+			currentUser.setLastName(user.getLastName());
+			currentUser.setEmail(user.getEmail());
+			if (!StringUtils.isNullOrEmpty(new_pwd)) {
+				String encoded_current_pwd = this.passwordEncoder.encode(current_pwd);
+				if (!currentUser.getPassword().equals(encoded_current_pwd)) {
+					model.addAttribute("msg", "Wrong current password!");
+					return "user/account_settings_result"; 
+				}
+				String encoded_new_pwd = this.passwordEncoder.encode(new_pwd);
+				currentUser.setPassword(encoded_new_pwd);
+			}
+
+			userService.saveOrUpdate(currentUser);
+			
+			model.addAttribute("msg", "Account settings changed successfully!");
+			return "user/account_settings_result"; 
+	}
+
+	// show account settings
+	@RequestMapping(value = "/user/settings", method = RequestMethod.GET)
+	public String showAccountSettings(Model model) {
+		findLoggedUserInfo(model);		
+		User loggedUser = userService.getById((int) model.getAttribute("loggedUserId"));
+		
+		model.addAttribute("user", loggedUser);
+		return "user/account_settings";
+	}
+	
+	//TODO TVA: find a better way
+	private void findLoggedUserInfo(Model model) {
 		int editAccType = 0;
 		int editPermissions = 0;
-		for (Permission perm : perms) {
-			Functionality func = perm.getFunctionality();
-			if (UserConstants.EDIT_ACCOUNT_TYPE_PATH.equals(func.getPath())) {
-				editAccType = perm.getUserPermission();
-			}
-			if ( UserConstants.EDIT_PERMISSIONS_PATH.equals(func.getPath())) {
-				editPermissions = perm.getUserPermission();
+		Integer loggedUserId = null;
+				
+		//get current logged user information
+		final Authentication oauth = SecurityContextHolder.getContext().getAuthentication();
+		if (oauth != null && oauth.isAuthenticated()) {
+			final Object principal = oauth.getPrincipal();
+			
+			if (principal instanceof AuthenticationUserDetails) {
+				final AuthenticationUserDetails userDetails = (AuthenticationUserDetails) principal;			
+				
+				loggedUserId = userDetails.getUserId();
+				
+				final Iterable<Permission> userPermissions = this.permissionService.getPermissionByUserId(loggedUserId);
+				if (userPermissions != null) {
+					for (Permission userPermission : userPermissions) {
+						final Functionality functionality = userPermission.getFunctionality();
+						if (UserConstants.EDIT_ACCOUNT_TYPE_PATH.equals(functionality.getPath())) {
+							editAccType = userPermission.getUserPermission();
+						}
+						if ( UserConstants.EDIT_PERMISSIONS_PATH.equals(functionality.getPath())) {
+							editPermissions = userPermission.getUserPermission();
+						}					
+					}
+				}
 			}
 		}
 		
+		model.addAttribute("loggedUserId", loggedUserId);
 		model.addAttribute("editAccType", editAccType);
 		model.addAttribute("editPermissions", editPermissions);
-
-		return "user/userform";
 	}
 
 	// delete user

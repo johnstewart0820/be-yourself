@@ -24,8 +24,12 @@ public class UserCSV {
 	@CsvBindByName(column = "User Type")	
 	private String userType;
 
-
+	@CsvBindByName(column = "Subscription Type")	
+	private String subscriptionType = "XXXX"; //TODO TVA get this
 	
+	
+
+
 	public UserCSV() {
 		
 	}
@@ -98,7 +102,13 @@ public class UserCSV {
 	}
 	
 
-	
+	public String getSubscriptionType() {
+		return subscriptionType;
+	}
+
+	public void setSubscriptionType(String subscriptionType) {
+		this.subscriptionType = subscriptionType;
+	}
 	
 	
 }
