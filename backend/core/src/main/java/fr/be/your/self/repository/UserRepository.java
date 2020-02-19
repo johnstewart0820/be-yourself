@@ -17,6 +17,8 @@ public interface UserRepository extends BaseRepository<User> {
     
     User findBySocialLogin(String socialLogin);
     
+    User findByActivateCode(String activateCode);
+    
     long countByEmailOrFirstNameOrLastName(String email, String firstName, String lastName);
     
     Iterable<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName);

@@ -32,6 +32,11 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	
 	private static final String ACCESS_DENIED_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACCESS_DENIED;
 	
+	protected static final String TOAST_ACTION_KEY = "toastAction";
+	protected static final String TOAST_STATUS_KEY = "toastStatus";
+	protected static final String TOAST_TITLE_KEY = "toastTitle";
+	protected static final String TOAST_MESSAGE_KEY = "toastMessage";
+	
 	protected Logger logger;
 	
 	public BaseResourceController() {

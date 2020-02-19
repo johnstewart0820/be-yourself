@@ -140,6 +140,9 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         	return this.getFormView();
         }
         
+        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
+        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+        
         return "redirect:" + this.getBaseURL();
     }
 	
@@ -213,6 +216,9 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 			}
         }
         
+        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+        
         return "redirect:" + this.getBaseURL() + "/current-page";
     }
 	
@@ -233,9 +239,10 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 				message = StringUtils.upperCaseFirst(message);
 			}
 			
-			redirectAttributes.addAttribute("status", false);
-			redirectAttributes.addAttribute("message", message);
-			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
@@ -259,8 +266,9 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 				message = StringUtils.upperCaseFirst(message);
 			}
 
-			redirectAttributes.addAttribute("status", result);
-			redirectAttributes.addAttribute("message", message);
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
 			
 			return "redirect:" + this.getBaseURL();
 		}
@@ -270,9 +278,10 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 			message = StringUtils.upperCaseFirst(message);
 		}
 		
-		redirectAttributes.addAttribute("status", result);
-		redirectAttributes.addAttribute("message", message);
-		
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
+        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+        
 		return "redirect:" + this.getBaseURL() + "/current-page";
 	}
 	

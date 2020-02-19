@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.model.User;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.UserRepository;
@@ -70,5 +71,20 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	@Override
 	public <S extends User> Iterable<S> saveAll(Iterable<S> entities) {
 		return this.repository.saveAll(entities);
+	}
+
+	@Override
+	public User getByActivateCode(String activateCode) {
+		return this.repository.findByActivateCode(activateCode);
+	}
+
+	@Override
+	public boolean activateUser(Integer userId) {
+		return this.repository.updateStatus(userId, UserStatus.ACTIVE.getValue()) > 0;
+	}
+
+	@Override
+	public User getByEmail(String email) {
+		return this.repository.findByEmail(email);
 	}
 }

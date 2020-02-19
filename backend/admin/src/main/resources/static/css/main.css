@@ -29,3 +29,79 @@ b, strong {
 .main-header-container {
 	min-height: 50px;
 }
+
+/********* Modal *************/
+.modal-header.modal-header-warning {
+	background-color: #fb6340; 
+	color: #fff;
+}
+
+.modal-header.modal-header-warning button,
+.modal-header.modal-header-warning .modal-title {
+	color: #fff;
+}
+
+.modal-header.modal-header-danger {
+	background-color: #f5365c; 
+	color: #fff;
+}
+
+.modal-header.modal-header-danger button,
+.modal-header.modal-header-danger .modal-title {
+	color: #fff;
+}
+
+/********* Toast *************/
+.toast-primary .toast-header {
+	background-color: #5e72e4; 
+	color: #fff;
+}
+
+.toast-primary .toast-header svg rect {
+	fill: #2038c1;	/* 30% darker */
+}
+
+.toast-secondary .toast-header {
+	background-color: #f7fafc; 
+	color: #212529;
+}
+
+.toast-secondary .toast-header svg rect {
+	fill: #8ab5d3;	/* 30% darker */
+}
+
+.toast-success .toast-header {
+	background-color: #2dce89; 
+	color: #fff;
+}
+
+.toast-success .toast-header svg rect {
+	fill: #1f905f;	/* 30% darker */
+}
+
+.toast-info .toast-header {
+	background-color: #11cdef; 
+	color: #fff;
+}
+
+.toast-info .toast-header svg rect {
+	fill: #0b8fa7;	/* 30% darker */
+}
+
+.toast-warning .toast-header {
+	background-color: #fb6340; 
+	color: #fff;
+}
+
+.toast-warning .toast-header svg rect {
+	fill: #d72c04;	/**30% darker */
+}
+
+.toast-danger .toast-header {
+	background-color: #f5365c; 
+	color: #fff;
+}
+
+.toast-danger .toast-header svg rect {
+	fill: #c7092f;	/**30% darker */
+}
