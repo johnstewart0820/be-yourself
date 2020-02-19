@@ -36,4 +36,16 @@ public enum UserType {
 		
 		return USER;
 	}
+
+	public static String getStatusDescription(String val) {
+		switch (val) {
+			case "SAM": return "SUPER ADMIN";
+			case "ADM": return "ADMIN";
+			case "B2B": return "B2B";
+			case "B2C": return "B2C";
+			case "PRO": return "PRO";
+			
+			default: return "UNKNOWN";		
+		}
+	}
 }

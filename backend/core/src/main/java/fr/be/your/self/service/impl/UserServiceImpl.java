@@ -1,5 +1,8 @@
 package fr.be.your.self.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.model.User;
+import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.UserRepository;
 import fr.be.your.self.service.UserService;
@@ -86,5 +90,33 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	@Override
 	public User getByEmail(String email) {
 		return this.repository.findByEmail(email);
+	}
+	
+	@Override
+	public List<UserCSV> extractUserCsv(List<Integer> ids) {
+		Iterable<User> users= this.repository.findAllById(ids);
+		List<UserCSV> returnList = new ArrayList<UserCSV>();
+		for (User user: users) {
+			UserCSV userCSV = new UserCSV(user);
+			returnList.add(userCSV);
+		}
+		
+		return returnList;
+	}
+
+	@Override
+	public Page<User> findAllByUserType(String userType, Pageable pageable) {
+		return this.repository.findAllByUserType(userType, pageable);
+	}
+
+	@Override
+	public Page<User> findAllByStatus(int status, Pageable pageable) {
+		return this.repository.findAllByStatus(status, pageable);
+
+	}
+
+	@Override
+	public Iterable<User> findAllById(List<Integer> ids) {
+		return this.repository.findAllById(ids);
 	}
 }

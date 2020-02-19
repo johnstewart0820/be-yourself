@@ -4,14 +4,113 @@
 	layout:decorate="~{layout/main-layout.html}">
 <head>
 <title>Home</title>
+	<script>
+	var select_all = false;
+	
+	$(document).ready(function() {
+		
+		$('#nb_per_page').val([[${nb_per_page}]]);
+		$('#filter_role').val("[[${filter_role}]]");
+		$("#filter_status").val([[${filter_status}]]);
+		var status = "[[${filter_status}]]";
+		
+		$("select#filter_status").change(function() {
+			$("#filter_role").val($("#filter_role option:first").val());
+			 $( "#select_form" ).submit();
+
+		})
+		
+		$("select#filter_role").change(function() {
+			$("#filter_status").val($("#filter_status option:first").val());
+		    $( "#select_form" ).submit();
+
+		})
+		
+		$('a[href="#select_users"]').click(function(){
+			if (select_all == false) {
+				$("[name='selected_id']").prop('checked', true);    
+				select_all = true;
+			} else {
+				$("[name='selected_id']").prop('checked', false);    
+				select_all = false;
+			}
+		}); 
+	});
+</script>
 </head>
 <body>
-	<div layout:fragment="content">
-		<div>
-			<a href="/user/add" class="btn btn-sm btn-primary">+ Add User</a>
-			<a href="/user/exportcsv" class="btn btn-sm btn-primary">Export CSV</a>
-			<a href="/user/uploadform" class="btn btn-sm btn-primary">Import CSV</a>
+	<div layout:fragment="content">	
+		<div class="row mb-3">
+			<div class="col">
+				<a href="/user/add" class="btn btn-sm btn-primary">+ Add User</a>
+
+			</div>
 		</div>
+		<div class="row">
+			<div class="col">
+				<div class="table-responsive">
+					<form id="select_form" th:action="@{/user/list/page/1}" method="post">
+						<table class="table align-items-center table-flush">
+							<tr>
+								<td>
+									<div class="form-group">
+										<div class="input-group input-group-alternative mb-3">
+											<select id="nb_per_page" name="nb_per_page"
+												class="form-control" onchange="this.form.submit()">
+												<option value="2">SHOW 2 USERS</option>
+												<option value="10">SHOW 10 USERS</option>
+												<option value="20">SHOW 20 USERS</option>
+												<option value="50">SHOW 50 USERS</option>
+												<option value="100000">SHOW ALL USERS</option>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<div class="input-group input-group-alternative mb-3">
+											<select id="filter_role" name="filter_role"
+												class="form-control">
+												<option value="">FILTER BY ROLE</option>
+												<option value="B2B">B2B</option>
+												<option value="B2C">B2C</option>
+												<option value="PRO">PRO</option>
+												<option value="ADM">ADM</option>
+												<option value="SAM">SAM</option>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<div class="input-group input-group-alternative mb-3">
+											<select id="filter_status" name="filter_status"
+												class="form-control">
+												<option value="-2">FILTER BY STATUS</option>
+												<option value="0">DRAFT</option>
+												<option value="1">ACTIVE</option>
+												<option value="2">INACTIVE</option>
+												<option value="-1">UNKNOWN</option>
+											</select>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</form>
+
+				</div>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<div class="col">
+			<a href="#select_users" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
+				<a href="#" class="btn btn-sm btn-primary" onclick="document.getElementById('select_user_form').submit();">Export
+					CSV</a> <a href="/user/uploadform" class="btn btn-sm btn-primary">Import
+					CSV</a>
+			</div>
+		</div>
+	
 		<!-- Table -->
 		<div class="row">
 			<div class="col">
@@ -19,6 +118,8 @@
 					<div class="card-header border-0">
 						<h3 class="mb-0">Users list</h3>
 					</div>
+					<form id="select_user_form"  th:action="@{/user/exportcsv}" method="post">
+					
 					<div class="table-responsive">
 						<table class="table align-items-center table-flush">
 							<thead class="thead-light">
@@ -27,17 +128,23 @@
 									<th scope="col">Email</th>
 									<th scope="col">FullName</th>
 									<th scope="col">Status</th>
+									<th scope="col">Subscription Type</th>
 									<th scope="col">Role</th>
 									<th scope="col">Action</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="user : ${userPage.content}">
-									<td><span th:text="${user.id}"> ID </span></td>
+									<td>
+									<input type="checkbox"  name="selected_id"  id="selected_id" th:value="${user.id}"></input>
+									
+									</td>
 									<td><span th:text="${user.email}"> Email </span></td>
 									<td><span th:text="${user.fullName}"> Fullname </span></td>
-									<td>Status</td>
-									<td>Role</td>
+									<td th:text="${user.statusDescription}"></td>
+
+									<td scope="col">Subscription Type</td>
+									<td th:text="${user.userTypeDescription}"></td>
 									<td class="text-right">
 										<div class="dropdown">
 											<a class="btn btn-sm btn-icon-only text-light" href="#"
@@ -49,8 +156,7 @@
 												<a class="dropdown-item"
 													th:href="@{/user/{id}/update(id=${user.id})}">Update</a> <a
 													class="dropdown-item"
-													th:href="@{/user/{id}/delete(id=${user.id})}">Delete</a> <a
-													class="dropdown-item" href="#">Something else here</a>
+													th:href="@{/user/{id}/delete(id=${user.id})}">Delete</a>
 											</div>
 										</div>
 									</td>
@@ -58,32 +164,33 @@
 							</tbody>
 						</table>
 					</div>
+					</form>
 					<!-- Begin paging -->
 					<div class="card-footer py-4">
-							<nav aria-label="...">
-								<ul class="pagination justify-content-end mb-0">
-									<li class="page-item">
-										<a class="page-link" th:href="@{|/user/list/page/${userPage.number}|}" tabindex="-1" th:if="${userPage.number > 0}"> 
-											<i class="fas fa-angle-left"></i>
-										</a>									
-									</li>
+						<nav aria-label="...">
+							<ul class="pagination justify-content-end mb-0">
+								<li class="page-item"><a class="page-link"
+									th:href="@{|/user/list/page/${userPage.number}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}" tabindex="-1"
+									th:if="${userPage.number > 0}"> <i
+										class="fas fa-angle-left"></i>
+								</a></li>
 
-									<li class="page-item" th:each="pageNumber : ${pageNumbers}" 
+								<li class="page-item" th:each="pageNumber : ${pageNumbers}"
 									th:classappend="${pageNumber==userPage.number + 1} ? active">
-										<a class="page-link"
-										th:href="@{|/user/list/page/${pageNumber}|}"
-										th:text=${pageNumber} 
-										>1</a>
-									</li>
-									
-									<li class="page-item">
-										<a class="page-link" th:href="@{|/user/list/page/${userPage.number+2}|}" tabindex="-1" th:unless="${userPage.number == userPage.totalPages - 1}"> 
-											<i class="fas fa-angle-right"></i>
-										</a>								
-									</li>
-									
-								</ul>
-							</nav>
+									<a class="page-link"
+									th:href="@{|/user/list/page/${pageNumber}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}"
+									th:text=${pageNumber}>1</a>
+								</li>
+
+								<li class="page-item"><a class="page-link"
+									th:href="@{|/user/list/page/${userPage.number+2}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}"
+									tabindex="-1"
+									th:unless="${userPage.number == userPage.totalPages - 1}">
+										<i class="fas fa-angle-right"></i>
+								</a></li>
+
+							</ul>
+						</nav>
 					</div>
 					<!-- End paging -->
 				</div>

@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,8 +28,9 @@ import fr.be.your.self.model.User;
 import fr.be.your.self.repository.FunctionalityRepository;
 import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.repository.UserRepository;
+import fr.be.your.self.model.UserConstants;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @ComponentScan(basePackages = { "fr.be.your.self.backend.config.root" })
 @EntityScan(basePackages = { "fr.be.your.self.model" })
 @EnableJpaRepositories(basePackages = { "fr.be.your.self.repository" })
@@ -83,12 +85,41 @@ public class AdminApplication implements CommandLineRunner {
 				tempFunc.setName("Temp function");
 				Functionality savedTempFunc = this.functionalityRepository.save(tempFunc);
 				
+				Functionality editAccountTypeFunc = new Functionality();
+				editAccountTypeFunc.setPath(UserConstants.EDIT_ACCOUNT_TYPE_PATH);
+				editAccountTypeFunc.setName("Edit Account Type");
+				Functionality savedEditAccountTypeFunc = this.functionalityRepository.save(editAccountTypeFunc);
+				
+				
+				Functionality editPermissionsFunc = new Functionality();
+				editPermissionsFunc.setPath(UserConstants.EDIT_PERMISSIONS_PATH);
+				editPermissionsFunc.setName("Edit Permissions");
+				Functionality savedEditPermissionsFunc = this.functionalityRepository.save(editPermissionsFunc);
+				
+				
 				Permission adminUserPermission = new Permission();
 				adminUserPermission.setUser(savedUser);
 				adminUserPermission.setFunctionality(savedAdminUserFunc);
 				adminUserPermission.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(adminUserPermission);
 				
+				Permission tempFuncPermission = new Permission();
+				tempFuncPermission.setUser(savedUser);
+				tempFuncPermission.setFunctionality(savedTempFunc);
+				tempFuncPermission.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(tempFuncPermission);
+				
+				Permission editAccountTypePermission = new Permission();
+				editAccountTypePermission.setUser(savedUser);
+				editAccountTypePermission.setFunctionality(savedEditAccountTypeFunc);
+				editAccountTypePermission.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(editAccountTypePermission);
+				
+				Permission editPermissions = new Permission();
+				editPermissions.setUser(savedUser);
+				editPermissions.setFunctionality(savedEditPermissionsFunc);
+				editPermissions.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(editPermissions);
 				Permission sessionGroupPermission = new Permission();
 				sessionGroupPermission.setUser(savedUser);
 				sessionGroupPermission.setFunctionality(savedSessionGroupFunc);
@@ -101,11 +132,13 @@ public class AdminApplication implements CommandLineRunner {
 				sessionPermission.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(sessionPermission);
 				
-				Permission tempPermission = new Permission();
-				tempPermission.setUser(savedUser);
-				tempPermission.setFunctionality(savedTempFunc);
-				tempPermission.setUserPermission(UserPermission.READONLY.getValue());
-				this.permissionRepository.save(tempPermission);
+				/*
+				 * Permission tempPermission = new Permission();
+				 * tempPermission.setUser(savedUser);
+				 * tempPermission.setFunctionality(savedTempFunc);
+				 * tempPermission.setUserPermission(UserPermission.READONLY.getValue());
+				 * this.permissionRepository.save(tempPermission);
+				 */
 			} else {
 				
 				// session-group permission

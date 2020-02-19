@@ -31,4 +31,14 @@ public enum UserStatus {
 		
 		return UNKNOWN;
 	}
+	
+	public static String getStatusDescription(int val) {
+		switch (val) {
+			case 0: return "DRAFT";
+			case 1: return "ACTIVE";
+			case 2: return "INACTIVE";
+			default: return "UNKNOWN";	
+		}		
+	}
+	
 }
