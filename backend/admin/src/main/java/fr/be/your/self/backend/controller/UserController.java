@@ -45,6 +45,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
+import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserUtils;
@@ -110,7 +111,19 @@ public class UserController {
 				: this.dataSetting.isAutoActivateAccount();
 
 		if (isNewUser) { // TODO TVA check this
+			
+			if (user.getLoginType() == LoginType.PASSWORD.getValue()) {
+				String tempPwd = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength()); // TODO TVA change this
+						
+				String encodedPwd = passwordEncoder.encode(tempPwd);
+				user.setPassword(encodedPwd);
+			}
 
+			if (userService.existsEmail(user.getEmail())) {
+				model.addAttribute("msg", "E-mail already exists!");
+				return "user/userform_result";
+			}
+				
 			if (isAutoActivateAccount) {
 				user.setStatus(UserStatus.ACTIVE.getValue());
 			} else {
@@ -123,7 +136,7 @@ public class UserController {
 				user.setStatus(UserStatus.DRAFT.getValue());
 			}
 		}
-
+		
 		User savedUser = userService.saveOrUpdate(user);
 		if (isAdminUser) {
 			for (Permission permission : user.getPermissions()) {
@@ -204,8 +217,7 @@ public class UserController {
 			currentUser.setLastName(user.getLastName());
 			currentUser.setEmail(user.getEmail());
 			if (!StringUtils.isNullOrEmpty(new_pwd)) {
-				String encoded_current_pwd = this.passwordEncoder.encode(current_pwd);
-				if (!currentUser.getPassword().equals(encoded_current_pwd)) {
+				if (!passwordEncoder.matches(current_pwd, currentUser.getPassword())) {
 					model.addAttribute("msg", "Wrong current password!");
 					return "user/account_settings_result"; 
 				}

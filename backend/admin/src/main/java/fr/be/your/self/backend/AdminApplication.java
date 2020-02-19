@@ -132,11 +132,13 @@ public class AdminApplication implements CommandLineRunner {
 				sessionPermission.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(sessionPermission);
 				
-				Permission tempPermission = new Permission();
-				tempPermission.setUser(savedUser);
-				tempPermission.setFunctionality(savedTempFunc);
-				tempPermission.setUserPermission(UserPermission.READONLY.getValue());
-				this.permissionRepository.save(tempPermission);
+				/*
+				 * Permission tempPermission = new Permission();
+				 * tempPermission.setUser(savedUser);
+				 * tempPermission.setFunctionality(savedTempFunc);
+				 * tempPermission.setUserPermission(UserPermission.READONLY.getValue());
+				 * this.permissionRepository.save(tempPermission);
+				 */
 			} else {
 				
 				// session-group permission
