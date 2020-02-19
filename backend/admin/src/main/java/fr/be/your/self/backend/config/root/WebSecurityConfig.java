@@ -69,6 +69,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${jwt.secret}")
 	private String secret;
 	
+	@Value("${auth.remember.me.key}")
+	private String rememberMeKey;
+	
+	@Value("${auth.remember.me.validity}")
+	private int rememberMeValidity;
+	
 	@Bean
     public AllowFromStrategy allowFromStrategy() {
     	List<String> listAllowedOrgins = Arrays.asList(this.allowedOrigins.split(","));
@@ -172,6 +178,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					.defaultSuccessUrl(this.defaultRedirectUrl)
 					.failureUrl(LOGIN_URL + "?authentication_error=true")
 					.permitAll()
+			.and()
+				.rememberMe()
+					.key(this.rememberMeKey)
+					.tokenValiditySeconds(this.rememberMeValidity)
+					.rememberMeParameter("rememberMe")
 			.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 			; 

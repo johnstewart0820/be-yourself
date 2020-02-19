@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import fr.be.your.self.backend.dto.PermissionDto;
+import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.security.oauth2.AuthenticationUserDetails;
@@ -21,15 +23,21 @@ import fr.be.your.self.util.StringUtils;
 
 public abstract class BaseController {
 	
+	private static final String BASE_AVATAR_URL = Constants.PATH.WEB_ADMIN_PREFIX 
+			+ Constants.PATH.WEB_ADMIN.MEDIA 
+			+ Constants.PATH.WEB_ADMIN.MEDIA_TYPE.AVATAR;
+	
 	@Autowired
 	private MessageSource messageSource;
+	
+	@Autowired
+	protected DataSetting dataSetting;
 	
 	@Autowired
 	private PermissionService permissionService;
 	
 	protected void initAttributes(HttpSession session, HttpServletRequest request, 
-			HttpServletResponse response, Model model) {
-		
+			HttpServletResponse response, Model model, PermissionDto permission) {
 	}
 	
 	@ModelAttribute
@@ -40,6 +48,7 @@ public abstract class BaseController {
 		
 		Integer userId = null;
 		String displayName = null;
+		String userAvatar = null;
 		
 		final Authentication oauth = SecurityContextHolder.getContext().getAuthentication();
 		if (oauth != null && oauth.isAuthenticated()) {
@@ -48,10 +57,15 @@ public abstract class BaseController {
 			if (principal instanceof AuthenticationUserDetails) {
 				final AuthenticationUserDetails userDetails = (AuthenticationUserDetails) principal;
 				final String fullName = userDetails.getFullName();
+				final String avatar = userDetails.getAvatar();
 				
 				displayName = oauth.getName();
 				if (!StringUtils.isNullOrSpace(fullName)) {
 					displayName = fullName;
+				}
+				
+				if (!StringUtils.isNullOrSpace(avatar)) {
+					userAvatar = avatar;
 				}
 				
 				userId = userDetails.getUserId();
@@ -71,10 +85,14 @@ public abstract class BaseController {
 		}
 		
 		model.addAttribute("userId", userId);
+		model.addAttribute("userAvatar", userAvatar);
 		model.addAttribute("displayName", displayName);
 		model.addAttribute("permission", permission);
 		
-		this.initAttributes(session, request, response, model);
+		model.addAttribute("allowRegister", this.dataSetting.isAllowRegisterOnAuthPage());
+		model.addAttribute("baseAvatarURL", BASE_AVATAR_URL);
+		
+		this.initAttributes(session, request, response, model, permission);
 	}
 	
 	protected String getMessage(String key, Object[] args, String defaultValue) {

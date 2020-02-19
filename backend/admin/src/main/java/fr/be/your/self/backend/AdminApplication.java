@@ -1,5 +1,7 @@
 package fr.be.your.self.backend;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -53,7 +55,9 @@ public class AdminApplication implements CommandLineRunner {
 		final String email = "admin@gmail.com";
 		
 		try {
-			if (!userRepository.existsByEmail(email)) {
+			final User currentAdminUser = userRepository.findByEmail(email);
+			
+			if (currentAdminUser == null) {
 				String password = this.passwordEncoder.encode("123456");
 				
 				User adminUser = new User(email, password, UserType.SUPER_ADMIN.getValue(), "Administrator", "");
@@ -64,6 +68,16 @@ public class AdminApplication implements CommandLineRunner {
 				adminUserFunc.setPath("/admin-user");
 				adminUserFunc.setName("Admin User");
 				Functionality savedAdminUserFunc = this.functionalityRepository.save(adminUserFunc);
+				
+				Functionality sessionGroupFunc = new Functionality();
+				sessionGroupFunc.setPath("/session-group");
+				sessionGroupFunc.setName("Session Group");
+				Functionality savedSessionGroupFunc = this.functionalityRepository.save(sessionGroupFunc);
+				
+				Functionality sessionFunc = new Functionality();
+				sessionFunc.setPath("/session");
+				sessionFunc.setName("Session");
+				Functionality savedSessionFunc = this.functionalityRepository.save(sessionFunc);
 				
 				Functionality tempFunc = new Functionality();
 				tempFunc.setPath("/temp");
@@ -105,6 +119,39 @@ public class AdminApplication implements CommandLineRunner {
 				editPermissions.setFunctionality(savedEditPermissionsFunc);
 				editPermissions.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(editPermissions);
+				Permission sessionGroupPermission = new Permission();
+				sessionGroupPermission.setUser(savedUser);
+				sessionGroupPermission.setFunctionality(savedSessionGroupFunc);
+				sessionGroupPermission.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(sessionGroupPermission);
+				
+				Permission sessionPermission = new Permission();
+				sessionPermission.setUser(savedUser);
+				sessionPermission.setFunctionality(savedSessionFunc);
+				sessionPermission.setUserPermission(UserPermission.WRITE.getValue());
+				this.permissionRepository.save(sessionPermission);
+				
+				Permission tempPermission = new Permission();
+				tempPermission.setUser(savedUser);
+				tempPermission.setFunctionality(savedTempFunc);
+				tempPermission.setUserPermission(UserPermission.READONLY.getValue());
+				this.permissionRepository.save(tempPermission);
+			} else {
+				
+				// session-group permission
+				final Optional<Functionality> sessionGroupFunc = this.functionalityRepository.findByPath("/session-group");
+				if (sessionGroupFunc.isPresent()) {
+					final Optional<Permission> sessionGroupPermission = this.permissionRepository.findByUserIdAndFunctionalityId(currentAdminUser.getId(), sessionGroupFunc.get().getId());
+					
+					if (sessionGroupPermission.isPresent()) {
+						final Permission permission = sessionGroupPermission.get();
+						permission.setUserPermission(UserPermission.WRITE.getValue());
+						
+						this.permissionRepository.save(permission);
+					}
+				}
+				
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

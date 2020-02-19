@@ -53,7 +53,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 	
 	@Override
 	protected String getDefaultPageTitle() {
-		return this.getMessage("session.group.title", "Session Group management");
+		return this.getMessage(this.getName() + ".page.title", "Session Group management");
 	}
 	
 	@Override
@@ -86,13 +86,13 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 			Model model, SessionGroupDto dto) throws BusinessException {
 		super.loadDetailForm(session, request, response, model, dto);
 		
-		final String supportMediaTypes = String.join(",", this.dataSetting.getImageMediaTypes());
-		final String supportExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
+		final String supportImageTypes = String.join(",", this.dataSetting.getImageMediaTypes());
+		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
 		
-		model.addAttribute("supportMediaTypes", supportMediaTypes);
-		model.addAttribute("supportExtensions", supportExtensions);
-		model.addAttribute("supportFileSize", this.dataSetting.getImageMaxFileSize());
-		model.addAttribute("formatSupportFileSize", StringUtils.formatFileSize(this.dataSetting.getImageMaxFileSize()));
+		model.addAttribute("supportImageTypes", supportImageTypes);
+		model.addAttribute("supportImageExtensions", supportImageExtensions);
+		model.addAttribute("supportImageSize", this.dataSetting.getImageMaxFileSize());
+		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(this.dataSetting.getImageMaxFileSize()));
 	}
 
 	@PostMapping("/create")
@@ -144,6 +144,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
     }
 	
 	@PostMapping("/update/{id}")
+	@Transactional
     public String updateDomain(
     		@PathVariable("id") Integer id, 
     		@ModelAttribute @Validated SessionGroupDto dto, 
@@ -214,6 +215,66 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         
         return "redirect:" + this.getBaseURL() + "/current-page";
     }
+	
+	@PostMapping(value = { "/delete/{id}" })
+	@Transactional
+    public String deletePage(
+    		@PathVariable(name = "id", required = true) Integer id,
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		RedirectAttributes redirectAttributes, Model model) {
+		
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String dataName = this.getMessage(baseMessageKey + ".name");
+		
+		final SessionGroup domain = this.mainService.getById(id);
+		if (domain == null) {
+			String message = this.getMessage("error.message.id.not.found", new String[] { dataName, id.toString() });
+			if (message.startsWith(dataName)) {
+				message = StringUtils.upperCaseFirst(message);
+			}
+			
+			redirectAttributes.addAttribute("status", false);
+			redirectAttributes.addAttribute("message", message);
+			
+			return "redirect:" + this.getBaseURL() + "/current-page";
+		}
+		
+		final String deleteMediaFileName = domain.getImage();
+		
+		final boolean result = this.mainService.delete(id);
+		if (result) {
+			// Success, delete old image file
+	        if (!StringUtils.isNullOrSpace(deleteMediaFileName)) {
+	        	final Path mediaFilePath = Paths.get(this.dataSetting.getSessionGroupFolder() + "/" + deleteMediaFileName);
+	        	
+	        	try {
+					Files.delete(mediaFilePath);
+				} catch (IOException ex) {
+					this.logger.error("Cannot delete media file", ex);
+				}
+	        }
+	        
+			String message = this.getMessage("success.message.delete", new String[] { dataName, id.toString() });
+			if (message.startsWith(dataName)) {
+				message = StringUtils.upperCaseFirst(message);
+			}
+
+			redirectAttributes.addAttribute("status", result);
+			redirectAttributes.addAttribute("message", message);
+			
+			return "redirect:" + this.getBaseURL();
+		}
+		
+		String message = this.getMessage("error.message.cannot.delete.id", new String[] { dataName, id.toString() });
+		if (message.startsWith(dataName)) {
+			message = StringUtils.upperCaseFirst(message);
+		}
+		
+		redirectAttributes.addAttribute("status", result);
+		redirectAttributes.addAttribute("message", message);
+		
+		return "redirect:" + this.getBaseURL() + "/current-page";
+	}
 	
 	private Path uploadFile(final MultipartFile mediaFile) {
 		final String fileName = mediaFile.getOriginalFilename();
