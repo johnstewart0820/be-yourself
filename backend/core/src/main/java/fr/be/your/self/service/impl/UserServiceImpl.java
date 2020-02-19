@@ -78,8 +78,8 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
 
 	@Override
-	public List<UserCSV> extractUserCsv() {
-		Iterable<User> users= this.repository.findAll();
+	public List<UserCSV> extractUserCsv(List<Integer> ids) {
+		Iterable<User> users= this.repository.findAllById(ids);
 		List<UserCSV> returnList = new ArrayList<UserCSV>();
 		for (User user: users) {
 			UserCSV userCSV = new UserCSV(user);
@@ -87,5 +87,21 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 		}
 		
 		return returnList;
+	}
+
+	@Override
+	public Page<User> findAllByUserType(String userType, Pageable pageable) {
+		return this.repository.findAllByUserType(userType, pageable);
+	}
+
+	@Override
+	public Page<User> findAllByStatus(int status, Pageable pageable) {
+		return this.repository.findAllByStatus(status, pageable);
+
+	}
+
+	@Override
+	public Iterable<User> findAllById(List<Integer> ids) {
+		return this.repository.findAllById(ids);
 	}
 }

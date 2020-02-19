@@ -84,7 +84,11 @@ public class UserController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	public static int NB_USERS_PER_PAGE = 2; // FIXME: move this to config file
+	public static final String DEFAULT_URL = "/user/list/page/1"; // FIXME: move this to config file
+	public static String USERS_PER_PAGE = "USERS_PER_PAGE";
+	public static final int DEFAULT_NB_PER_PAGE = 2;
+	public static final String DEFAULT_NB_PER_PAGE_STR = String.valueOf(DEFAULT_NB_PER_PAGE);
+
 	public static String CSV_USERS_EXPORT_FILE = "users.csv";
 
 	
@@ -93,69 +97,59 @@ public class UserController {
 	// 2. @Validated form validator
 	// 3. RedirectAttributes for flash value
 	@RequestMapping(value = "/user/save", method = RequestMethod.POST)
-	public String saveOrUpdateUser(@ModelAttribute @Validated User user, 
-			HttpServletRequest request, BindingResult result, Model model,
-			final RedirectAttributes redirectAttributes) {
+	public String saveOrUpdateUser(@ModelAttribute @Validated User user, HttpServletRequest request,
+			BindingResult result, Model model, final RedirectAttributes redirectAttributes) {
 
 		if (result.hasErrors()) {
 			return "user/userform";
-		} else {
-			boolean isNewUser = user.getId() == 0; 
-			boolean isAdminUser = UserUtils.isAdmin(user);
-			
-			boolean isAutoActivateAccount = isAdminUser 
-					? this.dataSetting.isAutoActivateAdminAccount() 
-					: this.dataSetting.isAutoActivateAccount();
-			
-			// Add message to flash scope. TODO TVA: check if we need to keep this
-			redirectAttributes.addFlashAttribute("css", "success");
-			if (isNewUser) { // TODO TVA check this
-				redirectAttributes.addFlashAttribute("msg", "User added successfully!");
-				
-				if (isAutoActivateAccount) {
-					user.setStatus(UserStatus.ACTIVE.getValue());
-				} else {
-					String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
-					long activateCodeTimeout = (new Date().getTime() / (60 * 1000)) + this.dataSetting.getActivateCodeTimeout();
-					
-					user.setActivateCode(activateCode);
-					user.setActivateTimeout(activateCodeTimeout);
-					user.setStatus(UserStatus.DRAFT.getValue());
-				}
+		}
+		boolean isNewUser = user.getId() == 0;
+		boolean isAdminUser = UserUtils.isAdmin(user);
+
+		boolean isAutoActivateAccount = isAdminUser ? this.dataSetting.isAutoActivateAdminAccount()
+				: this.dataSetting.isAutoActivateAccount();
+
+		if (isNewUser) { // TODO TVA check this
+
+			if (isAutoActivateAccount) {
+				user.setStatus(UserStatus.ACTIVE.getValue());
 			} else {
-				redirectAttributes.addFlashAttribute("msg", "User updated successfully!");
+				String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
+				long activateCodeTimeout = (new Date().getTime() / (60 * 1000))
+						+ this.dataSetting.getActivateCodeTimeout();
+
+				user.setActivateCode(activateCode);
+				user.setActivateTimeout(activateCodeTimeout);
+				user.setStatus(UserStatus.DRAFT.getValue());
+			}
+		}
+
+		User savedUser = userService.saveOrUpdate(user);
+		if (isAdminUser) {
+			for (Permission permission : user.getPermissions()) {
+				permission.setUser(savedUser); // We need user id of saved user
+				permissionService.saveOrUpdate(permission);
+			}
+		}
+
+		if (isNewUser && !isAutoActivateAccount) {
+			String activateAccountUrl = request.getScheme() + "://" + request.getServerName() + ":"
+					+ request.getServerPort() + request.getContextPath();
+
+			if (activateAccountUrl.endsWith("/")) {
+				activateAccountUrl = activateAccountUrl.substring(0, activateAccountUrl.length() - 1);
 			}
 
-			User savedUser = userService.saveOrUpdate(user);
-			if (isAdminUser) {
-				for (Permission permission : user.getPermissions()) {
-					permission.setUser(savedUser); //We need user id of saved user
-					permissionService.saveOrUpdate(permission);
-				}
-			}
-			
-			if (isNewUser && !isAutoActivateAccount) {
-				String activateAccountUrl = request.getScheme() + "://" 
-						+ request.getServerName() + ":"
-						+ request.getServerPort() 
-						+ request.getContextPath();
-				
-				if (activateAccountUrl.endsWith("/")) {
-					activateAccountUrl = activateAccountUrl.substring(0, activateAccountUrl.length() - 1);
-				}
-				
-				activateAccountUrl += ACTIVATE_URL;
-				
-				boolean success = this.emailSender.sendActivateUser(savedUser.getEmail(), 
-						activateAccountUrl, savedUser.getActivateCode());
-				
-				// TODO: Use success variable?
-			}
-			
-			
-			
-			return "redirect:/user/list/page/1"; // back to list of users
+			activateAccountUrl += ACTIVATE_URL;
+
+			boolean success = this.emailSender.sendActivateUser(savedUser.getEmail(), activateAccountUrl,
+					savedUser.getActivateCode());
+
+			// TODO: Use success variable?
 		}
+
+		return "redirect:" + DEFAULT_URL; // back to list of users
+
 	}
 
 	// show add user form
@@ -225,6 +219,8 @@ public class UserController {
 			return "user/account_settings_result"; 
 	}
 
+
+	
 	// show account settings
 	@RequestMapping(value = "/user/settings", method = RequestMethod.GET)
 	public String showAccountSettings(Model model) {
@@ -276,13 +272,39 @@ public class UserController {
 	public String deleteUser(@PathVariable("id") int id, Model model) {
 		userService.delete(id);
 
-		return "redirect:/user/list/page/1"; // back to list of users
+		return "redirect:" + DEFAULT_URL; // back to list of users
 	}
 
+	@RequestMapping(value = "/user/display/settings", method = RequestMethod.POST)
+	public String updatePageSettings(
+			@RequestParam(value ="nb_per_page", required=false) Integer nb,			
+			Model model) {
+		
+		
+		return "redirect:" + DEFAULT_URL; 
+	}
+	
+	
 	@RequestMapping(value = "/user/list/page/{page}")
-	public String listUserPageByPage(@PathVariable("page") int page, Model model) {
-		PageRequest pageable = PageRequest.of(page - 1, NB_USERS_PER_PAGE); // TODO TVA check this
-		Page<User> userPage = userService.getPaginatedUsers(pageable);
+	public String listUserPageByPage(@PathVariable("page") int page, 
+			@RequestParam(value="nb_per_page", required=false, defaultValue = "10") Integer nb,
+			@RequestParam(value="filter_role", required=false) String role,
+			@RequestParam(value="filter_status", required=false, defaultValue = "-2") Integer status,
+
+			Model model) {
+
+		PageRequest pageable = PageRequest.of(page - 1, nb);
+		Page<User> userPage;
+		if ("null".equals(role)) {
+			role ="";
+		}
+		if (!StringUtils.isNullOrEmpty(role)) {
+			userPage = userService.findAllByUserType(role, pageable);
+		} else if (status != null && status != -2) {
+			userPage = userService.findAllByStatus(status, pageable);
+		} 	else {
+			userPage = userService.getPaginatedUsers(pageable);
+		}
 		int totalPages = userPage.getTotalPages();
 		model.addAttribute("totalPages", totalPages);
 
@@ -293,11 +315,16 @@ public class UserController {
 
 		model.addAttribute("activeUserList", true);
 		model.addAttribute("userPage", userPage);
+		model.addAttribute("nb_per_page", nb);
+		model.addAttribute("filter_role", role);
+		model.addAttribute("filter_status", status);
+
 		return "user/userlist";
 	}
 
-	@GetMapping("/user/exportcsv")
-	public void exportCSV(HttpServletResponse response) throws Exception {
+	@RequestMapping("/user/exportcsv")
+	public void exportCSV(@RequestParam(value="selected_id", required=false) List<Integer> userId,
+			HttpServletResponse response) throws Exception {
 
 		// set file name and content type
 
@@ -310,7 +337,7 @@ public class UserController {
 				.withOrderedResults(false).build();
 
 		// write all users to csv file
-		List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv().spliterator(), false)
+		List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv(userId).spliterator(), false)
 				.collect(Collectors.toList());
 		
 		writer.write(usersList);
@@ -330,15 +357,15 @@ public class UserController {
 		Reader reader = new InputStreamReader(file.getInputStream());
 		CSVReader csvReader = new CSVReaderBuilder(reader).withSkipLines(0).build();
 
-		MappingStrategy<User> strategy = new HeaderColumnNameMappingStrategy<>();
-		strategy.setType(User.class);
+		MappingStrategy<UserCSV> strategy = new HeaderColumnNameMappingStrategy<>();
+		strategy.setType(UserCSV.class);
 
-		CsvToBean<User> csvToBean = new CsvToBeanBuilder<User>(csvReader).withType(User.class)
+		CsvToBean<UserCSV> csvToBean = new CsvToBeanBuilder<UserCSV>(csvReader).withType(UserCSV.class)
 				.withMappingStrategy(strategy).build();
-		List<User> users = csvToBean.parse();
+		List<UserCSV> usersCsv = csvToBean.parse();
 
-		System.out.println(users); // TODO TVA delete this line
-
+		List<User> users = UserUtils.convertUsersCsv(usersCsv);
+		
 		userService.saveAll(users);
 
 		redirectAttributes.addFlashAttribute("message",

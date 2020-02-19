@@ -23,6 +23,10 @@ public interface UserRepository extends BaseRepository<User> {
     
     Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable);
     
+    Page<User> findAllByUserType(String userType, Pageable pageable);
+    Page<User> findAllByStatus(int status, Pageable pageable);
+
+    
     @Modifying
     @Query("UPDATE User SET status = ?2 WHERE id = ?1")
     int updateStatus(Integer id, Integer status);

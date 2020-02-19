@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,7 +30,7 @@ import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.repository.UserRepository;
 import fr.be.your.self.model.UserConstants;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @ComponentScan(basePackages = { "fr.be.your.self.backend.config.root" })
 @EntityScan(basePackages = { "fr.be.your.self.model" })
 @EnableJpaRepositories(basePackages = { "fr.be.your.self.repository" })
