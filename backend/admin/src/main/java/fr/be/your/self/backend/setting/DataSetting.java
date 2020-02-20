@@ -11,6 +11,7 @@ public class DataSetting {
 	private boolean autoActivateAdminAccount;
 	private int activateCodeLength;
 	private long activateCodeTimeout;
+	private int tempPwdLength;
 	
 	private String uploadFolder;
 	
@@ -163,5 +164,13 @@ public class DataSetting {
 	
 	public String getSessionGroupFolder() {
 		return this.getUploadFolder() + Constants.FOLDER.MEDIA.SESSION_GROUP;
+	}
+
+	public int getTempPwdLength() {
+		return tempPwdLength;
+	}
+
+	public void setTempPwdLength(int tempPwdLength) {
+		this.tempPwdLength = tempPwdLength;
 	}
 }

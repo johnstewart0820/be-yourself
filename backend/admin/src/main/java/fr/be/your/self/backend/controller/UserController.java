@@ -109,11 +109,11 @@ public class UserController {
 
 		boolean isAutoActivateAccount = isAdminUser ? this.dataSetting.isAutoActivateAdminAccount()
 				: this.dataSetting.isAutoActivateAccount();
-
+		
+		String tempPwd = null;
 		if (isNewUser) { // TODO TVA check this
-			
 			if (user.getLoginType() == LoginType.PASSWORD.getValue()) {
-				String tempPwd = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength()); // TODO TVA change this
+				tempPwd = StringUtils.randomAlphanumeric(this.dataSetting.getTempPwdLength());
 						
 				String encodedPwd = passwordEncoder.encode(tempPwd);
 				user.setPassword(encodedPwd);
@@ -159,6 +159,10 @@ public class UserController {
 					savedUser.getActivateCode());
 
 			// TODO: Use success variable?
+			
+			if (tempPwd != null) {
+				this.emailSender.sendTemporaryPassword(savedUser.getEmail(), tempPwd);
+			}
 		}
 
 		return "redirect:" + DEFAULT_URL; // back to list of users

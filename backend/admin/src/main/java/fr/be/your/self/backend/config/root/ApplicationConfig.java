@@ -61,6 +61,9 @@ public class ApplicationConfig {
 	@Value("${account.activate.code.length:6}")
 	private int activateCodeLength;
 	
+	@Value("${account.temporary.password.length:6}")
+	private int tempPasswordLength;
+	
 	@Value("${account.activate.code.timeout}")
 	private long activateCodeTimeout;
 	
@@ -88,7 +91,7 @@ public class ApplicationConfig {
 		setting.setAutoActivateAccount(this.autoActivateNormalAccount, this.autoActivateAdminAccount, 
 				this.activateCodeLength, this.activateCodeTimeout);
 		setting.setAuthenticationConfiguration(this.displayHeaderOnAuthPage, this.allowRegisterOnAuthPage, this.allowSocialOnAuthPage);
-		
+		setting.setTempPwdLength(this.tempPasswordLength);
 		return setting;
 	}
 	
