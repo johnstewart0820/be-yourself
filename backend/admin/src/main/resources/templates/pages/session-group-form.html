@@ -44,11 +44,11 @@
 									<div class="col-md-8 col-sm-12">
 										<div class="form-group row">
 											<label for="name" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
-												th:text="#{session.group.detail.name}"></label>
+												th:text="#{|${baseMessageKey}.detail.name|}"></label>
 											<div class="col-md-10 col-sm-9 col-xs-12">
 												<input type="text" class="form-control" 
 													th:field="*{name}" id="name"
-													th:placeholder="#{session.group.detail.name.placeholder}" 
+													th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
 													required="required" autofocus="autofocus" />
 												<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 											</div>
@@ -56,31 +56,31 @@
 										
 										<th:block th:switch="${action}">
 											<div th:case="create" class="form-group row">
-												<label for="name" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
-													th:text="#{session.group.detail.image}"></label>
+												<label for="uploadImageFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+													th:text="#{|${baseMessageKey}.detail.image|}"></label>
 												<div class="col-md-10 col-sm-9 col-xs-12">
 													<div class="custom-file">
-														<input type="file" class="custom-file-input" th:field="*{imageFile}" id="imageFile" 
-															th:placeholder="#{session.group.detail.image.placeholder}" required="required"
+														<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
+															th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
 															th:accept="${supportImageTypes}" onChange="selectImage(this)"/>
-														<label class="custom-file-label" for="imageFile" id="imageFileLabel" 
+														<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 															th:data-browse="#{action.select.image}" 
-															th:text="#{session.group.detail.image.placeholder}"></label>
+															th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 													</div>
 													<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
 												</div>
 											</div>
 											<div th:case="*" class="form-group row">
-												<label for="name" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-													th:text="#{session.group.detail.image}"></label>
+												<label for="uploadImageFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+													th:text="#{|${baseMessageKey}.detail.image|}"></label>
 												<div class="col-md-10 col-sm-9 col-xs-12">
 													<div class="custom-file">
-														<input type="file" class="custom-file-input" th:field="*{imageFile}" id="imageFile" 
-															th:placeholder="#{session.group.detail.image.placeholder}" 
+														<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
+															th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
 															th:accept="${supportImageTypes}" onChange="selectImage(this)"/>
-														<label class="custom-file-label" for="imageFile" id="imageFileLabel" 
+														<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 															th:data-browse="#{action.select.image}" 
-															th:text="#{session.group.detail.image.placeholder}"></label>
+															th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 													</div>
 													<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
 												</div>
@@ -158,9 +158,6 @@
 						<p th:text="#{error.media.image.support.max.size(${supportImageSizeLabel})}"></p>
 					</div>
 					<div class="modal-footer">
-						<!-- 
-						<button type="button" class="btn btn-white">Ok, Got it</button>
-						-->
                 		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal" th:text="#{modal.button.ok}"></button>
 					</div>
 				</div>
@@ -173,10 +170,10 @@
 			function selectImage(inputElement) {
 				var supportImageTypes = '[[${supportImageTypes}]]';
 				var supportImageFileSize = [[${supportImageSize}]];
-				var defaultLabel = '[[#{session.group.detail.image.placeholder}]]';
+				var defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
 				
 				validateAndPreviewImage(inputElement, 
-						'imagePreview', 'imageFileLabel', defaultLabel,
+						'imagePreview', 'imageFileLabel', defaultImageLabel,
 						supportImageTypes, supportImageFileSize, 
 						'image-file-type-modal', 'image-file-size-modal');
 			}

@@ -52,7 +52,9 @@
 						<table class="table align-items-center table-flush">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col" width="90%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
+									<th scope="col" width="40%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
+									<th scope="col" width="15%" th:text="#{|${baseMessageKey}.detail.group|}"></th>
+									<th scope="col" width="35%" th:text="#{|${baseMessageKey}.detail.subtitle|}"></th>
 									<th scope="col" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
@@ -63,17 +65,23 @@
 											<a th:if="${item.image != null && item.image != ''}" 
 												th:href="${baseMediaURL + '/image/view/' + item.image}" 
 												class="avatar rounded-circle mr-3" target="_blank">
-												<img th:alt="${item.name}" th:src="${baseMediaURL + '/image/view/' + item.image}">
+												<img th:alt="${item.title}" th:src="${baseMediaURL + '/image/view/' + item.image}">
 											</a>
 											<a th:if="${item.image == null || item.image == ''}" 
 												href="javascript:;" class="avatar rounded-circle mr-3">
-												<img th:alt="${item.name}" th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
+												<img th:alt="${item.title}" th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
 											</a>
 											<div class="media-body">
-												<span class="mb-0 text-sm" th:text="${item.name}"></span>
+												<span class="mb-0 text-sm" th:utext="${item.title}"></span>
 											</div>
 										</div>
 									</th>
+									<td nowrap>
+										<span th:if="${item.sessionGroup != null}" th:utext="${item.sessionGroup.name}"></span>
+									</td>
+									<td nowrap>
+										<span th:utext="${item.subtitle}"></span>
+									</td>
 									<td class="text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
 											<span class="btn-inner--icon">

@@ -7,6 +7,7 @@ public final class Constants {
 			public static final String AVATAR = "/avatar";
 			
 			public static final String SESSION_GROUP = "/session-group";
+			public static final String SESSION = "/session";
 		}
 	}
 	
@@ -42,6 +43,7 @@ public final class Constants {
 			public static interface MEDIA_TYPE {
 				public static final String AVATAR = "/avatar";
 				public static final String SESSION_GROUP = "/session-group";
+				public static final String SESSION = "/session";
 			}
 		}
 	}

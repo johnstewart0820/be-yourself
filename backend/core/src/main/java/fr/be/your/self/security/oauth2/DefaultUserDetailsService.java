@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.repository.UserRepository;
+import fr.be.your.self.util.StringUtils;
 
 public class DefaultUserDetailsService implements UserDetailsService {
 	
@@ -28,9 +29,18 @@ public class DefaultUserDetailsService implements UserDetailsService {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
 		
+		final String userType = user.getUserType();
+		if (StringUtils.isNullOrSpace(userType)) {
+			throw new UsernameNotFoundException("User not found with username: " + username);
+		}
+		
+		if (!userType.equalsIgnoreCase(UserType.SUPER_ADMIN.getValue())
+				&& !userType.equalsIgnoreCase(UserType.ADMIN.getValue())) {
+			throw new UsernameNotFoundException("User not found with username: " + username);
+		}
+		
 		final List<GrantedAuthority> roles = Arrays.asList(
-				new SimpleGrantedAuthority(ROLE_GRANTED_AUTHORITY_PREFIX + UserType.SUPER_ADMIN.getValue()), 
-				new SimpleGrantedAuthority(ROLE_GRANTED_AUTHORITY_PREFIX + UserType.ADMIN.getValue()),
+				new SimpleGrantedAuthority(ROLE_GRANTED_AUTHORITY_PREFIX + userType), 
 				new SimpleGrantedAuthority(ROLE_GRANTED_AUTHORITY_PREFIX + UserType.USER.getValue()));
 		
 		final AuthenticationUserDetails authenticationUser = new AuthenticationUserDetails(
@@ -39,7 +49,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
 		
 		authenticationUser.setFullName(user.getFullName());
 		
-		// TODO
+		// TODO: PhatPQ => Initialize authentication user properties
 		authenticationUser.setAvatar(null);
 		
 		return authenticationUser;
