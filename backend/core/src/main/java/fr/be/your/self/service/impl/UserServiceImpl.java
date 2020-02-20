@@ -119,4 +119,9 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	public Iterable<User> findAllById(List<Integer> ids) {
 		return this.repository.findAllById(ids);
 	}
+
+	@Override
+	public Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable) {
+		return this.repository.findAllByEmailOrFirstNameOrLastName(email, firstName, lastName, pageable);
+	}
 }

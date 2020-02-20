@@ -53,6 +53,12 @@ public class EmailConfig {
 	
 	@Value("${mail.forgot.password.body}")
 	private String forgotPasswordBody;
+
+	@Value("${mail.temp.password.subject}")
+	private String tempPasswordSubject;
+	
+	@Value("${mail.temp.password.body}")
+	private String tempPasswordBody;
 	
 	@Bean 
 	public MailSender javaMailSender() {
@@ -102,6 +108,7 @@ public class EmailConfig {
 	public EmailSender emailSender() {
 		return new DefaultEmailSender(
 				this.activateUserSubject, this.activateUserBody, 
-				this.forgotPasswordSubject, this.forgotPasswordBody);
+				this.forgotPasswordSubject, this.forgotPasswordBody,
+				this.tempPasswordSubject, this.tempPasswordBody);
 	}
 }

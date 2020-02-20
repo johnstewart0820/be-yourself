@@ -60,6 +60,7 @@ import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.StringUtils;
+import net.bytebuddy.matcher.ModifierMatcher.Mode;
 
 @Controller
 public class UserController {
@@ -109,11 +110,11 @@ public class UserController {
 
 		boolean isAutoActivateAccount = isAdminUser ? this.dataSetting.isAutoActivateAdminAccount()
 				: this.dataSetting.isAutoActivateAccount();
-
+		
+		String tempPwd = null;
 		if (isNewUser) { // TODO TVA check this
-			
 			if (user.getLoginType() == LoginType.PASSWORD.getValue()) {
-				String tempPwd = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength()); // TODO TVA change this
+				tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
 						
 				String encodedPwd = passwordEncoder.encode(tempPwd);
 				user.setPassword(encodedPwd);
@@ -146,25 +147,61 @@ public class UserController {
 		}
 
 		if (isNewUser && !isAutoActivateAccount) {
-			String activateAccountUrl = request.getScheme() + "://" + request.getServerName() + ":"
-					+ request.getServerPort() + request.getContextPath();
-
-			if (activateAccountUrl.endsWith("/")) {
-				activateAccountUrl = activateAccountUrl.substring(0, activateAccountUrl.length() - 1);
-			}
-
-			activateAccountUrl += ACTIVATE_URL;
-
-			boolean success = this.emailSender.sendActivateUser(savedUser.getEmail(), activateAccountUrl,
-					savedUser.getActivateCode());
+			boolean success = sendVerificationEmailToUser(request, savedUser);
 
 			// TODO: Use success variable?
+			
+			if (tempPwd != null) {
+				this.emailSender.sendTemporaryPassword(savedUser.getEmail(), tempPwd);
+			}
 		}
 
 		return "redirect:" + DEFAULT_URL; // back to list of users
 
 	}
 
+	private boolean sendVerificationEmailToUser(HttpServletRequest request, User savedUser) {
+		String activateAccountUrl = buildActivateAccountUrl(request);
+
+		activateAccountUrl += ACTIVATE_URL;
+
+		boolean success = this.emailSender.sendActivateUser(savedUser.getEmail(), activateAccountUrl,
+				savedUser.getActivateCode());
+		return success;
+	}
+
+	private String buildActivateAccountUrl(HttpServletRequest request) {
+		String activateAccountUrl = request.getScheme() + "://" + request.getServerName() + ":"
+				+ request.getServerPort() + request.getContextPath();
+
+		if (activateAccountUrl.endsWith("/")) {
+			activateAccountUrl = activateAccountUrl.substring(0, activateAccountUrl.length() - 1);
+		}
+		return activateAccountUrl;
+	}
+
+	// reset password user
+	@RequestMapping(value = "/user/{id}/resetpassword")
+	public String resetPasswordUser(@PathVariable("id") int id, Model model) {
+		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
+		String encodedPwd = passwordEncoder.encode(tempPwd);
+		User user = userService.getById(id);
+		user.setPassword(encodedPwd);
+		userService.saveOrUpdate(user);
+		this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
+		model.addAttribute("msg", "Password reset successfully");
+		return "user/userform_result";
+	}
+
+	// resend verification email user
+	@RequestMapping(value = "/user/{id}/resendverifemail")
+	public String resendVerificationEmail(@PathVariable("id") int id, HttpServletRequest request, Model model) {
+		User user = userService.getById(id);
+		sendVerificationEmailToUser(request, user);
+		model.addAttribute("msg", "Resend verification email successfully");
+		return "user/userform_result";
+	}
+	
 	// show add user form
 	@RequestMapping(value = "/user/add")
 	public String showAddUserForm(Model model) {
@@ -300,23 +337,24 @@ public class UserController {
 	@RequestMapping(value = "/user/list/page/{page}")
 	public String listUserPageByPage(@PathVariable("page") int page, 
 			@RequestParam(value="nb_per_page", required=false, defaultValue = "10") Integer nb,
-			@RequestParam(value="filter_role", required=false) String role,
+			@RequestParam(value="filter_role", required=false, defaultValue="") String role,
 			@RequestParam(value="filter_status", required=false, defaultValue = "-2") Integer status,
-
+			@RequestParam(value="search_box", required=false) String searchBox,
 			Model model) {
 
 		PageRequest pageable = PageRequest.of(page - 1, nb);
 		Page<User> userPage;
-		if ("null".equals(role)) {
-			role ="";
-		}
-		if (!StringUtils.isNullOrEmpty(role)) {
+		
+		if (!StringUtils.isNullOrEmpty(searchBox)) {
+			userPage = userService.findAllByEmailOrFirstNameOrLastName(searchBox, searchBox, searchBox, pageable);
+		} else if (!StringUtils.isNullOrEmpty(role)) {
 			userPage = userService.findAllByUserType(role, pageable);
 		} else if (status != null && status != -2) {
 			userPage = userService.findAllByStatus(status, pageable);
 		} 	else {
 			userPage = userService.getPaginatedUsers(pageable);
 		}
+		
 		int totalPages = userPage.getTotalPages();
 		model.addAttribute("totalPages", totalPages);
 
@@ -330,6 +368,8 @@ public class UserController {
 		model.addAttribute("nb_per_page", nb);
 		model.addAttribute("filter_role", role);
 		model.addAttribute("filter_status", status);
+		model.addAttribute("search_box", searchBox);
+
 
 		return "user/userlist";
 	}

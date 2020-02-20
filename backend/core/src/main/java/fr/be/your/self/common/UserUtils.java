@@ -5,6 +5,7 @@ import java.util.List;
 
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
+import fr.be.your.self.util.StringUtils;
 
 public final class UserUtils {
 	public static boolean isAdmin(User user) {
@@ -33,5 +34,9 @@ public final class UserUtils {
 		}
 		return users;
 		
+	}
+	
+	public static String generateRandomPassword(int pwdLength) {
+		return StringUtils.randomAlphanumeric(pwdLength);
 	}
 }

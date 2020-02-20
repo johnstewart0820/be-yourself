@@ -4,52 +4,31 @@
 	layout:decorate="~{layout/main-layout.html}">
 <head>
 <title>Home</title>
-	<script>
-	var select_all = false;
 	
-	$(document).ready(function() {
-		
-		$('#nb_per_page').val([[${nb_per_page}]]);
-		$('#filter_role').val("[[${filter_role}]]");
-		$("#filter_status").val([[${filter_status}]]);
-		var status = "[[${filter_status}]]";
-		
-		$("select#filter_status").change(function() {
-			$("#filter_role").val($("#filter_role option:first").val());
-			 $( "#select_form" ).submit();
-
-		})
-		
-		$("select#filter_role").change(function() {
-			$("#filter_status").val($("#filter_status option:first").val());
-		    $( "#select_form" ).submit();
-
-		})
-		
-		$('a[href="#select_users"]').click(function(){
-			if (select_all == false) {
-				$("[name='selected_id']").prop('checked', true);    
-				select_all = true;
-			} else {
-				$("[name='selected_id']").prop('checked', false);    
-				select_all = false;
-			}
-		}); 
-	});
-</script>
 </head>
 <body>
-	<div layout:fragment="content">	
-		<div class="row mb-3">
-			<div class="col">
-				<a href="/user/add" class="btn btn-sm btn-primary">+ Add User</a>
+	<div layout:fragment="content">
 
+		<form id="select_form" th:action="@{/user/list/page/1}" method="post">
+			<div class="row">
+				<div class="col-md-6">
+					<a href="/user/add" class="btn btn-sm btn-primary">+ Add User</a>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<div class="input-group mb-4">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><i
+									class="ni ni-zoom-split-in"></i></span>
+							</div>
+							<input class="form-control" placeholder="Search" id="search_box" name="search_box" 	type="text">
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="table-responsive">
-					<form id="select_form" th:action="@{/user/list/page/1}" method="post">
+			<div class="row">
+				<div class="col">
+					<div class="table-responsive">
 						<table class="table align-items-center table-flush">
 							<tr>
 								<td>
@@ -97,11 +76,12 @@
 								</td>
 							</tr>
 						</table>
-					</form>
 
+					</div>
 				</div>
 			</div>
-		</div>
+		</form>
+
 		<div class="row mb-3">
 			<div class="col">
 			<a href="#select_users" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
@@ -199,8 +179,67 @@
 		<!-- End table -->
 
 	</div>
+	
+	
+	<section layout:fragment="scripts">
+	<script>
+		var nb_per_page = 10;
+		var filter_role = "";
+		var filter_status = -2;
+		var search_box = "";
+	</script>
+	
+	<script th:if="${filter_role != null}">
+		filter_role= "[[${filter_role}]]";
+	</script>
+	
+	<script th:if="${filter_status != null}">
+		filter_status= "[[${filter_status}]]";
+	</script>	
+	<script>
+	var select_all = false;
+	
+	$(document).ready(function() {
+		
+		$('#nb_per_page').val([[${nb_per_page}]]);
+		$('#filter_role').val(filter_role);
+		$("#filter_status").val(filter_status);
+		$("#search_box").val("[[${search_box}]]");
+		
+		$("select#filter_status").change(function() {
+			$("#filter_role").val($("#filter_role option:first").val());
+			 $( "#select_form" ).submit();
 
-	<section layout:fragment="scripts"></section>
+		});
+		
+		$("select#filter_role").change(function() {
+			$("#filter_status").val($("#filter_status option:first").val());
+		    $( "#select_form" ).submit();
+
+		});
+		
+		$('a[href="#select_users"]').click(function(){
+			if (select_all == false) {
+				$("[name='selected_id']").prop('checked', true);    
+				select_all = true;
+			} else {
+				$("[name='selected_id']").prop('checked', false);    
+				select_all = false;
+			}
+		});
+		
+		
+		$('#search_box').on("keypress", function(e) {
+	        if (e.keyCode == 13) {
+	        	$("#filter_role").val($("#filter_role option:first").val());
+				$("#filter_status").val($("#filter_status option:first").val());
+			    $( "#select_form" ).submit();
+	        }
+		});
+	});
+</script>
+	
+	</section>
 
 </body>
 </html>

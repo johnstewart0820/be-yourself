@@ -29,13 +29,18 @@ public class DefaultEmailSender implements EmailSender {
 
 	private String forgotPasswordSubject;
 	private String forgotPasswordBody;
+	
+	private String tempPasswordSubject;
+	private String tempPasswordBody;	
 
 	public DefaultEmailSender(String activateUserSubject, String activateUserBody, String forgotPasswordSubject,
-			String forgotPasswordBody) {
+			String forgotPasswordBody, String tempPasswordSubject, String tempPasswordBody) {
 		this.activateUserSubject = activateUserSubject;
 		this.activateUserBody = activateUserBody;
 		this.forgotPasswordSubject = forgotPasswordSubject;
 		this.forgotPasswordBody = forgotPasswordBody;
+		this.tempPasswordSubject = tempPasswordSubject;
+		this.tempPasswordBody = tempPasswordBody;
 	}
 
 	@Override
@@ -145,5 +150,46 @@ public class DefaultEmailSender implements EmailSender {
 		}
 
 		return this.send(email, this.forgotPasswordSubject, mailBody);
+	}
+
+	@Override
+	public boolean sendTemporaryPassword(String email, String tempPassword) {
+		final String mailBody = this.tempPasswordBody
+				.replace("[TemporaryPassword]", tempPassword);
+		
+		if (JavaMailSender.class.isAssignableFrom(this.mailSender.getClass())) {
+			try {
+				final JavaMailSender javaMailSender = (JavaMailSender) this.mailSender;
+				
+				final MimeMessage message = javaMailSender.createMimeMessage();
+				message.setSubject(this.tempPasswordSubject, "UTF-8");
+
+				final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+				helper.setFrom(defaultMessage.getFrom());
+
+				final String[] bcc = defaultMessage.getBcc();
+				if (bcc != null && bcc.length > 0 && !StringUtils.isNullOrEmpty(bcc[0])) {
+					helper.setBcc(bcc);
+				}
+
+				final String[] cc = defaultMessage.getCc();
+				if (cc != null && cc.length > 0 && !StringUtils.isNullOrEmpty(cc[0])) {
+					helper.setCc(cc);
+				}
+
+				helper.setTo(email);
+				helper.setText(mailBody, true);
+
+				javaMailSender.send(message);
+
+				return true;
+			} catch (MessagingException ex) {
+				logger.error("Invalid email message", ex);
+			} catch (Exception ex) {
+				logger.error("Send email error", ex);
+			}
+		}
+
+		return this.send(email, this.tempPasswordSubject, mailBody);
 	}
 }

@@ -2,6 +2,7 @@ package fr.be.your.self.model;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,7 +29,7 @@ public class User extends PO<Integer> {
 	private String lastName;
 
 	private String title;
-
+	
 	private String email;
 
 	@JsonIgnore

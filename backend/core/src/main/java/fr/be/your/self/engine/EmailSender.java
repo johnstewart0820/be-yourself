@@ -7,4 +7,7 @@ public interface EmailSender {
 	public boolean sendActivateUser(String email, String activeUrl, String validToken);
 	
 	public boolean sendForgotPassword(String email, String forgetPasswordUrl, String validToken);
+	
+	public boolean sendTemporaryPassword(String email, String tempPassword);
+
 }

@@ -12,6 +12,7 @@ public class DataSetting {
 	private boolean autoActivateAdminAccount;
 	private int activateCodeLength;
 	private long activateCodeTimeout;
+	private int tempPwdLength;
 	
 	private String uploadFolder;
 	
@@ -182,5 +183,13 @@ public class DataSetting {
 		this.displayHeaderOnAuthPage = displayHeaderOnAuthPage;
 		this.allowRegisterOnAuthPage = allowRegisterOnAuthPage;
 		this.allowSocialOnAuthPage = allowSocialOnAuthPage;
+	}
+
+	public int getTempPwdLength() {
+		return tempPwdLength;
+	}
+
+	public void setTempPwdLength(int tempPwdLength) {
+		this.tempPwdLength = tempPwdLength;
 	}
 }
