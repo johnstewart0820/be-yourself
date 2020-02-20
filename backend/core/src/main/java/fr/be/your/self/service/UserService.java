@@ -20,6 +20,7 @@ public interface UserService extends BaseService<User> {
 
 	Page<User> findAllByUserType(String userType, Pageable pageable);
     Page<User> findAllByStatus(int status, Pageable pageable);
+    Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable);
 
 	Iterable<User> findAllById(List<Integer> ids);
 

@@ -337,23 +337,24 @@ public class UserController {
 	@RequestMapping(value = "/user/list/page/{page}")
 	public String listUserPageByPage(@PathVariable("page") int page, 
 			@RequestParam(value="nb_per_page", required=false, defaultValue = "10") Integer nb,
-			@RequestParam(value="filter_role", required=false) String role,
+			@RequestParam(value="filter_role", required=false, defaultValue="") String role,
 			@RequestParam(value="filter_status", required=false, defaultValue = "-2") Integer status,
-
+			@RequestParam(value="search_box", required=false) String searchBox,
 			Model model) {
 
 		PageRequest pageable = PageRequest.of(page - 1, nb);
 		Page<User> userPage;
-		if ("null".equals(role)) {
-			role ="";
-		}
-		if (!StringUtils.isNullOrEmpty(role)) {
+		
+		if (!StringUtils.isNullOrEmpty(searchBox)) {
+			userPage = userService.findAllByEmailOrFirstNameOrLastName(searchBox, searchBox, searchBox, pageable);
+		} else if (!StringUtils.isNullOrEmpty(role)) {
 			userPage = userService.findAllByUserType(role, pageable);
 		} else if (status != null && status != -2) {
 			userPage = userService.findAllByStatus(status, pageable);
 		} 	else {
 			userPage = userService.getPaginatedUsers(pageable);
 		}
+		
 		int totalPages = userPage.getTotalPages();
 		model.addAttribute("totalPages", totalPages);
 
@@ -367,6 +368,8 @@ public class UserController {
 		model.addAttribute("nb_per_page", nb);
 		model.addAttribute("filter_role", role);
 		model.addAttribute("filter_status", status);
+		model.addAttribute("search_box", searchBox);
+
 
 		return "user/userlist";
 	}
