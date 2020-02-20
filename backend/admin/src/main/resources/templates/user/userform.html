@@ -160,13 +160,12 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-4" id="reset_pwd_email_div">
+				<div class="col-md-4" id="reset_pwd_email_div"  th:if="${isUpdating}">
 					<div class="card bg-secondary shadow border-0">
 						<div class="card-body px-lg-5 py-lg-5">
-							<button type="button" class="btn btn-primary mt-4">
-								Reset password</button>
-							<button type="button" class="btn btn-primary mt-4">
-								Resend verification email</button>
+							<a th:href="@{/user/{id}/resetpassword(id=${user.id})}" class="btn btn-primary mt-4">Reset Password</a>
+							<a th:href="@{/user/{id}/resendverifemail(id=${user.id})}" class="btn btn-primary mt-4">Resend Verification Email</a>
+
 						</div>
 					</div>
 				</div>
