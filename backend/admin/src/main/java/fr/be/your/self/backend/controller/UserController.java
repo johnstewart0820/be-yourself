@@ -193,6 +193,23 @@ public class UserController {
 		return "user/userform_result";
 	}
 
+	// reset password user by email
+	@RequestMapping(value = "/user/password/resetbyemail")
+	public String resetPasswordByEmail(@RequestParam("user_email") String userEmail, Model model) {
+		User user = userService.getByEmail(userEmail);
+		if (user == null) {
+			model.addAttribute("msg", "Email address does not exist!");
+			return "user/reset_password_result";
+		}
+		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
+		String encodedPwd = passwordEncoder.encode(tempPwd);
+		user.setPassword(encodedPwd);
+		userService.saveOrUpdate(user);
+		this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
+		model.addAttribute("msg", "Password reset successfully for user: '" + user.getFullName() + "' with email: " + user.getEmail());
+		return "user/reset_password_result";
+	}
+	
 	// resend verification email user
 	@RequestMapping(value = "/user/{id}/resendverifemail")
 	public String resendVerificationEmail(@PathVariable("id") int id, HttpServletRequest request, Model model) {
@@ -433,5 +450,10 @@ public class UserController {
 		return "user/upload_form";
 	}
 	
-
+	// show reset password form
+	@RequestMapping(value = "/user/resetpwdbyemail")
+	public String showResetPassword(Model model) {
+		return "user/reset_password_form";
+	}
+	
 }
