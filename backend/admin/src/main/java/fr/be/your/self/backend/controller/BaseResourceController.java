@@ -39,7 +39,7 @@ import fr.be.your.self.util.StringUtils;
 
 public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, DetailDto> extends BaseController {
 	
-	private static final String ACCESS_DENIED_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACCESS_DENIED;
+	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 	
 	protected static final String TOAST_ACTION_KEY = "toastAction";
 	protected static final String TOAST_STATUS_KEY = "toastStatus";
@@ -354,69 +354,9 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	*/
 	
-	protected final ObjectError createFieldError(BindingResult result, String fieldName, String errorMessageCode, String defaultMessage) {
-		final String baseMessageKey = this.getName().replace('-', '.');
-		
-		final List<String> fieldNameMessageCodes = Arrays.asList(fieldName.split("(?=\\p{Lu})"));
-		fieldNameMessageCodes.replaceAll(String::toLowerCase);
-		
-		final String fieldNameMessageCode = String.join(".", fieldNameMessageCodes);
-		final String messageCode = baseMessageKey + ".error." + fieldNameMessageCode + "." + errorMessageCode;
-		
-		return new FieldError(result.getObjectName(), fieldName, null, false, new String[] { messageCode }, null, defaultMessage);
-	}
-	
-	protected final ObjectError createFieldError(BindingResult result, String fieldName, String messageCode) {
-		return createFieldError(result, fieldName, messageCode, "");
-	}
-	
-	protected final ObjectError createIdNotFoundError(BindingResult result, Integer id) {
-		return new ObjectError(result.getObjectName(), new String[] { "error.id.not.found" }, null, "Not found");
-	}
-	
-	protected final ObjectError createProcessingError(BindingResult result) {
-		return new ObjectError(result.getObjectName(), new String[] { "error.processing" }, null, "Processing error");
-	}
-	
-	protected String getIdNotFoundMessage(Integer idValue) {
-		final String baseMessageKey = this.getName().replace('-', '.');
-		final String dataName = this.getMessage(baseMessageKey + ".name");
-		
-		final String message = this.getMessage("error.message.id.not.found", new String[] { dataName, idValue.toString() }, null);
-		
-		if (message.startsWith(dataName)) {
-			return StringUtils.upperCaseFirst(message);
-		}
-		
-		return message;
-	}
-	
-	protected String getDeleteByIdErrorMessage(Integer idValue) {
-		final String baseMessageKey = this.getName().replace('-', '.');
-		final String dataName = this.getMessage(baseMessageKey + ".name");
-		
-		final String message = this.getMessage("error.message.cannot.delete.id", new String[] { dataName, idValue.toString() }, null);
-		
-		if (message.startsWith(dataName)) {
-			return StringUtils.upperCaseFirst(message);
-		}
-		
-		return message;
-	}
-	
-	protected String getDeleteSuccessMessage(Integer idValue) {
-		final String baseMessageKey = this.getName().replace('-', '.');
-		final String dataName = this.getMessage(baseMessageKey + ".name");
-		
-		final String message = this.getMessage("success.message.delete", new String[] { dataName, idValue.toString() }, null);
-		
-		if (message.startsWith(dataName)) {
-			return StringUtils.upperCaseFirst(message);
-		}
-		
-		return message;
-	}
-	
+	/**************************************************************************************/
+	/********************* OPTION PROPERTIES **********************************************/
+	/**************************************************************************************/
 	protected final String getBaseURL() {
 		return Constants.PATH.WEB_ADMIN_PREFIX + "/" + this.getName();
 	}
@@ -457,6 +397,165 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
         return PageRequest.of(page - 1, size);
     }
 	
+	/**************************************************************************************/
+	/********************* CREATE FORM ERROR MESSAGE **************************************/
+	/**************************************************************************************/
+	protected final ObjectError createFieldError(BindingResult result, String fieldName, String errorMessageCode, String defaultMessage) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		
+		final List<String> fieldNameMessageCodes = Arrays.asList(fieldName.split("(?=\\p{Lu})"));
+		fieldNameMessageCodes.replaceAll(String::toLowerCase);
+		
+		final String fieldNameMessageCode = String.join(".", fieldNameMessageCodes);
+		final String messageCode = baseMessageKey + ".error." + fieldNameMessageCode + "." + errorMessageCode;
+		
+		return new FieldError(result.getObjectName(), fieldName, null, false, new String[] { messageCode }, null, defaultMessage);
+	}
+	
+	protected final ObjectError createFieldError(BindingResult result, String fieldName, String messageCode) {
+		return createFieldError(result, fieldName, messageCode, "");
+	}
+	
+	protected final ObjectError createIdNotFoundError(BindingResult result, Integer id) {
+		return new ObjectError(result.getObjectName(), new String[] { "error.id.not.found" }, null, "Not found");
+	}
+	
+	protected final ObjectError createProcessingError(BindingResult result) {
+		return new ObjectError(result.getObjectName(), new String[] { "error.processing" }, null, "Processing error");
+	}
+	
+	/**************************************************************************************/
+	/********************* MESSAGE METHODS ************************************************/
+	/**************************************************************************************/
+	protected String getIdNotFoundMessage(Integer idValue) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String dataName = this.getMessage(baseMessageKey + ".name");
+		
+		final String message = this.getMessage("error.message.id.not.found", new String[] { dataName, idValue.toString() }, null);
+		
+		if (message.startsWith(dataName)) {
+			return StringUtils.upperCaseFirst(message);
+		}
+		
+		return message;
+	}
+	
+	protected String getDeleteByIdErrorMessage(Integer idValue) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String dataName = this.getMessage(baseMessageKey + ".name");
+		
+		final String message = this.getMessage("error.message.cannot.delete.id", new String[] { dataName, idValue.toString() }, null);
+		
+		if (message.startsWith(dataName)) {
+			return StringUtils.upperCaseFirst(message);
+		}
+		
+		return message;
+	}
+	
+	protected String getDeleteSuccessMessage(Integer idValue) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String dataName = this.getMessage(baseMessageKey + ".name");
+		
+		final String message = this.getMessage("success.message.delete", new String[] { dataName, idValue.toString() }, null);
+		
+		if (message.startsWith(dataName)) {
+			return StringUtils.upperCaseFirst(message);
+		}
+		
+		return message;
+	}
+	
+	/**************************************************************************************/
+	/********************* PROCESS UPLOAD FILES *******************************************/
+	/**************************************************************************************/
+	protected Path processUploadImageFile(final MultipartFile uploadImageFile, BindingResult result) {
+		if (!this.isValidImageFileSize(uploadImageFile.getSize())) {
+        	final ObjectError error = this.createFieldError(result, "image", "too.large", "Image is too large");
+        	result.addError(error);
+        	
+        	return null;
+        }
+		
+		final Path uploadImageFilePath = this.uploadFile(uploadImageFile);
+        if (uploadImageFilePath == null) {
+        	final ObjectError error = this.createProcessingError(result);
+        	result.addError(error);
+        	
+        	return null;
+        }
+        
+        final String imageContentType = this.getFileContentType(uploadImageFilePath);
+        if (StringUtils.isNullOrSpace(imageContentType) || !this.isValidImageContentType(imageContentType)) {
+        	this.deleteUploadFile(uploadImageFilePath);
+        	
+        	final ObjectError error = this.createFieldError(result, "image", "invalid", "Image is invalid");
+        	result.addError(error);
+        	
+        	return null;
+        }
+        
+        return uploadImageFilePath;
+	}
+	
+	protected Path processUploadContentFile(final MultipartFile uploadContentFile, BindingResult result) {
+		final long contentFileSize = uploadContentFile.getSize();
+		if (!this.isValidMediaFileSize(contentFileSize)) {
+        	final ObjectError error = this.createFieldError(result, "contentFile", "too.large", "Content file is too large");
+        	result.addError(error);
+        	
+        	return null;
+        }
+		
+		final Path uploadContentFilePath = this.uploadFile(uploadContentFile);
+        if (uploadContentFilePath == null) {
+        	final ObjectError error = this.createProcessingError(result);
+        	result.addError(error);
+        	
+        	return null;
+        }
+        
+        final String contentFileContentType = this.getFileContentType(uploadContentFilePath);
+        if (StringUtils.isNullOrSpace(contentFileContentType)) {
+        	this.deleteUploadFile(uploadContentFilePath);
+        	
+        	final ObjectError error = this.createFieldError(result, "contentFile", "invalid", "Content file is invalid");
+        	result.addError(error);
+        	
+        	return null;
+        }
+        
+        // Validate content type and file size
+        if (this.isValidAudioContentType(contentFileContentType)) {
+        	if (!this.isValidAudioFileSize(contentFileSize)) {
+            	this.deleteUploadFile(uploadContentFilePath);
+            	
+            	final ObjectError error = this.createFieldError(result, "contentFile", "too.large", "Content file is too large");
+            	result.addError(error);
+            	
+            	return null;
+            }
+        } else if (this.isValidVideoContentType(contentFileContentType)) {
+        	if (!this.isValidVideoFileSize(contentFileSize)) {
+            	this.deleteUploadFile(uploadContentFilePath);
+            	
+            	final ObjectError error = this.createFieldError(result, "contentFile", "too.large", "Content file is too large");
+            	result.addError(error);
+            	
+            	return null;
+            }
+        } else {
+        	this.deleteUploadFile(uploadContentFilePath);
+        	
+        	final ObjectError error = this.createFieldError(result, "contentFile", "invalid", "Content file is invalid");
+        	result.addError(error);
+        	
+        	return null;
+        }
+        
+        return uploadContentFilePath;
+	}
+	
 	protected Path uploadFile(final MultipartFile mediaFile) {
 		final String uploadDirectoryName = this.getUploadDirectoryName();
 		final String fileName = mediaFile.getOriginalFilename();
@@ -496,13 +595,89 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		
     	final Path mediaFilePath = Paths.get(this.getUploadDirectoryName() + "/" + deleteFileName);
     	
-    	try {
-			Files.delete(mediaFilePath);
+    	return deleteUploadFile(mediaFilePath);
+	}
+	
+	protected boolean deleteUploadFile(final Path filePath) {
+		if (filePath == null) {
+			return false;
+		}
+		
+		try {
+			Files.delete(filePath);
 			return true;
 		} catch (IOException ex) {
 			this.logger.error("Cannot delete media file", ex);
 		}
-    	
-    	return false;
+		
+		return false;
+	}
+	
+	protected String getFileContentType(final Path filePath) {
+		try {
+			final String contentType = Files.probeContentType(filePath);
+			
+			return contentType == null ? null : contentType.toLowerCase();
+		} catch (IOException ex) {
+			this.logger.error("Cannot retrieve file mime type", ex);
+		}
+		
+		return null;
+	}
+	
+	protected boolean isValidImageContentType(final String contentType) {
+		if (StringUtils.isNullOrSpace(contentType)) {
+			return false;
+		}
+		
+		return this.dataSetting.getImageMimeTypes().contains(contentType);
+	}
+	
+	protected boolean isValidImageFileSize(final long fileSize) {
+		final long maxFileSize = this.dataSetting.getImageMaxFileSize();
+		return maxFileSize <= 0 || maxFileSize >= fileSize;
+	}
+	
+	protected boolean isValidAudioContentType(final String contentType) {
+		if (StringUtils.isNullOrSpace(contentType)) {
+			return false;
+		}
+		
+		return this.dataSetting.getAudioMimeTypes().contains(contentType);
+	}
+	
+	protected boolean isValidAudioFileSize(final long fileSize) {
+		final long maxFileSize = this.dataSetting.getAudioMaxFileSize();
+		return maxFileSize <= 0 || maxFileSize >= fileSize;
+	}
+	
+	protected boolean isValidVideoContentType(final String contentType) {
+		if (StringUtils.isNullOrSpace(contentType)) {
+			return false;
+		}
+		
+		return this.dataSetting.getVideoMimeTypes().contains(contentType);
+	}
+	
+	protected boolean isValidVideoFileSize(final long fileSize) {
+		final long maxFileSize = this.dataSetting.getVideoMaxFileSize();
+		return maxFileSize <= 0 || maxFileSize >= fileSize;
+	}
+	
+	protected boolean isValidMediaContentType(final String contentType) {
+		if (StringUtils.isNullOrSpace(contentType)) {
+			return false;
+		}
+		
+		return this.dataSetting.getMediaMimeTypes().contains(contentType);
+	}
+	
+	protected boolean isValidMediaFileSize(final long fileSize) {
+		long maxFileSize = this.dataSetting.getAudioMaxFileSize();
+		if (maxFileSize < this.dataSetting.getVideoMaxFileSize()) {
+			maxFileSize = this.dataSetting.getVideoMaxFileSize();
+		}
+		
+		return maxFileSize <= 0 || maxFileSize >= fileSize;
 	}
 }

@@ -23,7 +23,7 @@
 							</div>
 							
 							<div class="col-6 text-right">
-								<h3 class="mb-0" th:text="${formTitle}"></h3>
+								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
 							</div>
 						</div>
 					</div>
@@ -88,7 +88,8 @@
 													<div class="custom-file">
 														<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 															th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
-															th:accept="${supportImageTypes}" onChange="selectImage(this)"/>
+															th:accept="${supportImageTypes}" onChange="selectImage(this)"
+															th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
 														<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 															th:data-browse="#{action.select.image}" 
 															th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
@@ -103,7 +104,8 @@
 													<div class="custom-file">
 														<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 															th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
-															th:accept="${supportImageTypes}" onChange="selectImage(this)"/>
+															th:accept="${supportImageTypes}" onChange="selectImage(this)"
+															th:default-src="${baseMediaURL + '/image/view/' + dto.image}" />
 														<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 															th:data-browse="#{action.select.image}" 
 															th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
@@ -135,8 +137,10 @@
 												<div class="col-md-10 col-sm-9 col-xs-12">
 													<div class="custom-file">
 														<input type="file" class="custom-file-input" th:field="*{uploadContentFile}" id="uploadContentFile" 
-															th:placeholder="#{|${baseMessageKey}.detail.content.file.placeholder|}" required="required"
-															th:accept="${supportMediaTypes}" onChange="selectMedia(this)"/>
+															th:placeholder="#{|${baseMessageKey}.detail.content.file.placeholder|}" 
+															th:accept="${supportMediaTypes}" onChange="selectMedia(this)" 
+															th:default-src="${baseMediaURL + '/media/view/' + dto.contentFile}"
+															th:default-mime-type="${dto.contentMimeType}"/>
 														<label class="custom-file-label" for="uploadContentFile" id="contentFileLabel" 
 															th:data-browse="#{action.select.media}" 
 															th:text="#{|${baseMessageKey}.detail.content.file.placeholder|}"></label>
@@ -181,82 +185,37 @@
 										<div class="form-group row">
 											<div class="col-12 text-center" th:switch="${action}">
 												<img th:case="create" id="imagePreview" class="image-fit" style="max-height: 124px;"
-													th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
-													th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}">
-												<a th:case="*" th:href="${baseMediaURL + '/image/view/' + dto.image}" 
+													th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
+												<a th:case="*" th:href="${baseMediaURL + '/image/download/' + dto.image}" 
 													th:title="#{session.group.detail.image.link.title}" target="_blank">
 													<img class="image-fit" id="imagePreview" style="max-height: 124px;"
-														th:alt="${dto.title}" th:src="${baseMediaURL + '/image/view/' + dto.image}"
-														th:default-src="${baseMediaURL + '/image/view/' + dto.image}">
+														th:alt="${dto.title}" th:src="${baseMediaURL + '/image/view/' + dto.image}">
 												</a>
-											</div>
-										</div>
-										
-										<div class="form-group row">
-											<div class="col-12">
-												<audio controls loop autoplay class="form-control">
-													<source src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/9473/new_year_dubstep_minimix.ogg" type="audio/ogg">
-													Your browser dose not Support the audio Tag
-												</audio>
 											</div>
 										</div>
 										
 										<div class="form-group row" id="audioContainer">
 											<div class="col-12">
 												<audio id="audioPlayer" controls>
-													<source src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/9473/new_year_dubstep_minimix.ogg" type="audio/ogg">
+													<source th:if="${action != 'create' && dto.contentFileType != null && dto.contentFileType == 'audio' }" 
+														th:src="${baseMediaURL + '/media/view/' + dto.contentFile}" 
+														th:type="${dto.contentMimeType}" />
 												</audio>
 											</div>
 										</div>
 										
 										<div class="form-group row" id="videoContainer">
-											<div class="col-12">
-												<div id="container">
-								                    <video
-								                        controls
-								                        crossorigin
-								                        playsinline
-								                        poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg"
-								                        id="videoPlayer"
-								                    >
-								                        <!-- Video files -->
-								                        <source
-								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4"
-								                            type="video/mp4"
-								                            size="576"
-								                        />
-								                        <source
-								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4"
-								                            type="video/mp4"
-								                            size="720"
-								                        />
-								                        <source
-								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4"
-								                            type="video/mp4"
-								                            size="1080"
-								                        />
-								
-								                        <!-- Caption files -->
-								                        <track
-								                            kind="captions"
-								                            label="English"
-								                            srclang="en"
-								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
-								                            default
-								                        />
-								                        <track
-								                            kind="captions"
-								                            label="Français"
-								                            srclang="fr"
-								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt"
-								                        />
-								
-								                        <!-- Fallback for browsers that don't support the <video> element -->
-								                        <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download
-								                            >Download</a
-								                        >
-								                    </video>
-								                </div>
+											<div class="col-12" th:switch="${action}">
+												<video th:case="create" id="videoPlayer" controls crossorigin playsinline></video>
+												<video th:case="*" id="videoPlayer" controls crossorigin playsinline 
+													th:poster="${baseMediaURL + '/image/view/' + dto.image}">
+													<source th:if="${dto.contentFileType != null && dto.contentFileType == 'video' }" 
+														th:src="${baseMediaURL + '/media/view/' + dto.contentFile}" th:type="${dto.contentMimeType}" />
+													<a th:if="${dto.contentFileType != null && dto.contentFileType == 'video' }" 
+														th:href="${baseMediaURL + '/media/download/' + dto.contentFile}" download>
+														<i class="fas fa-cloud-download-alt"></i>
+													</a>
+												</video>
 											</div>
 										</div>
 									</div>
@@ -286,7 +245,7 @@
 		</div>
 		
 		<div class="modal fade" id="image-file-type-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="fileTypeModal" aria-hidden="true" data-backdrop="false">
+			aria-labelledby="imageFileTypeModal" aria-hidden="true" data-backdrop="false">
 			<div class="modal-dialog modal-danger modal-dialog-centered modal-10" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -296,17 +255,18 @@
 						</button>
 					</div>
 					<div class="modal-body">
-						<p th:text="#{error.media.image.support.type(${supportImageExtensions})}"></p>
+						<p th:text="#{error.media.image.support.type(${supportImageExtensions.replace(',', ', ')})}"></p>
 					</div>
 					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal">Close</button> 
+                		<button type="button" class="btn btn-link text-white ml-auto" 
+                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button> 
 					</div>
 				</div>
 			</div>
 		</div>
 		
 		<div class="modal fade" id="image-file-size-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="fileSizeModal" aria-hidden="true" data-backdrop="false">
+			aria-labelledby="imageFileSizeModal" aria-hidden="true" data-backdrop="false">
 			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -319,7 +279,50 @@
 						<p th:text="#{error.media.image.support.max.size(${supportImageSizeLabel})}"></p>
 					</div>
 					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal" th:text="#{modal.button.ok}"></button>
+                		<button type="button" class="btn btn-link text-white ml-auto" 
+                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="media-file-type-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="mediaFileTypeModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-danger modal-dialog-centered modal-10" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title" id="media-file-type-modal-title" th:text="#{error.media.modal.title}"></h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p th:text="#{error.media.support.type(${supportMediaExtensions.replace(',', ', ')})}"></p>
+					</div>
+					<div class="modal-footer">
+                		<button type="button" class="btn btn-link text-white ml-auto" 
+                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button> 
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="media-file-size-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="mediaFileSizeModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title" id="media-file-size-modal-title" th:text="#{error.media.modal.title}"></h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p th:text="#{error.media.support.max.size(${supportMediaSizeLabel})}"></p>
+					</div>
+					<div class="modal-footer">
+                		<button type="button" class="btn btn-link text-white ml-auto" 
+                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button>
 					</div>
 				</div>
 			</div>
@@ -328,11 +331,23 @@
 
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
+			const supportImageTypes = '[[${supportImageTypes}]]';
+			const supportImageFileSize = [[${supportImageSize}]];
+			const defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
+
+			const supportAudioTypes = '[[${supportAudioTypes}]]';
+			const supportAudioExtensions = '[[${supportAudioExtensions}]]';
+			const supportVideoTypes = '[[${supportVideoTypes}]]';
+			const supportVideoExtensions = '[[${supportVideoExtensions}]]';
+			const supportMediaTypes = '[[${supportMediaTypes}]]';
+			const supportMediaFileSize = [[${supportMediaSize}]];
+			const defaultMediaLabel = '[[#{|${baseMessageKey}.detail.content.file.placeholder|}]]';
+			
+			const contentFileType = '[[${dto.contentFileType}]]';
+			var audioPlayer;
+			var videoPlayer;
+			
 			function selectImage(inputElement) {
-				var supportImageTypes = '[[${supportImageTypes}]]';
-				var supportImageFileSize = [[${supportImageSize}]];
-				var defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
-				
 				validateAndPreviewImage(inputElement, 
 						'imagePreview', 'imageFileLabel', defaultImageLabel,
 						supportImageTypes, supportImageFileSize, 
@@ -340,15 +355,28 @@
 			}
 			
 			function selectMedia(inputElement) {
-				var supportAudioTypes = '[[${supportAudioTypes}]]';
-				var supportVideoTypes = '[[${supportVideoTypes}]]';
-				var supportMediaTypes = '[[${supportMediaTypes}]]';
-				var supportMediaFileSize = [[${supportMediaSize}]];
-				var defaultMediaLabel = '[[#{|${baseMessageKey}.detail.content.file.placeholder|}]]';
+				validateAndPreviewMedia(inputElement, 
+					audioPlayer, 'audioContainer', 'audioPlayer', 
+					supportAudioTypes, supportAudioExtensions, 
+					videoPlayer, 'videoContainer', 'videoPlayer', 
+					supportVideoTypes, supportVideoExtensions,
+					'contentFileLabel', defaultMediaLabel, 
+					supportMediaTypes, supportMediaFileSize, 
+					'media-file-type-modal', 'media-file-size-modal');
 			}
 			
-		    const audioPlayer = new Plyr('#audioPlayer');
-		    const videoPlayer = new Plyr('#videoPlayer');
+		    $(function() {
+		    	audioPlayer = new Plyr('#audioPlayer', { invertTime: false });
+		    	videoPlayer = new Plyr('#videoPlayer', { invertTime: false });
+		    	
+		    	if (contentFileType != 'audio') {
+		    		$('#audioContainer').hide();
+		    	}
+		    	
+		    	if (contentFileType != 'video') {
+		    		$('#videoContainer').hide();
+		    	}
+		    });
 		</script>
 	</th:block>
 </body>

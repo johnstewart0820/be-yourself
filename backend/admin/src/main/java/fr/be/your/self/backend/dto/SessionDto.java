@@ -33,7 +33,9 @@ public class SessionDto implements Serializable {
 	private MultipartFile uploadImageFile;
 
 	private String contentFile;
-
+	private String contentFileType;
+	private String contentMimeType;
+	
 	private MultipartFile uploadContentFile;
 
 	private int duration;
@@ -57,6 +59,7 @@ public class SessionDto implements Serializable {
 			this.subtitle = domain.getSubtitle();
 			this.image = domain.getImage();
 			this.contentFile = domain.getContentFile();
+			this.contentMimeType = domain.getContentMimeType();
 			this.duration = domain.getDuration();
 			this.description = domain.getDescription();
 			this.free = domain.isFree();
@@ -130,6 +133,22 @@ public class SessionDto implements Serializable {
 
 	public void setContentFile(String contentFile) {
 		this.contentFile = contentFile;
+	}
+
+	public String getContentMimeType() {
+		return contentMimeType;
+	}
+
+	public void setContentMimeType(String contentMimeType) {
+		this.contentMimeType = contentMimeType;
+	}
+
+	public String getContentFileType() {
+		return contentFileType;
+	}
+
+	public void setContentFileType(String contentFileType) {
+		this.contentFileType = contentFileType;
 	}
 
 	public MultipartFile getUploadContentFile() {

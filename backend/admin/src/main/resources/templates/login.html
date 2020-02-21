@@ -6,6 +6,16 @@
 	<title th:text="#{login.page.title}"></title>
 </head>
 <body>
+	<th:block layout:fragment="stylesheets">
+		<style type="text/css">
+			.footer {
+				position: fixed;
+				bottom: 0;
+				width: 100%;
+			}
+		</style>
+	</th:block>
+	
 	<div layout:fragment="content">
 		<!-- Header -->
 		<div class="header bg-gradient-primary py-7 py-lg-8">

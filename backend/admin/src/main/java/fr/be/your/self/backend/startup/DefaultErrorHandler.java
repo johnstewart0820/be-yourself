@@ -32,7 +32,7 @@ public class DefaultErrorHandler {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultErrorHandler.class);
 	
 	private static final String API_URL_PREFIX = Constants.PATH.API_PREFIX + "/";
-	private static final String ACCESS_DENIED_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACCESS_DENIED;
+	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 	
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 	

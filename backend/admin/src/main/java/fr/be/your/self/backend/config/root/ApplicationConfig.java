@@ -43,14 +43,14 @@ public class ApplicationConfig {
 	@Value("#{'${data.upload.video.extension}'.split(',')}")
 	private Set<String> videoFileExtensions;
 	
-	@Value("#{'${data.upload.image.media.type}'.split(',')}")
-	private Set<String> imageFileMediaTypes;
+	@Value("#{'${data.upload.image.mime.type}'.split(',')}")
+	private Set<String> imageFileMimeTypes;
 	
-	@Value("#{'${data.upload.audio.media.type}'.split(',')}")
-	private Set<String> audioFileMediaTypes;
+	@Value("#{'${data.upload.audio.mime.type}'.split(',')}")
+	private Set<String> audioFileMimeTypes;
 	
-	@Value("#{'${data.upload.video.media.type}'.split(',')}")
-	private Set<String> videoFileMediaTypes;
+	@Value("#{'${data.upload.video.mime.type}'.split(',')}")
+	private Set<String> videoFileMimeTypes;
 	
 	@Value("${account.auto.activate:false}")
 	private boolean autoActivateNormalAccount;
@@ -87,7 +87,7 @@ public class ApplicationConfig {
 		setting.setUploadFolder(this.uploadFolder);
 		setting.setUploadFileSizes(this.imageMaxFileSize, this.audioMaxFileSize, this.videoMaxFileSize);
 		setting.setUploadFileExtensions(this.imageFileExtensions, this.audioFileExtensions, this.videoFileExtensions);
-		setting.setUploadMediaTypes(this.imageFileMediaTypes, this.audioFileMediaTypes, this.videoFileMediaTypes);
+		setting.setUploadMimeTypes(this.imageFileMimeTypes, this.audioFileMimeTypes, this.videoFileMimeTypes);
 		setting.setAutoActivateAccount(this.autoActivateNormalAccount, this.autoActivateAdminAccount, 
 				this.activateCodeLength, this.activateCodeTimeout);
 		setting.setAuthenticationConfiguration(this.displayHeaderOnAuthPage, this.allowRegisterOnAuthPage, this.allowSocialOnAuthPage);

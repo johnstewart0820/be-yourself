@@ -1,7 +1,5 @@
 package fr.be.your.self.backend.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -76,7 +74,17 @@ public class SessionController extends BaseResourceController<Session, Session, 
 
 	@Override
 	protected SessionDto createDetailDto(Session domain) {
-		return new SessionDto(domain);
+		final SessionDto dto = new SessionDto(domain);
+		
+		if (this.isValidAudioContentType(dto.getContentMimeType())) {
+			dto.setContentFileType(Constants.MEDIA_TYPE.AUDIO);
+		} else if (this.isValidVideoContentType(dto.getContentMimeType())) {
+			dto.setContentFileType(Constants.MEDIA_TYPE.VIDEO);
+		} else {
+			dto.setContentFileType(Constants.MEDIA_TYPE.IMAGE);
+		}
+		
+		return dto;
 	}
 
 	@Override
@@ -94,19 +102,19 @@ public class SessionController extends BaseResourceController<Session, Session, 
 			Model model, SessionDto dto) throws BusinessException {
 		super.loadDetailForm(session, request, response, model, dto);
 		
-		final String supportImageTypes = String.join(",", this.dataSetting.getImageMediaTypes());
+		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
 		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
 		
-		final String supportAudioTypes = String.join(",", this.dataSetting.getAudioMediaTypes());
+		final String supportAudioTypes = String.join(",", this.dataSetting.getAudioMimeTypes());
 		final String supportAudioExtensions = String.join(",", this.dataSetting.getAudioFileExtensions());
 		final long supportAudioSize = this.dataSetting.getAudioMaxFileSize();
 		
-		final String supportVideoTypes = String.join(",", this.dataSetting.getVideoMediaTypes());
+		final String supportVideoTypes = String.join(",", this.dataSetting.getVideoMimeTypes());
 		final String supportVideoExtensions = String.join(",", this.dataSetting.getVideoFileExtensions());
 		final long supportVideoSize = this.dataSetting.getVideoMaxFileSize();
 		
-		final String supportMediaTypes = String.join(",", this.dataSetting.getSupportMediaTypes());
+		final String supportMediaTypes = String.join(",", this.dataSetting.getMediaMimeTypes());
 		final String supportMediaExtensions = String.join(",", this.dataSetting.getMediaFileExtensions());
 		final long supportMediaSize = supportVideoSize > supportAudioSize ? supportVideoSize : supportAudioSize;
 		
@@ -145,7 +153,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	return this.getFormView();
         }
         
-        // Session group
+        // ====> Session group
         final SessionGroup sessionGroup = this.sessionGroupService.getById(dto.getGroupId());
         if (sessionGroup == null) {
         	final ObjectError error = this.createFieldError(result, "groupId", "not.found", "Session group is not found");
@@ -154,10 +162,10 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	return this.getFormView();
         }
         
-        // Image and content file
+        // ====> Validate image and content file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final ObjectError error = this.createFieldError(result, "image", "required", "Image required");
+        	final ObjectError error = this.createFieldError(result, "image", "required", "Image is required");
         	result.addError(error);
         	
         	return this.getFormView();
@@ -165,36 +173,29 @@ public class SessionController extends BaseResourceController<Session, Session, 
         
         final MultipartFile uploadContentFile = dto.getUploadContentFile();
         if (uploadContentFile == null || uploadContentFile.isEmpty()) {
-        	final ObjectError error = this.createFieldError(result, "contentFile", "required", "Content file required");
+        	final ObjectError error = this.createFieldError(result, "contentFile", "required", "Content file is required");
         	result.addError(error);
         	
         	return this.getFormView();
         }
         
-        final Path uploadImagePath = this.uploadFile(uploadImageFile);
-        if (uploadImagePath == null) {
-        	final ObjectError error = this.createProcessingError(result);
-        	result.addError(error);
-        	
+        // ====> Process upload image and content file
+        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
+        if (uploadImageFilePath == null) {
         	return this.getFormView();
         }
         
-        final Path uploadContentFilePath = this.uploadFile(uploadContentFile);
+        final Path uploadContentFilePath = this.processUploadContentFile(uploadContentFile, result);
         if (uploadContentFilePath == null) {
-        	try {
-				Files.delete(uploadImagePath);
-			} catch (IOException ex) {
-				this.logger.error("Cannot delete media file", ex);
-			}
-        	
-        	final ObjectError error = this.createProcessingError(result);
-        	result.addError(error);
+        	this.deleteUploadFile(uploadImageFilePath);
         	
         	return this.getFormView();
         }
         
-        final String uploadFileName = uploadImagePath.getFileName().toString();
+        // ====> Update domain
+        final String uploadFileName = uploadImageFilePath.getFileName().toString();
         final String uploadContentFileName = uploadContentFilePath.getFileName().toString();
+        final String contentFileContentType = this.getFileContentType(uploadContentFilePath);
         
         final Session domain = this.newDomain();
         dto.copyToDomain(domain);
@@ -202,22 +203,19 @@ public class SessionController extends BaseResourceController<Session, Session, 
         domain.setSessionGroup(sessionGroup);
         domain.setImage(uploadFileName);
         domain.setContentFile(uploadContentFileName);
+        domain.setContentMimeType(contentFileContentType);
         
         final Session savedDomain = this.mainService.create(domain);
         
-        // Error, delete upload file
+        // ====> Error, delete upload file
         if (savedDomain == null || result.hasErrors()) {
-        	try {
-				Files.delete(uploadImagePath);
-			} catch (IOException ex) {
-				this.logger.error("Cannot delete media file", ex);
-			}
+        	this.deleteUploadFile(uploadImageFilePath);
+        	this.deleteUploadFile(uploadContentFilePath);
         	
-        	try {
-				Files.delete(uploadContentFilePath);
-			} catch (IOException ex) {
-				this.logger.error("Cannot delete media file", ex);
-			}
+        	if (!result.hasErrors()) {
+	        	final ObjectError error = this.createProcessingError(result);
+	        	result.addError(error);
+        	}
         	
         	return this.getFormView();
         }
@@ -238,7 +236,6 @@ public class SessionController extends BaseResourceController<Session, Session, 
 		
         if (result.hasErrors()) {
         	dto.setId(id);
-        	
         	return this.getFormView();
         }
         
@@ -253,7 +250,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         
         dto.copyToDomain(domain);
         
-        // Session group
+        // ====> Session group
         final SessionGroup currentGroup = domain.getSessionGroup();
 		if (currentGroup == null || currentGroup.getId() != dto.getGroupId()) {
 			final SessionGroup sessionGroup = this.sessionGroupService.getById(dto.getGroupId());
@@ -262,13 +259,14 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	        	final ObjectError error = this.createFieldError(result, "groupId", "not.found", "Session group is not found");
 	        	result.addError(error);
 	        	
+	        	dto.setId(id);
 	        	return this.getFormView();
 	        }
 			
 			domain.setSessionGroup(sessionGroup);
 		}
 		
-		// Image and content file
+		// ====> Process upload image and content file
         String deleteImageFileName = null;
         Path uploadImageFilePath = null;
         
@@ -278,37 +276,27 @@ public class SessionController extends BaseResourceController<Session, Session, 
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
         	deleteImageFileName = domain.getImage();
-        	uploadImageFilePath = this.uploadFile(uploadImageFile);
         	
-        	if (uploadImageFilePath == null) {
-        		final ObjectError error = this.createProcessingError(result);
-            	result.addError(error);
-            	
+        	// ====> Process upload image file
+        	uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
+            if (uploadImageFilePath == null) {
             	dto.setId(id);
             	return this.getFormView();
-        	}
-        	
-        	final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+            }
+            
+            final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
         	domain.setImage(uploadImageFileName);
         }
         
         final MultipartFile uploadContentFile = dto.getUploadContentFile();
         if (uploadContentFile != null && !uploadContentFile.isEmpty()) {
         	deleteContentFileName = domain.getContentFile();
-        	uploadContentFilePath = this.uploadFile(uploadContentFile);
         	
+        	// ====> Process upload content file
+        	uploadContentFilePath = this.processUploadContentFile(uploadContentFile, result);
         	if (uploadContentFilePath == null) {
-        		if (uploadImageFilePath != null) {
-    	        	try {
-    					Files.delete(uploadImageFilePath);
-    				} catch (IOException ex) {
-    					this.logger.error("Cannot delete media file", ex);
-    				}
-            	}
-        		
-        		final ObjectError error = this.createProcessingError(result);
-            	result.addError(error);
-            	
+    			this.deleteUploadFile(uploadImageFilePath);
+    			
             	dto.setId(id);
             	return this.getFormView();
         	}
@@ -319,28 +307,16 @@ public class SessionController extends BaseResourceController<Session, Session, 
         
         final Session savedDomain = this.mainService.update(domain);
         
-        // Error, delete upload file
+        // ====> Error, delete upload file
         if (savedDomain == null || result.hasErrors()) {
-        	if (uploadImageFilePath != null) {
-	        	try {
-					Files.delete(uploadImageFilePath);
-				} catch (IOException ex) {
-					this.logger.error("Cannot delete media file", ex);
-				}
-        	}
+        	this.deleteUploadFile(uploadImageFilePath);
+        	this.deleteUploadFile(uploadContentFilePath);
         	
-        	if (uploadContentFilePath != null) {
-	        	try {
-					Files.delete(uploadContentFilePath);
-				} catch (IOException ex) {
-					this.logger.error("Cannot delete media file", ex);
-				}
-        	}
-        	
+        	dto.setId(id);
         	return this.getFormView();
         }
         
-        // Success, delete old image file
+        // ====> Success, delete old image file
         this.deleteUploadFile(deleteImageFileName);
         this.deleteUploadFile(deleteContentFileName);
         

@@ -83,6 +83,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	}
 
 	@Override
+	@Transactional
 	public boolean activateUser(Integer userId) {
 		return this.repository.updateStatus(userId, UserStatus.ACTIVE.getValue()) > 0;
 	}
