@@ -119,7 +119,7 @@
 		  		
 		  		<th:block sec:authorize="hasAnyRole('ROLE_SAM', 'ROLE_ADM')">
 			  		<li class="nav-item" sec:authorize="hasAnyRole('ROLE_SAM','ROLE_ADM')">
-						<a class="nav-link" th:href="@{/user/list/page/1}">
+						<a class="nav-link" th:href="@{/user/management}">
 				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.user.management}"></span>
 						</a>
 			  		</li>

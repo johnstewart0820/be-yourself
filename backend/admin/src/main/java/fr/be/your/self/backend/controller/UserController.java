@@ -59,6 +59,7 @@ import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.security.oauth2.AuthenticationUserDetails;
+import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.UserService;
@@ -66,7 +67,9 @@ import fr.be.your.self.util.StringUtils;
 import net.bytebuddy.matcher.ModifierMatcher.Mode;
 
 @Controller
-public class UserController {
+public class UserController extends BaseResourceController<User, User, User>  {
+	public static final String NAME = "user";
+
 	private static final String ACTIVATE_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.AUTHENTICATION_PREFIX 
 			+ Constants.PATH.AUTHENTICATION.ACTIVATE;
@@ -509,6 +512,51 @@ public class UserController {
 	@RequestMapping(value = "/user/resetpwdbyemail")
 	public String showResetPassword(Model model) {
 		return "user/reset_password_form";
+	}
+	
+	// default page
+	@RequestMapping(value = "/user/management")
+	public String showDefaultUserPage(Model model) {
+		return  "redirect:" + DEFAULT_URL; 	}
+
+
+	@Override
+	protected String getName() {
+		return NAME;
+	}
+	
+	@Override
+	protected String getDefaultPageTitle() {
+		return this.getMessage("user", "User management");
+	}
+	
+	@Override
+	protected String getUploadDirectoryName() {
+		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.AVATAR;
+	}
+
+	@Override
+	protected BaseService<User> getService() {
+		return this.userService;
+	}
+	
+	@Override
+	protected User newDomain() {
+		return new User();
+	}
+	
+	@Override
+	protected User createDetailDto(User domain) {
+		if (domain == null) {
+			return new User();
+		}
+		
+		return domain;
+	}
+
+	@Override
+	protected User createSimpleDto(User domain) {
+		return domain;
 	}
 	
 }
