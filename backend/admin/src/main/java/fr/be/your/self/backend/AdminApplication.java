@@ -65,10 +65,10 @@ public class AdminApplication implements CommandLineRunner {
 				adminUser.setStatus(UserStatus.ACTIVE.getValue());
 				User savedUser = userRepository.save(adminUser);
 				
-				Functionality adminUserFunc = new Functionality();
-				adminUserFunc.setPath("/admin-user");
-				adminUserFunc.setName("Admin User");
-				Functionality savedAdminUserFunc = this.functionalityRepository.save(adminUserFunc);
+				Functionality userManagementFunc = new Functionality();
+				userManagementFunc.setPath("/user");
+				userManagementFunc.setName("User Management");
+				Functionality savedAdminUserFunc = this.functionalityRepository.save(userManagementFunc);
 				
 				Functionality sessionGroupFunc = new Functionality();
 				sessionGroupFunc.setPath("/session-group");
@@ -80,10 +80,6 @@ public class AdminApplication implements CommandLineRunner {
 				sessionFunc.setName("Session");
 				Functionality savedSessionFunc = this.functionalityRepository.save(sessionFunc);
 				
-				Functionality tempFunc = new Functionality();
-				tempFunc.setPath("/temp");
-				tempFunc.setName("Temp function");
-				Functionality savedTempFunc = this.functionalityRepository.save(tempFunc);
 				
 				Functionality editAccountTypeFunc = new Functionality();
 				editAccountTypeFunc.setPath(UserConstants.EDIT_ACCOUNT_TYPE_PATH);
@@ -102,12 +98,6 @@ public class AdminApplication implements CommandLineRunner {
 				adminUserPermission.setFunctionality(savedAdminUserFunc);
 				adminUserPermission.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(adminUserPermission);
-				
-				Permission tempFuncPermission = new Permission();
-				tempFuncPermission.setUser(savedUser);
-				tempFuncPermission.setFunctionality(savedTempFunc);
-				tempFuncPermission.setUserPermission(UserPermission.WRITE.getValue());
-				this.permissionRepository.save(tempFuncPermission);
 				
 				Permission editAccountTypePermission = new Permission();
 				editAccountTypePermission.setUser(savedUser);
@@ -132,13 +122,6 @@ public class AdminApplication implements CommandLineRunner {
 				sessionPermission.setUserPermission(UserPermission.WRITE.getValue());
 				this.permissionRepository.save(sessionPermission);
 				
-				/*
-				 * Permission tempPermission = new Permission();
-				 * tempPermission.setUser(savedUser);
-				 * tempPermission.setFunctionality(savedTempFunc);
-				 * tempPermission.setUserPermission(UserPermission.READONLY.getValue());
-				 * this.permissionRepository.save(tempPermission);
-				 */
 			} else {
 				
 				// session-group permission

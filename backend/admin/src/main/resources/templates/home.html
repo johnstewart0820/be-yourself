@@ -14,10 +14,9 @@
     	<h1 th:text="#{greeting}"></h1>
     	
         <h1>Be Your Self Application</h1>
-        <h2>1. Visit <a th:href="@{/admin}">Admin page</a></h2>
-        <h2>2. Visit <a th:href="@{/user}">User page</a></h2>
-        <h2>3. Visit <a th:href="@{/about}">Normal page</a></h2>
-        <h2>4. API <a th:href="@{/api/test}">Test API</a></h2>
+        <h2>Visit <a th:href="@{/user/management}">User management</a></h2>
+        <h2>Visit <a th:href="@{/about}">Normal page</a></h2>
+        <h2>API <a th:href="@{/api/test}">Test API</a></h2>
         
         <h2>5. <span th:utext="#{lang.change}"></span>: <a th:href="@{/home?lang=en}" th:text="#{lang.eng}"></a></h2>
         <h2>6. <span th:utext="#{lang.change}"></span>: <a th:href="@{/home?lang=fr}" th:text="#{lang.fr}"></a></h2>
