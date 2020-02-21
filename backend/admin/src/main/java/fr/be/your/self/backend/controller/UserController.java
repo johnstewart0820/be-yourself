@@ -13,6 +13,7 @@ import java.util.stream.StreamSupport;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +44,8 @@ import com.opencsv.bean.MappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
+import fr.be.your.self.backend.dto.ResultStatus;
+import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.LoginType;
@@ -56,6 +59,7 @@ import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.security.oauth2.AuthenticationUserDetails;
+import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.UserService;
@@ -63,7 +67,9 @@ import fr.be.your.self.util.StringUtils;
 import net.bytebuddy.matcher.ModifierMatcher.Mode;
 
 @Controller
-public class UserController {
+public class UserController extends BaseResourceController<User, User, User>  {
+	public static final String NAME = "user";
+
 	private static final String ACTIVATE_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.AUTHENTICATION_PREFIX 
 			+ Constants.PATH.AUTHENTICATION.ACTIVATE;
@@ -128,26 +134,23 @@ public class UserController {
 			if (isAutoActivateAccount) {
 				user.setStatus(UserStatus.ACTIVE.getValue());
 			} else {
-				String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
-				long activateCodeTimeout = (new Date().getTime() / (60 * 1000))
-						+ this.dataSetting.getActivateCodeTimeout();
-
-				user.setActivateCode(activateCode);
-				user.setActivateTimeout(activateCodeTimeout);
+				setActivateCodeAndTimeout(user);
 				user.setStatus(UserStatus.DRAFT.getValue());
 			}
 		}
 		
 		User savedUser = userService.saveOrUpdate(user);
-		if (isAdminUser) {
-			for (Permission permission : user.getPermissions()) {
-				permission.setUser(savedUser); // We need user id of saved user
-				permissionService.saveOrUpdate(permission);
-			}
+		
+		//For normal user, default value = "Denied"
+		for (Permission permission : user.getPermissions()) {
+			permission.setUser(savedUser); // We need user id of saved user
+			permissionService.saveOrUpdate(permission);
 		}
 
+
 		if (isNewUser && !isAutoActivateAccount) {
-			boolean success = sendVerificationEmailToUser(request, savedUser);
+			String activateAccountUrl = buildActivateAccountUrl(request);
+			boolean success = sendVerificationEmailToUser(activateAccountUrl, savedUser);
 
 			// TODO: Use success variable?
 			
@@ -160,10 +163,17 @@ public class UserController {
 
 	}
 
-	private boolean sendVerificationEmailToUser(HttpServletRequest request, User savedUser) {
-		String activateAccountUrl = buildActivateAccountUrl(request);
+	//generate a new activation code and timeout for a user
+	private void setActivateCodeAndTimeout(User user) {
+		String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
+		long activateCodeTimeout = (new Date().getTime() / (60 * 1000))
+				+ this.dataSetting.getActivateCodeTimeout();
 
-		activateAccountUrl += ACTIVATE_URL;
+		user.setActivateCode(activateCode);
+		user.setActivateTimeout(activateCodeTimeout);
+	}
+
+	private boolean sendVerificationEmailToUser(String activateAccountUrl, User savedUser) {
 
 		boolean success = this.emailSender.sendActivateUser(savedUser.getEmail(), activateAccountUrl,
 				savedUser.getActivateCode());
@@ -177,6 +187,8 @@ public class UserController {
 		if (activateAccountUrl.endsWith("/")) {
 			activateAccountUrl = activateAccountUrl.substring(0, activateAccountUrl.length() - 1);
 		}
+		activateAccountUrl += ACTIVATE_URL;
+
 		return activateAccountUrl;
 	}
 
@@ -214,7 +226,10 @@ public class UserController {
 	@RequestMapping(value = "/user/{id}/resendverifemail")
 	public String resendVerificationEmail(@PathVariable("id") int id, HttpServletRequest request, Model model) {
 		User user = userService.getById(id);
-		sendVerificationEmailToUser(request, user);
+		String activateAccountUrl = buildActivateAccountUrl(request);
+		setActivateCodeAndTimeout(user);
+		userService.saveOrUpdate(user);
+		sendVerificationEmailToUser(activateAccountUrl, user);
 		model.addAttribute("msg", "Resend verification email successfully");
 		return "user/userform_result";
 	}
@@ -413,16 +428,67 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/user/importcsv", method = RequestMethod.POST)
-	public String fileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes)
+	public String fileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, Model model)
 			throws IOException {
-		// LOGGER.info("File is {}", file.getName());
-		// LOGGER.info("Company Guid is {}", companyGuid);
 
+		SimpleResult result = new SimpleResult(ResultStatus.UNKNOWN.getValue(), "Unknown status");
+		result.setFunctionalityName("Upload users CSV file!");
+		
 		if (file.isEmpty()) {
-			redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
-			return "redirect:/uploadStatus";
+			result.setResStatus(ResultStatus.ERROR.getValue());
+			result.setMessage("File is empty");
+			return "/user/simple_status";
 		}
 
+		List<UserCSV> usersCsv;
+		try {
+			usersCsv = readCsvFile(file);
+		} catch (Exception e) {
+			result.setResStatus(ResultStatus.ERROR.getValue());
+			result.setMessage("Exception occured while reading CSV file: " + e.getMessage());
+			return "/user/simple_status";
+		}
+		List<User> users = UserUtils.convertUsersCsv(usersCsv);
+				
+		model.addAttribute("result", result);
+		
+		for (User user : users) {
+			if (StringUtils.isNullOrEmpty(user.getEmail()) || !EmailValidator.getInstance().isValid(user.getEmail())) {
+				result.setResStatus(ResultStatus.ERROR.getValue());
+				result.setMessage("ERROR: Email field of " + user.getFullName() + " is empty or not valid!");
+				return "/user/simple_status";
+			} else {
+				if (userService.existsEmail(user.getEmail())) {
+					result.setResStatus(ResultStatus.ERROR.getValue());
+					result.setMessage("ERROR: Email of user " + user.getFullName() + " already exists!");
+					return "/user/simple_status";
+				}
+			}
+		}
+		
+		
+		for (User user : users) {
+			String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
+			String encodedPwd = passwordEncoder.encode(tempPwd);
+			user.setPassword(encodedPwd);
+			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
+				setActivateCodeAndTimeout(user);
+			}
+			
+			userService.saveOrUpdate(user);
+			this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
+			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
+				String activateAccountUrl = buildActivateAccountUrl(request);
+				sendVerificationEmailToUser(activateAccountUrl, user);
+			}
+		}
+		
+		result.setResStatus(ResultStatus.SUCCESS.getValue());
+		result.setMessage("File imported successfully!");
+		return "/user/simple_status";
+	}
+
+	private List<UserCSV> readCsvFile(MultipartFile file) throws Exception {
 		Reader reader = new InputStreamReader(file.getInputStream());
 		CSVReader csvReader = new CSVReaderBuilder(reader).withSkipLines(0).build();
 
@@ -432,15 +498,7 @@ public class UserController {
 		CsvToBean<UserCSV> csvToBean = new CsvToBeanBuilder<UserCSV>(csvReader).withType(UserCSV.class)
 				.withMappingStrategy(strategy).build();
 		List<UserCSV> usersCsv = csvToBean.parse();
-
-		List<User> users = UserUtils.convertUsersCsv(usersCsv);
-		
-		userService.saveAll(users);
-
-		redirectAttributes.addFlashAttribute("message",
-				"You successfully uploaded " + file.getOriginalFilename() + " and added " + users.size() + " users");
-
-		return "/user/upload_status";
+		return usersCsv;
 	}
 
 	// show upload user form
@@ -454,6 +512,51 @@ public class UserController {
 	@RequestMapping(value = "/user/resetpwdbyemail")
 	public String showResetPassword(Model model) {
 		return "user/reset_password_form";
+	}
+	
+	// default page
+	@RequestMapping(value = "/user/management")
+	public String showDefaultUserPage(Model model) {
+		return  "redirect:" + DEFAULT_URL; 	}
+
+
+	@Override
+	protected String getName() {
+		return NAME;
+	}
+	
+	@Override
+	protected String getDefaultPageTitle() {
+		return this.getMessage("user", "User management");
+	}
+	
+	@Override
+	protected String getUploadDirectoryName() {
+		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.AVATAR;
+	}
+
+	@Override
+	protected BaseService<User> getService() {
+		return this.userService;
+	}
+	
+	@Override
+	protected User newDomain() {
+		return new User();
+	}
+	
+	@Override
+	protected User createDetailDto(User domain) {
+		if (domain == null) {
+			return new User();
+		}
+		
+		return domain;
+	}
+
+	@Override
+	protected User createSimpleDto(User domain) {
+		return domain;
 	}
 	
 }

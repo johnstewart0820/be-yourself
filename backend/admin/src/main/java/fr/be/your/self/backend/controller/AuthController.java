@@ -66,7 +66,7 @@ public class AuthController {
     public String activatePage(
     		@RequestParam(name = "code", required = false) String activateCode,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
+    		RedirectAttributes redirectAttributes, Model model) {
 		
 		model.addAttribute("activateCode", activateCode);
 		

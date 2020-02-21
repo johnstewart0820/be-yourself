@@ -8,11 +8,10 @@
 </head>
 <body>
 	<div layout:fragment="content">
-
 		<form id="select_form" th:action="@{/user/list/page/1}" method="post">
 			<div class="row">
 				<div class="col-md-6">
-					<a href="/user/add" class="btn btn-sm btn-primary">+ Add User</a>
+					<a href="/user/add" class="btn btn-sm btn-primary" th:if="${writePermission}">+ Add User</a>
 				</div>
 				<div class="col-md-3">
 					<div class="form-group">
@@ -54,8 +53,8 @@
 												<option value="B2B">B2B</option>
 												<option value="B2C">B2C</option>
 												<option value="PRO">PRO</option>
-												<option value="ADM">ADM</option>
-												<option value="SAM">SAM</option>
+												<option value="ADM">ADMIN</option>
+												<option value="SAM">SUPER ADMIN</option>
 											</select>
 										</div>
 									</div>
@@ -87,8 +86,8 @@
 					<a href="#select_users" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
 					<a href="#" class="btn btn-sm btn-primary" onclick="document.getElementById('select_user_form').submit();">Export
 					CSV</a> 
-					<a href="/user/uploadform" class="btn btn-sm btn-primary">Import CSV</a> 
-					<a href="/user/resetpwdbyemail" class="btn btn-sm btn-primary">Reset password by email</a>
+					<a href="/user/uploadform" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
+					<a href="/user/resetpwdbyemail" class="btn btn-sm btn-primary" th:if="${writePermission}">Reset password by email</a>
 			</div>
 		</div>
 	
@@ -102,7 +101,7 @@
 					<form id="select_user_form"  th:action="@{/user/exportcsv}" method="post">
 					
 					<div class="table-responsive">
-						<table class="table align-items-center table-flush">
+						<table class="table align-items-center table-flush" id="user_table">
 							<thead class="thead-light">
 								<tr>
 									<th scope="col">ID</th>
@@ -201,6 +200,10 @@
 	var select_all = false;
 	
 	$(document).ready(function() {
+		  $('#user_table').DataTable({
+			    "sDom":  't'
+		  });
+
 		
 		$('#nb_per_page').val([[${nb_per_page}]]);
 		$('#filter_role').val(filter_role);
