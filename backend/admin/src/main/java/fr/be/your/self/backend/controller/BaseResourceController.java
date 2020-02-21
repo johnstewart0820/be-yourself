@@ -1,6 +1,14 @@
 package fr.be.your.self.backend.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.setting.Constants;
@@ -39,8 +48,18 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	
 	protected Logger logger;
 	
+	private Class<T> domainClazz;
+	private Class<SimpleDto> simpleDtoClazz;
+	private Class<DetailDto> detailDtoClazz;
+	
+	@SuppressWarnings("unchecked")
 	public BaseResourceController() {
 		super();
+		
+		final ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericSuperclass();
+		this.domainClazz = ((Class<T>) parameterizedType.getActualTypeArguments()[0]);
+		this.simpleDtoClazz = ((Class<SimpleDto>) parameterizedType.getActualTypeArguments()[1]);
+		this.detailDtoClazz = ((Class<DetailDto>) parameterizedType.getActualTypeArguments()[2]);
 		
 		this.logger = LoggerFactory.getLogger(this.getClass());
 	}
@@ -50,6 +69,8 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	protected abstract String getName();
 	
 	protected abstract String getDefaultPageTitle();
+	
+	protected abstract String getUploadDirectoryName();
 	
 	protected abstract T newDomain();
 	
@@ -154,6 +175,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return this.listPage(session, request, response, model, search, pageable);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private String listPage(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model, 
     		String search, PageRequest pageable) {
@@ -163,14 +185,23 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 			throw new BusinessException(StatusCode.PROCESSING_ERROR);
 		}
 		
-		final PageableResponse<SimpleDto> result = new PageableResponse<>();
-		result.setPageIndex(domainPage.getPageIndex());
-		result.setPageSize(domainPage.getPageSize());
-		result.setTotalItems(domainPage.getTotalItems());
-		result.setTotalPages(domainPage.getTotalPages());
-		
-		for (T domain : domainPage.getItems()) {
-			result.addItem(this.createSimpleDto(domain));
+		final PageableResponse<SimpleDto> result;
+		if (this.domainClazz == this.simpleDtoClazz) {
+			result = (PageableResponse<SimpleDto>) domainPage;
+		} else {
+			result = new PageableResponse<>();
+			result.setPageIndex(domainPage.getPageIndex());
+			result.setPageSize(domainPage.getPageSize());
+			result.setTotalItems(domainPage.getTotalItems());
+			result.setTotalPages(domainPage.getTotalPages());
+			
+			for (T domain : domainPage.getItems()) {
+				final SimpleDto dto = this.createSimpleDto(domain);
+				
+				if (dto != null) {
+					result.addItem(dto);
+				}
+			}
 		}
 		
 		// Store properties
@@ -323,20 +354,67 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	*/
 	
-	protected final ObjectError createFieldError(BindingResult result, String fieldName, String messageCode, String defaultMessage) {
+	protected final ObjectError createFieldError(BindingResult result, String fieldName, String errorMessageCode, String defaultMessage) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		
+		final List<String> fieldNameMessageCodes = Arrays.asList(fieldName.split("(?=\\p{Lu})"));
+		fieldNameMessageCodes.replaceAll(String::toLowerCase);
+		
+		final String fieldNameMessageCode = String.join(".", fieldNameMessageCodes);
+		final String messageCode = baseMessageKey + ".error." + fieldNameMessageCode + "." + errorMessageCode;
+		
 		return new FieldError(result.getObjectName(), fieldName, null, false, new String[] { messageCode }, null, defaultMessage);
 	}
 	
 	protected final ObjectError createFieldError(BindingResult result, String fieldName, String messageCode) {
-		return new FieldError(result.getObjectName(), fieldName, null, false, new String[] { messageCode }, null, messageCode);
+		return createFieldError(result, fieldName, messageCode, "");
 	}
 	
-	protected final ObjectError createIdNotFoundError(BindingResult result) {
+	protected final ObjectError createIdNotFoundError(BindingResult result, Integer id) {
 		return new ObjectError(result.getObjectName(), new String[] { "error.id.not.found" }, null, "Not found");
 	}
 	
 	protected final ObjectError createProcessingError(BindingResult result) {
 		return new ObjectError(result.getObjectName(), new String[] { "error.processing" }, null, "Processing error");
+	}
+	
+	protected String getIdNotFoundMessage(Integer idValue) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String dataName = this.getMessage(baseMessageKey + ".name");
+		
+		final String message = this.getMessage("error.message.id.not.found", new String[] { dataName, idValue.toString() }, null);
+		
+		if (message.startsWith(dataName)) {
+			return StringUtils.upperCaseFirst(message);
+		}
+		
+		return message;
+	}
+	
+	protected String getDeleteByIdErrorMessage(Integer idValue) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String dataName = this.getMessage(baseMessageKey + ".name");
+		
+		final String message = this.getMessage("error.message.cannot.delete.id", new String[] { dataName, idValue.toString() }, null);
+		
+		if (message.startsWith(dataName)) {
+			return StringUtils.upperCaseFirst(message);
+		}
+		
+		return message;
+	}
+	
+	protected String getDeleteSuccessMessage(Integer idValue) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String dataName = this.getMessage(baseMessageKey + ".name");
+		
+		final String message = this.getMessage("success.message.delete", new String[] { dataName, idValue.toString() }, null);
+		
+		if (message.startsWith(dataName)) {
+			return StringUtils.upperCaseFirst(message);
+		}
+		
+		return message;
 	}
 	
 	protected final String getBaseURL() {
@@ -378,4 +456,53 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
         
         return PageRequest.of(page - 1, size);
     }
+	
+	protected Path uploadFile(final MultipartFile mediaFile) {
+		final String uploadDirectoryName = this.getUploadDirectoryName();
+		final String fileName = mediaFile.getOriginalFilename();
+        final int dotIndex = fileName.lastIndexOf(".");
+        final String fileExtension = dotIndex > 0 ? fileName.substring(dotIndex) : ".png";
+        
+        try {
+        	final File directory = new File(uploadDirectoryName);
+	        if (!directory.exists()){
+	            directory.mkdirs();
+	        }
+        } catch (Exception ex) {
+        	this.logger.error("Cannot create media directory", ex);
+        	
+			return null;
+		}
+        
+        final String uploadFileName = UUID.randomUUID().toString() + fileExtension;
+        final Path uploadFilePath = Paths.get(uploadDirectoryName + "/" + uploadFileName);
+        
+        try {
+	        final byte[] mediaBytes = mediaFile.getBytes();
+	        Files.write(uploadFilePath, mediaBytes);
+        } catch(Exception ex) {
+        	this.logger.error("Cannot write media data", ex);
+        	
+        	return null;
+        }
+        
+        return uploadFilePath;
+	}
+	
+	protected boolean deleteUploadFile(String deleteFileName) {
+		if (StringUtils.isNullOrSpace(deleteFileName)) {
+			return false;
+		}
+		
+    	final Path mediaFilePath = Paths.get(this.getUploadDirectoryName() + "/" + deleteFileName);
+    	
+    	try {
+			Files.delete(mediaFilePath);
+			return true;
+		} catch (IOException ex) {
+			this.logger.error("Cannot delete media file", ex);
+		}
+    	
+    	return false;
+	}
 }

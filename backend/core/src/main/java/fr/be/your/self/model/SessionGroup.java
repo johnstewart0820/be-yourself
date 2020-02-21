@@ -16,8 +16,8 @@ public class SessionGroup extends PO<Integer> {
 	private int id;
 	
 	@Column(name = "Name", length = 120)
-	@NotEmpty(message = "{session.group.name.not.empty}")
-	@NotNull(message = "{session.group.name.not.empty}")
+	@NotEmpty(message = "{session.group.error.name.not.empty}")
+	@NotNull(message = "{session.group.error.name.not.empty}")
 	private String name;
 	
 	@Column(name = "Image", length = 255)

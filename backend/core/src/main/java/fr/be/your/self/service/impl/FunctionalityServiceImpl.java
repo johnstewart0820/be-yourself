@@ -9,50 +9,39 @@ import fr.be.your.self.model.Functionality;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.FunctionalityRepository;
 import fr.be.your.self.service.FunctionalityService;
+import fr.be.your.self.util.StringUtils;
 
 @Service
 public class FunctionalityServiceImpl extends BaseServiceImpl<Functionality> implements FunctionalityService {
+	
 	@Autowired
 	private FunctionalityRepository repository;
 
 	@Override
-	public long count(String text) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Iterable<Functionality> findAll() {
-		return this.repository.findAll();
-	}
-
-	@Override
-	public Page<Functionality> getPaginatedUsers(Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <S extends Functionality> Iterable<S> saveAll(Iterable<S> entities) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	protected BaseRepository<Functionality> getRepository() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.repository;
+	}
+	
+	@Override
+	public long count(String text) {
+		if (StringUtils.isNullOrSpace(text)) {
+			return this.repository.count();
+		}
+		
+		return this.repository.countByNameContainsIgnoreCase(text);
 	}
 
 	@Override
 	protected Iterable<Functionality> getList(String text) {
-		// TODO Auto-generated method stub
-		return null;
+		return StringUtils.isNullOrSpace(text) 
+				? this.repository.findAll()
+				: this.repository.findAllByNameContainsIgnoreCase(text);
 	}
 
 	@Override
 	protected Page<Functionality> getListByPage(String text, Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
+		return StringUtils.isNullOrSpace(text) 
+				? this.repository.findAll(pageable)
+				: this.repository.findAllByNameContainsIgnoreCase(text, pageable);
 	}
 }

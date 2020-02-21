@@ -69,7 +69,7 @@ public class AuthController {
 		final StatusResponse result = new StatusResponse(true);
 		result.addData("data", savedDomain.getId());
 		
-		// TODO PhatPQ => Send email to notify
+		// TODO: PhatPQ - RestAPI => Send email to notify
 		return ResponseEntity.ok(result);
 	}
     
@@ -103,7 +103,7 @@ public class AuthController {
     		jwtUser.setFullname(jwtUserDetails.getFullname());
         	jwtUser.setAvatar(jwtUserDetails.getAvatar());
         	
-        	// TODO
+        	// TODO: PhatPQ - RestAPI
     	}
     	
     	return jwtUser;

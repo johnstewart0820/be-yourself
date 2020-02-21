@@ -17,13 +17,13 @@ public class SessionGroupDto implements Serializable {
 	
 	private int id;
 	
-	@NotEmpty(message = "{session.group.name.not.empty}")
-	@NotNull(message = "{session.group.name.not.empty}")
+	@NotEmpty(message = "{session.group.error.name.not.empty}")
+	@NotNull(message = "{session.group.error.name.not.empty}")
 	private String name;
 	
 	private String image;
 	
-	private MultipartFile imageFile;
+	private MultipartFile uploadImageFile;
 	
 	public SessionGroupDto() {
 		super();
@@ -63,11 +63,11 @@ public class SessionGroupDto implements Serializable {
 		this.image = image;
 	}
 
-	public MultipartFile getImageFile() {
-		return imageFile;
+	public MultipartFile getUploadImageFile() {
+		return uploadImageFile;
 	}
 
-	public void setImageFile(MultipartFile imageFile) {
-		this.imageFile = imageFile;
+	public void setUploadImageFile(MultipartFile uploadImageFile) {
+		this.uploadImageFile = uploadImageFile;
 	}
 }

@@ -1,11 +1,9 @@
 package fr.be.your.self.backend.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +55,11 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 	}
 	
 	@Override
+	protected String getUploadDirectoryName() {
+		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.SESSION_GROUP;
+	}
+	
+	@Override
 	protected BaseService<SessionGroup> getService() {
 		return this.mainService;
 	}
@@ -88,11 +91,12 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 		
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMediaTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
+		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
 		
 		model.addAttribute("supportImageTypes", supportImageTypes);
 		model.addAttribute("supportImageExtensions", supportImageExtensions);
-		model.addAttribute("supportImageSize", this.dataSetting.getImageMaxFileSize());
-		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(this.dataSetting.getImageMaxFileSize()));
+		model.addAttribute("supportImageSize", supportImageSize);
+		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
 	}
 
 	@PostMapping("/create")
@@ -105,9 +109,9 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         	return this.getFormView();
         }
         
-        final MultipartFile mediaFile = dto.getImageFile();
+        final MultipartFile mediaFile = dto.getUploadImageFile();
         if (mediaFile == null || mediaFile.isEmpty()) {
-        	final ObjectError error = this.createFieldError(result, "image", this.getName() + ".image.required", "Image required");
+        	final ObjectError error = this.createFieldError(result, "image", "required", "Image required");
         	result.addError(error);
         	
         	return this.getFormView();
@@ -161,7 +165,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         
         SessionGroup domain = this.mainService.getById(id);
         if (domain == null) {
-        	final ObjectError error = this.createIdNotFoundError(result);
+        	final ObjectError error = this.createIdNotFoundError(result, id);
         	result.addError(error);
         	
         	dto.setId(id);
@@ -171,11 +175,11 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         String deleteMediaFileName = null;
         Path uploadFilePath = null;
         
-        final MultipartFile mediaFile = dto.getImageFile();
+        final MultipartFile mediaFile = dto.getUploadImageFile();
         if (mediaFile != null && !mediaFile.isEmpty()) {
         	deleteMediaFileName = domain.getImage();
-        	
         	uploadFilePath = this.uploadFile(mediaFile);
+        	
         	if (uploadFilePath == null) {
         		final ObjectError error = this.createProcessingError(result);
             	result.addError(error);
@@ -206,15 +210,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         }
         
         // Success, delete old image file
-        if (!StringUtils.isNullOrSpace(deleteMediaFileName)) {
-        	final Path mediaFilePath = Paths.get(this.dataSetting.getSessionGroupFolder() + "/" + deleteMediaFileName);
-        	
-        	try {
-				Files.delete(mediaFilePath);
-			} catch (IOException ex) {
-				this.logger.error("Cannot delete media file", ex);
-			}
-        }
+        this.deleteUploadFile(deleteMediaFileName);
         
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
@@ -229,15 +225,9 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		RedirectAttributes redirectAttributes, Model model) {
 		
-		final String baseMessageKey = this.getName().replace('-', '.');
-		final String dataName = this.getMessage(baseMessageKey + ".name");
-		
 		final SessionGroup domain = this.mainService.getById(id);
 		if (domain == null) {
-			String message = this.getMessage("error.message.id.not.found", new String[] { dataName, id.toString() });
-			if (message.startsWith(dataName)) {
-				message = StringUtils.upperCaseFirst(message);
-			}
+			final String message = this.getIdNotFoundMessage(id);
 			
 			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
 	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
@@ -251,21 +241,10 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 		final boolean result = this.mainService.delete(id);
 		if (result) {
 			// Success, delete old image file
-	        if (!StringUtils.isNullOrSpace(deleteMediaFileName)) {
-	        	final Path mediaFilePath = Paths.get(this.dataSetting.getSessionGroupFolder() + "/" + deleteMediaFileName);
-	        	
-	        	try {
-					Files.delete(mediaFilePath);
-				} catch (IOException ex) {
-					this.logger.error("Cannot delete media file", ex);
-				}
-	        }
+			this.deleteUploadFile(deleteMediaFileName);
 	        
-			String message = this.getMessage("success.message.delete", new String[] { dataName, id.toString() });
-			if (message.startsWith(dataName)) {
-				message = StringUtils.upperCaseFirst(message);
-			}
-
+			final String message = this.getDeleteSuccessMessage(id);
+			
 			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
 	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
 	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
@@ -273,48 +252,12 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 			return "redirect:" + this.getBaseURL();
 		}
 		
-		String message = this.getMessage("error.message.cannot.delete.id", new String[] { dataName, id.toString() });
-		if (message.startsWith(dataName)) {
-			message = StringUtils.upperCaseFirst(message);
-		}
+		final String message = this.getDeleteByIdErrorMessage(id);
 		
 		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
         redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
         
 		return "redirect:" + this.getBaseURL() + "/current-page";
-	}
-	
-	private Path uploadFile(final MultipartFile mediaFile) {
-		final String fileName = mediaFile.getOriginalFilename();
-        final int dotIndex = fileName.lastIndexOf(".");
-        final String fileExtension = dotIndex > 0 ? fileName.substring(dotIndex) : ".png";
-        
-        final String uploadDirectoryName = this.dataSetting.getSessionGroupFolder();
-        
-        try {
-        	final File directory = new File(uploadDirectoryName);
-	        if (!directory.exists()){
-	            directory.mkdirs();
-	        }
-        } catch (Exception ex) {
-        	this.logger.error("Cannot create media directory", ex);
-        	
-			return null;
-		}
-        
-        final String uploadFileName = UUID.randomUUID().toString() + fileExtension;
-        final Path uploadFilePath = Paths.get(uploadDirectoryName + "/" + uploadFileName);
-        
-        try {
-	        final byte[] mediaBytes = mediaFile.getBytes();
-	        Files.write(uploadFilePath, mediaBytes);
-        } catch(Exception ex) {
-        	this.logger.error("Cannot write media data", ex);
-        	
-        	return null;
-        }
-        
-        return uploadFilePath;
 	}
 }

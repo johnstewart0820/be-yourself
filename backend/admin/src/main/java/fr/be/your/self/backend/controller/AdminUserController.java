@@ -38,6 +38,11 @@ public class AdminUserController extends BaseResourceController<User, User, User
 	}
 	
 	@Override
+	protected String getUploadDirectoryName() {
+		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.AVATAR;
+	}
+
+	@Override
 	protected BaseService<User> getService() {
 		return this.userService;
 	}
@@ -49,6 +54,10 @@ public class AdminUserController extends BaseResourceController<User, User, User
 	
 	@Override
 	protected User createDetailDto(User domain) {
+		if (domain == null) {
+			return new User();
+		}
+		
 		return domain;
 	}
 

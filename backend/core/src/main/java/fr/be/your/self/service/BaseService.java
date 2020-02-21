@@ -24,7 +24,8 @@ public interface BaseService<T> {
 	public boolean delete(Integer id);
 
 	public Iterable<T> findAll();
-
+	
+	// TODO: TVA - Change method name
 	public Page<T> getPaginatedUsers(Pageable pageable);
 
 	public <S extends T> Iterable<S> saveAll(Iterable<S> entities);

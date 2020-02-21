@@ -1,6 +1,7 @@
 package fr.be.your.self.backend.setting;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DataSetting {
@@ -23,10 +24,12 @@ public class DataSetting {
 	private Set<String> imageFileExtensions;
 	private Set<String> audioFileExtensions;
 	private Set<String> videoFileExtensions;
+	private Set<String> mediaFileExtensions;
 	
 	private Set<String> imageMediaTypes;
 	private Set<String> audioMediaTypes;
 	private Set<String> videoMediaTypes;
+	private Set<String> supportMediaTypes;
 	
 	private boolean displayHeaderOnAuthPage;
 	private boolean allowRegisterOnAuthPage;
@@ -92,6 +95,10 @@ public class DataSetting {
 		return videoFileExtensions == null ? Collections.emptySet() : this.videoFileExtensions;
 	}
 
+	public Set<String> getMediaFileExtensions() {
+		return mediaFileExtensions == null ? Collections.emptySet() : this.mediaFileExtensions;
+	}
+
 	public Set<String> getImageMediaTypes() {
 		return imageMediaTypes == null ? Collections.emptySet() : this.imageMediaTypes;
 	}
@@ -102,6 +109,10 @@ public class DataSetting {
 
 	public Set<String> getVideoMediaTypes() {
 		return videoMediaTypes == null ? Collections.emptySet() : this.videoMediaTypes;
+	}
+
+	public Set<String> getSupportMediaTypes() {
+		return supportMediaTypes == null ? Collections.emptySet() : this.supportMediaTypes;
 	}
 
 	public boolean isDisplayHeaderOnAuthPage() {
@@ -135,12 +146,28 @@ public class DataSetting {
 		this.imageFileExtensions = imageFileExtensions;
 		this.audioFileExtensions = audioFileExtensions;
 		this.videoFileExtensions = videoFileExtensions;
+		
+		this.mediaFileExtensions = new HashSet<String>();
+		if (this.audioFileExtensions != null) {
+			this.mediaFileExtensions.addAll(this.audioFileExtensions);
+		}
+		if (this.videoFileExtensions != null) {
+			this.mediaFileExtensions.addAll(this.videoFileExtensions);
+		}
 	}
 	
 	public void setUploadMediaTypes(Set<String> imageMediaTypes, Set<String> audioMediaTypes, Set<String> videoMediaTypes) {
 		this.imageMediaTypes = imageMediaTypes;
 		this.audioMediaTypes = audioMediaTypes;
 		this.videoMediaTypes = videoMediaTypes;
+		
+		this.supportMediaTypes = new HashSet<String>();
+		if (this.audioMediaTypes != null) {
+			this.supportMediaTypes.addAll(this.audioMediaTypes);
+		}
+		if (this.videoMediaTypes != null) {
+			this.supportMediaTypes.addAll(this.videoMediaTypes);
+		}
 	}
 	
 	public void setAutoActivateAccount(boolean autoActivateNormalAccount, boolean autoActivateAdminAccount, 
@@ -156,14 +183,6 @@ public class DataSetting {
 		this.displayHeaderOnAuthPage = displayHeaderOnAuthPage;
 		this.allowRegisterOnAuthPage = allowRegisterOnAuthPage;
 		this.allowSocialOnAuthPage = allowSocialOnAuthPage;
-	}
-	
-	public String getAvatarFolder() {
-		return this.getUploadFolder() + Constants.FOLDER.MEDIA.AVATAR;
-	}
-	
-	public String getSessionGroupFolder() {
-		return this.getUploadFolder() + Constants.FOLDER.MEDIA.SESSION_GROUP;
 	}
 
 	public int getTempPwdLength() {

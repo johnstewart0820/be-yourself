@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+	<title th:text="#{|${baseMessageKey}.page.title|}"></title>
+</head>
+<body>
+	<th:block layout:fragment="content">
+		<!-- Form -->
+		<div class="row">
+			<div class="col">
+				<div class="card shadow">
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col-6">
+								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/current-page'}"
+									th:title="#{action.go.to.list.title}">
+									<span class="btn-inner--icon">
+										<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+									</span>
+								</a>
+							</div>
+							
+							<div class="col-6 text-right">
+								<h3 class="mb-0" th:text="${formTitle}"></h3>
+							</div>
+						</div>
+					</div>
+					
+					<div class="card-body border-0">
+						<form action="#" th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
+							th:object="${dto}" method="post" enctype="multipart/form-data">
+							<fieldset th:disabled="${!writePermission}">
+								<div th:if="${param.error}">
+									<div class="alert alert-danger">Invalid username and password.</div>
+								</div>
+				
+								<div th:if="${param.logout}">
+									<div class="alert alert-info">You have been logged out.</div>
+								</div>
+								
+								<div class="row">
+									<div class="col-md-8 col-sm-12">
+										<div class="form-group row">
+											<label for="groupId" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.group|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<select class="form-control" th:field="*{groupId}" id="groupId"
+													th:placeholder="#{|${baseMessageKey}.detail.group.placeholder|}">
+													<option th:each="sessionGroup : ${sessionGroups}" 
+														th:value="${sessionGroup.id}" th:text="${sessionGroup.name}">
+													</option>
+												</select>
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('groupId')}" th:errors="*{groupId}"></div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<label for="title" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.title|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<input type="text" class="form-control" 
+													th:field="*{title}" id="title"
+													th:placeholder="#{|${baseMessageKey}.detail.title.placeholder|}" 
+													required="required" />
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<label for="subtitle" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.subtitle|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<input type="text" class="form-control" 
+													th:field="*{subtitle}" id="subtitle"
+													th:placeholder="#{|${baseMessageKey}.detail.subtitle.placeholder|}" 
+													required="required" />
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('subtitle')}" th:errors="*{subtitle}"></div>
+											</div>
+										</div>
+										
+										<th:block th:switch="${action}">
+											<div th:case="create" class="form-group row">
+												<label for="uploadImageFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+													th:text="#{|${baseMessageKey}.detail.image|}"></label>
+												<div class="col-md-10 col-sm-9 col-xs-12">
+													<div class="custom-file">
+														<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
+															th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
+															th:accept="${supportImageTypes}" onChange="selectImage(this)"/>
+														<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
+															th:data-browse="#{action.select.image}" 
+															th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
+													</div>
+													<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
+												</div>
+											</div>
+											<div th:case="*" class="form-group row">
+												<label for="uploadImageFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+													th:text="#{|${baseMessageKey}.detail.image|}"></label>
+												<div class="col-md-10 col-sm-9 col-xs-12">
+													<div class="custom-file">
+														<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
+															th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
+															th:accept="${supportImageTypes}" onChange="selectImage(this)"/>
+														<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
+															th:data-browse="#{action.select.image}" 
+															th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
+													</div>
+													<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
+												</div>
+											</div>
+										</th:block>
+										
+										<th:block th:switch="${action}">
+											<div th:case="create" class="form-group row">
+												<label for="uploadContentFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+													th:text="#{|${baseMessageKey}.detail.content.file|}"></label>
+												<div class="col-md-10 col-sm-9 col-xs-12">
+													<div class="custom-file">
+														<input type="file" class="custom-file-input" th:field="*{uploadContentFile}" id="uploadContentFile" 
+															th:placeholder="#{|${baseMessageKey}.detail.content.file.placeholder|}" required="required"
+															th:accept="${supportMediaTypes}" onChange="selectMedia(this)"/>
+														<label class="custom-file-label" for="uploadContentFile" id="contentFileLabel" 
+															th:data-browse="#{action.select.media}" 
+															th:text="#{|${baseMessageKey}.detail.content.file.placeholder|}"></label>
+													</div>
+													<div class="invalid-feedback" th:if="${#fields.hasErrors('contentFile')}" th:errors="*{contentFile}"></div>
+												</div>
+											</div>
+											<div th:case="*" class="form-group row">
+												<label for="uploadContentFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+													th:text="#{|${baseMessageKey}.detail.content.file|}"></label>
+												<div class="col-md-10 col-sm-9 col-xs-12">
+													<div class="custom-file">
+														<input type="file" class="custom-file-input" th:field="*{uploadContentFile}" id="uploadContentFile" 
+															th:placeholder="#{|${baseMessageKey}.detail.content.file.placeholder|}" required="required"
+															th:accept="${supportMediaTypes}" onChange="selectMedia(this)"/>
+														<label class="custom-file-label" for="uploadContentFile" id="contentFileLabel" 
+															th:data-browse="#{action.select.media}" 
+															th:text="#{|${baseMessageKey}.detail.content.file.placeholder|}"></label>
+													</div>
+													<div class="invalid-feedback" th:if="${#fields.hasErrors('contentFile')}" th:errors="*{contentFile}"></div>
+												</div>
+											</div>
+										</th:block>
+										
+										<div class="form-group row">
+											<label for="duration" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.duration|}"></label>
+											<div class="col-md-7 col-sm-6 col-xs-12">
+												<input type="number" class="form-control" 
+													th:field="*{duration}" id="duration"
+													th:placeholder="#{|${baseMessageKey}.detail.duration.placeholder|}" 
+													required="required" />
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
+											</div>
+											
+											<div class="col-md-3 col-sm-3 col-xs-12">
+												<div class="custom-control custom-control-alternative custom-checkbox mb-3">
+													<input class="custom-control-input" th:field="*{free}" id="free" type="checkbox">
+													<label class="custom-control-label" for="free" th:text="#{|${baseMessageKey}.detail.free|}">Free</label>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<label for="description" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+												th:text="#{|${baseMessageKey}.detail.description|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<textarea class="form-control" rows="10"
+													th:field="*{description}" id="description"
+													th:placeholder="#{|${baseMessageKey}.detail.description.placeholder|}"></textarea>
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+											</div>
+										</div>
+									</div>
+									
+									<div class="col-md-4 col-sm-12">
+										<div class="form-group row">
+											<div class="col-12 text-center" th:switch="${action}">
+												<img th:case="create" id="imagePreview" class="image-fit" style="max-height: 124px;"
+													th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
+													th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}">
+												<a th:case="*" th:href="${baseMediaURL + '/image/view/' + dto.image}" 
+													th:title="#{session.group.detail.image.link.title}" target="_blank">
+													<img class="image-fit" id="imagePreview" style="max-height: 124px;"
+														th:alt="${dto.title}" th:src="${baseMediaURL + '/image/view/' + dto.image}"
+														th:default-src="${baseMediaURL + '/image/view/' + dto.image}">
+												</a>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<div class="col-12">
+												<audio controls loop autoplay class="form-control">
+													<source src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/9473/new_year_dubstep_minimix.ogg" type="audio/ogg">
+													Your browser dose not Support the audio Tag
+												</audio>
+											</div>
+										</div>
+										
+										<div class="form-group row" id="audioContainer">
+											<div class="col-12">
+												<audio id="audioPlayer" controls>
+													<source src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/9473/new_year_dubstep_minimix.ogg" type="audio/ogg">
+												</audio>
+											</div>
+										</div>
+										
+										<div class="form-group row" id="videoContainer">
+											<div class="col-12">
+												<div id="container">
+								                    <video
+								                        controls
+								                        crossorigin
+								                        playsinline
+								                        poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg"
+								                        id="videoPlayer"
+								                    >
+								                        <!-- Video files -->
+								                        <source
+								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4"
+								                            type="video/mp4"
+								                            size="576"
+								                        />
+								                        <source
+								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4"
+								                            type="video/mp4"
+								                            size="720"
+								                        />
+								                        <source
+								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4"
+								                            type="video/mp4"
+								                            size="1080"
+								                        />
+								
+								                        <!-- Caption files -->
+								                        <track
+								                            kind="captions"
+								                            label="English"
+								                            srclang="en"
+								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
+								                            default
+								                        />
+								                        <track
+								                            kind="captions"
+								                            label="Français"
+								                            srclang="fr"
+								                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt"
+								                        />
+								
+								                        <!-- Fallback for browsers that don't support the <video> element -->
+								                        <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download
+								                            >Download</a
+								                        >
+								                    </video>
+								                </div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</fieldset>
+							
+							<div th:if="${writePermission}" class="form-group row">
+								<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+									<div class="form-action-buttons-row">
+										<button type="submit" class="btn btn-primary" th:title="#{action.save.title}">
+											<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
+										</button>
+										
+										<a class="btn btn-outline-warning" th:href="${baseURL + '/current-page'}"
+											th:title="#{action.go.to.list.title}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+											</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="image-file-type-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="fileTypeModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-danger modal-dialog-centered modal-10" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title" id="image-file-type-modal-title" th:text="#{error.media.modal.title}"></h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p th:text="#{error.media.image.support.type(${supportImageExtensions})}"></p>
+					</div>
+					<div class="modal-footer">
+                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal">Close</button> 
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="image-file-size-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="fileSizeModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title" id="image-file-size-modal-title" th:text="#{error.media.modal.title}"></h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p th:text="#{error.media.image.support.max.size(${supportImageSizeLabel})}"></p>
+					</div>
+					<div class="modal-footer">
+                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal" th:text="#{modal.button.ok}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+	<th:block layout:fragment="scripts">
+		<script type="text/javascript">
+			function selectImage(inputElement) {
+				var supportImageTypes = '[[${supportImageTypes}]]';
+				var supportImageFileSize = [[${supportImageSize}]];
+				var defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
+				
+				validateAndPreviewImage(inputElement, 
+						'imagePreview', 'imageFileLabel', defaultImageLabel,
+						supportImageTypes, supportImageFileSize, 
+						'image-file-type-modal', 'image-file-size-modal');
+			}
+			
+			function selectMedia(inputElement) {
+				var supportAudioTypes = '[[${supportAudioTypes}]]';
+				var supportVideoTypes = '[[${supportVideoTypes}]]';
+				var supportMediaTypes = '[[${supportMediaTypes}]]';
+				var supportMediaFileSize = [[${supportMediaSize}]];
+				var defaultMediaLabel = '[[#{|${baseMessageKey}.detail.content.file.placeholder|}]]';
+			}
+			
+		    const audioPlayer = new Plyr('#audioPlayer');
+		    const videoPlayer = new Plyr('#videoPlayer');
+		</script>
+	</th:block>
+</body>
+</html>
