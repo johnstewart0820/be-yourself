@@ -88,13 +88,22 @@
 												</div>
 											</div>
 										</th:block>
+										
+										<div th:if="${action != 'create'}" class="form-group row">
+											<label for="name" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+												th:text="#{|${baseMessageKey}.detail.session.count|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<input type="text" class="form-control" readonly="readonly" 
+													th:field="*{sessionCount}" id="sessionCount" />
+											</div>
+										</div>
 									</div>
 									
 									<div class="col-md-4 col-sm-12 text-center" th:switch="${action}">
 										<img th:case="create" id="imagePreview" class="image-fit" style="max-height: 124px;"
 											th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
 										<a th:case="*" th:href="${baseMediaURL + '/image/download/' + dto.image}" 
-											th:title="#{session.group.detail.image.link.title}" target="_blank">
+											th:title="#{session.category.detail.image.link.title}" target="_blank">
 											<img class="image-fit" id="imagePreview" style="max-height: 124px;"
 												th:alt="${dto.name}" th:src="${baseMediaURL + '/image/view/' + dto.image}">
 										</a>

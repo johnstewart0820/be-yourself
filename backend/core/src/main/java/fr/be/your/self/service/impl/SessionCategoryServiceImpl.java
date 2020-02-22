@@ -6,20 +6,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.be.your.self.model.SessionGroup;
+import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.repository.BaseRepository;
-import fr.be.your.self.repository.SessionGroupRepository;
-import fr.be.your.self.service.SessionGroupService;
+import fr.be.your.self.repository.SessionCategoryRepository;
+import fr.be.your.self.service.SessionCategoryService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class SessionGroupServiceImpl extends BaseServiceImpl<SessionGroup> implements SessionGroupService {
+public class SessionCategoryServiceImpl extends BaseServiceImpl<SessionCategory> implements SessionCategoryService {
 	
 	@Autowired
-	private SessionGroupRepository repository;
+	private SessionCategoryRepository repository;
 
 	@Override
-	protected BaseRepository<SessionGroup> getRepository() {
+	protected BaseRepository<SessionCategory> getRepository() {
 		return this.repository;
 	}
 	
@@ -34,14 +34,14 @@ public class SessionGroupServiceImpl extends BaseServiceImpl<SessionGroup> imple
 	}
 
 	@Override
-	protected Iterable<SessionGroup> getList(String text) {
+	protected Iterable<SessionCategory> getList(String text) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll()
 				: this.repository.findAllByNameContainsIgnoreCase(text);
 	}
 
 	@Override
-	protected Page<SessionGroup> getListByPage(String text, Pageable pageable) {
+	protected Page<SessionCategory> getListByPage(String text, Pageable pageable) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll(pageable)
 				: this.repository.findAllByNameContainsIgnoreCase(text, pageable);

@@ -83,8 +83,8 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	protected void loadDetailForm(HttpSession session, HttpServletRequest request, 
-			HttpServletResponse response, Model model, DetailDto dto) throws BusinessException {
-		
+			HttpServletResponse response, Model model, 
+			T domain, DetailDto dto) throws BusinessException {
 	}
 	
 	@Override
@@ -230,7 +230,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		}
 		
 		try {
-			this.loadDetailForm(session, request, response, model, dto);
+			this.loadDetailForm(session, request, response, model, null, dto);
 		} catch (BusinessException ex) {
 			this.logger.error("Business error", ex);
 			
@@ -268,7 +268,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		}
 		
 		try {
-			this.loadDetailForm(session, request, response, model, dto);
+			this.loadDetailForm(session, request, response, model, domain, dto);
 		} catch (BusinessException ex) {
 			this.logger.error("Business error", ex);
 			
@@ -307,7 +307,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		}
 		
 		try {
-			this.loadDetailForm(session, request, response, model, dto);
+			this.loadDetailForm(session, request, response, model, domain, dto);
 		} catch (BusinessException ex) {
 			this.logger.error("Business error", ex);
 			

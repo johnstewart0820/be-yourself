@@ -22,26 +22,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import fr.be.your.self.backend.dto.SessionGroupDto;
+import fr.be.your.self.backend.dto.SessionCategoryDto;
+import fr.be.your.self.backend.dto.SessionCategorySimpleDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.exception.BusinessException;
-import fr.be.your.self.model.SessionGroup;
+import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.service.BaseService;
-import fr.be.your.self.service.SessionGroupService;
+import fr.be.your.self.service.SessionCategoryService;
 import fr.be.your.self.util.StringUtils;
 
 @Controller
-@RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SessionGroupController.NAME)
-public class SessionGroupController extends BaseResourceController<SessionGroup, SessionGroup, SessionGroupDto> {
+@RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SessionCategoryController.NAME)
+public class SessionCategoryController extends BaseResourceController<SessionCategory, SessionCategorySimpleDto, SessionCategoryDto> {
 	
-	public static final String NAME = "session-group";
+	public static final String NAME = "session-category";
 	
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
-			+ Constants.PATH.WEB_ADMIN.MEDIA_TYPE.SESSION_GROUP;
+			+ Constants.FOLDER.MEDIA.SESSION_CATEGORY;
 	
 	@Autowired
-	private SessionGroupService mainService;
+	private SessionCategoryService mainService;
 	
 	@Override
 	protected String getName() {
@@ -50,32 +51,32 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 	
 	@Override
 	protected String getDefaultPageTitle() {
-		return this.getMessage(this.getName() + ".page.title", "Session Group management");
+		return this.getMessage(this.getName() + ".page.title", "Session Category management");
 	}
 	
 	@Override
 	protected String getUploadDirectoryName() {
-		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.SESSION_GROUP;
+		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.SESSION_CATEGORY;
 	}
 	
 	@Override
-	protected BaseService<SessionGroup> getService() {
+	protected BaseService<SessionCategory> getService() {
 		return this.mainService;
 	}
 	
 	@Override
-	protected SessionGroup newDomain() {
-		return new SessionGroup();
+	protected SessionCategory newDomain() {
+		return new SessionCategory();
 	}
 
 	@Override
-	protected SessionGroupDto createDetailDto(SessionGroup domain) {
-		return new SessionGroupDto(domain);
+	protected SessionCategoryDto createDetailDto(SessionCategory domain) {
+		return new SessionCategoryDto(domain);
 	}
 
 	@Override
-	protected SessionGroup createSimpleDto(SessionGroup domain) {
-		return domain;
+	protected SessionCategorySimpleDto createSimpleDto(SessionCategory domain) {
+		return new SessionCategorySimpleDto(domain);
 	}
 
 	@Override
@@ -85,8 +86,8 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 	
 	@Override
 	protected void loadDetailForm(HttpSession session, HttpServletRequest request, HttpServletResponse response,
-			Model model, SessionGroupDto dto) throws BusinessException {
-		super.loadDetailForm(session, request, response, model, dto);
+			Model model, SessionCategory domain, SessionCategoryDto dto) throws BusinessException {
+		super.loadDetailForm(session, request, response, model, domain, dto);
 		
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
@@ -101,7 +102,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 	@PostMapping("/create")
 	@Transactional
     public String createDomain(
-    		@ModelAttribute @Validated SessionGroupDto dto, 
+    		@ModelAttribute @Validated SessionCategoryDto dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         if (result.hasErrors()) {
@@ -126,11 +127,11 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         
         final String uploadFileName = uploadFilePath.getFileName().toString();
         
-        final SessionGroup domain = this.newDomain();
+        final SessionCategory domain = this.newDomain();
         domain.setName(dto.getName());
         domain.setImage(uploadFileName);
         
-        final SessionGroup savedDomain = this.mainService.create(domain);
+        final SessionCategory savedDomain = this.mainService.create(domain);
         
         // Error, delete upload file
         if (savedDomain == null || result.hasErrors()) {
@@ -153,7 +154,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 	@Transactional
     public String updateDomain(
     		@PathVariable("id") Integer id, 
-    		@ModelAttribute @Validated SessionGroupDto dto, 
+    		@ModelAttribute @Validated SessionCategoryDto dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -162,7 +163,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         	return this.getFormView();
         }
         
-        SessionGroup domain = this.mainService.getById(id);
+        SessionCategory domain = this.mainService.getById(id);
         if (domain == null) {
         	final ObjectError error = this.createIdNotFoundError(result, id);
         	result.addError(error);
@@ -193,7 +194,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
         
         domain.setName(dto.getName());
         
-        final SessionGroup savedDomain = this.mainService.update(domain);
+        final SessionCategory savedDomain = this.mainService.update(domain);
         
         // Error, delete upload file
         if (savedDomain == null || result.hasErrors()) {
@@ -224,7 +225,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		RedirectAttributes redirectAttributes, Model model) {
 		
-		final SessionGroup domain = this.mainService.getById(id);
+		final SessionCategory domain = this.mainService.getById(id);
 		if (domain == null) {
 			final String message = this.getIdNotFoundMessage(id);
 			

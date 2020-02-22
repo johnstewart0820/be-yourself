@@ -25,7 +25,7 @@ public abstract class BaseController {
 	
 	private static final String BASE_AVATAR_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
-			+ Constants.PATH.WEB_ADMIN.MEDIA_TYPE.AVATAR;
+			+ Constants.FOLDER.MEDIA.AVATAR;
 	
 	@Autowired
 	private MessageSource messageSource;

@@ -1,5 +1,7 @@
 package fr.be.your.self.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -7,8 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -19,20 +22,16 @@ public class Session extends PO<Integer> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "GroupID")
-	private SessionGroup sessionGroup;
-
 	@Column(name = "Title", length = 255)
 	@NotEmpty(message = "{session.error.title.not.empty}")
 	@NotNull(message = "{session.error.title.not.empty}")
 	private String title;
-
+	
 	@Column(name = "Subtitle", length = 255)
 	@NotEmpty(message = "{session.error.subtitle.not.empty}")
 	@NotNull(message = "{session.error.subtitle.not.empty}")
 	private String subtitle;
-
+	
 	@Column(name = "Image", length = 255)
 	private String image;
 
@@ -52,21 +51,25 @@ public class Session extends PO<Integer> {
 	@Column(name = "Free")
 	private boolean free;
 
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "Session_Categories", 
+			joinColumns = @JoinColumn(name = "SessionId"), 
+			inverseJoinColumns = @JoinColumn(name = "CategoryId"))
+    private List<SessionCategory> categories;
+	
 	@Override
 	public Integer getId() {
 		return id;
 	}
 
+	@Override
+	public String getDisplay() {
+		return this.title;
+	}
+	
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public SessionGroup getSessionGroup() {
-		return sessionGroup;
-	}
-
-	public void setSessionGroup(SessionGroup sessionGroup) {
-		this.sessionGroup = sessionGroup;
 	}
 
 	public String getTitle() {
@@ -133,8 +136,11 @@ public class Session extends PO<Integer> {
 		this.free = free;
 	}
 
-	@Override
-	public String getDisplay() {
-		return this.title;
+	public List<SessionCategory> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(List<SessionCategory> categories) {
+		this.categories = categories;
 	}
 }

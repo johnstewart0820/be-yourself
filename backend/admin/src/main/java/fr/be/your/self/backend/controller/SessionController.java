@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -25,9 +26,9 @@ import fr.be.your.self.backend.dto.SessionDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Session;
-import fr.be.your.self.model.SessionGroup;
+import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.service.BaseService;
-import fr.be.your.self.service.SessionGroupService;
+import fr.be.your.self.service.SessionCategoryService;
 import fr.be.your.self.service.SessionService;
 import fr.be.your.self.util.StringUtils;
 
@@ -39,13 +40,13 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
-			+ Constants.PATH.WEB_ADMIN.MEDIA_TYPE.SESSION;
+			+ Constants.FOLDER.MEDIA.SESSION;
 	
 	@Autowired
 	private SessionService mainService;
 	
 	@Autowired
-	private SessionGroupService sessionGroupService;
+	private SessionCategoryService sessionCategoryService;
 	
 	@Override
 	protected String getName() {
@@ -99,8 +100,8 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	
 	@Override
 	protected void loadDetailForm(HttpSession session, HttpServletRequest request, HttpServletResponse response,
-			Model model, SessionDto dto) throws BusinessException {
-		super.loadDetailForm(session, request, response, model, dto);
+			Model model, Session domain, SessionDto dto) throws BusinessException {
+		super.loadDetailForm(session, request, response, model, domain, dto);
 		
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
@@ -138,14 +139,15 @@ public class SessionController extends BaseResourceController<Session, Session, 
 		model.addAttribute("supportMediaSize", supportMediaSize);
 		model.addAttribute("supportMediaSizeLabel", StringUtils.formatFileSize(supportMediaSize));
 		
-		final List<SessionGroup> sessionGroups = this.sessionGroupService.search(null);
-		model.addAttribute("sessionGroups", sessionGroups);
+		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll();
+		model.addAttribute("sessionCategories", sessionCategories);
 	}
 
 	@PostMapping("/create")
 	@Transactional
     public String createDomain(
     		@ModelAttribute @Validated SessionDto dto, 
+    		@RequestParam(value = "categoryIds" , required = false) int[] categoryIds,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -153,14 +155,9 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	return this.getFormView();
         }
         
-        // ====> Session group
-        final SessionGroup sessionGroup = this.sessionGroupService.getById(dto.getGroupId());
-        if (sessionGroup == null) {
-        	final ObjectError error = this.createFieldError(result, "groupId", "not.found", "Session group is not found");
-        	result.addError(error);
-        	
-        	return this.getFormView();
-        }
+        // ====> Session category
+        //final Set<Integer> categoryIds = dto.getCategoryIds();
+        final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
         
         // ====> Validate image and content file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
@@ -200,7 +197,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         final Session domain = this.newDomain();
         dto.copyToDomain(domain);
         
-        domain.setSessionGroup(sessionGroup);
+        domain.setCategories(categories);
         domain.setImage(uploadFileName);
         domain.setContentFile(uploadContentFileName);
         domain.setContentMimeType(contentFileContentType);
@@ -231,6 +228,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
     public String updateDomain(
     		@PathVariable("id") Integer id, 
     		@ModelAttribute @Validated SessionDto dto, 
+    		@RequestParam(value = "categoryIds" , required = false) int[] categoryIds,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -250,23 +248,12 @@ public class SessionController extends BaseResourceController<Session, Session, 
         
         dto.copyToDomain(domain);
         
-        // ====> Session group
-        final SessionGroup currentGroup = domain.getSessionGroup();
-		if (currentGroup == null || currentGroup.getId() != dto.getGroupId()) {
-			final SessionGroup sessionGroup = this.sessionGroupService.getById(dto.getGroupId());
-			
-			if (sessionGroup == null) {
-	        	final ObjectError error = this.createFieldError(result, "groupId", "not.found", "Session group is not found");
-	        	result.addError(error);
-	        	
-	        	dto.setId(id);
-	        	return this.getFormView();
-	        }
-			
-			domain.setSessionGroup(sessionGroup);
-		}
-		
-		// ====> Process upload image and content file
+        // ====> Session category
+        //final Set<Integer> categoryIds = dto.getCategoryIds();
+        final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
+        domain.setCategories(categories);
+        
+        // ====> Process upload image and content file
         String deleteImageFileName = null;
         Path uploadImageFilePath = null;
         

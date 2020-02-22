@@ -12,7 +12,7 @@ public final class Constants {
 		public static interface MEDIA {
 			public static final String AVATAR = "/avatar";
 			
-			public static final String SESSION_GROUP = "/session-group";
+			public static final String SESSION_CATEGORY = "/session-category";
 			public static final String SESSION = "/session";
 		}
 	}
@@ -48,11 +48,8 @@ public final class Constants {
 			public static final String MEDIA = "/media";
 			//public static final String ADMIN_USER = "/admin-user";
 			
-			public static interface MEDIA_TYPE {
-				public static final String AVATAR = "/avatar";
-				public static final String SESSION_GROUP = "/session-group";
-				public static final String SESSION = "/session";
-			}
+			public static final String SESSION = "/session";
+			public static final String SESSION_CATEGORY = "/session-category";
 		}
 	}
 }

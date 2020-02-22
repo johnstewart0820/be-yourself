@@ -52,7 +52,8 @@
 						<table class="table align-items-center table-flush">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col" width="90%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
+									<th scope="col" width="80%" th:text="#{|${baseMessageKey}.detail.name|}"></th>
+									<th scope="col" width="10%" th:text="#{|${baseMessageKey}.detail.session.count|}"></th>
 									<th scope="col" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
@@ -74,6 +75,9 @@
 											</div>
 										</div>
 									</th>
+									<td class="text-center">
+										<span th:text="${item.sessionCount}"></span>
+									</td>
 									<td class="text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
 											<span class="btn-inner--icon">

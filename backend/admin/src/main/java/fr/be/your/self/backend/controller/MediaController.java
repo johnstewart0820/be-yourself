@@ -30,12 +30,11 @@ public class MediaController {
 	@Autowired
 	private DataSetting dataSetting;
 	
-	@GetMapping(Constants.PATH.WEB_ADMIN.MEDIA_TYPE.AVATAR + "/{fileName}")
+	@GetMapping(Constants.FOLDER.MEDIA.AVATAR + "/{fileName}")
     public String avatar(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model, 
     		@PathVariable(name="fileName") String fileName) {
-		// Read image file and response
-        return "user";
+		return this.viewImage(session, request, response, model, "avatar", fileName);
     }
 	
 	@GetMapping("/{dataType}/image/view/{fileName}")

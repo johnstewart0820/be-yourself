@@ -52,9 +52,8 @@
 						<table class="table align-items-center table-flush">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col" width="40%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
-									<th scope="col" width="15%" th:text="#{|${baseMessageKey}.detail.group|}"></th>
-									<th scope="col" width="35%" th:text="#{|${baseMessageKey}.detail.subtitle|}"></th>
+									<th scope="col" width="50%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
+									<th scope="col" width="40%" th:text="#{|${baseMessageKey}.detail.subtitle|}"></th>
 									<th scope="col" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
@@ -76,9 +75,6 @@
 											</div>
 										</div>
 									</th>
-									<td nowrap>
-										<span th:if="${item.sessionGroup != null}" th:utext="${item.sessionGroup.name}"></span>
-									</td>
 									<td nowrap>
 										<span th:utext="${item.subtitle}"></span>
 									</td>
