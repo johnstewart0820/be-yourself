@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
@@ -100,6 +101,12 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	public static String CSV_USERS_EXPORT_FILE = "users.csv";
 
 	
+	@Override
+	protected Set<String> getSortableColumns() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	// save or update user
 	// 1. @ModelAttribute bind form value
 	// 2. @Validated form validator

@@ -19,23 +19,22 @@
 	<link type="text/css" th:href="@{/css/fontawesome.min.css}" rel="stylesheet" />
 	
 	<!--  CSS -->
-	<link type="text/css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
 	<link type="text/css" th:href="@{/css/argon.min.css}" rel="stylesheet" />
-	<link type="text/css" th:href="@{/css/main.css}" rel="stylesheet" />
+	<link type="text/css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
 	
 	<!--  Media Player -->
 	<link type="text/css" th:href="@{/css/media.player.css}" rel="stylesheet" />
 	
-	<th:block layout:fragment="stylesheets"></th:block>
+	<link type="text/css" th:href="@{/css/dataTables.bootstrap4.min.css}" rel="stylesheet" />
+	<link type="text/css" th:href="@{/css/bootstrap-select.min.css}" rel="stylesheet" />
 	
-	<!-- Datatable -->
-	<link type="text/css" th:href="@{/css/jquery.dataTables.css}" rel="stylesheet" />
+	<link type="text/css" th:href="@{/css/main.css}" rel="stylesheet" />
+	
+	<th:block layout:fragment="stylesheets"></th:block>
 	
 	<!-- JS Core -->
 	<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/js/bootstrap.bundle.min.js}"></script>
-	
-    <script type="text/javascript" charset="utf8" th:src="@{/js/jquery.dataTables.min.js}"></script>
 </head>
 <body>
 	<nav th:insert="layout/main-side-nav :: side-nav" 
@@ -56,10 +55,16 @@
 		</div>
 	</div>
 
-	<script th:src="@{/js/argon.min.js}"></script>
-	<script th:src="@{/js/media.player.min.js}"></script>
-	<script th:src="@{/js/main.js}"></script>
-
+	<script type="text/javascript" th:src="@{/js/argon.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/media.player.min.js}"></script>
+	
+	<script type="text/javascript" th:src="@{/js/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/dataTables.bootstrap4.min.js}"></script>
+	
+	<script type="text/javascript" th:src="@{/js/bootstrap-select.min.js}"></script>
+	
+	<script type="text/javascript" th:src="@{/js/main.js}"></script>
+	
 	<th:block layout:fragment="scripts"></th:block>
 </body>
 </html>

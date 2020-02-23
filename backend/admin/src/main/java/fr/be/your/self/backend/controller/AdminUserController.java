@@ -1,5 +1,7 @@
 package fr.be.your.self.backend.controller;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -47,6 +49,12 @@ public class AdminUserController extends BaseResourceController<User, User, User
 		return this.userService;
 	}
 	
+	@Override
+	protected Set<String> getSortableColumns() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	protected User newDomain() {
 		return new User();

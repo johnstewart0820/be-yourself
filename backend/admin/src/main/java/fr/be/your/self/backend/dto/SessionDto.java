@@ -1,6 +1,5 @@
 package fr.be.your.self.backend.dto;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import fr.be.your.self.model.Session;
 import fr.be.your.self.model.SessionCategory;
 
-public class SessionDto implements Serializable {
+public class SessionDto extends BaseDto {
 	/**
 	 * 
 	 */
@@ -54,8 +53,11 @@ public class SessionDto implements Serializable {
 	}
 
 	public SessionDto(Session domain) {
-		this();
+		super(domain);
 
+		this.free = false;
+		this.categoryIds = new ArrayList<Integer>();
+		
 		if (domain != null) {
 			this.id = domain.getId().intValue();
 			this.title = domain.getTitle();

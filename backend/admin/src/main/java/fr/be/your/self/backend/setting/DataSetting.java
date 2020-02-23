@@ -1,7 +1,9 @@
 package fr.be.your.self.backend.setting;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class DataSetting {
@@ -19,6 +21,7 @@ public class DataSetting {
 	private long imageMaxFileSize;
 	private long audioMaxFileSize;
 	private long videoMaxFileSize;
+	private long mediaMaxFileSize;
 	private long uploadMaxFileSize;
 	
 	private Set<String> imageFileExtensions;
@@ -31,10 +34,16 @@ public class DataSetting {
 	private Set<String> videoMimeTypes;
 	private Set<String> mediaMimeTypes;				// include audioMimeTypes and videoMimeTypes
 	
+	private Map<String, String> defaultMimeTypeMappings;
+	
 	private boolean displayHeaderOnAuthPage;
 	private boolean allowRegisterOnAuthPage;
 	private boolean allowSocialOnAuthPage;
 	
+	public DataSetting() {
+		this.defaultMimeTypeMappings = new HashMap<String, String>();
+	}
+
 	public int getDefaultPageSize() {
 		return defaultPageSize;
 	}
@@ -61,6 +70,10 @@ public class DataSetting {
 
 	public long getVideoMaxFileSize() {
 		return videoMaxFileSize;
+	}
+
+	public long getMediaMaxFileSize() {
+		return mediaMaxFileSize;
 	}
 
 	public long getUploadMaxFileSize() {
@@ -115,6 +128,14 @@ public class DataSetting {
 		return mediaMimeTypes == null ? Collections.emptySet() : this.mediaMimeTypes;
 	}
 
+	public void addDefaultMimeTypeMapping(String fileExtension, String mimeType) {
+		this.defaultMimeTypeMappings.put(fileExtension.toLowerCase(), mimeType);
+	}
+	
+	public String getDefaultMimeTypeMapping(String fileExtension) {
+		return this.defaultMimeTypeMappings.get(fileExtension.toLowerCase());
+	}
+	
 	public boolean isDisplayHeaderOnAuthPage() {
 		return displayHeaderOnAuthPage;
 	}
@@ -126,19 +147,20 @@ public class DataSetting {
 	public boolean isAllowSocialOnAuthPage() {
 		return allowSocialOnAuthPage;
 	}
-
+	
 	public void setUploadFileSizes(long imageMaxFileSize, long audioMaxFileSize, long videoMaxFileSize) {
 		this.imageMaxFileSize = imageMaxFileSize * 1024;
 		this.audioMaxFileSize = audioMaxFileSize * 1024;
 		this.videoMaxFileSize = videoMaxFileSize * 1024;
 		
-		this.uploadMaxFileSize = this.imageMaxFileSize;
-		if (this.uploadMaxFileSize < this.audioMaxFileSize) {
-			this.uploadMaxFileSize = this.audioMaxFileSize;
+		this.mediaMaxFileSize = this.audioMaxFileSize;
+		if (this.mediaMaxFileSize < this.videoMaxFileSize) {
+			this.mediaMaxFileSize = this.videoMaxFileSize;
 		}
 		
-		if (this.uploadMaxFileSize < this.videoMaxFileSize) {
-			this.uploadMaxFileSize = this.videoMaxFileSize;
+		this.uploadMaxFileSize = this.imageMaxFileSize;
+		if (this.uploadMaxFileSize < this.mediaMaxFileSize) {
+			this.uploadMaxFileSize = this.mediaMaxFileSize;
 		}
 	}
 

@@ -3,13 +3,21 @@ package fr.be.your.self.backend.controller;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -17,6 +25,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -27,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.setting.Constants;
@@ -78,13 +90,25 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	
 	protected abstract SimpleDto createSimpleDto(T domain);
 	
+	protected abstract Set<String> getSortableColumns();
+	
+	/**
+	 * @return default data sort, format column|{asc|desc}
+	 **/
+	protected String getDefaultSort() {
+		return null;
+	}
+	
 	protected String getBaseMediaURL() {
 		return null;
 	}
 	
-	protected void loadDetailForm(HttpSession session, HttpServletRequest request, 
-			HttpServletResponse response, Model model, 
-			T domain, DetailDto dto) throws BusinessException {
+	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+			Model model, Map<String, String> searchParams, PageableResponse<SimpleDto> pageableDto) throws BusinessException {
+	}
+	
+	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+			Model model, T domain, DetailDto dto) throws BusinessException {
 	}
 	
 	@Override
@@ -117,70 +141,113 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		if (!StringUtils.isNullOrSpace(baseImageURL)) {
 			model.addAttribute("baseMediaURL", baseImageURL);
 		}
+		
+		final String dateFormat = this.getMessage("locale.format.date", "dd-MM-yyyy");
+		final String dateTimeFormat = this.getMessage("locale.format.date.time", "dd-MM-yyyy HH:mm");
+		
+		model.addAttribute("dateFormat", dateFormat);
+		model.addAttribute("dateTimeFormat", dateTimeFormat);
 	}
 	
 	@GetMapping(value = { "", "/search" })
-    public String listPage(
-    		@RequestParam(name = "q", required = false) String search,
-    		@RequestParam(name = "sort", required = false) String sort,
+    public String listPage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model,
     		@RequestParam(name = "page", required = false) Integer page,
     		@RequestParam(name = "size", required = false) Integer size,
-    		HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model) {
+    		@RequestParam(name = "sort", required = false) String sort,
+    		@RequestParam(name = "action", required = false) String action,
+    		@RequestParam Map<String, String> searchParams) {
 		
-		final PageRequest pageable = this.getPageRequest(page, size);
+		if ("update-filter".equalsIgnoreCase(action)) {
+			Map<String, String> currentSearchParams = this.getSearchSessionValue(session);
+			
+			for (Entry<String, String> currentSearchItem : currentSearchParams.entrySet()) {
+				if (!searchParams.containsKey(currentSearchItem.getKey())) {
+					searchParams.put(currentSearchItem.getKey(), currentSearchItem.getValue());
+				}
+			}
+		}
+		
+		if (StringUtils.isNullOrSpace(sort)) {
+			sort = this.getDefaultSort();
+		}
+		
+		final PageRequest pageable = this.getPageRequest(page, size, sort);
 		
 		// Save session
-		session.setAttribute(this.getSearchSessionKey(), search);
+		session.setAttribute(this.getSearchSessionKey(), searchParams);
 		session.setAttribute(this.getSortSessionKey(), sort);
 		session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
 		session.setAttribute(this.getPageSizeSessionKey(), pageable.getPageSize());
 		
-		return this.listPage(session, request, response, model, search, pageable);
+		return this.listPage(session, request, response, model, searchParams, sort, pageable);
     }
 	
+	@GetMapping(value = { "/page" })
+    public String changePageNormal(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model, 
+    		@RequestParam(name = "page", required = true) Integer page) {
+		return this.changePage(session, request, response, model, page);
+	}
+	
 	@GetMapping(value = { "/page/{page}" })
-    public String changePage(
-    		@PathVariable(name = "page", required = true) Integer page,
-    		HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model) {
+    public String changePage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model,
+    		@PathVariable(name = "page", required = true) Integer page) {
 		
-		final String search = (String) session.getAttribute(this.getSearchSessionKey());
-		final String sort = (String) session.getAttribute(this.getSortSessionKey());
-		final Integer size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
+		Map<String, String> searchParams = this.getSearchSessionValue(session);
+		
+		Integer size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
+		String sort = (String) session.getAttribute(this.getSortSessionKey());
 		
 		if (page == null || page <= 0) {
 			page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
 		}
 		
-		final PageRequest pageable = this.getPageRequest(page, size);
+		if (StringUtils.isNullOrSpace(sort)) {
+			sort = this.getDefaultSort();
+		}
+		
+		final PageRequest pageable = this.getPageRequest(page, size, sort);
 		
 		// Save session
 		session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
 		
-		return this.listPage(session, request, response, model, search, pageable);
+		return this.listPage(session, request, response, model, searchParams, sort, pageable);
 	}
 	
 	@GetMapping(value = { "/current-page" })
     public String currentPage(HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model) {
+    		HttpServletResponse response, Model model,
+    		@RequestParam(name = "sort", required = false) String sort) {
 		
-		final String search = (String) session.getAttribute(this.getSearchSessionKey());
-		final String sort = (String) session.getAttribute(this.getSortSessionKey());
-		final Integer size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
-		final Integer page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
+		Map<String, String> searchParams = this.getSearchSessionValue(session);
 		
-		final PageRequest pageable = this.getPageRequest(page, size);
+		Integer size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
+		Integer page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
 		
-		return this.listPage(session, request, response, model, search, pageable);
+		if (StringUtils.isNullOrSpace(sort)) {
+			sort = (String) session.getAttribute(this.getSortSessionKey());
+			
+			if (StringUtils.isNullOrSpace(sort)) {
+				sort = this.getDefaultSort();
+			}
+		}
+		
+		final PageRequest pageable = this.getPageRequest(page, size, sort);
+		
+		// Save session
+		session.setAttribute(this.getSortSessionKey(), sort);
+		
+		return this.listPage(session, request, response, model, searchParams, sort, pageable);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private String listPage(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model, 
-    		String search, PageRequest pageable) {
+    		Map<String, String> searchParams, String sort, PageRequest pageable) {
 		
-		final PageableResponse<T> domainPage = this.getService().pageableSearch(search, pageable);
+		final PageableResponse<T> domainPage = this.pageableSearch(searchParams, pageable);
 		if (domainPage == null) {
 			throw new BusinessException(StatusCode.PROCESSING_ERROR);
 		}
@@ -204,12 +271,15 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 			}
 		}
 		
+		this.loadListPageOptions(session, request, response, model, searchParams, result);
+		
 		// Store properties
 		final String titleKey = this.getName().replace('-', '.') + ".page.title"; 
 		model.addAttribute("formTitle", this.getMessage(titleKey));
 		
+		final String search = searchParams.get("q");
 		model.addAttribute("search", search == null ? "" : search);
-		//model.addAttribute("sort", sort == null ? "" : sort);
+		model.addAttribute("sort", sort == null ? "" : sort);
 		model.addAttribute("page", pageable.getPageNumber() + 1);
 		model.addAttribute("size", pageable.getPageSize());
 		
@@ -219,25 +289,45 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
         return this.getListView();
 	}
 	
+	protected PageableResponse<T> pageableSearch(Map<String, String> searchParams, PageRequest pageable) {
+		final String search = searchParams.get("q");
+		return this.getService().pageableSearch(search, pageable);
+	}
+	
 	@GetMapping(value = { "/create" })
-    public String addNewPage(HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model) {
-		
-		final DetailDto dto = this.createDetailDto(null);
-		
+    public String addNewPage(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		RedirectAttributes redirectAttributes, Model model) {
+		return this.redirectAddNewPage(session, request, response, redirectAttributes, model, null);
+	}
+	
+	protected String redirectAddNewPage(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+			RedirectAttributes redirectAttributes, Model model, DetailDto dto) {
 		if (dto == null) {
-			return "redirect:" + this.getBaseURL() + "/current-page";
+			dto = this.createDetailDto(null);
+			
+			if (dto == null) {
+				redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
+		        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+		        
+				return "redirect:" + this.getBaseURL() + "/current-page";
+			}
 		}
 		
 		try {
-			this.loadDetailForm(session, request, response, model, null, dto);
+			this.loadDetailFormOptions(session, request, response, model, null, dto);
 		} catch (BusinessException ex) {
 			this.logger.error("Business error", ex);
 			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		} catch (Exception ex) {
 			this.logger.error("Process error", ex);
 			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
@@ -252,30 +342,61 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	@GetMapping(value = { "/edit/{id}" })
-    public String editPage(
-    		@PathVariable(name = "id", required = true) Integer id,
-    		HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model) {
+    public String editPage(@PathVariable(name = "id", required = true) Integer id,
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		RedirectAttributes redirectAttributes, Model model) {
+		return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected String redirectEditPage(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+			RedirectAttributes redirectAttributes, Model model, Integer id, DetailDto dto) {
 		
-		final T domain = this.getService().getById(id);
-		if (domain == null) {
-			return "redirect:" + this.getBaseURL() + "/current-page";
+		T domain = null;
+		if (this.domainClazz == this.detailDtoClazz) {
+			domain = (T) dto;
 		}
 		
-		final DetailDto dto = this.createDetailDto(domain);
+		if (domain == null) {
+			domain = this.getService().getById(id);
+			
+			if (domain == null) {
+				final String message = this.getIdNotFoundMessage(id);
+				
+				redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "edit");
+		        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+		        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+		        
+				return "redirect:" + this.getBaseURL() + "/current-page";
+			}
+		}
+		
 		if (dto == null) {
-			return "redirect:" + this.getBaseURL() + "/current-page";
+			dto = this.createDetailDto(domain);
+			
+			if (dto == null) {
+				redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "edit");
+		        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+		        
+				return "redirect:" + this.getBaseURL() + "/current-page";
+			}
 		}
 		
 		try {
-			this.loadDetailForm(session, request, response, model, domain, dto);
+			this.loadDetailFormOptions(session, request, response, model, domain, dto);
 		} catch (BusinessException ex) {
 			this.logger.error("Business error", ex);
 			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "edit");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		} catch (Exception ex) {
 			this.logger.error("Process error", ex);
 			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "edit");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
@@ -291,30 +412,44 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	@RequestMapping(value = { "/view/{id}" }, method = { RequestMethod.GET, RequestMethod.POST })
-    public String viewPage(
-    		@PathVariable(name = "id", required = true) Integer id,
-    		HttpSession session, HttpServletRequest request, 
-    		HttpServletResponse response, Model model) {
+    public String viewPage(@PathVariable(name = "id", required = true) Integer id,
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		RedirectAttributes redirectAttributes, Model model) {
 		
 		final T domain = this.getService().getById(id);
 		if (domain == null) {
+			final String message = this.getIdNotFoundMessage(id);
+			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "view");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
 		final DetailDto dto = this.createDetailDto(domain);
 		if (dto == null) {
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "view");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
 		try {
-			this.loadDetailForm(session, request, response, model, domain, dto);
+			this.loadDetailFormOptions(session, request, response, model, domain, dto);
 		} catch (BusinessException ex) {
 			this.logger.error("Business error", ex);
 			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "view");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		} catch (Exception ex) {
 			this.logger.error("Process error", ex);
 			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "view");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
@@ -385,7 +520,16 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return this.getName() + "_PASE_SIZE";
 	}
 	
-	protected final PageRequest getPageRequest(Integer page, Integer size) {
+	@SuppressWarnings("unchecked")
+	protected Map<String, String> getSearchSessionValue(HttpSession session) {
+		try {
+			return (Map<String, String>) session.getAttribute(this.getSearchSessionKey());
+		} catch (Exception ex) {}
+		
+		return Collections.emptyMap();
+	}
+	
+	protected final PageRequest getPageRequest(Integer page, Integer size, String sortQuery) {
         if (page == null || page < 1) {
             page = 1;
         }
@@ -394,13 +538,32 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
             size = this.dataSetting.getDefaultPageSize();
         }
         
-        return PageRequest.of(page - 1, size);
+        List<Order> orders = new ArrayList<Order>();
+        if (!StringUtils.isNullOrSpace(sortQuery)) {
+        	final String[] sortProperties = sortQuery.split(";");
+        	
+        	for (String sortProperty : sortProperties) {
+        		final String[] sortValues = sortProperty.split("\\|");
+        		if (sortValues.length != 2) {
+        			continue;
+        		}
+        		
+    			if (this.getSortableColumns().contains(sortValues[0])) {
+        			final Optional<Direction> direction = Direction.fromOptionalString(sortValues[1]);
+        			final Order order = new Order(direction.isPresent() ? direction.get() : Direction.ASC, sortValues[0]);
+        			orders.add(order);
+    			}
+			}
+        }
+        
+        return PageRequest.of(page - 1, size, Sort.by(orders));
     }
 	
 	/**************************************************************************************/
 	/********************* CREATE FORM ERROR MESSAGE **************************************/
 	/**************************************************************************************/
-	protected final ObjectError createFieldError(BindingResult result, String fieldName, String errorMessageCode, String defaultMessage) {
+	protected final ObjectError createFieldError(BindingResult result, String fieldName, 
+			String errorMessageCode, Object[] messageArguments, String defaultMessage) {
 		final String baseMessageKey = this.getName().replace('-', '.');
 		
 		final List<String> fieldNameMessageCodes = Arrays.asList(fieldName.split("(?=\\p{Lu})"));
@@ -409,15 +572,55 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		final String fieldNameMessageCode = String.join(".", fieldNameMessageCodes);
 		final String messageCode = baseMessageKey + ".error." + fieldNameMessageCode + "." + errorMessageCode;
 		
-		return new FieldError(result.getObjectName(), fieldName, null, false, new String[] { messageCode }, null, defaultMessage);
+		return new FieldError(result.getObjectName(), fieldName, null, false, 
+				new String[] { messageCode }, messageArguments, defaultMessage);
+	}
+	
+	protected final ObjectError createFieldError(BindingResult result, String fieldName, String errorMessageCode, String defaultMessage) {
+		return this.createFieldError(result, fieldName, errorMessageCode, null, defaultMessage);
 	}
 	
 	protected final ObjectError createFieldError(BindingResult result, String fieldName, String messageCode) {
-		return createFieldError(result, fieldName, messageCode, "");
+		return createFieldError(result, fieldName, messageCode, null, "");
+	}
+	
+	protected final ObjectError createInvalidImageError(BindingResult result, String fileContentType, 
+			String fieldName, String defaultMessage) {
+		final String supportImageExtensions = String.join(", ", this.dataSetting.getImageFileExtensions());
+		final Object[] messageArguments = new String[] { supportImageExtensions };
+		
+		return this.createFieldError(result, fieldName, "invalid", messageArguments, defaultMessage);
+	}
+	
+	protected final ObjectError createTooLargeImageError(BindingResult result, long fileSize, 
+			String fieldName, String defaultMessage) {
+		final String formatFileSize = StringUtils.formatFileSize(this.dataSetting.getImageMaxFileSize());
+		final Object[] messageArguments = new Object[] { formatFileSize };
+		
+		return this.createFieldError(result, fieldName, "too.large", messageArguments, defaultMessage);
+	}
+	
+	protected final ObjectError createInvalidMediaError(BindingResult result, String fileContentType,
+			String fieldName, String defaultMessage) {
+		final String supportMediaExtensions = String.join(", ", this.dataSetting.getMediaFileExtensions());
+		final Object[] messageArguments = new String[] { supportMediaExtensions };
+		
+		return this.createFieldError(result, fieldName, "invalid", messageArguments, defaultMessage);
+	}
+	
+	protected final ObjectError createTooLargeMediaError(BindingResult result, long fileSize, 
+			String fieldName, String defaultMessage) {
+		final String formatFileSize = StringUtils.formatFileSize(this.dataSetting.getMediaMaxFileSize());
+		final Object[] messageArguments = new Object[] { formatFileSize };
+		
+		return this.createFieldError(result, fieldName, "too.large", messageArguments, defaultMessage);
 	}
 	
 	protected final ObjectError createIdNotFoundError(BindingResult result, Integer id) {
-		return new ObjectError(result.getObjectName(), new String[] { "error.id.not.found" }, null, "Not found");
+		final Object[] messageArguments = id == null || id.intValue() <= 0 ? null : new Integer[] { id };
+		
+		return new ObjectError(result.getObjectName(), new String[] { "error.id.not.found" }, 
+				messageArguments, "Not found");
 	}
 	
 	protected final ObjectError createProcessingError(BindingResult result) {
@@ -470,10 +673,14 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	/********************* PROCESS UPLOAD FILES *******************************************/
 	/**************************************************************************************/
 	protected Path processUploadImageFile(final MultipartFile uploadImageFile, BindingResult result) {
-		if (!this.isValidImageFileSize(uploadImageFile.getSize())) {
-        	final ObjectError error = this.createFieldError(result, "image", "too.large", "Image is too large");
+		final String uploadFileName = uploadImageFile.getOriginalFilename();
+		final long uploadFileSize = uploadImageFile.getSize();
+		
+		if (!this.isValidImageFileSize(uploadFileSize)) {
+			final ObjectError error = this.createTooLargeImageError(result, uploadFileSize, "image", "Image is too large");
         	result.addError(error);
         	
+			this.logger.error("Image file {0} with size {1} is too large!", uploadFileName, uploadFileSize);
         	return null;
         }
 		
@@ -485,13 +692,14 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
         	return null;
         }
         
-        final String imageContentType = this.getFileContentType(uploadImageFilePath);
-        if (StringUtils.isNullOrSpace(imageContentType) || !this.isValidImageContentType(imageContentType)) {
+        final String uploadContentType = this.getFileContentType(uploadImageFilePath, this.dataSetting.getImageMimeTypes());
+        if (StringUtils.isNullOrSpace(uploadContentType) || !this.isValidImageContentType(uploadContentType)) {
         	this.deleteUploadFile(uploadImageFilePath);
         	
-        	final ObjectError error = this.createFieldError(result, "image", "invalid", "Image is invalid");
+        	final ObjectError error = this.createInvalidImageError(result, uploadContentType, "image", "Image is invalid");
         	result.addError(error);
         	
+        	this.logger.error("Image file {0} with content type {1} is invalid!", uploadFileName, uploadContentType);
         	return null;
         }
         
@@ -499,11 +707,14 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	protected Path processUploadContentFile(final MultipartFile uploadContentFile, BindingResult result) {
-		final long contentFileSize = uploadContentFile.getSize();
-		if (!this.isValidMediaFileSize(contentFileSize)) {
-        	final ObjectError error = this.createFieldError(result, "contentFile", "too.large", "Content file is too large");
+		final String uploadFileName = uploadContentFile.getOriginalFilename();
+		final long uploadFileSize = uploadContentFile.getSize();
+		
+		if (!this.isValidMediaFileSize(uploadFileSize)) {
+			final ObjectError error = this.createTooLargeImageError(result, uploadFileSize, "contentFile", "Content file is too large");
         	result.addError(error);
         	
+        	this.logger.error("Content file {0} with size {1} is too large!", uploadFileName, uploadFileSize);
         	return null;
         }
 		
@@ -515,41 +726,45 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
         	return null;
         }
         
-        final String contentFileContentType = this.getFileContentType(uploadContentFilePath);
-        if (StringUtils.isNullOrSpace(contentFileContentType)) {
+        final String uploadContentType = this.getFileContentType(uploadContentFilePath, this.dataSetting.getMediaMimeTypes());
+        if (StringUtils.isNullOrSpace(uploadContentType)) {
         	this.deleteUploadFile(uploadContentFilePath);
         	
-        	final ObjectError error = this.createFieldError(result, "contentFile", "invalid", "Content file is invalid");
+        	final ObjectError error = this.createInvalidMediaError(result, uploadContentType, "contentFile", "Content file is invalid");
         	result.addError(error);
         	
+        	this.logger.error("Content file {0} with content type {1} is invalid!", uploadFileName, uploadContentType);
         	return null;
         }
         
         // Validate content type and file size
-        if (this.isValidAudioContentType(contentFileContentType)) {
-        	if (!this.isValidAudioFileSize(contentFileSize)) {
+        if (this.isValidAudioContentType(uploadContentType)) {
+        	if (!this.isValidAudioFileSize(uploadFileSize)) {
             	this.deleteUploadFile(uploadContentFilePath);
             	
-            	final ObjectError error = this.createFieldError(result, "contentFile", "too.large", "Content file is too large");
+            	final ObjectError error = this.createTooLargeImageError(result, uploadFileSize, "contentFile", "Content audio file is too large");
             	result.addError(error);
             	
+            	this.logger.error("Content audio file {0} with size {1} is too large!", uploadFileName, uploadFileSize);
             	return null;
             }
-        } else if (this.isValidVideoContentType(contentFileContentType)) {
-        	if (!this.isValidVideoFileSize(contentFileSize)) {
+        } else if (this.isValidVideoContentType(uploadContentType)) {
+        	if (!this.isValidVideoFileSize(uploadFileSize)) {
             	this.deleteUploadFile(uploadContentFilePath);
             	
-            	final ObjectError error = this.createFieldError(result, "contentFile", "too.large", "Content file is too large");
+            	final ObjectError error = this.createTooLargeImageError(result, uploadFileSize, "contentFile", "Content video file is too large");
             	result.addError(error);
             	
+            	this.logger.error("Content video file {0} with size {1} is too large!", uploadFileName, uploadFileSize);
             	return null;
             }
         } else {
         	this.deleteUploadFile(uploadContentFilePath);
         	
-        	final ObjectError error = this.createFieldError(result, "contentFile", "invalid", "Content file is invalid");
+        	final ObjectError error = this.createInvalidMediaError(result, uploadContentType, "contentFile", "Content file is invalid");
         	result.addError(error);
         	
+        	this.logger.error("Content file {0} with content type {1} is invalid!", uploadFileName, uploadContentType);
         	return null;
         }
         
@@ -613,12 +828,63 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return false;
 	}
 	
-	protected String getFileContentType(final Path filePath) {
+	protected String getFileContentType(final Path filePath, Set<String> validContentTypes) {
 		try {
 			final String contentType = Files.probeContentType(filePath);
 			
-			return contentType == null ? null : contentType.toLowerCase();
-		} catch (IOException ex) {
+			if (!StringUtils.isNullOrSpace(contentType) && validContentTypes.contains(contentType)) {
+				return contentType.toLowerCase();
+			}
+		} catch (Exception ex) {
+			this.logger.error("Cannot retrieve file mime type", ex);
+		}
+		
+		try {
+			final File file = filePath.toFile();
+			final String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
+			
+			if (!StringUtils.isNullOrSpace(contentType) && validContentTypes.contains(contentType)) {
+				return contentType.toLowerCase();
+			}
+		} catch (Exception ex) {
+			this.logger.error("Cannot retrieve file mime type", ex);
+		}
+		
+		try {
+			final String fileAbsolutePath = filePath.toFile().getAbsolutePath();
+			final String contentType = URLConnection.guessContentTypeFromName(fileAbsolutePath);
+			
+			if (!StringUtils.isNullOrSpace(contentType) && validContentTypes.contains(contentType)) {
+				return contentType.toLowerCase();
+			}
+		} catch (Exception ex) {
+			this.logger.error("Cannot retrieve file mime type", ex);
+		}
+		
+		try {
+			final String fileName = filePath.toFile().getName();
+			final String contentType = URLConnection.getFileNameMap().getContentTypeFor(fileName);
+			
+			if (!StringUtils.isNullOrSpace(contentType) && validContentTypes.contains(contentType)) {
+				return contentType.toLowerCase();
+			}
+		} catch (Exception ex) {
+			this.logger.error("Cannot retrieve file mime type", ex);
+		}
+		
+		try {
+			final String fileName = filePath.toFile().getName();
+	        final int dotIndex = fileName.lastIndexOf(".");
+	        
+	        if (dotIndex > 0) {
+	        	final String fileExtension = fileName.substring(dotIndex);
+	        	final String mimeType = this.dataSetting.getDefaultMimeTypeMapping(fileExtension);
+	        	
+	        	if (!StringUtils.isNullOrSpace(mimeType) && validContentTypes.contains(mimeType)) {
+					return mimeType.toLowerCase();
+				}
+	        }
+		} catch (Exception ex) {
 			this.logger.error("Cannot retrieve file mime type", ex);
 		}
 		

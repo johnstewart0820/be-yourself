@@ -1,13 +1,17 @@
 package fr.be.your.self.backend.controller;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -24,12 +28,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.SessionDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Session;
 import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.SessionCategoryService;
 import fr.be.your.self.service.SessionService;
+import fr.be.your.self.util.NumberUtils;
 import fr.be.your.self.util.StringUtils;
 
 @Controller
@@ -41,6 +47,16 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
 			+ Constants.FOLDER.MEDIA.SESSION;
+	
+	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
+	
+	static {
+		SORTABLE_COLUMNS.add("title");
+		SORTABLE_COLUMNS.add("subtitle");
+		SORTABLE_COLUMNS.add("duration");
+		SORTABLE_COLUMNS.add("free");
+		SORTABLE_COLUMNS.add("created");
+	}
 	
 	@Autowired
 	private SessionService mainService;
@@ -68,6 +84,16 @@ public class SessionController extends BaseResourceController<Session, Session, 
 		return this.mainService;
 	}
 	
+	@Override
+	protected Set<String> getSortableColumns() {
+		return SORTABLE_COLUMNS;
+	}
+
+	@Override
+	protected String getDefaultSort() {
+		return "title|asc";
+	}
+
 	@Override
 	protected Session newDomain() {
 		return new Session();
@@ -99,9 +125,33 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	}
 	
 	@Override
-	protected void loadDetailForm(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Model model, Map<String, String> searchParams, PageableResponse<Session> pageableDto) throws BusinessException {
+		super.loadListPageOptions(session, request, response, model, searchParams, pageableDto);
+		
+		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll();
+		model.addAttribute("sessionCategories", sessionCategories);
+		
+		final Set<Integer> filterCategoryIds = new HashSet<Integer>();
+		
+		final String categoryIds = searchParams.get("categoryIds");
+		if (!StringUtils.isNullOrSpace(categoryIds)) {
+			final String[] categoryIdValues = categoryIds.split(",");
+			for (String categoryIdValue : categoryIdValues) {
+				final Integer categoryId = NumberUtils.parseInteger(categoryIdValue);
+				if (categoryId != null) {
+					filterCategoryIds.add(categoryId);
+				}
+			}
+		}
+		
+		model.addAttribute("filterCategoryIds", filterCategoryIds);
+	}
+
+	@Override
+	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, Session domain, SessionDto dto) throws BusinessException {
-		super.loadDetailForm(session, request, response, model, domain, dto);
+		super.loadDetailFormOptions(session, request, response, model, domain, dto);
 		
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
@@ -143,16 +193,22 @@ public class SessionController extends BaseResourceController<Session, Session, 
 		model.addAttribute("sessionCategories", sessionCategories);
 	}
 
+	@Override
+	protected PageableResponse<Session> pageableSearch(Map<String, String> searchParams, PageRequest pageable) {
+		// TODO Filter category?
+		return super.pageableSearch(searchParams, pageable);
+	}
+
 	@PostMapping("/create")
 	@Transactional
     public String createDomain(
-    		@ModelAttribute @Validated SessionDto dto, 
+    		@Validated @ModelAttribute("dto") SessionDto dto, 
     		@RequestParam(value = "categoryIds" , required = false) int[] categoryIds,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
         if (result.hasErrors()) {
-        	return this.getFormView();
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
         // ====> Session category
@@ -165,7 +221,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	final ObjectError error = this.createFieldError(result, "image", "required", "Image is required");
         	result.addError(error);
         	
-        	return this.getFormView();
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
         final MultipartFile uploadContentFile = dto.getUploadContentFile();
@@ -173,26 +229,26 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	final ObjectError error = this.createFieldError(result, "contentFile", "required", "Content file is required");
         	result.addError(error);
         	
-        	return this.getFormView();
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
         // ====> Process upload image and content file
         final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
         if (uploadImageFilePath == null) {
-        	return this.getFormView();
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
         final Path uploadContentFilePath = this.processUploadContentFile(uploadContentFile, result);
         if (uploadContentFilePath == null) {
         	this.deleteUploadFile(uploadImageFilePath);
         	
-        	return this.getFormView();
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
         // ====> Update domain
         final String uploadFileName = uploadImageFilePath.getFileName().toString();
         final String uploadContentFileName = uploadContentFilePath.getFileName().toString();
-        final String contentFileContentType = this.getFileContentType(uploadContentFilePath);
+        final String contentFileContentType = this.getFileContentType(uploadContentFilePath, this.dataSetting.getMediaMimeTypes());
         
         final Session domain = this.newDomain();
         dto.copyToDomain(domain);
@@ -214,7 +270,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	        	result.addError(error);
         	}
         	
-        	return this.getFormView();
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
@@ -227,14 +283,14 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	@Transactional
     public String updateDomain(
     		@PathVariable("id") Integer id, 
-    		@ModelAttribute @Validated SessionDto dto, 
+    		@Validated @ModelAttribute("dto") SessionDto dto, 
     		@RequestParam(value = "categoryIds" , required = false) int[] categoryIds,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
         if (result.hasErrors()) {
         	dto.setId(id);
-        	return this.getFormView();
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
         Session domain = this.mainService.getById(id);
@@ -243,7 +299,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	result.addError(error);
         	
         	dto.setId(id);
-        	return this.getFormView();
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
         dto.copyToDomain(domain);
@@ -268,7 +324,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
             if (uploadImageFilePath == null) {
             	dto.setId(id);
-            	return this.getFormView();
+            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
             }
             
             final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
@@ -285,7 +341,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
     			this.deleteUploadFile(uploadImageFilePath);
     			
             	dto.setId(id);
-            	return this.getFormView();
+            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         	}
         	
         	final String uploadContentFileName = uploadContentFilePath.getFileName().toString();
@@ -300,7 +356,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         	this.deleteUploadFile(uploadContentFilePath);
         	
         	dto.setId(id);
-        	return this.getFormView();
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
         // ====> Success, delete old image file

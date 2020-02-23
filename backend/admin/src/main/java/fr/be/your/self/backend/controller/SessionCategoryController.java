@@ -3,6 +3,8 @@ package fr.be.your.self.backend.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +43,12 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
 			+ Constants.FOLDER.MEDIA.SESSION_CATEGORY;
 	
+	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
+	
+	static {
+		SORTABLE_COLUMNS.add("name");
+	}
+	
 	@Autowired
 	private SessionCategoryService mainService;
 	
@@ -65,6 +73,16 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	}
 	
 	@Override
+	protected Set<String> getSortableColumns() {
+		return SORTABLE_COLUMNS;
+	}
+
+	@Override
+	protected String getDefaultSort() {
+		return "name|asc";
+	}
+
+	@Override
 	protected SessionCategory newDomain() {
 		return new SessionCategory();
 	}
@@ -85,9 +103,9 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	}
 	
 	@Override
-	protected void loadDetailForm(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, SessionCategory domain, SessionCategoryDto dto) throws BusinessException {
-		super.loadDetailForm(session, request, response, model, domain, dto);
+		super.loadDetailFormOptions(session, request, response, model, domain, dto);
 		
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());

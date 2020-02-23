@@ -31,7 +31,14 @@ b, strong {
 }
 
 .form-title-label {
-	padding-top: 10px;
+	/*padding-top: 10px;*/
+}
+
+.form-search-container {
+	color: #495057;
+    border-top: 1px solid #dee2e6;
+    margin-top: 12px;
+    padding-top: 10px;
 }
 
 /********* Modal *************/
@@ -61,6 +68,8 @@ b, strong {
 	color: #fff;
 }
 
+.modal-dialog .modal-header-primary svg rect,
+.modal-primary .modal-header svg rect,
 .toast-primary .toast-header svg rect {
 	fill: #2038c1;	/* 30% darker */
 }
@@ -69,7 +78,8 @@ b, strong {
 	background-color: #f7fafc; 
 	color: #212529;
 }
-
+.modal-dialog .modal-header-secondary svg rect,
+.modal-secondary .modal-header svg rect,
 .toast-secondary .toast-header svg rect {
 	fill: #8ab5d3;	/* 30% darker */
 }
@@ -79,6 +89,8 @@ b, strong {
 	color: #fff;
 }
 
+.modal-dialog .modal-header-success svg rect,
+.modal-success .modal-header svg rect,
 .toast-success .toast-header svg rect {
 	fill: #1f905f;	/* 30% darker */
 }
@@ -88,6 +100,8 @@ b, strong {
 	color: #fff;
 }
 
+.modal-dialog .modal-header-info svg rect,
+.modal-info .modal-header svg rect,
 .toast-info .toast-header svg rect {
 	fill: #0b8fa7;	/* 30% darker */
 }
@@ -97,6 +111,8 @@ b, strong {
 	color: #fff;
 }
 
+.modal-dialog .modal-header-warning svg rect,
+.modal-warning .modal-header svg rect,
 .toast-warning .toast-header svg rect {
 	fill: #d72c04;	/**30% darker */
 }
@@ -106,6 +122,34 @@ b, strong {
 	color: #fff;
 }
 
+.modal-dialog .modal-header-danger svg rect,
+.modal-danger .modal-header svg rect,
 .toast-danger .toast-header svg rect {
 	fill: #c7092f;	/**30% darker */
+}
+
+/********* Table *************/
+table.dataTable thead .sorting:before, 
+table.dataTable thead .sorting_asc:before, 
+table.dataTable thead .sorting_desc:before, 
+table.dataTable thead .sorting_asc_disabled:before, 
+table.dataTable thead .sorting_desc_disabled:before {
+	padding-bottom: 0.25rem;	
+}
+
+table.dataTable thead .sorting:after, 
+table.dataTable thead .sorting_asc:after, 
+table.dataTable thead .sorting_desc:after, 
+table.dataTable thead .sorting_asc_disabled:after, 
+table.dataTable thead .sorting_desc_disabled:after {
+    padding-bottom: .25rem;
+}
+
+table.dataTable td.action-column {
+	text-align: right !important;
+}
+
+table.dataTable td.action-column .btn {
+	/*padding: .625rem 1.25rem;*/
+	padding: .5rem .8rem;	
 }

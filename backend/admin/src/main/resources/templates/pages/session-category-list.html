@@ -49,12 +49,12 @@
 					</div>
 					
 					<div class="table-responsive">
-						<table class="table align-items-center table-flush">
+						<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
 							<thead class="thead-light">
 								<tr>
 									<th scope="col" width="80%" th:text="#{|${baseMessageKey}.detail.name|}"></th>
-									<th scope="col" width="10%" th:text="#{|${baseMessageKey}.detail.session.count|}"></th>
-									<th scope="col" th:if="${readPermission}"></th>
+									<th scope="col" class="no-sort" width="10%" th:text="#{|${baseMessageKey}.detail.session.count|}"></th>
+									<th scope="col" class="no-sort" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -109,41 +109,29 @@
 			</div>
 		</div>
 		
-		<div class="modal fade" id="confirm-delete-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="deleteConfirmModal" aria-hidden="true" data-backdrop="false">
-			<div class="modal-dialog modal-dialog-centered modal-7" role="document">
-				<div class="modal-content">
-					<form id="confirm-delete-form" action="javascript:;" method="POST">
-						<div class="modal-header modal-header-danger">
-							<h3 class="modal-title" id="confirm-delete-modal-title" th:utext="#{modal.confirm.delete.title}"></h3>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">×</span>
-							</button>
-						</div>
-						<div class="modal-body">
-							<p th:utext="#{modal.confirm.delete.message(#{${baseMessageKey} + '.name'})}"></p>
-						</div>
-						<div class="modal-footer">
-							<button type="submit" class="btn btn-danger" th:utext="#{modal.button.yes}">Yes</button>
-	                		<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal" th:utext="#{modal.button.no}">No</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
+		<th:block th:replace="fragments/data-list-modals :: modals"></th:block>
 	</th:block>
 
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
+			const sortableColumnMaps = { 'name': 0, 'created': -1 };
+					
 			function confirmDelete(id) {
-				var url = '[[${baseURL}]]/delete/' + id;
+				const deleteUrl = '[[${baseURL}]]/delete/' + id;
 				
-				$('#confirm-delete-form').attr('action', url);
+				$('#confirm-delete-form').attr('action', deleteUrl);
 				showModal('confirm-delete-modal');
 			}
 			
 			$(function() {
-				$('#on-load-toast').toast('show');
+				const dataTableId = '[[${pageName}]]-data-table'; 
+				const defaultSort = '[[${sort}]]';
+				const sortUrl = '[[${baseURL}]]/current-page?sort=';
+				
+				buildDataTable(dataTableId, sortableColumnMaps, defaultSort, sortUrl);
+				
+				showModal('on-load-modal', 5000);
+				//$('#on-load-toast').toast('show');
 			});
 		</script>
 	</th:block>
