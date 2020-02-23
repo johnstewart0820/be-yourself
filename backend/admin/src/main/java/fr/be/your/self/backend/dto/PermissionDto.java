@@ -40,6 +40,21 @@ public class PermissionDto {
 		return permission == UserPermission.WRITE.getValue();
 	}
 	
+	public int getPermission(String path) {
+		if (path == null || path.isEmpty()) {
+			return UserPermission.DENIED.getValue();
+		}
+		
+		final String funcPath = (path.startsWith("/") ? "" : "/") + path.toLowerCase();
+		final Integer permission = this.userPermissions.get(funcPath);
+		
+		if (permission == null) {
+			return UserPermission.DENIED.getValue();
+		}
+		
+		return permission.intValue();
+	}
+	
 	public void addPermission(String path, int permission) {
 		this.userPermissions.put(path.toLowerCase(), permission);
 	}

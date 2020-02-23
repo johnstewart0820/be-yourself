@@ -108,7 +108,15 @@ public class AdminApplication implements CommandLineRunner {
 				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 			}
 			
-			// Session category management
+			// Subscription type management
+			{
+				final String path = "/subtype";
+				final String name = "Subscription Type Management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			
+			// Session group management
 			{
 				final String path = "/session-category";
 				final String name = "Session Category";

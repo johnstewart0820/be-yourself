@@ -110,7 +110,7 @@
 									<th scope="col">Status</th>
 									<th scope="col">Subscription Type</th>
 									<th scope="col">Role</th>
-									<th scope="col">Action</th>
+									<th scope="col"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -125,7 +125,8 @@
 
 									<td scope="col">Subscription Type</td>
 									<td th:text="${user.userTypeDescription}"></td>
-									<td class="text-right">
+									
+									<!-- td class="text-right">
 										<div class="dropdown">
 											<a class="btn btn-sm btn-icon-only text-light" href="#"
 												role="button" data-toggle="dropdown" aria-haspopup="true"
@@ -139,6 +140,21 @@
 													th:href="@{/user/{id}/delete(id=${user.id})}">Delete</a>
 											</div>
 										</div>
+									</td-->
+									
+									<td class="text-right" th:if="${writePermission}">
+										<a class="btn btn-icon btn-2 btn-primary" th:href="@{/user/{id}/update(id=${user.id})}" th:title="#{action.edit.title}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-edit"></i>
+											</span>
+										</a>
+										
+										<button class="btn btn-icon btn-2 btn-danger" type="button" 
+											th:title="#{action.delete.title}" th:onclick="confirmDelete([[${user.id}]])">
+											<span class="btn-inner--icon">
+												<i class="fas fa-times"></i>
+											</span>
+										</button>
 									</td>
 								</tr>
 							</tbody>
@@ -178,6 +194,36 @@
 		</div>
 		<!-- End table -->
 
+		<div class="modal fade" id="confirm-delete-modal" tabindex="-1"
+			role="dialog" aria-labelledby="deleteConfirmModal" aria-hidden="true"
+			data-backdrop="false">
+			<div class="modal-dialog modal-dialog-centered modal-7"
+				role="document">
+				<div class="modal-content">
+					<form id="confirm-delete-form" action="javascript:;" method="POST">
+						<div class="modal-header modal-header-danger">
+							<h3 class="modal-title" id="confirm-delete-modal-title"
+								th:utext="#{modal.confirm.delete.title}"></h3>
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p
+								th:utext="#{modal.confirm.delete.message(#{${baseMessageKey} + '.name'})}"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-danger"
+								th:utext="#{modal.button.yes}">Yes</button>
+							<button type="button" class="btn btn-secondary ml-auto"
+								data-dismiss="modal" th:utext="#{modal.button.no}">No</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
 	</div>
 	
 	
@@ -198,6 +244,12 @@
 	</script>	
 	<script>
 	var select_all = false;
+	function confirmDelete(id) {
+		var url = '/user/' + id + '/delete';
+		
+		$('#confirm-delete-form').attr('action', url);
+		showModal('confirm-delete-modal');
+	}
 	
 	$(document).ready(function() {
 		  $('#user_table').DataTable({

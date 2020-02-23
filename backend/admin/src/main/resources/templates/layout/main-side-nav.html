@@ -117,11 +117,18 @@
 		  		</li>
 		  		
 		  		<th:block sec:authorize="hasAnyRole('ROLE_SAM', 'ROLE_ADM')">
-			  		<li class="nav-item" sec:authorize="hasAnyRole('ROLE_SAM','ROLE_ADM')">
+			  		<li class="nav-item">
 						<a class="nav-link" th:href="@{/user/management}">
 				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.user.management}"></span>
 						</a>
 			  		</li>
+
+		  			<li class="nav-item" th:if="${permission.hasPermission('/subtype')}">
+						<a class="nav-link" th:href="@{/subtype/current-page}">
+				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.subscriptions.type}"></span>
+						</a>
+					</li>
+							
 			  		
 			  		<th:block th:if="${permission != null}">
 			  			<li class="nav-item" th:if="${permission.hasPermission('/session-category')}">
