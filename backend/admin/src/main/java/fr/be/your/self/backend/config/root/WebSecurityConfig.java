@@ -56,7 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final String LOGOUT_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGOUT;
 	private static final String ACTIVATE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACTIVATE;
 	
-	private static final String ACCESS_DENIED_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACCESS_DENIED;
+	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 	
 	private static final String API_URL_PREFIX = Constants.PATH.API_PREFIX + "/";
 	
@@ -155,9 +155,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/", "/home", "/about", "/error", "/test").permitAll()
 			.and()
         		.authorizeRequests()
-        			.antMatchers("/admin/**").hasAnyRole(UserType.SUPER_ADMIN.getValue(), UserType.ADMIN.getValue())
-        			.antMatchers("/user/**").hasAnyRole(UserType.USER.getValue())
-        			.anyRequest().permitAll() // .hasRole("USER")
+        			//.antMatchers("/admin/**").hasAnyRole(UserType.SUPER_ADMIN.getValue(), UserType.ADMIN.getValue())
+        			//.antMatchers("/user/**").hasAnyRole(UserType.USER.getValue())
+        			.anyRequest().hasRole(UserType.USER.getValue())
         	.and()
         		.exceptionHandling()
             		.accessDeniedHandler(this.accessDeniedHandler())

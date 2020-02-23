@@ -30,6 +30,10 @@ b, strong {
 	min-height: 50px;
 }
 
+.form-title-label {
+	padding-top: 10px;
+}
+
 /********* Modal *************/
 .modal-header.modal-header-warning {
 	background-color: #fb6340; 

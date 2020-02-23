@@ -98,9 +98,8 @@
 			<form th:if="${baseURL != null && baseURL != ''}" 
 				role="form" th:action="${baseURL} + '/search'" method="get" class="mt-4 mb-3 d-md-none">
 		  		<div class="input-group input-group-rounded input-group-merge">
-					<input type="search" name="q" 
-						class="form-control form-control-rounded form-control-prepended" aria-label="Search" 
-						th:placeholder="#{search.placeholder}">
+					<input type="search" name="q" class="form-control form-control-rounded form-control-prepended" 
+						aria-label="Search" th:placeholder="#{search.placeholder}" th:value="${search}">
 					<div class="input-group-prepend">
 			  			<div class="input-group-text">
 							<span class="fa fa-search"></span>

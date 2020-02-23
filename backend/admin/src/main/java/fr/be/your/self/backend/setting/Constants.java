@@ -2,6 +2,12 @@ package fr.be.your.self.backend.setting;
 
 public final class Constants {
 	
+	public static interface MEDIA_TYPE {
+		public static final String IMAGE = "image";
+		public static final String AUDIO = "audio";
+		public static final String VIDEO = "video";
+	}
+	
 	public static interface FOLDER {
 		public static interface MEDIA {
 			public static final String AVATAR = "/avatar";
@@ -18,6 +24,9 @@ public final class Constants {
 		/** Never change the value when using OAuth2 */
 		public static final String AUTHENTICATION_PREFIX = "/oauth";
 		
+		public static final String ACCESS_DENIED = "/403";
+		public static final String ERROR = "/error";
+		
 		public static interface AUTHENTICATION {
 			/** Never change the value when using OAuth2 */
 			public static final String AUTHORIZE = "/authorize";
@@ -27,7 +36,6 @@ public final class Constants {
 			
 			public static final String LOGIN = "/login";
 			public static final String LOGOUT = "/logout";
-			public static final String ACCESS_DENIED = "/403";
 			
 			public static final String REGISTER = "/register";
 			public static final String ACTIVATE = "/activate";

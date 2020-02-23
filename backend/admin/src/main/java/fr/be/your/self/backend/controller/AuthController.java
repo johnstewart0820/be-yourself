@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -109,21 +108,19 @@ public class AuthController {
     public String sendActivatePage(
     		@RequestParam(name = "email", required = false) String email,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
-		
-		if (result.hasErrors()) {
-			return "pages/auth-activate-error";
-		}
+    		RedirectAttributes redirectAttributes, Model model) {
 		
 		if (StringUtils.isNullOrSpace(email)) {
-			model.addAttribute("formError", "invalid.email");
+			model.addAttribute("errorFormKey", "invalid.email");
+			model.addAttribute("errorFormValue", "");
 			
 			return "pages/auth-activate-error";
 		}
 		
 		final User user = this.userService.getByEmail(email);
 		if (user == null || user.getStatus() != UserStatus.ACTIVE.getValue()) {
-			model.addAttribute("formError", "invalid.email");
+			model.addAttribute("errorFormKey", "invalid.email");
+			model.addAttribute("errorFormValue", email);
 			
 			return "pages/auth-activate-error";
 		}
@@ -138,14 +135,14 @@ public class AuthController {
 		try {
 			savedUser = this.userService.saveOrUpdate(user);
 			if (savedUser == null) {
-				model.addAttribute("formError", "unknown");
+				model.addAttribute("errorFormKey", "unknown");
 				
 				return "pages/auth-activate-error";
 			}
 		} catch (Exception ex) {
 			logger.error("Send activate code error", ex);
 			
-			model.addAttribute("formError", "unknown");
+			model.addAttribute("errorFormKey", "unknown");
 			return "pages/auth-activate-error";
 		}
 		
@@ -163,10 +160,10 @@ public class AuthController {
 		this.emailSender.sendActivateUser(savedUser.getEmail(), 
 				activateAccountUrl, savedUser.getActivateCode());
 		
-		return "redirect:/";
+		return "pages/auth-send-activate-success";
     }
 	
-	@GetMapping(Constants.PATH.AUTHENTICATION.ACCESS_DENIED)
+	@GetMapping(Constants.PATH.ACCESS_DENIED)
     public String accessDeninedPage(Model model) {
         return "error/403";
     }

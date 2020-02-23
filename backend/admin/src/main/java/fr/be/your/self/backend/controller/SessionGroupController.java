@@ -3,7 +3,6 @@ package fr.be.your.self.backend.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -89,7 +88,7 @@ public class SessionGroupController extends BaseResourceController<SessionGroup,
 			Model model, SessionGroupDto dto) throws BusinessException {
 		super.loadDetailForm(session, request, response, model, dto);
 		
-		final String supportImageTypes = String.join(",", this.dataSetting.getImageMediaTypes());
+		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
 		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
 		

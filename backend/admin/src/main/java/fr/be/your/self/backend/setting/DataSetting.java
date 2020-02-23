@@ -24,12 +24,12 @@ public class DataSetting {
 	private Set<String> imageFileExtensions;
 	private Set<String> audioFileExtensions;
 	private Set<String> videoFileExtensions;
-	private Set<String> mediaFileExtensions;
+	private Set<String> mediaFileExtensions;		// include audioFileExtensions and videoFileExtensions
 	
-	private Set<String> imageMediaTypes;
-	private Set<String> audioMediaTypes;
-	private Set<String> videoMediaTypes;
-	private Set<String> supportMediaTypes;
+	private Set<String> imageMimeTypes;
+	private Set<String> audioMimeTypes;
+	private Set<String> videoMimeTypes;
+	private Set<String> mediaMimeTypes;				// include audioMimeTypes and videoMimeTypes
 	
 	private boolean displayHeaderOnAuthPage;
 	private boolean allowRegisterOnAuthPage;
@@ -99,20 +99,20 @@ public class DataSetting {
 		return mediaFileExtensions == null ? Collections.emptySet() : this.mediaFileExtensions;
 	}
 
-	public Set<String> getImageMediaTypes() {
-		return imageMediaTypes == null ? Collections.emptySet() : this.imageMediaTypes;
+	public Set<String> getImageMimeTypes() {
+		return imageMimeTypes == null ? Collections.emptySet() : this.imageMimeTypes;
 	}
 
-	public Set<String> getAudioMediaTypes() {
-		return audioMediaTypes == null ? Collections.emptySet() : this.audioMediaTypes;
+	public Set<String> getAudioMimeTypes() {
+		return audioMimeTypes == null ? Collections.emptySet() : this.audioMimeTypes;
 	}
 
-	public Set<String> getVideoMediaTypes() {
-		return videoMediaTypes == null ? Collections.emptySet() : this.videoMediaTypes;
+	public Set<String> getVideoMimeTypes() {
+		return videoMimeTypes == null ? Collections.emptySet() : this.videoMimeTypes;
 	}
 
-	public Set<String> getSupportMediaTypes() {
-		return supportMediaTypes == null ? Collections.emptySet() : this.supportMediaTypes;
+	public Set<String> getMediaMimeTypes() {
+		return mediaMimeTypes == null ? Collections.emptySet() : this.mediaMimeTypes;
 	}
 
 	public boolean isDisplayHeaderOnAuthPage() {
@@ -156,17 +156,17 @@ public class DataSetting {
 		}
 	}
 	
-	public void setUploadMediaTypes(Set<String> imageMediaTypes, Set<String> audioMediaTypes, Set<String> videoMediaTypes) {
-		this.imageMediaTypes = imageMediaTypes;
-		this.audioMediaTypes = audioMediaTypes;
-		this.videoMediaTypes = videoMediaTypes;
+	public void setUploadMimeTypes(Set<String> imageMimeTypes, Set<String> audioMimeTypes, Set<String> videoMimeTypes) {
+		this.imageMimeTypes = imageMimeTypes;
+		this.audioMimeTypes = audioMimeTypes;
+		this.videoMimeTypes = videoMimeTypes;
 		
-		this.supportMediaTypes = new HashSet<String>();
-		if (this.audioMediaTypes != null) {
-			this.supportMediaTypes.addAll(this.audioMediaTypes);
+		this.mediaMimeTypes = new HashSet<String>();
+		if (this.audioMimeTypes != null) {
+			this.mediaMimeTypes.addAll(this.audioMimeTypes);
 		}
-		if (this.videoMediaTypes != null) {
-			this.supportMediaTypes.addAll(this.videoMediaTypes);
+		if (this.videoMimeTypes != null) {
+			this.mediaMimeTypes.addAll(this.videoMimeTypes);
 		}
 	}
 	

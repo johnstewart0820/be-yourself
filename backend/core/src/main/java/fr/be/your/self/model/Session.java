@@ -39,6 +39,9 @@ public class Session extends PO<Integer> {
 	@Column(name = "ContentFile", length = 255)
 	private String contentFile;
 
+	@Column(name = "ContentMimeType", length = 50)
+	private String contentMimeType;
+	
 	@Column(name = "Duration")
 	private int duration;
 
@@ -96,6 +99,14 @@ public class Session extends PO<Integer> {
 
 	public void setContentFile(String contentFile) {
 		this.contentFile = contentFile;
+	}
+
+	public String getContentMimeType() {
+		return contentMimeType;
+	}
+
+	public void setContentMimeType(String contentMimeType) {
+		this.contentMimeType = contentMimeType;
 	}
 
 	public int getDuration() {

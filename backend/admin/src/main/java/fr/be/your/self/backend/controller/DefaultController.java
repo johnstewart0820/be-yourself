@@ -1,7 +1,10 @@
 package fr.be.your.self.backend.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import fr.be.your.self.backend.setting.Constants;
 
 @Controller
 public class DefaultController extends BaseController {
@@ -26,13 +29,17 @@ public class DefaultController extends BaseController {
         return "about";
     }
 
-    @GetMapping("/403")
-    public String error403() {
-        return "error/403";
+    @GetMapping(Constants.PATH.ACCESS_DENIED)
+    public String accessDenied(Model model) {
+        return this.error(model);
     }
     
-    @GetMapping("/error")
-    public String error() {
+    @GetMapping(Constants.PATH.ERROR)
+    public String error(Model model) {
+    	model.addAttribute("displayHeader", this.dataSetting.isDisplayHeaderOnAuthPage());
+		model.addAttribute("allowRegister", this.dataSetting.isAllowRegisterOnAuthPage());
+		model.addAttribute("allowSocial", this.dataSetting.isAllowSocialOnAuthPage());
+		
         return "error/403";
     }
 }

@@ -12,8 +12,9 @@ function previewImage(inputElement, previewElementId) {
 	reader.readAsDataURL(inputElement.files[0]);
 }
 
-function validateAndPreviewImage(inputElement, previewElementId, labelElementId, defaultLabel, 
-		supportFileType, maxFileSize, fileTypeModalId, fileSizeModalId) {
+function validateAndPreviewImage(inputElement, 
+		previewElementId, labelElementId, defaultLabel, 
+		supportFileTypes, maxFileSize, fileTypeModalId, fileSizeModalId) {
 	
 	if (!inputElement.files || !inputElement.files[0]) {
 		return null;
@@ -24,7 +25,7 @@ function validateAndPreviewImage(inputElement, previewElementId, labelElementId,
     var fileSize = file.size;
     var fileName = file.name;
     
-    if (supportFileType && supportFileType.indexOf(fileType) < 0) {
+    if (supportFileTypes && supportFileTypes.indexOf(fileType) < 0) {
     	resetImageElement(inputElement, previewElementId, labelElementId, defaultLabel);
     	
     	showModal(fileTypeModalId);
@@ -57,12 +58,169 @@ function resetImageElement(inputElement, previewElementId, labelElementId, defau
 	}
 	
 	if (previewElementId) {
-		var defaultSrc = $('#' + previewElementId).attr('default-src');
+		var defaultSrc = $(inputElement).attr('default-src');
 		
 		if (defaultSrc) {
 			$('#' + previewElementId).attr('src', defaultSrc);
 		}
 	}
+}
+
+function validateAndPreviewMedia(inputElement, 
+		audioPlayer, audioContainerElementId, audioPlayerElementId, 
+		audioSupportFileTypes, audioSupportExtensions, 
+		videoPlayer, videoContainerElementId, videoPlayerElementId, 
+		videoSupportFileTypes, videoSupportExtensions,
+		labelElementId, defaultLabel, 
+		supportFileTypes, maxFileSize, fileTypeModalId, fileSizeModalId) {
+	
+	if (!inputElement.files || !inputElement.files[0]) {
+		return null;
+	}
+	
+	if (audioPlayer != null) {
+		audioPlayer.stop();
+		$('#' + audioContainerElementId).hide();
+	}
+
+	if (videoPlayer != null) {
+		videoPlayer.stop();
+		$('#' + videoContainerElementId).hide();
+	}
+
+	const file = inputElement.files[0];
+	const fileType = file.type;
+    const fileSize = file.size;
+    const fileName = file.name;
+	
+    if (supportFileTypes && supportFileTypes.indexOf(fileType) < 0) {
+    	resetMediaElement(inputElement, 
+			audioPlayer, audioContainerElementId, audioPlayerElementId, audioSupportExtensions,  
+			videoPlayer, videoContainerElementId, videoPlayerElementId, videoSupportExtensions,
+			labelElementId, defaultLabel)
+    	
+    	showModal(fileTypeModalId);
+    	
+    	return null;
+    }
+	
+	if (maxFileSize && maxFileSize > 0 && fileSize > maxFileSize) {
+    	resetMediaElement(inputElement, 
+			audioPlayer, audioContainerElementId, audioPlayerElementId, audioSupportExtensions,  
+			videoPlayer, videoContainerElementId, videoPlayerElementId, videoSupportExtensions,
+			labelElementId, defaultLabel)
+    	
+    	showModal(fileSizeModalId);
+    	
+    	return null;
+	}
+	
+	if (audioSupportFileTypes && audioSupportFileTypes.indexOf(fileType) >= 0) {
+		loadLocalAudioSource(audioPlayer, audioContainerElementId, 
+			audioPlayerElementId, file);
+	} else if (videoSupportFileTypes && videoSupportFileTypes.indexOf(fileType) >= 0) {
+		loadLocalVideoSource(videoPlayer, videoContainerElementId, 
+			videoPlayerElementId, file);
+	} else {
+		resetMediaElement(inputElement, 
+			audioPlayer, audioContainerElementId, audioPlayerElementId, audioSupportExtensions,  
+			videoPlayer, videoContainerElementId, videoPlayerElementId, videoSupportExtensions,
+			labelElementId, defaultLabel)
+    	
+    	showModal(fileTypeModalId);
+    	
+    	return null;
+	}
+
+	if (labelElementId) {
+		$('#' + labelElementId).text(fileName);
+	}
+    
+    return fileName;
+}
+
+function resetMediaElement(inputElement, 
+		audioPlayer, audioContainerElementId, audioPlayerElementId, audioSupportExtensions,  
+		videoPlayer, videoContainerElementId, videoPlayerElementId, videoSupportExtensions,
+		labelElementId, defaultLabel) {
+	
+	inputElement.value = null;
+	
+	if (labelElementId && defaultLabel) {
+		$('#' + labelElementId).text(defaultLabel);
+	}
+	
+	const defaultSrc = $(inputElement).attr('default-src');
+	if (defaultSrc) {
+		const defaultMimeType = $(inputElement).attr('default-mime-type');
+		const defaultExt = getFileExtension(defaultSrc);
+		
+		if (defaultExt && defaultExt.length > 0) {
+			if (audioSupportExtensions && audioSupportExtensions.indexOf(defaultExt) >= 0) {
+				changeAudioSource(audioPlayer, audioContainerElementId, 
+					audioPlayerElementId, defaultSrc, defaultMimeType);
+			} else if (videoSupportExtensions && videoSupportExtensions.indexOf(defaultExt) >= 0) {
+				changeVideoSource(videoPlayer, videoContainerElementId, 
+					videoPlayerElementId, defaultSrc, defaultMimeType);
+			}
+		}
+	}
+}
+
+function loadLocalAudioSource(audioPlayer, audioContainerElementId, audioPlayerElementId, file) {
+	const audioMimeType = file.type;
+
+	const reader = new FileReader();
+	reader.onload = function(e) {
+		changeAudioSource(audioPlayer, audioContainerElementId, 
+			audioPlayerElementId, e.target.result, audioMimeType);
+	}
+	
+	reader.readAsDataURL(file);
+}
+
+function loadLocalVideoSource(videoPlayer, videoContainerElementId, videoPlayerElementId, file) {
+	const videoMimeType = file.type;
+
+	const reader = new FileReader();
+	reader.onload = function(e) {
+		changeVideoSource(videoPlayer, videoContainerElementId, 
+			videoPlayerElementId, e.target.result, videoMimeType);
+	}
+	
+	reader.readAsDataURL(file);
+}
+
+function changeAudioSource(audioPlayer, audioContainerElementId, 
+	audioPlayerElementId, audioSource, audioMimeType) {
+	
+	$('#' + audioContainerElementId).show();
+
+	audioPlayer.source = {
+		type: 'audio',
+		sources: [
+			{
+				src: audioSource,
+				type: audioMimeType
+			}
+		]
+	};
+}
+
+function changeVideoSource(videoPlayer, videoContainerElementId, 
+	videoPlayerElementId, videoSource, videoMimeType) {
+	
+	$('#' + videoContainerElementId).show();
+
+	videoPlayer.source = {
+		type: 'video',
+		sources: [ 
+			{
+				src: videoSource,
+				type: videoMimeType
+			}
+		]
+	};
 }
 
 function showModal(modalId) {
@@ -81,4 +239,12 @@ function formatBytes(bytes, decimals) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+function getFileExtension(fileName) {
+	var lastDot = fileName.lastIndexOf('.');
+	if (lastDot < 0) 
+		return null;
+	
+	return fileName.substring(lastDot + 1);
 }

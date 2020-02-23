@@ -21,6 +21,59 @@
         <h2>5. <span th:utext="#{lang.change}"></span>: <a th:href="@{/home?lang=en}" th:text="#{lang.eng}"></a></h2>
         <h2>6. <span th:utext="#{lang.change}"></span>: <a th:href="@{/home?lang=fr}" th:text="#{lang.fr}"></a></h2>
         
+        <audio id="audioPlayer" controls>
+        	<source src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/9473/new_year_dubstep_minimix.ogg" type="audio/ogg">
+        </audio>
+		
+        <video
+                        controls
+                        crossorigin
+                        playsinline
+                        poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg"
+                        id="player"
+                    >
+                        <!-- Video files -->
+                        <source
+                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4"
+                            type="video/mp4"
+                            size="576"
+                        />
+                        <source
+                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4"
+                            type="video/mp4"
+                            size="720"
+                        />
+                        <source
+                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4"
+                            type="video/mp4"
+                            size="1080"
+                        />
+
+                        <!-- Caption files -->
+                        <track
+                            kind="captions"
+                            label="English"
+                            srclang="en"
+                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
+                            default
+                        />
+                        <track
+                            kind="captions"
+                            label="Français"
+                            srclang="fr"
+                            src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt"
+                        />
+
+                        <!-- Fallback for browsers that don't support the <video> element -->
+                        <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download
+                            >Download</a
+                        >
+                    </video>
+		
+		<button type="button" class="btn btn-primary" onclick="stopAudio()">Stop Audio</button>
+		<button type="button" class="btn btn-primary" onclick="stopVideo()">Stop Video</button>
+		<button type="button" class="btn btn-primary" onclick="changeVideoUrls()">Chane Video url</button>
+		
         <button class="btn btn-icon btn-2 btn-danger" type="button" 
 			th:title="#{action.delete.title}" onclick="confirmDelete(1)">
 			<span class="btn-inner--icon">
@@ -56,12 +109,46 @@
 
     <th:block layout:fragment="scripts">
     	<script type="text/javascript">
+    		var audioPlayer;
+			var videoPlayer;
+			
 			function confirmDelete(id) {
 				var url = '[[${baseURL}]]/delete/' + id;
 				
 				$('#confirm-delete-form').attr('action', url);
 				showModal('confirm-delete-modal');
 			}
+			
+
+		    function stopAudio() {
+		    	audioPlayer.stop();
+		    }
+		    
+		    function stopVideo() {
+		    	videoPlayer.stop();
+		    }
+		    
+		    function changeVideoUrls() {
+		    	videoPlayer.source = {
+		    			type: 'video',
+		    			sources: [
+		    				{
+		    					src: 'http://vjs.zencdn.net/v/oceans.mp4',
+		    					type: 'video/mp4'
+		    				}
+		    			]
+		    	};
+		    	     
+		    	videoPlayer.play();		    	     
+		    }
+		    
+		    
+			$(function() {
+			    console.log( "ready!" );
+			    
+			    audioPlayer = new Plyr('#audioPlayer', { invertTime: false });
+			    videoPlayer = new Plyr('#videoPlayer', { invertTime: false });
+			});
 		</script>
     </th:block>
 

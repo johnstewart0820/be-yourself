@@ -2,6 +2,10 @@ package fr.be.your.self.backend.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,20 +38,22 @@ public class MediaController {
         return "user";
     }
 	
-	@GetMapping("/{mediaType}/image/view/{fileName}")
-    public String imageMedia(HttpSession session, HttpServletRequest request, 
+	@GetMapping("/{dataType}/image/view/{fileName}")
+    public String viewImage(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model,
-    		@PathVariable(name="mediaType") String mediaType,
+    		@PathVariable(name="dataType") String dataType,
     		@PathVariable(name="fileName") String fileName) {
 		
-		final String mediaFileName = this.dataSetting.getUploadFolder() + mediaType + "/" + fileName;
+		final String mediaFileName = this.dataSetting.getUploadFolder() + dataType + "/" + fileName;
 		final File mediaFile = new File(mediaFileName);
 		
 		if (!mediaFile.exists()) {
 			return "/";
 		}
 		
-		final String contentType = this.getImageMediaType(fileName);
+		final Path mediaFilePath = Paths.get(mediaFileName);
+		final String contentType = this.getFileContentType(mediaFilePath);
+		
 		try (FileInputStream mediaStream = new FileInputStream(mediaFile)) {
 			response.setContentType(contentType);
 		    IOUtils.copy(mediaStream, response.getOutputStream());
@@ -58,7 +64,80 @@ public class MediaController {
 		return null;
     }
 	
+	@GetMapping("/{dataType}/image/download/{fileName}")
+    public String downloadImage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model,
+    		@PathVariable(name="dataType") String dataType,
+    		@PathVariable(name="fileName") String fileName) {
+		
+		final String mediaFileName = this.dataSetting.getUploadFolder() + dataType + "/" + fileName;
+		final File mediaFile = new File(mediaFileName);
+		
+		if (!mediaFile.exists()) {
+			return "/";
+		}
+		
+		final Path mediaFilePath = Paths.get(mediaFileName);
+		final String contentType = this.getFileContentType(mediaFilePath);
+		
+		try (FileInputStream mediaStream = new FileInputStream(mediaFile)) {
+			response.setContentType(contentType);
+		    IOUtils.copy(mediaStream, response.getOutputStream());
+		} catch (Exception e) {
+			return "/";
+		}
+		
+		return null;
+    }
+	
+	@GetMapping("/{dataType}/media/view/{fileName}")
+    public String mediaImage(HttpSession session, HttpServletRequest request, 
+    		HttpServletResponse response, Model model,
+    		@PathVariable(name="dataType") String dataType,
+    		@PathVariable(name="fileName") String fileName) {
+		
+		final String mediaFileName = this.dataSetting.getUploadFolder() + dataType + "/" + fileName;
+		final File mediaFile = new File(mediaFileName);
+		
+		if (!mediaFile.exists()) {
+			return "/";
+		}
+		
+		final Path mediaFilePath = Paths.get(mediaFileName);
+		final String contentType = this.getFileContentType(mediaFilePath);
+		
+		try (FileInputStream mediaStream = new FileInputStream(mediaFile)) {
+			response.setContentType(contentType);
+		    IOUtils.copy(mediaStream, response.getOutputStream());
+		} catch (Exception e) {
+			return "/";
+		}
+		
+		return null;
+    }
+	
+	/*
 	private String getImageMediaType(String fileName) {
+		final int dotIndex = fileName.lastIndexOf(".");
+        final String fileExtension = dotIndex > 0 ? (fileName.substring(dotIndex) + 1).toLowerCase() : "png";
+        
+		if ("jpg".equalsIgnoreCase(fileExtension) || "jpeg".equalsIgnoreCase(fileExtension)) {
+			return MediaType.IMAGE_JPEG_VALUE;
+		}
+		
+		return MediaType.IMAGE_PNG_VALUE;
+	}
+	*/
+	
+	private String getFileContentType(final Path filePath) {
+		try {
+			final String contentType = Files.probeContentType(filePath);
+			
+			if (contentType != null) 
+				return contentType;
+		} catch (IOException ex) {}
+		
+		final String fileName = filePath.getFileName().toString();
 		final int dotIndex = fileName.lastIndexOf(".");
         final String fileExtension = dotIndex > 0 ? (fileName.substring(dotIndex) + 1).toLowerCase() : "png";
         

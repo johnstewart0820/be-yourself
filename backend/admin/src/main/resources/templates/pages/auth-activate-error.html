@@ -3,9 +3,19 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layout/auth-layout.html}">
 <head>
-	<title th:text="#{auth.activate.error.page}"></title>
+	<title th:text="#{auth.activate.error.page.title}"></title>
 </head>
 <body>
+	<th:block layout:fragment="stylesheets">
+		<style type="text/css">
+			.footer {
+				position: fixed;
+				bottom: 0;
+				width: 100%;
+			}
+		</style>
+	</th:block>
+	
 	<div layout:fragment="content">
 		<!-- Header -->
 		<div class="header bg-gradient-primary py-7 py-lg-8">
@@ -36,7 +46,11 @@
 							<form role="form" th:action="@{/oauth/send-activate-code}" method="post">
 								<fieldset>
 									<div th:if="${errorMessageKey != null && errorMessageKey != ''}">
-										<div class="alert alert-danger" th:utext="#{auth.activate.error.message.${errorMessageKey}(${activateCode})}"></div>
+										<div class="alert alert-danger" th:utext="#{|auth.activate.error.message.${errorMessageKey}|(${activateCode})}"></div>
+									</div>
+									
+									<div th:if="${errorFormKey != null && errorFormKey != ''}">
+										<div class="alert alert-danger" th:utext="#{|auth.activate.error.message.${errorFormKey}|(${errorFormValue})}"></div>
 									</div>
 									
 									<div th:if="${errorMessage != null && errorMessage != ''}">

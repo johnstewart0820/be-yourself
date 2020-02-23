@@ -8,9 +8,12 @@ import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.util.StringUtils;
 
 public final class UserUtils {
+	
 	public static boolean isAdmin(User user) {
-		return UserType.ADMIN.getValue().equals(user.getUserType() ) || UserType.SUPER_ADMIN.getValue().equals(user.getUserType());
+		return UserType.ADMIN.getValue().equals(user.getUserType()); 
+				//|| UserType.SUPER_ADMIN.getValue().equals(user.getUserType());
 	}
+	
 	public static List<User> convertUsersCsv(List<UserCSV> usersCsv){
 		List<User> users = new ArrayList<>();
 		
