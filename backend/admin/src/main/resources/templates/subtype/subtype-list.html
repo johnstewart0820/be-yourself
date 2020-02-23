@@ -1,1 +1,150 @@
-abcdef
+abcdef<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+	<title th:text="#{|${baseMessageKey}.page.title|}"></title>
+</head>
+<body>
+	<th:block layout:fragment="content">
+		<!-- Table -->
+		<div class="row">
+			<div class="col">
+				<div class="card shadow"> 
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col-6">
+								<th:block th:if="${writePermission}">
+									<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/create'}">
+										<span class="btn-inner--icon">
+											<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
+										</span>
+									</a>
+								</th:block>
+								
+								<div th:if="${toastStatus != null && toastStatus != ''}" 
+									th:class="${'toast toast-' + toastStatus}" id="on-load-toast" role="alert" 
+									aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="5000" 
+									style="position: absolute; top: 0px; right: 0px;">
+									<div class="toast-header">
+										<svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+											<rect fill="#007aff" width="100%" height="100%"></rect>
+										</svg>
+										<strong th:if="${toastTitle == null || toastTitle == ''}" class="mr-auto" th:utext="#{|${baseMessageKey}.toast.${toastAction}.${toastStatus}.title|}">Title</strong>
+										<strong th:if="${toastTitle != null && toastTitle != ''}" class="mr-auto" th:utext="${toastTitle}">Title</strong>
+										<!-- <small>11 mins ago</small> -->
+										<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div th:if="${toastMessage == null || toastMessage == ''}" class="toast-body" th:utext="#{|${baseMessageKey}.toast.${toastAction}.${toastStatus}.message|}">message</div>
+									<div th:if="${toastMessage != null && toastMessage != ''}" class="toast-body" th:utext="${toastMessage}">message</div>
+								</div>
+							</div>
+							
+							<div class="col-6 text-right">
+								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
+							</div>
+						</div>
+					</div>
+					
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush">
+							<thead class="thead-light">
+								<tr>
+									<th scope="col" width="40%" th:text="#{|${baseMessageKey}.detail.name|}"></th>
+									<th scope="col" width="15%" th:text="#{|${baseMessageKey}.detail.duration|}"></th>
+									<th scope="col" width="35%" th:text="#{|${baseMessageKey}.detail.price|}"></th>
+									<th scope="col" width="35%" th:text="#{|${baseMessageKey}.detail.canal|}"></th>
+									<th scope="col" width="35%" th:text="#{|${baseMessageKey}.detail.autorenew|}"></th>
+									<th scope="col" width="35%" th:text="#{|${baseMessageKey}.detail.status|}"></th>
+									<th scope="col" th:if="${readPermission}"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item : ${result.items}">
+									<td nowrap>
+										<span th:if="${item.name != null}" th:utext="${item.name}"></span>
+									</td>
+									<td nowrap>
+										<span th:if="${item.name != null}" th:utext="${item.duration}"></span>
+									</td>
+									<td nowrap>
+										<span th:if="${item.name != null}" th:utext="${item.price}"></span>
+									</td>
+									<td nowrap>
+										<span th:if="${item.name != null}" th:utext="${item.canal}"></span>
+									</td>
+									<td nowrap>
+										<span th:if="${item.autoRenew}" ><i class="fas fa-check"></i></span>
+										<span th:unless="${item.autoRenew}"><i class="fas fa-times"></i></span>
+									</td>
+									<td nowrap>
+										<span th:if="${item.status}" ><i class="fas fa-check"></i></span>
+										<span th:unless="${item.status}"><i class="fas fa-times"></i></span>
+										
+									</td>
+									<td class="text-right" th:if="${writePermission}">
+										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-edit"></i>
+											</span>
+										</a>
+										
+										<button class="btn btn-icon btn-2 btn-danger" type="button" 
+											th:title="#{action.delete.title}" th:onclick="confirmDelete([[${item.id}]])">
+											<span class="btn-inner--icon">
+												<i class="fas fa-times"></i>
+											</span>
+										</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<div class="card-footer py-4" th:insert="fragments/data-list-pagination :: pagination"></div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="confirm-delete-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="deleteConfirmModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<form id="confirm-delete-form" action="javascript:;" method="POST">
+						<div class="modal-header modal-header-danger">
+							<h3 class="modal-title" id="confirm-delete-modal-title" th:utext="#{modal.confirm.delete.title}"></h3>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p th:utext="#{modal.confirm.delete.message(#{${baseMessageKey} + '.name'})}"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-danger" th:utext="#{modal.button.yes}">Yes</button>
+	                		<button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal" th:utext="#{modal.button.no}">No</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+	<th:block layout:fragment="scripts">
+		<script type="text/javascript">
+			function confirmDelete(id) {
+				var url = '[[${baseURL}]]/delete/' + id;
+				
+				$('#confirm-delete-form').attr('action', url);
+				showModal('confirm-delete-modal');
+			}
+			
+			$(function() {
+				$('#on-load-toast').toast('show');
+			});
+		</script>
+	</th:block>
+</body>
+</html>

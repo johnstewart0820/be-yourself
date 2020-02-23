@@ -1,13 +1,7 @@
 package fr.be.your.self.backend.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,26 +22,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import fr.be.your.self.backend.dto.SessionDto;
 import fr.be.your.self.backend.dto.SubscriptionTypeDto;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.common.LoginType;
-import fr.be.your.self.common.UserPermission;
-import fr.be.your.self.common.UserStatus;
-import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.exception.BusinessException;
-import fr.be.your.self.model.Functionality;
-import fr.be.your.self.model.Permission;
-import fr.be.your.self.model.Session;
-import fr.be.your.self.model.SessionGroup;
 import fr.be.your.self.model.SubscriptionType;
-import fr.be.your.self.model.User;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.SubscriptionTypeService;
-import fr.be.your.self.util.StringUtils;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SubscriptionTypeController.NAME)
@@ -131,6 +113,73 @@ public class SubscriptionTypeController
         
         return "redirect:" + this.getBaseURL();
     }
+	
+	
+	@PostMapping("/update/{id}")
+	@Transactional
+    public String updateDomain(
+    		@PathVariable("id") Integer id, 
+    		@ModelAttribute @Validated SubscriptionTypeDto dto, 
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
+		
+        if (result.hasErrors()) {
+        	dto.setId(id);
+        	return this.getFormView();
+        }
+        
+        SubscriptionType domain = this.subTypeService.getById(id);
+        if (domain == null) {
+        	final ObjectError error = this.createIdNotFoundError(result, id);
+        	result.addError(error);
+        	
+        	dto.setId(id);
+        	return this.getFormView();
+        }
+        
+        dto.copyToDomain(domain);
+        
+        final SubscriptionType savedDomain = this.subTypeService.update(domain);
+    
+        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+        
+        return "redirect:" + this.getBaseURL() + "/current-page";
+    }
+	
+	@PostMapping(value = { "/delete/{id}" })
+	@Transactional
+    public String deletePage(
+    		@PathVariable(name = "id", required = true) Integer id,
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		RedirectAttributes redirectAttributes, Model model) {
+		
+		final SubscriptionType domain = this.subTypeService.getById(id);
+		if (domain == null) {
+			final String message = this.getIdNotFoundMessage(id);
+			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+			return "redirect:" + this.getBaseURL() + "/current-page";
+		}
+		
+		
+		final boolean result = this.subTypeService.delete(id);
+		if (result) {
+			
+			return "redirect:" + this.getBaseURL();
+		}
+		
+		final String message = this.getDeleteByIdErrorMessage(id);
+		
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
+        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+        
+		return "redirect:" + this.getBaseURL() + "/current-page";
+	}
 
 	@Override
 	protected String getName() {

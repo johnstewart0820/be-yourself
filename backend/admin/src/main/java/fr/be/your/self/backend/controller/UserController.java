@@ -327,7 +327,7 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	}
 
 	// delete user
-	@RequestMapping(value = "/user/{id}/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/user/{id}/delete")
 	public String deleteUser(@PathVariable("id") int id, Model model) {
 		userService.delete(id);
 
