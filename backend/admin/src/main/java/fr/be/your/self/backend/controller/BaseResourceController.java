@@ -361,11 +361,11 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return Constants.PATH.WEB_ADMIN_PREFIX + "/" + this.getName();
 	}
 	
-	protected final String getListView() {
+	protected String getListView() {
 		return "pages/" + this.getName() + "-list";
 	}
 	
-	protected final String getFormView() {
+	protected String getFormView() {
 		return "pages/" + this.getName() + "-form";
 	}
 	
