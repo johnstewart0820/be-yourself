@@ -44,6 +44,7 @@ import com.opencsv.bean.MappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
+import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.ResultStatus;
 import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.setting.Constants;
@@ -305,8 +306,8 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	// show account settings
 	@RequestMapping(value = "/user/settings", method = RequestMethod.GET)
 	public String showAccountSettings(Model model) {
-		findLoggedUserInfo(model);		
-		User loggedUser = userService.getById((int) model.getAttribute("loggedUserId"));
+		//findLoggedUserInfo(model);		
+		User loggedUser = userService.getById((int) model.getAttribute("userId"));
 		
 		model.addAttribute("user", loggedUser);
 		return "user/account_settings";
@@ -314,36 +315,13 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	
 	//TODO TVA: find a better way
 	private void findLoggedUserInfo(Model model) {
-		int editAccType = 0;
-		int editPermissions = 0;
-		Integer loggedUserId = null;
+		int editAccType = UserPermission.DENIED.getValue();
+		int editPermissions = UserPermission.DENIED.getValue();
 				
-		//get current logged user information
-		final Authentication oauth = SecurityContextHolder.getContext().getAuthentication();
-		if (oauth != null && oauth.isAuthenticated()) {
-			final Object principal = oauth.getPrincipal();
-			
-			if (principal instanceof AuthenticationUserDetails) {
-				final AuthenticationUserDetails userDetails = (AuthenticationUserDetails) principal;			
-				
-				loggedUserId = userDetails.getUserId();
-				
-				final Iterable<Permission> userPermissions = this.permissionService.getPermissionByUserId(loggedUserId);
-				if (userPermissions != null) {
-					for (Permission userPermission : userPermissions) {
-						final Functionality functionality = userPermission.getFunctionality();
-						if (UserConstants.EDIT_ACCOUNT_TYPE_PATH.equals(functionality.getPath())) {
-							editAccType = userPermission.getUserPermission();
-						}
-						if ( UserConstants.EDIT_PERMISSIONS_PATH.equals(functionality.getPath())) {
-							editPermissions = userPermission.getUserPermission();
-						}					
-					}
-				}
-			}
-		}
+		PermissionDto permission = (PermissionDto) model.getAttribute("permission");
 		
-		model.addAttribute("loggedUserId", loggedUserId);
+		editAccType = permission.getPermission(UserConstants.EDIT_ACCOUNT_TYPE_PATH);
+		editPermissions = permission.getPermission(UserConstants.EDIT_PERMISSIONS_PATH);
 		model.addAttribute("editAccType", editAccType);
 		model.addAttribute("editPermissions", editPermissions);
 	}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+	<title th:text="#{|${baseMessageKey}.page.title|}"></title>
+</head>
+<body>
+	<th:block layout:fragment="content">
+		<!-- Form -->
+		<div class="row">
+			<div class="col">
+				<div class="card shadow">
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col-6">
+								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/current-page'}"
+									th:title="#{action.go.to.list.title}">
+									<span class="btn-inner--icon">
+										<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+									</span>
+								</a>
+							</div>
+							
+							<div class="col-6 text-right">
+								<h3 class="mb-0" th:text="${formTitle}"></h3>
+							</div>
+						</div>
+					</div>
+					
+					<div class="card-body border-0">
+						<form th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}" th:object="${dto}" method="post">
+							<fieldset th:disabled="${!writePermission}">
+								<!-- Name -->
+								<div class="row">
+									<div class="col-md-6 col-sm-10">
+									<div class="form-group row">
+											<label for="title" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.name|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<input type="text" class="form-control" 
+													id="name" th:field="*{name}"
+													th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
+													/>
+												<div class="invalid-feedback" ></div>
+											</div>
+										</div>
+
+
+									</div>
+								</div>
+								<!-- Description -->
+								<div class="row">
+									<div class="col-md-6 col-sm-10">
+									<div class="form-group row">
+											<label for="title" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.description|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<textarea class="form-control"  rows="3"
+													id="description" th:field="*{description}"
+													th:placeholder="#{|${baseMessageKey}.detail.description.placeholder|}" 
+													> </textarea>
+												<div class="invalid-feedback" ></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- Price -->
+								<div class="row">
+									<div class="col-md-6 col-sm-10">
+									<div class="form-group row">
+											<label for="title" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.price|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<input type="text" class="form-control" 
+													id="price" th:field="*{price}"
+													th:placeholder="#{|${baseMessageKey}.detail.price.placeholder|}" 
+													/>
+												<div class="invalid-feedback" ></div>
+											</div>
+										</div>
+
+
+									</div>
+								</div>		
+								<!-- Canal -->
+								<div class="form-group row">
+									<label for="groupId" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+										th:text="#{|${baseMessageKey}.detail.canal|}"></label>
+									<div class="col-md-4 col-sm-8">
+										<select class="form-control"  id="canal" th:field="*{canal}"
+											th:placeholder="#{|${baseMessageKey}.detail.canal.placeholder|}">
+											<option th:each="canal : ${canals}" 
+												th:value="${canal}" th:text="${canal}">
+											</option>
+										</select>
+									</div>
+								</div>
+								<!-- Duration -->
+								<div class="form-group row">
+									<label for="groupId" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+										th:text="#{|${baseMessageKey}.detail.duration|}"></label>
+									<div class="col-md-4 col-sm-8">
+										<select class="form-control"  id="duration" th:field="*{duration}"
+											th:placeholder="#{|${baseMessageKey}.detail.duration.placeholder|}">
+											<option th:each="duration : ${durations}" 
+												th:value="${duration}" th:text="${duration} + ' ' + #{|${baseMessageKey}.detail.duration.unit|}">
+											</option>
+										</select>
+									</div>
+								</div>		
+								<!-- Automatic renewal -->
+								<div class="form-group row">
+									<label for="autorenew"
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
+										th:text="#{|${baseMessageKey}.detail.autorenew|}"></label> 
+										<input  id="autorenew" th:field="*{autoRenew}" type="checkbox">
+								</div>
+								<!-- Status -->
+								<div class="form-group row">
+									<label for="status"
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
+										th:text="#{|${baseMessageKey}.detail.status|}"></label> 
+										<input  id="status" th:field="*{status}" type="checkbox">
+								</div>
+							</fieldset>
+							
+							<div class="form-group row">
+								<div class="offset-md-1 col-md-11 offset-sm-3 col-sm-9 col-xs-12">
+									<div class="form-action-buttons-row">
+										<button type="submit" class="btn btn-primary" th:title="#{action.save.title}">
+											<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
+										</button>
+										
+										<a class="btn btn-outline-warning" th:href="${baseURL + '/current-page'}"
+											th:title="#{action.go.to.list.title}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+											</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="image-file-type-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="fileTypeModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-danger modal-dialog-centered modal-10" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title" id="image-file-type-modal-title" th:text="#{error.media.modal.title}"></h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p th:text="#{error.media.image.support.type(${supportImageExtensions})}"></p>
+					</div>
+					<div class="modal-footer">
+                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal">Close</button> 
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="image-file-size-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="fileSizeModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title" id="image-file-size-modal-title" th:text="#{error.media.modal.title}"></h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p th:text="#{error.media.image.support.max.size(${supportImageSizeLabel})}"></p>
+					</div>
+					<div class="modal-footer">
+                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal" th:text="#{modal.button.ok}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+	<th:block layout:fragment="scripts">
+		<script type="text/javascript">
+			function selectImage(inputElement) {
+				var supportImageTypes = '[[${supportImageTypes}]]';
+				var supportImageFileSize = [[${supportImageSize}]];
+				var defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
+				
+				validateAndPreviewImage(inputElement, 
+						'imagePreview', 'imageFileLabel', defaultImageLabel,
+						supportImageTypes, supportImageFileSize, 
+						'image-file-type-modal', 'image-file-size-modal');
+			}
+			
+			function selectMedia(inputElement) {
+				var supportAudioTypes = '[[${supportAudioTypes}]]';
+				var supportVideoTypes = '[[${supportVideoTypes}]]';
+				var supportMediaTypes = '[[${supportMediaTypes}]]';
+				var supportMediaFileSize = [[${supportMediaSize}]];
+				var defaultMediaLabel = '[[#{|${baseMessageKey}.detail.content.file.placeholder|}]]';
+			}
+			
+		    const audioPlayer = new Plyr('#audioPlayer');
+		    const videoPlayer = new Plyr('#videoPlayer');
+		</script>
+	</th:block>
+</body>
+</html>
