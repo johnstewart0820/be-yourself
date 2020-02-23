@@ -2,6 +2,7 @@ package fr.be.your.self.backend.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,11 +42,17 @@ public class SubscriptionTypeController
 	private static final String DEFAULT_URL = "/subtype/list/page/1";
 
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX + Constants.PATH.WEB_ADMIN.MEDIA
-			+ Constants.PATH.WEB_ADMIN.MEDIA_TYPE.SESSION;
+			+ Constants.FOLDER.MEDIA.SESSION;
 
 	@Autowired
 	private SubscriptionTypeService subTypeService;
 	
+	@Override
+	protected Set<String> getSortableColumns() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	protected String getFormView() {
 		return "subtype/subtype_form";
@@ -57,8 +64,8 @@ public class SubscriptionTypeController
 	}
 	
 	@Override
-	protected void loadDetailForm(HttpSession session, HttpServletRequest request, HttpServletResponse response,
-			Model model, SubscriptionTypeDto dto) throws BusinessException {
+	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Model model, SubscriptionType domain, SubscriptionTypeDto dto) throws BusinessException {
 		
 		final List<String> canals = Arrays.asList("WEB", "APP");
 		final List<Integer> durations = Arrays.asList(1, 3, 6, 12, 24);
