@@ -72,7 +72,7 @@
 											<label for="title" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
 												th:text="#{|${baseMessageKey}.detail.price|}"></label>
 											<div class="col-md-10 col-sm-9 col-xs-12">
-												<input type="text" class="form-control" 
+												<input type="number" step="0.01" class="form-control" 
 													id="price" th:field="*{price}"
 													th:placeholder="#{|${baseMessageKey}.detail.price.placeholder|}" 
 													/>
@@ -147,71 +147,11 @@
 			</div>
 		</div>
 		
-		<div class="modal fade" id="image-file-type-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="fileTypeModal" aria-hidden="true" data-backdrop="false">
-			<div class="modal-dialog modal-danger modal-dialog-centered modal-10" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3 class="modal-title" id="image-file-type-modal-title" th:text="#{error.media.modal.title}"></h3>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p th:text="#{error.media.image.support.type(${supportImageExtensions})}"></p>
-					</div>
-					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal">Close</button> 
-					</div>
-				</div>
-			</div>
-		</div>
 		
-		<div class="modal fade" id="image-file-size-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="fileSizeModal" aria-hidden="true" data-backdrop="false">
-			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3 class="modal-title" id="image-file-size-modal-title" th:text="#{error.media.modal.title}"></h3>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p th:text="#{error.media.image.support.max.size(${supportImageSizeLabel})}"></p>
-					</div>
-					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" data-dismiss="modal" th:text="#{modal.button.ok}"></button>
-					</div>
-				</div>
-			</div>
-		</div>
 	</th:block>
 
 	<th:block layout:fragment="scripts">
-		<script type="text/javascript">
-			function selectImage(inputElement) {
-				var supportImageTypes = '[[${supportImageTypes}]]';
-				var supportImageFileSize = [[${supportImageSize}]];
-				var defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
-				
-				validateAndPreviewImage(inputElement, 
-						'imagePreview', 'imageFileLabel', defaultImageLabel,
-						supportImageTypes, supportImageFileSize, 
-						'image-file-type-modal', 'image-file-size-modal');
-			}
-			
-			function selectMedia(inputElement) {
-				var supportAudioTypes = '[[${supportAudioTypes}]]';
-				var supportVideoTypes = '[[${supportVideoTypes}]]';
-				var supportMediaTypes = '[[${supportMediaTypes}]]';
-				var supportMediaFileSize = [[${supportMediaSize}]];
-				var defaultMediaLabel = '[[#{|${baseMessageKey}.detail.content.file.placeholder|}]]';
-			}
-			
-		    const audioPlayer = new Plyr('#audioPlayer');
-		    const videoPlayer = new Plyr('#videoPlayer');
-		</script>
+		
 	</th:block>
 </body>
 </html>
