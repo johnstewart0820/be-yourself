@@ -118,8 +118,8 @@ public class AdminApplication implements CommandLineRunner {
 			
 			// Session group management
 			{
-				final String path = "/session-group";
-				final String name = "Session Group";
+				final String path = "/session-category";
+				final String name = "Session Category";
 				
 				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 			}

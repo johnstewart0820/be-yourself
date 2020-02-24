@@ -1,5 +1,6 @@
 package fr.be.your.self.backend.config.root;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +9,22 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import fr.be.your.self.backend.setting.DataSetting;
+import fr.be.your.self.util.StringUtils;
 
 @Configuration
 @ComponentScan(basePackages = {
 		"fr.be.your.self.backend.startup",
         "fr.be.your.self.service",
         "fr.be.your.self.util" })
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class ApplicationConfig {
 	
 	@Value("${data.default.page.size:10}")
@@ -77,7 +85,23 @@ public class ApplicationConfig {
 	private boolean allowSocialOnAuthPage;
 	
 	@Autowired
+	private Environment env;
+	
+	@Autowired
 	private MessageSource messageSource;
+	
+	@Bean
+    public AuditorAware<String> auditorProvider() {
+        return () -> {
+        	final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        	
+        	if (authentication != null) {
+        		return Optional.ofNullable(authentication.getName());
+        	}
+        	
+        	return Optional.ofNullable("system");
+        };
+    }
 	
 	@Bean
 	public DataSetting dataSetting() {
@@ -92,6 +116,31 @@ public class ApplicationConfig {
 				this.activateCodeLength, this.activateCodeTimeout);
 		setting.setAuthenticationConfiguration(this.displayHeaderOnAuthPage, this.allowRegisterOnAuthPage, this.allowSocialOnAuthPage);
 		setting.setTempPwdLength(this.tempPasswordLength);
+		
+		for (final String fileExt : this.imageFileExtensions) {
+			final String mimeType = this.env.getProperty("setting.default.mime.type.mapping." + fileExt.toLowerCase());
+			
+			if (!StringUtils.isNullOrSpace(mimeType)) {
+				setting.addDefaultMimeTypeMapping(fileExt, mimeType);
+			}
+		}
+		
+		for (final String fileExt : this.audioFileExtensions) {
+			final String mimeType = this.env.getProperty("setting.default.mime.type.mapping." + fileExt.toLowerCase());
+			
+			if (!StringUtils.isNullOrSpace(mimeType)) {
+				setting.addDefaultMimeTypeMapping(fileExt, mimeType);
+			}
+		}
+		
+		for (final String fileExt : this.videoFileExtensions) {
+			final String mimeType = this.env.getProperty("setting.default.mime.type.mapping." + fileExt.toLowerCase());
+			
+			if (!StringUtils.isNullOrSpace(mimeType)) {
+				setting.addDefaultMimeTypeMapping(fileExt, mimeType);
+			}
+		}
+		
 		return setting;
 	}
 	

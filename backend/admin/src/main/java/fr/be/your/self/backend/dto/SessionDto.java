@@ -1,6 +1,7 @@
 package fr.be.your.self.backend.dto;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -8,9 +9,9 @@ import javax.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import fr.be.your.self.model.Session;
-import fr.be.your.self.model.SessionGroup;
+import fr.be.your.self.model.SessionCategory;
 
-public class SessionDto implements Serializable {
+public class SessionDto extends BaseDto {
 	/**
 	 * 
 	 */
@@ -18,7 +19,7 @@ public class SessionDto implements Serializable {
 
 	private int id;
 
-	private int groupId;
+	private List<Integer> categoryIds;
 
 	@NotEmpty(message = "{session.error.title.not.empty}")
 	@NotNull(message = "{session.error.title.not.empty}")
@@ -35,7 +36,7 @@ public class SessionDto implements Serializable {
 	private String contentFile;
 	private String contentFileType;
 	private String contentMimeType;
-	
+
 	private MultipartFile uploadContentFile;
 
 	private int duration;
@@ -46,12 +47,16 @@ public class SessionDto implements Serializable {
 
 	public SessionDto() {
 		super();
+
+		this.free = false;
+		this.categoryIds = new ArrayList<Integer>();
 	}
 
 	public SessionDto(Session domain) {
-		this();
-		
+		super(domain);
+
 		this.free = false;
+		this.categoryIds = new ArrayList<Integer>();
 		
 		if (domain != null) {
 			this.id = domain.getId().intValue();
@@ -64,21 +69,23 @@ public class SessionDto implements Serializable {
 			this.description = domain.getDescription();
 			this.free = domain.isFree();
 
-			final SessionGroup group = domain.getSessionGroup();
-			if (group != null) {
-				this.groupId = group.getId();
+			final List<SessionCategory> categories = domain.getCategories();
+			if (categories != null) {
+				for (SessionCategory category : categories) {
+					this.categoryIds.add(category.getId());
+				}
 			}
 		}
 	}
-	
+
 	public void copyToDomain(Session domain) {
 		domain.setTitle(this.title);
-        domain.setSubtitle(this.subtitle);
-        domain.setDuration(this.duration);
-        domain.setDescription(this.description);
-        domain.setFree(this.free);
+		domain.setSubtitle(this.subtitle);
+		domain.setDuration(this.duration);
+		domain.setDescription(this.description);
+		domain.setFree(this.free);
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -87,12 +94,12 @@ public class SessionDto implements Serializable {
 		this.id = id;
 	}
 
-	public int getGroupId() {
-		return groupId;
+	public List<Integer> getCategoryIds() {
+		return categoryIds;
 	}
 
-	public void setGroupId(int groupId) {
-		this.groupId = groupId;
+	public void setCategoryIds(List<Integer> categoryIds) {
+		this.categoryIds = categoryIds;
 	}
 
 	public String getTitle() {

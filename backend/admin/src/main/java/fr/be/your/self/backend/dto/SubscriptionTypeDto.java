@@ -3,7 +3,6 @@ package fr.be.your.self.backend.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import fr.be.your.self.model.SessionGroup;
 import fr.be.your.self.model.SubscriptionType;
 
 public class SubscriptionTypeDto  implements Serializable  {

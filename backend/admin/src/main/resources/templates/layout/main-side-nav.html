@@ -131,9 +131,9 @@
 							
 			  		
 			  		<th:block th:if="${permission != null}">
-			  			<li class="nav-item" th:if="${permission.hasPermission('/session-group')}">
-							<a class="nav-link" th:href="@{/session-group}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.session.group}"></span>
+			  			<li class="nav-item" th:if="${permission.hasPermission('/session-category')}">
+							<a class="nav-link" th:href="@{/session-category}">
+					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.session.category}"></span>
 							</a>
 				  		</li>
 				  		

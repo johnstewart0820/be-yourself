@@ -223,9 +223,15 @@ function changeVideoSource(videoPlayer, videoContainerElementId,
 	};
 }
 
-function showModal(modalId) {
+function showModal(modalId, hideInteval) {
 	if (modalId && modalId != '') {
 		$('#' + modalId).modal({ show: true });
+		
+		if (hideInteval && hideInteval > 0) {
+			setTimeout(function() {
+				$('#' + modalId).modal('hide')}
+			,hideInteval);
+		}
 	}
 }
 
@@ -247,4 +253,67 @@ function getFileExtension(fileName) {
 		return null;
 	
 	return fileName.substring(lastDot + 1);
+}
+
+function buildDataTable(dataTableId, sortableColumnNameMaps, defaultSort, sortUrl) {
+	const tableSorts = [];
+	
+	const defaultSortProperties = defaultSort.split(';');
+	for (var i = 0; i < defaultSortProperties.length; i++) {
+		const defaultSortValues = defaultSortProperties[i].split('|');
+		if (defaultSortValues.length == 2) {
+			const columnIndex = sortableColumnNameMaps[defaultSortValues[0]];
+			if (columnIndex != null && columnIndex != undefined && columnIndex >= 0) {
+				tableSorts.push([columnIndex, defaultSortValues[1]]);
+			}
+		}
+	}
+	
+	const sortableColumnIndexMaps = {};
+	for (var columnName in sortableColumnNameMaps) {
+		if (sortableColumnNameMaps.hasOwnProperty(columnName)) {
+			sortableColumnIndexMaps[sortableColumnNameMaps[columnName]] = columnName;
+		}
+	}
+	
+	const tableOption = {
+			"processing": true,
+			"serverSide": false,
+			"order": tableSorts,
+			"sDom":  't',
+			"columnDefs": [ {
+				"targets": 'no-sort',
+				"orderable": false,
+			}]
+	};
+	
+	$('#' + dataTableId)
+		.DataTable(tableOption)
+		.on('order.dt',  function (e, settings, ordArr) {
+			var sortQuery = '';
+			
+			if (ordArr && ordArr.length > 0) {
+				
+				
+				for (var i = 0; i < ordArr.length; i++) {
+					const order = ordArr[i];
+					const columnName = sortableColumnIndexMaps[order.col];
+					
+					if (columnName && columnName != '') {
+						if (sortQuery.length > 0) {
+							sortQuery += ';';
+						}
+						
+						sortQuery += (columnName + '|' + order.dir);
+					}
+				}
+			}
+			
+			if (defaultSort == sortQuery) {
+				return;
+			}
+			
+			const pageUrl = sortUrl + encodeURIComponent(sortQuery);
+			window.location = pageUrl;
+		});
 }

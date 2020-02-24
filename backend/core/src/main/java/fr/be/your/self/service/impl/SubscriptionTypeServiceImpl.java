@@ -5,11 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import fr.be.your.self.model.SessionGroup;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.SubscriptionTypeRepository;
-import fr.be.your.self.service.SessionGroupService;
 import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.util.StringUtils;
 
