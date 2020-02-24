@@ -48,6 +48,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.ResultStatus;
 import fr.be.your.self.backend.dto.SimpleResult;
+import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.LoginType;
@@ -126,6 +127,7 @@ public class UserController extends BaseResourceController<User, User, User>  {
 				: this.dataSetting.isAutoActivateAccount();
 		
 		String tempPwd = null;
+		User savedUser;
 		if (isNewUser) { // TODO TVA check this
 			if (user.getLoginType() == LoginType.PASSWORD.getValue()) {
 				tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
@@ -145,9 +147,13 @@ public class UserController extends BaseResourceController<User, User, User>  {
 				setActivateCodeAndTimeout(user);
 				user.setStatus(UserStatus.DRAFT.getValue());
 			}
+			savedUser = userService.saveOrUpdate(user);
+		}  else {
+			User existedUser = userService.getById(user.getId());
+			updateInfo(existedUser, user);
+			savedUser = userService.saveOrUpdate(existedUser);
 		}
 		
-		User savedUser = userService.saveOrUpdate(user);
 		
 		//For normal user, default value = "Denied"
 		for (Permission permission : user.getPermissions()) {
@@ -170,6 +176,17 @@ public class UserController extends BaseResourceController<User, User, User>  {
 
 		return "redirect:" + DEFAULT_URL; // back to list of users
 
+	}
+
+	private void updateInfo(User existedUser, User user) {
+		existedUser.setTitle(user.getTitle());
+		existedUser.setLastName(user.getLastName());
+		existedUser.setEmail(user.getEmail());
+		existedUser.setLoginType(user.getLoginType());
+		existedUser.setStatus(user.getStatus());
+		existedUser.setReferralCode(user.getReferralCode());
+		existedUser.setUserType(user.getUserType());
+	//	existedUser.setPermissions(user.getPermissions());	
 	}
 
 	//generate a new activation code and timeout for a user
