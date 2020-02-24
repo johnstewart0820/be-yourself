@@ -30,6 +30,9 @@ public class ApplicationConfig {
 	@Value("${data.default.page.size:10}")
 	private int defaultPageSize;
 	
+	@Value("#{'${data.option.support.page.size.list}'.split(',')}")
+	private Set<Integer> supportPageSizes;
+	
 	@Value("${data.upload.folder}")
 	private String uploadFolder;
 	
@@ -106,7 +109,7 @@ public class ApplicationConfig {
 	@Bean
 	public DataSetting dataSetting() {
 		final DataSetting setting = new DataSetting();
-		setting.setDefaultPageSize(this.defaultPageSize);
+		setting.setDataPageSize(this.supportPageSizes, this.defaultPageSize);
 		
 		setting.setUploadFolder(this.uploadFolder);
 		setting.setUploadFileSizes(this.imageMaxFileSize, this.audioMaxFileSize, this.videoMaxFileSize);

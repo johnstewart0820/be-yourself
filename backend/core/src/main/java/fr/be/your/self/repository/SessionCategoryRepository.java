@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +17,8 @@ public interface SessionCategoryRepository extends BaseRepository<SessionCategor
     
 	// findAllByNameContainsIgnoreCase("value")
     Iterable<SessionCategory> findAllByNameContainsIgnoreCase(String name);
+    
+    Iterable<SessionCategory> findAllByNameContainsIgnoreCase(String name, Sort sort);
     
     Page<SessionCategory> findAllByNameContainsIgnoreCase(String name, Pageable pageable);
     

@@ -3,6 +3,7 @@ package fr.be.your.self.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,11 @@ public class SessionCategoryServiceImpl extends BaseServiceImpl<SessionCategory>
 	}
 	
 	@Override
+	public String getDefaultSort() {
+		return "name|asc";
+	}
+	
+	@Override
 	@Transactional(readOnly = true)
 	public long count(String text) {
 		if (StringUtils.isNullOrSpace(text)) {
@@ -34,10 +40,10 @@ public class SessionCategoryServiceImpl extends BaseServiceImpl<SessionCategory>
 	}
 
 	@Override
-	protected Iterable<SessionCategory> getList(String text) {
-		return StringUtils.isNullOrSpace(text) 
-				? this.repository.findAll()
-				: this.repository.findAllByNameContainsIgnoreCase(text);
+	protected Iterable<SessionCategory> getList(String text, Sort sort) {
+		return StringUtils.isNullOrSpace(text)
+				? this.repository.findAll(sort) 
+				: this.repository.findAllByNameContainsIgnoreCase(text, sort);
 	}
 
 	@Override

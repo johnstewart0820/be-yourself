@@ -3,6 +3,7 @@ package fr.be.your.self.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.Permission;
@@ -21,6 +22,11 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 		return this.repository;
 	}
 
+	@Override
+	public String getDefaultSort() {
+		return null;
+	}
+	
 	@Override
 	public Iterable<Permission> getPermissionByUserId(Integer userId) {
 		return this.repository.findAllByUserId(userId);
@@ -47,7 +53,7 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission> implement
 	}
 
 	@Override
-	protected Iterable<Permission> getList(String text) {
+	protected Iterable<Permission> getList(String text, Sort sort) {
 		return null;
 	}
 

@@ -78,11 +78,6 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	}
 
 	@Override
-	protected String getDefaultSort() {
-		return "name|asc";
-	}
-
-	@Override
 	protected SessionCategory newDomain() {
 		return new SessionCategory();
 	}

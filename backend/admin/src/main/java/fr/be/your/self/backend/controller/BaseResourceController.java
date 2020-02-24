@@ -42,7 +42,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.common.StatusCode;
+import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.PO;
@@ -91,13 +91,6 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	protected abstract SimpleDto createSimpleDto(T domain);
 	
 	protected abstract Set<String> getSortableColumns();
-	
-	/**
-	 * @return default data sort, format column|{asc|desc}
-	 **/
-	protected String getDefaultSort() {
-		return null;
-	}
 	
 	protected String getBaseMediaURL() {
 		return null;
@@ -150,11 +143,11 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	@GetMapping(value = { "", "/search" })
-    public String listPage(HttpSession session, HttpServletRequest request, 
+    public String searchPage(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model,
     		@RequestParam(name = "page", required = false) Integer page,
     		@RequestParam(name = "size", required = false) Integer size,
-    		@RequestParam(name = "sort", required = false) String sort,
+    		@RequestParam(name = "sort", required = false) String sortQuery,
     		@RequestParam(name = "action", required = false) String action,
     		@RequestParam Map<String, String> searchParams) {
 		
@@ -166,90 +159,121 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 					searchParams.put(currentSearchItem.getKey(), currentSearchItem.getValue());
 				}
 			}
+			
+			if (page == null || page <= 0) {
+				page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
+			}
+			
+			if (size == null) {
+				size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
+			}
+			
+			if (StringUtils.isNullOrSpace(sortQuery)) {
+				sortQuery = (String) session.getAttribute(this.getSortSessionKey());
+			}
 		}
 		
-		if (StringUtils.isNullOrSpace(sort)) {
-			sort = this.getDefaultSort();
+		if (page == null || page <= 0) {
+			page = 1;
 		}
 		
+		if (size == null) {
+			size = this.dataSetting.getDefaultPageSize();
+		}
+		
+		if (StringUtils.isNullOrSpace(sortQuery)) {
+			sortQuery = this.getService().getDefaultSort();
+		}
+		
+		final Sort sort = this.getSortRequest(sortQuery);
 		final PageRequest pageable = this.getPageRequest(page, size, sort);
 		
 		// Save session
 		session.setAttribute(this.getSearchSessionKey(), searchParams);
-		session.setAttribute(this.getSortSessionKey(), sort);
-		session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
-		session.setAttribute(this.getPageSizeSessionKey(), pageable.getPageSize());
+		session.setAttribute(this.getSortSessionKey(), sortQuery);
 		
-		return this.listPage(session, request, response, model, searchParams, sort, pageable);
+		if (pageable != null) {
+			session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
+			session.setAttribute(this.getPageSizeSessionKey(), pageable.getPageSize());
+		}
+		
+		return this.listPage(session, request, response, model, searchParams, sortQuery, pageable, sort);
     }
 	
 	@GetMapping(value = { "/page" })
     public String changePageNormal(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model, 
-    		@RequestParam(name = "page", required = true) Integer page) {
-		return this.changePage(session, request, response, model, page);
+    		@RequestParam(name = "page", required = false) Integer page,
+    		@RequestParam(name = "size", required = false) Integer size) {
+		
+		Map<String, String> searchParams = this.getSearchSessionValue(session);
+		String sortQuery = (String) session.getAttribute(this.getSortSessionKey());
+		
+		if (page == null || page <= 0) {
+			page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
+		}
+		
+		if (size == null || size <= 0) {
+			size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
+		}
+		
+		if (StringUtils.isNullOrSpace(sortQuery)) {
+			sortQuery = this.getService().getDefaultSort();
+		}
+		
+		final Sort sort = this.getSortRequest(sortQuery);
+		final PageRequest pageable = this.getPageRequest(page, size, sort);
+		
+		// Save session
+		if (pageable != null) {
+			session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
+		}
+		
+		return this.listPage(session, request, response, model, searchParams, sortQuery, pageable, sort);
 	}
 	
 	@GetMapping(value = { "/page/{page}" })
     public String changePage(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model,
     		@PathVariable(name = "page", required = true) Integer page) {
-		
-		Map<String, String> searchParams = this.getSearchSessionValue(session);
-		
-		Integer size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
-		String sort = (String) session.getAttribute(this.getSortSessionKey());
-		
-		if (page == null || page <= 0) {
-			page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
-		}
-		
-		if (StringUtils.isNullOrSpace(sort)) {
-			sort = this.getDefaultSort();
-		}
-		
-		final PageRequest pageable = this.getPageRequest(page, size, sort);
-		
-		// Save session
-		session.setAttribute(this.getPageIndexSessionKey(), pageable.getPageNumber() + 1);
-		
-		return this.listPage(session, request, response, model, searchParams, sort, pageable);
+		return this.changePageNormal(session, request, response, model, page, null);
 	}
 	
 	@GetMapping(value = { "/current-page" })
     public String currentPage(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model,
-    		@RequestParam(name = "sort", required = false) String sort) {
+    		@RequestParam(name = "sort", required = false) String sortQuery) {
 		
 		Map<String, String> searchParams = this.getSearchSessionValue(session);
 		
 		Integer size = (Integer) session.getAttribute(this.getPageSizeSessionKey());
 		Integer page = (Integer) session.getAttribute(this.getPageIndexSessionKey());
 		
-		if (StringUtils.isNullOrSpace(sort)) {
-			sort = (String) session.getAttribute(this.getSortSessionKey());
+		if (StringUtils.isNullOrSpace(sortQuery)) {
+			sortQuery = (String) session.getAttribute(this.getSortSessionKey());
 			
-			if (StringUtils.isNullOrSpace(sort)) {
-				sort = this.getDefaultSort();
+			if (StringUtils.isNullOrSpace(sortQuery)) {
+				sortQuery = this.getService().getDefaultSort();
 			}
 		}
 		
+		final Sort sort = this.getSortRequest(sortQuery);
 		final PageRequest pageable = this.getPageRequest(page, size, sort);
 		
 		// Save session
-		session.setAttribute(this.getSortSessionKey(), sort);
+		session.setAttribute(this.getSortSessionKey(), sortQuery);
 		
-		return this.listPage(session, request, response, model, searchParams, sort, pageable);
+		return this.listPage(session, request, response, model, searchParams, sortQuery, pageable, sort);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private String listPage(HttpSession session, HttpServletRequest request, 
     		HttpServletResponse response, Model model, 
-    		Map<String, String> searchParams, String sort, PageRequest pageable) {
+    		Map<String, String> searchParams, String sortQuery, PageRequest pageable, Sort sort) {
 		
-		final PageableResponse<T> domainPage = this.pageableSearch(searchParams, pageable);
+		final PageableResponse<T> domainPage = this.pageableSearch(searchParams, pageable, sort);
 		if (domainPage == null) {
-			throw new BusinessException(StatusCode.PROCESSING_ERROR);
+			throw new BusinessException(ErrorStatusCode.PROCESSING_ERROR);
 		}
 		
 		final PageableResponse<SimpleDto> result;
@@ -274,14 +298,24 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		this.loadListPageOptions(session, request, response, model, searchParams, result);
 		
 		// Store properties
-		final String titleKey = this.getName().replace('-', '.') + ".page.title"; 
+		final String baseMessageKey = this.getName().replace('-', '.');
+		final String titleKey = baseMessageKey + ".page.title"; 
 		model.addAttribute("formTitle", this.getMessage(titleKey));
 		
 		final String search = searchParams.get("q");
 		model.addAttribute("search", search == null ? "" : search);
-		model.addAttribute("sort", sort == null ? "" : sort);
-		model.addAttribute("page", pageable.getPageNumber() + 1);
-		model.addAttribute("size", pageable.getPageSize());
+		model.addAttribute("sort", sortQuery == null ? "" : sortQuery);
+		
+		if (pageable != null) {
+			model.addAttribute("page", pageable.getPageNumber() + 1);
+			model.addAttribute("size", pageable.getPageSize());
+		}
+		
+		final String pageSizeNameKey = baseMessageKey + ".option.display.page.size.name"; 
+		model.addAttribute("pageSizeName", this.getMessage(pageSizeNameKey));
+		
+		final Set<Integer> supportPageSizes = this.dataSetting.getSupportPageSizes();
+		model.addAttribute("supportPageSizes", supportPageSizes);
 		
 		// Store result
 		model.addAttribute("result", result);
@@ -289,9 +323,9 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
         return this.getListView();
 	}
 	
-	protected PageableResponse<T> pageableSearch(Map<String, String> searchParams, PageRequest pageable) {
+	protected PageableResponse<T> pageableSearch(Map<String, String> searchParams, PageRequest pageable, Sort sort) {
 		final String search = searchParams.get("q");
-		return this.getService().pageableSearch(search, pageable);
+		return this.getService().pageableSearch(search, pageable, sort);
 	}
 	
 	@GetMapping(value = { "/create" })
@@ -529,16 +563,8 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return Collections.emptyMap();
 	}
 	
-	protected final PageRequest getPageRequest(Integer page, Integer size, String sortQuery) {
-        if (page == null || page < 1) {
-            page = 1;
-        }
-
-        if (size == null || size < 1) {
-            size = this.dataSetting.getDefaultPageSize();
-        }
-        
-        List<Order> orders = new ArrayList<Order>();
+	protected final Sort getSortRequest(String sortQuery) {
+		List<Order> orders = new ArrayList<Order>();
         if (!StringUtils.isNullOrSpace(sortQuery)) {
         	final String[] sortProperties = sortQuery.split(";");
         	
@@ -556,7 +582,20 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 			}
         }
         
-        return PageRequest.of(page - 1, size, Sort.by(orders));
+        return Sort.by(orders);
+	}
+	
+	protected final PageRequest getPageRequest(Integer page, Integer size, Sort sort) {
+        if (page == null || page < 1) {
+            page = 1;
+        }
+
+        if (size == null || size < 1) {
+        	return null;
+            //size = this.dataSetting.getDefaultPageSize();
+        }
+        
+        return PageRequest.of(page - 1, size, sort);
     }
 	
 	/**************************************************************************************/

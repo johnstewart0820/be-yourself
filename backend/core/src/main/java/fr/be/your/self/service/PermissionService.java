@@ -1,7 +1,6 @@
 package fr.be.your.self.service;
 
 import fr.be.your.self.model.Permission;
-import fr.be.your.self.model.User;
 
 public interface PermissionService extends BaseService<Permission> {
 	

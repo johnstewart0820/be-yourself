@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import fr.be.your.self.model.Functionality;
@@ -17,5 +18,7 @@ public interface FunctionalityRepository extends BaseRepository<Functionality> {
 
 	public Iterable<Functionality> findAllByNameContainsIgnoreCase(String name);
 
+	public Iterable<Functionality> findAllByNameContainsIgnoreCase(String name, Sort sort);
+	
 	public Page<Functionality> findAllByNameContainsIgnoreCase(String name, Pageable pageable);
 }

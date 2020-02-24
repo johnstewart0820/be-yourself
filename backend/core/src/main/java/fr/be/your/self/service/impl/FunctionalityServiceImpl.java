@@ -3,6 +3,7 @@ package fr.be.your.self.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.Functionality;
@@ -23,6 +24,11 @@ public class FunctionalityServiceImpl extends BaseServiceImpl<Functionality> imp
 	}
 	
 	@Override
+	public String getDefaultSort() {
+		return "name|asc";
+	}
+
+	@Override
 	public long count(String text) {
 		if (StringUtils.isNullOrSpace(text)) {
 			return this.repository.count();
@@ -32,10 +38,10 @@ public class FunctionalityServiceImpl extends BaseServiceImpl<Functionality> imp
 	}
 
 	@Override
-	protected Iterable<Functionality> getList(String text) {
+	protected Iterable<Functionality> getList(String text, Sort sort) {
 		return StringUtils.isNullOrSpace(text) 
-				? this.repository.findAll()
-				: this.repository.findAllByNameContainsIgnoreCase(text);
+				? this.repository.findAll(sort) 
+				: this.repository.findAllByNameContainsIgnoreCase(text, sort);
 	}
 
 	@Override

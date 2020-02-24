@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import fr.be.your.self.backend.setting.DataSetting;
-import fr.be.your.self.common.StatusCode;
+import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.exception.InvalidException;
@@ -30,9 +30,10 @@ public abstract class BaseController<T> {
     		@RequestParam(value = "q", required = false) String search,
     		@RequestParam(required = false) String sort) throws RuntimeException {
 		
-		final List<T> result = this.getService().search(search);
+		// TODO PhatPQ => Rest API
+		final List<T> result = this.getService().search(search, null);
 		if (result == null) {
-			throw new BusinessException(StatusCode.PROCESSING_ERROR);
+			throw new BusinessException(ErrorStatusCode.PROCESSING_ERROR);
 		}
 		
 		return ResponseEntity.ok(result);
@@ -48,12 +49,13 @@ public abstract class BaseController<T> {
 		
 		final PageRequest pageable = this.getPageRequest(page, size);
 		if (pageable == null) {
-			throw new InvalidException(StatusCode.INVALID_PARAMETER, "page");
+			throw new InvalidException(ErrorStatusCode.INVALID_PARAMETER, "page");
 		}
 		
-		final PageableResponse<T> result = this.getService().pageableSearch(search, pageable);
+		// TODO PhatPQ => Rest API
+		final PageableResponse<T> result = this.getService().pageableSearch(search, pageable, null);
 		if (result == null) {
-			throw new BusinessException(StatusCode.PROCESSING_ERROR);
+			throw new BusinessException(ErrorStatusCode.PROCESSING_ERROR);
 		}
 		
 		return ResponseEntity.ok(result);

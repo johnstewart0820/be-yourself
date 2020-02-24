@@ -129,6 +129,10 @@ b, strong {
 }
 
 /********* Table *************/
+table.dataTable {
+	margin-top: 0px !important;	
+}
+
 table.dataTable thead .sorting:before, 
 table.dataTable thead .sorting_asc:before, 
 table.dataTable thead .sorting_desc:before, 

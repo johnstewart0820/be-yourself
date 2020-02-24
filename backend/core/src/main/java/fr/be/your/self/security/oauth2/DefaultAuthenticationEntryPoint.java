@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.be.your.self.common.StatusCode;
+import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.dto.StatusResponse;
 import fr.be.your.self.util.StringUtils;
 
@@ -54,7 +54,7 @@ public class DefaultAuthenticationEntryPoint extends LoginUrlAuthenticationEntry
 			
 			if (requestURL.startsWith(apiPath)) {
 				final StatusResponse result = new StatusResponse(false);
-				result.setCode(StatusCode.UNAUTHORIZED.getValue());
+				result.setCode(ErrorStatusCode.UNAUTHORIZED.getValue());
 				result.setMessage("Unauthorized");
 				
 				final ObjectMapper mapper = new ObjectMapper();

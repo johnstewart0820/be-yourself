@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -90,11 +91,6 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	}
 
 	@Override
-	protected String getDefaultSort() {
-		return "title|asc";
-	}
-
-	@Override
 	protected Session newDomain() {
 		return new Session();
 	}
@@ -129,7 +125,9 @@ public class SessionController extends BaseResourceController<Session, Session, 
 			Model model, Map<String, String> searchParams, PageableResponse<Session> pageableDto) throws BusinessException {
 		super.loadListPageOptions(session, request, response, model, searchParams, pageableDto);
 		
-		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll();
+		final String categoryDefaultSort = this.sessionCategoryService.getDefaultSort();
+		final Sort categorySort = this.getSortRequest(categoryDefaultSort);
+		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll(categorySort);
 		model.addAttribute("sessionCategories", sessionCategories);
 		
 		final Set<Integer> filterCategoryIds = new HashSet<Integer>();
@@ -189,14 +187,18 @@ public class SessionController extends BaseResourceController<Session, Session, 
 		model.addAttribute("supportMediaSize", supportMediaSize);
 		model.addAttribute("supportMediaSizeLabel", StringUtils.formatFileSize(supportMediaSize));
 		
-		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll();
+		final String categoryDefaultSort = this.sessionCategoryService.getDefaultSort();
+		final Sort categorySort = this.getSortRequest(categoryDefaultSort);
+		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll(categorySort);
 		model.addAttribute("sessionCategories", sessionCategories);
 	}
 
 	@Override
-	protected PageableResponse<Session> pageableSearch(Map<String, String> searchParams, PageRequest pageable) {
-		// TODO Filter category?
-		return super.pageableSearch(searchParams, pageable);
+	protected PageableResponse<Session> pageableSearch(Map<String, String> searchParams, PageRequest pageable, Sort sort) {
+		final String search = searchParams.get("q");
+		final List<Integer> filterCategoryIds = NumberUtils.parseIntegers(searchParams.get("categoryIds"), ",");
+		
+		return this.mainService.pageableSearch(search, filterCategoryIds, pageable, sort);
 	}
 
 	@PostMapping("/create")

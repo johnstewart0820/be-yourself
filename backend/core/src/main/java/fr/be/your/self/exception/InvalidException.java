@@ -1,6 +1,6 @@
 package fr.be.your.self.exception;
 
-import fr.be.your.self.common.StatusCode;
+import fr.be.your.self.common.ErrorStatusCode;
 
 public class InvalidException extends RuntimeException {
 
@@ -9,15 +9,15 @@ public class InvalidException extends RuntimeException {
 	 */
 	private static final long serialVersionUID = 4522548717124837250L;
 
-	private final StatusCode code;
+	private final ErrorStatusCode code;
 	private final String parameter;
 
-	public InvalidException(StatusCode code, String parameter) {
+	public InvalidException(ErrorStatusCode code, String parameter) {
 		this.code = code;
 		this.parameter = parameter;
 	}
 
-	public StatusCode getCode() {
+	public ErrorStatusCode getCode() {
 		return code;
 	}
 
