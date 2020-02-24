@@ -11,7 +11,13 @@
 		<form id="select_form" th:action="@{/user/list/page/1}" method="post">
 			<div class="row">
 				<div class="col-md-6">
-					<a href="/user/add" class="btn btn-sm btn-primary" th:if="${writePermission}">+ Add User</a>
+					<th:block th:if="${writePermission}">
+						<a class="btn btn-icon btn-2 btn-primary"
+							th:href="${baseURL + '/add'}"> <span class="btn-inner--icon">
+								<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
+						</span>
+						</a>
+					</th:block>
 				</div>
 				<div class="col-md-3">
 					<div class="form-group">

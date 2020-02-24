@@ -33,7 +33,11 @@ public class SubscriptionServiceImpl  extends BaseServiceImpl<Subscription> impl
 
 	@Override
 	protected Iterable<Subscription> getList(String text) {
-		throw new UnsupportedOperationException("Get list by text not supported!");
+		if (!StringUtils.isNullOrEmpty(text)) {
+			throw new UnsupportedOperationException("Get list by text not supported!");
+		}
+		return this.subscriptionRepo.findAll();
+
 	}
 	
 	@Override
@@ -44,7 +48,10 @@ public class SubscriptionServiceImpl  extends BaseServiceImpl<Subscription> impl
 
 	@Override
 	protected Page<Subscription> getListByPage(String text, Pageable pageable) {
-		throw new UnsupportedOperationException("Get list by text not supported!");
+		if (!StringUtils.isNullOrEmpty(text)) {
+			throw new UnsupportedOperationException("Get list by text not supported!");
+		}
+		return this.subscriptionRepo.findAll(pageable);
 	}
 	
 	@Override

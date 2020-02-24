@@ -10,19 +10,39 @@
 	<div layout:fragment="content">
 
 		<div class="container">
-			<form th:action="@{/user/save}" th:object="${user}" method="post">
-		
+
 			<div class="row justify-content-center">
 				<!--div class="col-lg-5 col-md-7"-->
 				<div class="col-lg-7 col-md-9">
-					<div class="card bg-secondary shadow border-0">
-						<div class="card-body px-lg-5 py-lg-5">
-							<div class="mb-3">
-								<div class="text-center">
-									<span th:if="${isUpdating}"><b>Update User</b></span> <span
-										th:unless="${isUpdating}"><b>Add User</b></span>
+					<div class="card  shadow border-0">
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<div class="row">
+								<div class="col-6">
+									<a class="btn btn-icon btn-2 btn-primary"
+										th:href="${baseURL+'/management'}"
+										th:title="#{action.go.to.list.title}"> <span
+										class="btn-inner--icon"> <i class="fas fa-arrow-left"></i>
+											<span th:text="#{action.go.to.list}"></span>
+									</span>
+									</a>
+								</div>
+
+								<div class="col-6 text-right">
+									<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
 								</div>
 							</div>
+						</div>
+						<!-- Card body -->
+						<div class="card-body px-lg-5 py-lg-5">
+							<form th:action="@{/user/save}" th:object="${user}" method="post">
+
+								<div class="mb-3">
+									<div class="text-center">
+										<span th:if="${isUpdating}"><b>Update User</b></span> <span
+											th:unless="${isUpdating}"><b>Add User</b></span>
+									</div>
+								</div>
 								<input type="hidden" th:field="*{id}" />
 
 								<div class="form-group">
@@ -30,7 +50,8 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text required-field">Title</span>
 										</div>
-										<select id="title" class="form-control" th:field="*{title}" required>
+										<select id="title" class="form-control" th:field="*{title}"
+											required>
 											<option th:value="Mrs" th:text="Mrs"></option>
 											<option th:value="Mr" th:text="Mr"></option>
 										</select>
@@ -41,13 +62,14 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text">Last Name</span>
 										</div>
-										<input class="form-control" type="text" th:field="*{lastName}" required>
+										<input class="form-control" type="text" th:field="*{lastName}">
 									</div>
 								</div>
 								<div class="form-group">
 									<div class="input-group input-group-alternative mb-3">
 										<div class="input-group-prepend">
-											<span class="input-group-text required-field">First Name</span>
+											<span class="input-group-text required-field">First
+												Name</span>
 										</div>
 										<input class="form-control" type="text"
 											th:field="*{firstName}" required>
@@ -59,13 +81,15 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text required-field">Email</span>
 										</div>
-										<input class="form-control" type="email" th:field="*{email}" required>
+										<input class="form-control" type="email" th:field="*{email}"
+											required>
 									</div>
 								</div>
 								<div class="form-group">
 									<div class="input-group input-group-alternative mb-3">
 										<div class="input-group-prepend">
-											<span class="input-group-text required-field">Login type</span>
+											<span class="input-group-text required-field">Login
+												type</span>
 										</div>
 										<select id="loginType" class="form-control"
 											th:field="*{loginType}" required>
@@ -91,7 +115,8 @@
 										<div class="input-group-prepend">
 											<span class="input-group-text required-field">Status</span>
 										</div>
-										<select id="status" class="form-control" th:field="*{status}" required>
+										<select id="status" class="form-control" th:field="*{status}"
+											required>
 											<option th:value="0" th:text="Draft"></option>
 											<option th:value="1" th:text="Active"></option>
 											<option th:value="2" th:text="Inactive"></option>
@@ -111,7 +136,8 @@
 								<div class="form-group" id="account_type_div">
 									<div class="input-group input-group-alternative mb-3">
 										<div class="input-group-prepend">
-											<span class="input-group-text required-field">Account Type</span>
+											<span class="input-group-text required-field">Account
+												Type</span>
 										</div>
 										<select id="userType" class="form-control"
 											th:field="*{userType}" required>
@@ -123,8 +149,9 @@
 									</div>
 								</div>
 								<div class="form-group" id="admin_permissions_div">
-									<ul style="list-style-type: none; margin: 0;  padding: 0">
-										<li th:each="permission, itemStats : ${user.permissions}" style="float:left; width:50%">
+									<ul style="list-style-type: none; margin: 0; padding: 0">
+										<li th:each="permission, itemStats : ${user.permissions}"
+											style="float: left; width: 50%">
 											<div class="input-group input-group-alternative mb-3">
 
 												<div class="input-group-prepend">
@@ -137,9 +164,8 @@
 												<input type="hidden"
 													th:field="*{permissions[__${itemStats.index}__].functionality}" />
 												<input type="hidden"
-													th:field="*{permissions[__${itemStats.index}__].id}" />
-
-												<select class="form-control"
+													th:field="*{permissions[__${itemStats.index}__].id}" /> <select
+													class="form-control"
 													th:field="*{permissions[__${itemStats.index}__].userPermission}"
 													th:value="${permission.userPermission}">
 													<option th:value="0">Denied</option>
@@ -151,55 +177,58 @@
 									</ul>
 								</div>
 
-
+								<div class="row justify-content-center">
+									<div class="col-lg-7 col-md-9">
+										<div class="justify-content-center" th:if="${writePermission}">
+											<div class="justify-content-center">
+												<button type="submit" class="btn btn-primary mt-4">
+													Save changes</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
 
 						</div>
 
 					</div>
 				</div>
-				<div class="col-md-4" id="reset_pwd_email_div"  th:if="${isUpdating && writePermission}">
-					<div class="card bg-secondary shadow border-0">
+				<div class="col-md-4" id="reset_pwd_email_div"
+					th:if="${isUpdating && writePermission}">
+					<div class="card shadow border-0">
 						<div class="card-body px-lg-5 py-lg-5">
-							<a th:href="@{/user/{id}/resetpassword(id=${user.id})}" class="btn btn-primary mt-4">Reset Password</a>
-							<a th:href="@{/user/{id}/resendverifemail(id=${user.id})}" class="btn btn-primary mt-4">Resend Verification Email</a>
+							<a th:href="@{/user/{id}/resetpassword(id=${user.id})}"
+								class="btn btn-primary mt-4">Reset Password</a> <a
+								th:href="@{/user/{id}/resendverifemail(id=${user.id})}"
+								class="btn btn-primary mt-4">Resend Verification Email</a>
 
 						</div>
 					</div>
 				</div>
 
 			</div>
-				<div class="row justify-content-center">
-					<div class="col-lg-7 col-md-9">
-						<div class="justify-content-center" th:if="${writePermission}">
-							<div class="justify-content-center">
-								<button type="submit" class="btn btn-primary mt-4">
-									Save changes</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</form>
-			
+
+
 		</div>
 
 	</div>
 
 	<section layout:fragment="scripts">
-	<script>
+		<script>
 		var editAccType = 2;
 		var editPermissions = 2;
 	</script>
-	<div th:if="${editAccType != null}" >
-		<script>
+		<div th:if="${editAccType != null}">
+			<script>
 		   	editAccType = [[${editAccType}]];
 	   </script>
-	</div>
-	<div th:if="${editPermissions != null}" >
-		<script>
+		</div>
+		<div th:if="${editPermissions != null}">
+			<script>
 			editPermissions = [[${editPermissions}]];
 	   </script>
-	</div>
-	<script>
+		</div>
+		<script>
 
 	var isUpdating = [[${isUpdating}]];
 
@@ -251,7 +280,8 @@
 			selectUserType();
 		});
 	});
-</script></section>
+</script>
+	</section>
 
 </body>
 </html>

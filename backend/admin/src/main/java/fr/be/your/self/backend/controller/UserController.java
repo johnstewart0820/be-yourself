@@ -509,9 +509,10 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	}
 	
 	// default page
-	@RequestMapping(value = "/user/management")
+	@RequestMapping(value = {"/user/management"})
 	public String showDefaultUserPage(Model model) {
-		return  "redirect:" + DEFAULT_URL; 	}
+		return  "redirect:" + DEFAULT_URL; 	
+	}
 
 
 	@Override
