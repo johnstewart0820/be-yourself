@@ -1,7 +1,6 @@
 package fr.be.your.self.common;
 
-public enum StatusCode {
-	OK(""),
+public enum ErrorStatusCode {
 	
 	UNAUTHORIZED("unauthorized"),
 	INVALID_CREDENTIALS("invalid.credentials"),
@@ -15,7 +14,7 @@ public enum StatusCode {
 	
 	private final String value;
 
-	private StatusCode(String value) {
+	private ErrorStatusCode(String value) {
 		this.value = value;
 	}
 

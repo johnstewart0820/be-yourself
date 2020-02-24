@@ -169,7 +169,7 @@ function resetMediaElement(inputElement,
 
 function loadLocalAudioSource(audioPlayer, audioContainerElementId, audioPlayerElementId, file) {
 	const audioMimeType = file.type;
-
+	
 	const reader = new FileReader();
 	reader.onload = function(e) {
 		changeAudioSource(audioPlayer, audioContainerElementId, 
@@ -235,6 +235,10 @@ function showModal(modalId, hideInteval) {
 	}
 }
 
+function showOnLoadedModal() {
+	showModal('on-load-modal', 5000);
+}
+
 function formatBytes(bytes, decimals) {
     if (bytes === 0) return '0 Bytes';
 
@@ -293,8 +297,6 @@ function buildDataTable(dataTableId, sortableColumnNameMaps, defaultSort, sortUr
 			var sortQuery = '';
 			
 			if (ordArr && ordArr.length > 0) {
-				
-				
 				for (var i = 0; i < ordArr.length; i++) {
 					const order = ordArr[i];
 					const columnName = sortableColumnIndexMaps[order.col];

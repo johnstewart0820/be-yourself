@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.be.your.self.dto.PageableResponse;
@@ -18,9 +19,11 @@ import fr.be.your.self.service.BaseService;
 
 public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	
+	protected final static String TEXT_SEARCH_KEY = "q";
+	
 	protected abstract BaseRepository<T> getRepository();
 	
-	protected abstract Iterable<T> getList(String text);
+	protected abstract Iterable<T> getList(String text, Sort sort);
 	
 	protected abstract Page<T> getListByPage(String text, Pageable pageable);
 	
@@ -39,6 +42,9 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 		}
 		
 		final Iterable<T> domains = this.getRepository().findAllById(ids);
+		if (domains == null) {
+			return Collections.emptyList();
+		}
 		
 		final List<T> result = new ArrayList<>();
 		domains.forEach(result::add);
@@ -59,8 +65,12 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<T> getAll() {
-		final Iterable<T> domains = this.getRepository().findAll();
+	public List<T> getAll(Sort sort) {
+		final Iterable<T> domains = this.getRepository().findAll(sort == null ? Sort.unsorted() : sort);
+		
+		if (domains == null) {
+			return Collections.emptyList();
+		}
 		
 		final List<T> result = new ArrayList<>();
 		domains.forEach(result::add);
@@ -70,8 +80,12 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<T> search(String text) {
-		final Iterable<T> domains = this.getList(text);
+	public List<T> search(String text, Sort sort) {
+		final Iterable<T> domains = this.getList(text, sort == null ? Sort.unsorted() : sort);
+		
+		if (domains == null) {
+			return Collections.emptyList();
+		}
 		
 		final List<T> result = new ArrayList<>();
 		domains.forEach(result::add);
@@ -81,9 +95,18 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 
 	@Override
 	@Transactional(readOnly = true)
-	public PageableResponse<T> pageableSearch(String text, Pageable pageable) throws RuntimeException {
+	public PageableResponse<T> pageableSearch(String text, Pageable pageable, Sort sort) throws RuntimeException {
 		if (pageable == null) {
-			return null;
+			final List<T> items = this.search(text, sort);
+			
+			final PageableResponse<T> result = new PageableResponse<>();
+			result.setItems(items);
+			result.setTotalItems(items.size());
+			result.setTotalPages(1);
+			result.setPageIndex(1);
+			result.setPageSize(-1);
+			
+			return result;
 		}
 		
 		final Page<T> pageDomain = this.getListByPage(text, pageable);

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,15 +30,20 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 	}
 
 	@Override
+	public String getDefaultSort() {
+		return "email|asc";
+	}
+	
+	@Override
 	public boolean existsEmail(String email) {
 		return this.repository.existsByEmail(email);
 	}
 
 	@Override
-	protected Iterable<User> getList(String text) {
+	protected Iterable<User> getList(String text, Sort sort) {
 		return StringUtils.isNullOrSpace(text) 
-				? this.repository.findAll()
-				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text);
+				? this.repository.findAll(sort) 
+				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text, sort);
 	}
 	
 	@Override

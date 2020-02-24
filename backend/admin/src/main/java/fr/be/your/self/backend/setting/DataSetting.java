@@ -9,6 +9,7 @@ import java.util.Set;
 public class DataSetting {
 	
 	private int defaultPageSize;
+	private Set<Integer> supportPageSizes;
 	
 	private boolean autoActivateAccount;
 	private boolean autoActivateAdminAccount;
@@ -48,8 +49,8 @@ public class DataSetting {
 		return defaultPageSize;
 	}
 
-	public void setDefaultPageSize(int defaultPageSize) {
-		this.defaultPageSize = defaultPageSize > 0 ? defaultPageSize : 10;
+	public Set<Integer> getSupportPageSizes() {
+		return supportPageSizes == null ? Collections.emptySet() : supportPageSizes;
 	}
 
 	public String getUploadFolder() {
@@ -95,7 +96,7 @@ public class DataSetting {
 	public long getActivateCodeTimeout() {
 		return activateCodeTimeout;
 	}
-
+	
 	public Set<String> getImageFileExtensions() {
 		return imageFileExtensions == null ? Collections.emptySet() : this.imageFileExtensions;
 	}
@@ -146,6 +147,12 @@ public class DataSetting {
 
 	public boolean isAllowSocialOnAuthPage() {
 		return allowSocialOnAuthPage;
+	}
+	
+	/******************** SETTER **************************/
+	public void setDataPageSize(Set<Integer> supportPageSizes, int defaultPageSize) {
+		this.supportPageSizes = supportPageSizes;
+		this.defaultPageSize = defaultPageSize > 0 ? defaultPageSize : 10;
 	}
 	
 	public void setUploadFileSizes(long imageMaxFileSize, long audioMaxFileSize, long videoMaxFileSize) {

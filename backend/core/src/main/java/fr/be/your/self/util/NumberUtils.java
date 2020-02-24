@@ -1,6 +1,9 @@
 package fr.be.your.self.util;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NumberUtils {
 	
@@ -42,6 +45,47 @@ public class NumberUtils {
 	
 	public static final int parseInt(Object value) {
     	return parseInteger(value, 0);
+	}
+	
+	public static final List<Integer> parseIntegers(List<Object> values) {
+		if (values == null || values.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		final List<Integer> result = new ArrayList<Integer>();
+		for (Object value : values) {
+			Integer iValue = parseInteger(value);
+			if (iValue != null) {
+				result.add(iValue);
+			}
+		}
+		
+		return result;
+	}
+	
+	public static final List<Integer> parseIntegers(Object[] values) {
+		if (values == null || values.length == 0) {
+			return Collections.emptyList();
+		}
+		
+		final List<Integer> result = new ArrayList<Integer>();
+		for (Object value : values) {
+			Integer iValue = parseInteger(value);
+			if (iValue != null) {
+				result.add(iValue);
+			}
+		}
+		
+		return result;
+	}
+	
+	public static final List<Integer> parseIntegers(String value, String separator) {
+		if (value == null) {
+			return Collections.emptyList();
+		}
+		
+		final String[] values = value.split(separator);
+		return parseIntegers(values);
 	}
 	
 	public static final Long parseLong(Object value, Long defaultValue) {

@@ -13,24 +13,34 @@
 				<div class="card shadow"> 
 					<div class="card-header border-0" style="padding-bottom: 6px;">
 						<div class="row">
-							<div class="col-6">
-								<th:block th:if="${writePermission}">
-									<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/create'}">
-										<span class="btn-inner--icon">
-											<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
-										</span>
-									</a>
+							<th:block th:switch="${writePermission}">
+								<th:block th:case="true">
+									<div class="col-lg-6 col-md-12">
+										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/create'}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
+											</span>
+										</a>
+									</div>
+									
+									<div class="col-lg-6 text-right d-md-none d-lg-block">
+										<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
+									</div>
 								</th:block>
-							</div>
-							
-							<div class="col-6 text-right">
-								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
-							</div>
+								
+								<div th:case="*" class="col-12 text-right">
+									<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
+								</div>
+							</th:block>
 						</div>
 						
 						<div class="row form-search-container">
-							<div class="col-9">
+							<div class="col-md-9 col-sm-12">
 								<select id="category-filter" class="selectpicker" multiple 
+									data-actions-box="true" data-live-search="true" 
+									th:data-select-all-text="#{data.display.button.select.all}"
+									th:data-deselect-all-text="#{data.display.button.deselect.all}"
+									th:title="#{|${baseMessageKey}.option.filter.category.title|}"
 									th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}">
 									<option th:each="sessionCategory: ${sessionCategories}" 
 										th:value="${sessionCategory.id}" 
@@ -39,11 +49,15 @@
 								</select>
 							</div>
 							
-							<div class="col-3">
-								<select id="display-option" class="selectpicker" 
-									th:data-none-selected-text="#{|${baseMessageKey}.option.display.title|}">
-									<option value="1" th:text="#{|${baseMessageKey}.option.display.show.id|}"></option>
-									<option value="0" selected th:text="#{|${baseMessageKey}.option.display.hide.id|}"></option>
+							<div class="col-md-3 col-sm-12 text-right">
+								<select id="display-page-option" class="selectpicker show-tick" 
+									th:data-none-selected-text="#{data.display.page.option.title}">
+									<option th:each="pageSize: ${supportPageSizes}" 
+										th:value="${pageSize}" 
+										th:text="#{data.display.page.option.item(${pageSize}, ${pageSizeName})}"
+										th:selected="${size != null && size == pageSize}"></option>
+									<option value="-1" th:text="#{data.display.page.option.all(${pageSizeName})}"
+										th:selected="${size == null || size <= 0}"></option>
 								</select>
 							</div>
 						</div>
@@ -53,21 +67,16 @@
 						<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
 							<thead class="thead-light">
 								<tr>
-									<th class="column-id" scope="col" width="1%" th:text="#{|${baseMessageKey}.detail.id|}"></th>
-									<th scope="col" width="45%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
-									<th scope="col" class="no-sort" width="20%" th:text="#{|${baseMessageKey}.detail.categories|}"></th>
-									<th scope="col" width="10%" th:text="#{|${baseMessageKey}.detail.duration|}"></th>
-									<th scope="col" width="5%" th:text="#{|${baseMessageKey}.detail.free|}"></th>
-									<th scope="col" width="10%" th:text="#{data.detail.created}"></th>
-									<th scope="col" class="no-sort" th:if="${readPermission}"></th>
+									<th scope="col" width="42%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
+									<th scope="col" width="40%" class="no-sort" th:text="#{|${baseMessageKey}.detail.categories|}"></th>
+									<th scope="col" width="5%" style="min-width: 60px;" th:text="#{|${baseMessageKey}.detail.duration|}"></th>
+									<th scope="col" width="3%" style="min-width: 30px;" th:text="#{|${baseMessageKey}.detail.free|}"></th>
+									<th scope="col" width="5%" style="min-width: 110px;" th:text="#{data.detail.created}"></th>
+									<th scope="col" width="5%" style="min-width: 80px;" class="no-sort" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${result.items}">
-									<th scope="row" nowrap class="column-id">
-										<span th:text="${item.id}"></span>
-									</th>
-									
 									<th scope="row" nowrap style="padding-top: 0px; padding-bottom: 0px;">
 										<div class="media align-items-center">
 											<a th:if="${item.image != null && item.image != ''}" 
@@ -154,8 +163,6 @@
 				
 				buildDataTable(dataTableId, sortableColumnMaps, defaultSort, sortUrl);
 				
-				showModal('on-load-modal', 5000);
-				
 				$('select').selectpicker();
 				
 				$('#category-filter').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
@@ -164,15 +171,13 @@
 					window.location = '[[${baseURL}]]/search?action=update-filter&categoryIds=' + encodeURIComponent(selectedCategoryIds.join(','));
 				});
 				
-				$('#display-option').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-					const selectedValue = $('#display-option').val();
+				$('#display-page-option').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+					const selectedPageSize = $('#display-page-option').val();
 					
-					if (selectedValue == 0) {
-						$('#dataTableId .column-id').hide();
-					} else if (selectedValue == 1) {
-						$('#dataTableId .column-id').show();
-					}
+					window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size=' + selectedPageSize;
 				});
+				
+				showOnLoadedModal();
 			});
 		</script>
 	</th:block>

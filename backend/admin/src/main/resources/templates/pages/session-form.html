@@ -6,6 +6,14 @@
 	<title th:text="#{|${baseMessageKey}.page.title|}"></title>
 </head>
 <body>
+	<th:block layout:fragment="stylesheets">
+		<style type="text/css">
+			#[[${pageName + '-data-form'}]] .image-preview {
+				max-height: 250px;
+			}
+		</style>
+	</th:block>
+	
 	<th:block layout:fragment="content">
 		<!-- Form -->
 		<div class="row">
@@ -13,7 +21,7 @@
 				<div class="card shadow">
 					<div class="card-header border-0">
 						<div class="row">
-							<div class="col-6">
+							<div class="col-lg-6 col-md-12">
 								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/current-page'}"
 									th:title="#{action.go.to.list.title}">
 									<span class="btn-inner--icon">
@@ -22,7 +30,7 @@
 								</a>
 							</div>
 							
-							<div class="col-6 text-right">
+							<div class="col-lg-6 text-right d-md-none d-lg-block">
 								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
 							</div>
 						</div>
@@ -30,6 +38,7 @@
 					
 					<div class="card-body border-0">
 						<form action="#" th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
+							th:id="${pageName + '-data-form'}"
 							th:object="${dto}" method="post" enctype="multipart/form-data">
 							<fieldset th:disabled="${!writePermission}">
 								<div th:if="${param.error}">
@@ -148,7 +157,7 @@
 											</div>
 											
 											<div class="col-md-3 col-sm-3 col-xs-12">
-												<div class="custom-control custom-control-alternative custom-checkbox mb-3">
+												<div class="custom-control custom-control-alternative custom-checkbox" style="padding-top: 8px;">
 													<input class="custom-control-input" th:field="*{free}" id="free" type="checkbox">
 													<label class="custom-control-label" for="free" th:text="#{|${baseMessageKey}.detail.free|}">Free</label>
 												</div>
@@ -171,18 +180,36 @@
 												th:text="#{|${baseMessageKey}.detail.categories|}"></label>
 											<div class="col-md-10 col-sm-9 col-xs-12">
 												<div class="row">
-													<div th:each="sessionCategory: ${sessionCategories}" 
-														class="custom-control custom-control-alternative custom-checkbox mb-3 col-md-6 col-sm-12">
-														<input class="custom-control-input" type="checkbox" 
-															name="categoryIds" th:id="${'category_' + sessionCategory.id}"
-															th:value="${sessionCategory.id}" 
-															th:checked="${#arrays.contains(dto.categoryIds, sessionCategory.id)}" />
-														<label class="custom-control-label" 
-															th:for="${'category_' + sessionCategory.id}" 
-															th:text="${sessionCategory.name}"></label>
+													<div th:each="sessionCategory: ${sessionCategories}" class="col-lg-4 col-md-6 col-sm-12">
+														<div class="custom-control custom-control-alternative custom-checkbox mb-3">
+															<input class="custom-control-input" type="checkbox" 
+																name="categoryIds" th:id="${'category_' + sessionCategory.id}"
+																th:value="${sessionCategory.id}" 
+																th:checked="${#arrays.contains(dto.categoryIds, sessionCategory.id)}" />
+															<label class="custom-control-label" 
+																th:for="${'category_' + sessionCategory.id}" 
+																th:text="${sessionCategory.name}"></label>
+														</div>
 													</div>
 												</div>
 												<div class="invalid-feedback" th:if="${#fields.hasErrors('categoryIds')}" th:errors="*{categoryIds}"></div>
+											</div>
+										</div>
+										
+										<div th:if="${writePermission}" class="form-group row">
+											<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+												<div class="form-action-buttons-row">
+													<button type="submit" class="btn btn-primary" th:title="#{action.save.title}">
+														<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
+													</button>
+													
+													<a class="btn btn-outline-warning" th:href="${baseURL + '/current-page'}"
+														th:title="#{action.go.to.list.title}">
+														<span class="btn-inner--icon">
+															<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+														</span>
+													</a>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -190,11 +217,11 @@
 									<div class="col-md-4 col-sm-12">
 										<div class="form-group row">
 											<div class="col-12 text-center" th:switch="${action}">
-												<img th:case="create" id="imagePreview" class="image-fit" style="max-height: 124px;"
+												<img th:case="create" id="imagePreview" class="image-fit image-preview" 
 													th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
 												<a th:case="*" th:href="${baseMediaURL + '/image/download/' + dto.image}" 
 													th:title="#{session.category.detail.image.link.title}" target="_blank">
-													<img class="image-fit" id="imagePreview" style="max-height: 124px;"
+													<img id="imagePreview" class="image-fit image-preview" 
 														th:alt="${dto.title}" th:src="${baseMediaURL + '/image/view/' + dto.image}">
 												</a>
 											</div>
@@ -227,112 +254,13 @@
 									</div>
 								</div>
 							</fieldset>
-							
-							<div th:if="${writePermission}" class="form-group row">
-								<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
-									<div class="form-action-buttons-row">
-										<button type="submit" class="btn btn-primary" th:title="#{action.save.title}">
-											<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
-										</button>
-										
-										<a class="btn btn-outline-warning" th:href="${baseURL + '/current-page'}"
-											th:title="#{action.go.to.list.title}">
-											<span class="btn-inner--icon">
-												<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
-											</span>
-										</a>
-									</div>
-								</div>
-							</div>
 						</form>
 					</div>
 				</div>
 			</div>
 		</div>
 		
-		<div class="modal fade" id="image-file-type-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="imageFileTypeModal" aria-hidden="true" data-backdrop="false">
-			<div class="modal-dialog modal-danger modal-dialog-centered modal-10" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3 class="modal-title" id="image-file-type-modal-title" th:text="#{error.media.modal.title}"></h3>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p th:text="#{error.media.image.support.type(${supportImageExtensions.replace(',', ', ')})}"></p>
-					</div>
-					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" 
-                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button> 
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<div class="modal fade" id="image-file-size-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="imageFileSizeModal" aria-hidden="true" data-backdrop="false">
-			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3 class="modal-title" id="image-file-size-modal-title" th:text="#{error.media.modal.title}"></h3>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p th:text="#{error.media.image.support.max.size(${supportImageSizeLabel})}"></p>
-					</div>
-					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" 
-                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<div class="modal fade" id="media-file-type-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="mediaFileTypeModal" aria-hidden="true" data-backdrop="false">
-			<div class="modal-dialog modal-danger modal-dialog-centered modal-10" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3 class="modal-title" id="media-file-type-modal-title" th:text="#{error.media.modal.title}"></h3>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p th:text="#{error.media.support.type(${supportMediaExtensions.replace(',', ', ')})}"></p>
-					</div>
-					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" 
-                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button> 
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		<div class="modal fade" id="media-file-size-modal" tabindex="-1" role="dialog" 
-			aria-labelledby="mediaFileSizeModal" aria-hidden="true" data-backdrop="false">
-			<div class="modal-dialog modal-warning modal-dialog-centered modal-7" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h3 class="modal-title" id="media-file-size-modal-title" th:text="#{error.media.modal.title}"></h3>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p th:text="#{error.media.support.max.size(${supportMediaSizeLabel})}"></p>
-					</div>
-					<div class="modal-footer">
-                		<button type="button" class="btn btn-link text-white ml-auto" 
-                			data-dismiss="modal" th:text="#{modal.button.ok}">Ok</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<th:block th:replace="fragments/data-form-modals :: modals"></th:block>
 	</th:block>
 
 	<th:block layout:fragment="scripts">
@@ -340,7 +268,7 @@
 			const supportImageTypes = '[[${supportImageTypes}]]';
 			const supportImageFileSize = [[${supportImageSize}]];
 			const defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
-
+			
 			const supportAudioTypes = '[[${supportAudioTypes}]]';
 			const supportAudioExtensions = '[[${supportAudioExtensions}]]';
 			const supportVideoTypes = '[[${supportVideoTypes}]]';
@@ -372,6 +300,8 @@
 			}
 			
 		    $(function() {
+				$('select').selectpicker();
+				
 		    	audioPlayer = new Plyr('#audioPlayer', { invertTime: false });
 		    	videoPlayer = new Plyr('#videoPlayer', { invertTime: false });
 		    	
@@ -382,6 +312,26 @@
 		    	if (contentFileType != 'video') {
 		    		$('#videoContainer').hide();
 		    	}
+		    	
+		    	audioPlayer.on('loadedmetadata', event => {
+		    	    const instance = event.detail.plyr;
+		    	    const duration = Math.round(instance.duration);
+		    	    
+		    	    if (duration > 0) {
+		    	    	$('#duration').val(duration);
+		    	    }
+		    	});
+		    	
+		    	videoPlayer.on('loadedmetadata', event => {
+		    	    const instance = event.detail.plyr;
+		    	    const duration = Math.round(instance.duration);
+		    	    
+		    	    if (duration > 0) {
+		    	    	$('#duration').val(duration);
+		    	    }
+		    	});
+		    	
+		    	showOnLoadedModal();
 		    });
 		</script>
 	</th:block>

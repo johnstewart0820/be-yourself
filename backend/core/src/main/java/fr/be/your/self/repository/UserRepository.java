@@ -2,6 +2,7 @@ package fr.be.your.self.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,8 @@ public interface UserRepository extends BaseRepository<User> {
     long countByEmailOrFirstNameOrLastName(String email, String firstName, String lastName);
     
     Iterable<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName);
+    
+    Iterable<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Sort sort);
     
     Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable);
     

@@ -5,24 +5,30 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import fr.be.your.self.dto.PageableResponse;
 
 public interface BaseService<T> {
-
+	
+	/**
+	 * @return default data sort, format column|{asc|desc}
+	 **/
+	public String getDefaultSort();
+	
 	public T getById(Integer id);
 
 	public List<T> getByIds(Collection<Integer> ids);
 	
 	public List<T> getByIds(int...ids);
 	
-	public List<T> getAll();
+	public List<T> getAll(Sort sort);
 	
 	public long count(String text);
 
-	public PageableResponse<T> pageableSearch(String text, Pageable pageable);
+	public PageableResponse<T> pageableSearch(String text, Pageable pageable, Sort sort);
 
-	public List<T> search(String text);
+	public List<T> search(String text, Sort sort);
 	
 	public T create(T domain);
 

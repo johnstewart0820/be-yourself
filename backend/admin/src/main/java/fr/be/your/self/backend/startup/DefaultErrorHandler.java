@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.common.StatusCode;
+import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.dto.StatusResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.exception.InvalidException;
@@ -132,10 +132,10 @@ public class DefaultErrorHandler {
     	final StatusResponse result = new StatusResponse(false);
     	
     	if (exception.getCause() instanceof BadCredentialsException) {
-    		result.setCode(StatusCode.INVALID_CREDENTIALS.getValue());
+    		result.setCode(ErrorStatusCode.INVALID_CREDENTIALS.getValue());
     		result.setMessage(exception.getCause().getMessage());
     	} else {
-    		result.setCode(StatusCode.PROCESSING_ERROR.getValue());
+    		result.setCode(ErrorStatusCode.PROCESSING_ERROR.getValue());
     		result.setMessage(exception.getMessage());
     	}
     	

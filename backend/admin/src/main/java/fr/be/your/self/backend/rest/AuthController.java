@@ -14,7 +14,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
 import fr.be.your.self.backend.dto.UserCreateRequest;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.common.StatusCode;
+import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.dto.StatusResponse;
 import fr.be.your.self.exception.InvalidException;
@@ -51,11 +51,11 @@ public class AuthController {
 		final String email = body.getEmail();
 		
 		if (StringUtils.isNullOrSpace(email)) {
-			throw new InvalidException(StatusCode.INVALID_PARAMETER, "email");
+			throw new InvalidException(ErrorStatusCode.INVALID_PARAMETER, "email");
 		}
 		
 		if (this.userService.existsEmail(email)) {
-			throw new ValidationException(StatusCode.USERNAME_EXISTED, "Username already existed", email);
+			throw new ValidationException(ErrorStatusCode.USERNAME_EXISTED, "Username already existed", email);
 		}
 
 		final String password = body.getPassword();
