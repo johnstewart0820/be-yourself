@@ -89,8 +89,7 @@ public class SubscriptionType extends PO<Integer>  {
 
 	@Override
 	public String getDisplay() {
-		// TODO TVA Auto-generated method stub
-		return null;
+		return this.name;
 	}
 
 }

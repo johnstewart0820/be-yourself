@@ -157,10 +157,11 @@ public class UserController extends BaseResourceController<User, User, User>  {
 
 
 		if (isNewUser && !isAutoActivateAccount) {
-			String activateAccountUrl = buildActivateAccountUrl(request);
-			boolean success = sendVerificationEmailToUser(activateAccountUrl, savedUser);
-
-			// TODO: Use success variable?
+			if (savedUser.getStatus() == UserStatus.DRAFT.getValue()) {
+				String activateAccountUrl = buildActivateAccountUrl(request);
+				boolean success = sendVerificationEmailToUser(activateAccountUrl, savedUser);
+				// TODO: Use success variable?
+			}
 			
 			if (tempPwd != null) {
 				this.emailSender.sendTemporaryPassword(savedUser.getEmail(), tempPwd);
@@ -248,6 +249,16 @@ public class UserController extends BaseResourceController<User, User, User>  {
 		User user = new User();
 		model.addAttribute("user", user);
 		model.addAttribute("isUpdating", false);
+		addDefaultPermissions(user);
+		
+		findLoggedUserInfo(model);
+
+		model.addAttribute("editAccType", UserPermission.WRITE.getValue()); //If we are creating a new user, we need to be able to change the account type
+
+		return "user/userform";
+	}
+
+	private void addDefaultPermissions(User user) {
 		Iterable<Functionality> functionalities = functionalityService.findAll();
 		List<Permission> permissions = new ArrayList<Permission>();
 
@@ -259,12 +270,6 @@ public class UserController extends BaseResourceController<User, User, User>  {
 			permissions.add(permission);
 		}
 		user.setPermissions(permissions);
-		
-		findLoggedUserInfo(model);
-
-		model.addAttribute("editAccType", UserPermission.WRITE.getValue()); //If we are creating a new user, we need to be able to change the account type
-
-		return "user/userform";
 	}
 
 	// show update form
@@ -456,11 +461,15 @@ public class UserController extends BaseResourceController<User, User, User>  {
 			String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
 			String encodedPwd = passwordEncoder.encode(tempPwd);
 			user.setPassword(encodedPwd);
+
 			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
 				setActivateCodeAndTimeout(user);
 			}
-			
-			userService.saveOrUpdate(user);
+
+			User savedUser = userService.saveOrUpdate(user);
+			addDefaultPermissions(savedUser);
+			permissionService.saveAll(savedUser.getPermissions());
+
 			this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
 			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
 				String activateAccountUrl = buildActivateAccountUrl(request);
@@ -500,9 +509,10 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	}
 	
 	// default page
-	@RequestMapping(value = "/user/management")
+	@RequestMapping(value = {"/user/management"})
 	public String showDefaultUserPage(Model model) {
-		return  "redirect:" + DEFAULT_URL; 	}
+		return  "redirect:" + DEFAULT_URL; 	
+	}
 
 
 	@Override

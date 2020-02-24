@@ -82,7 +82,7 @@ public class SubscriptionTypeController
 		PageRequest pageable = PageRequest.of(page - 1, nb);
 		Page<SubscriptionType> subtypePage;
 
-		return "subtype/subtype_list";
+		return "subtype/subtype-list";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
