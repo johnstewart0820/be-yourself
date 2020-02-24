@@ -1,6 +1,5 @@
 package fr.be.your.self.backend.controller;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -10,26 +9,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import fr.be.your.self.backend.dto.SessionDto;
 import fr.be.your.self.backend.dto.SubscriptionDto;
-import fr.be.your.self.backend.dto.SubscriptionTypeDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.exception.BusinessException;
-import fr.be.your.self.model.Session;
-import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
@@ -111,17 +104,19 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		
 		final List<String> canals = Arrays.asList("WEB", "APP");
 		final List<Integer> durations = Arrays.asList(1, 3, 6, 12, 24);
-
-		final List<User> users = userService.getAll();
-		final List<SubscriptionType> subtypes = subtypeService.getAll();
-
 		
+		final String userDefaultSort = this.userService.getDefaultSort();
+		final Sort userSort = this.getSortRequest(userDefaultSort);
+		final List<User> users = userService.getAll(userSort);
+		
+		final String subtypeDefaultSort = this.subtypeService.getDefaultSort();
+		final Sort subtypeSort = this.getSortRequest(subtypeDefaultSort);
+		final List<SubscriptionType> subtypes = subtypeService.getAll(subtypeSort);
+
 		model.addAttribute("canals", canals); //TODO TVA check if we keep this
 		model.addAttribute("users", users);
 		model.addAttribute("subtypes", subtypes);
 		model.addAttribute("durations", durations);
-
-		
 	}
 	
 	@PostMapping("/create")
