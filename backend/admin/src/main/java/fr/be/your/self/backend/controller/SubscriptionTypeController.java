@@ -1,6 +1,7 @@
 package fr.be.your.self.backend.controller;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,6 +41,15 @@ public class SubscriptionTypeController
 	public static final String NAME = "subtype";
 
 	private static final String DEFAULT_URL = "/subtype/list/page/1";
+	
+	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
+		
+		static {
+			SORTABLE_COLUMNS.add("name");
+			SORTABLE_COLUMNS.add("duration");
+			SORTABLE_COLUMNS.add("canal");
+		/* SORTABLE_COLUMNS.add("price"); */
+		}
 
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX + Constants.PATH.WEB_ADMIN.MEDIA
 			+ Constants.FOLDER.MEDIA.SESSION;
@@ -49,8 +59,7 @@ public class SubscriptionTypeController
 	
 	@Override
 	protected Set<String> getSortableColumns() {
-		// TODO Auto-generated method stub
-		return null;
+		return SORTABLE_COLUMNS;
 	}
 
 	@Override

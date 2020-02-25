@@ -13,87 +13,105 @@
 			<div class="row justify-content-center">
 				<!--div class="col-lg-5 col-md-7"-->
 				<div class="col-lg-7 col-md-9">
-					<div class="card bg-secondary shadow border-0">
-						<div class="card-body px-lg-5 py-lg-5">
-							<div class="mb-3">
-								<div class="text-center">
-									<span><b>Account Settings</b></span>
-										
+					<div class="card  shadow border-0">
+						<div class="card-header border-0">
+							<div class="row">
+
+								<div class="col-lg-6 text-right d-md-none d-lg-block">
+									<h3 class="mb-0 form-title-label">Account Settings</h3>
 								</div>
 							</div>
-							<form id="user_form" th:action="@{/user/settings/save}" th:object="${user}" method="post">
+						</div>
+						<div class="card-body px-lg-5 py-lg-5">
+							<form id="user_form" th:action="@{/user/settings/save}"
+								th:object="${user}" method="post">
 								<input type="hidden" th:field="*{id}" />
+								<div class="row">
+									<div class="col-md-9 col-sm-12">
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">Title</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+												<select id="title" class="form-control" th:field="*{title}">
+													<option th:value="Mrs" th:text="Mrs"></option>
+													<option th:value="Mr" th:text="Mr"></option>
+												</select>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">Last
+												Name</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
 
-								<div class="form-group">
-									<div class="input-group input-group-alternative mb-3">
-										<div class="input-group-prepend">
-											<span class="input-group-text">Title</span>
+												<input class="form-control" type="text"
+													th:field="*{lastName}">
+											</div>
 										</div>
-										<select id="title" class="form-control" th:field="*{title}">
-											<option th:value="Mrs" th:text="Mrs"></option>
-											<option th:value="Mr" th:text="Mr"></option>
-										</select>
-									</div>
-								</div>
-								<div class="form-group">
-									<div class="input-group input-group-alternative mb-3">
-										<div class="input-group-prepend">
-											<span class="input-group-text">Last Name</span>
-										</div>
-										<input class="form-control" type="text" th:field="*{lastName}">
-									</div>
-								</div>
-								<div class="form-group">
-									<div class="input-group input-group-alternative mb-3">
-										<div class="input-group-prepend">
-											<span class="input-group-text">First Name</span>
-										</div>
-										<input class="form-control" type="text"
-											th:field="*{firstName}">
-									</div>
-								</div>
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">First
+												Name</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
 
-								<div class="form-group">
-									<div class="input-group input-group-alternative mb-3">
-										<div class="input-group-prepend">
-											<span class="input-group-text">Email</span>
+												<input class="form-control" type="text"
+													th:field="*{firstName}">
+											</div>
 										</div>
-										<input class="form-control" type="email" th:field="*{email}">
-									</div>
-								</div>
-								
-								<div class="form-group">
-									<div class="input-group input-group-alternative">
-										<div class="input-group-prepend">
-											<span class="input-group-text">Current Password</span>
-										</div>
-										<input class="form-control" name="current_pwd" type="password">
-									</div>
-								</div>
-								
-								<div class="form-group">
-									<div class="input-group input-group-alternative">
-										<div class="input-group-prepend">
-											<span class="input-group-text">New Password</span>
-										</div>
-										<input class="form-control" id="new_pwd"  name="new_pwd" type="password">
-									</div>
-								</div>
-								
-								<div class="form-group">
-									<div class="input-group input-group-alternative">
-										<div class="input-group-prepend">
-											<span class="input-group-text">Confirm New Password</span>
-										</div>
-										<input class="form-control" id="confirmed_new_pwd" name="confirmed_new_pwd" type="password">
-									</div>
-								</div>								
-								
-								<div class="text-center">
-									<button type="submit" class="btn btn-primary mt-4">
-										Save changes</button>
-								</div>
 
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">
+												Email</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+
+												<input class="form-control" type="email" th:field="*{email}">
+											</div>
+										</div>
+
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">
+												Current Password</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+												<input class="form-control" name="current_pwd"
+													type="password">
+											</div>
+
+										</div>
+
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">
+												New Password</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+												<input class="form-control" id="new_pwd" name="new_pwd"
+													type="password">
+											</div>
+										</div>
+
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">Confirmed
+												New Password</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+												<input class="form-control" id="confirmed_new_pwd"
+													name="confirmed_new_pwd" type="password">
+											</div>
+										</div>
+
+										<div class="text-center">
+											<button type="submit" class="btn btn-primary mt-4">
+												Save changes</button>
+										</div>
+									</div>
+								</div>
+								<!-- Action result -->
+								<div class="row">
+									<div class="col-md-10 col-sm-12">
+										<h4 th:if="${result != null}" th:text="${result.message}"></h4>
+									</div>
+								</div>
 							</form>
 						</div>
 					</div>
@@ -104,19 +122,17 @@
 	</div>
 
 	<section layout:fragment="scripts">
-	<script type="text/javascript">
-	$('#user_form').submit(function() {
-	    if ($("#new_pwd").val() != null && $("#new_pwd").val() != '') {
-	    	if ($("#confirmed_new_pwd").val() !=  $("#new_pwd").val()) {
-	    		alert("New passwords do not match!");
-	    		return false;
-	    	}
-	    } else {
-	    	return false;
-	    }
-	    return true;
-	});
-	</script>
+		<script type="text/javascript">
+			$('#user_form').submit(function() {
+				if ($("#new_pwd").val() != null && $("#new_pwd").val() != '') {
+					if ($("#confirmed_new_pwd").val() != $("#new_pwd").val()) {
+						alert("New passwords do not match!");
+						return false;
+					}
+				} 
+				return true;
+			});
+		</script>
 	</section>
 
 </body>
