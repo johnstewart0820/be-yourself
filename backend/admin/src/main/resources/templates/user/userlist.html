@@ -110,7 +110,7 @@
 						<table class="table align-items-center table-flush" id="user_table">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col">ID</th>
+									<th scope="col"></th>
 									<th scope="col">Email</th>
 									<th scope="col">FullName</th>
 									<th scope="col">Status</th>
@@ -122,8 +122,7 @@
 							<tbody>
 								<tr th:each="user : ${userPage.content}">
 									<td>
-									<input type="checkbox"  name="selected_id"  id="selected_id" th:value="${user.id}"></input>
-									
+										<input type="checkbox"  name="selected_id"  id="selected_id" th:value="${user.id}"></input>
 									</td>
 									<td><span th:text="${user.email}"> Email </span></td>
 									<td><span th:text="${user.fullName}"> Fullname </span></td>

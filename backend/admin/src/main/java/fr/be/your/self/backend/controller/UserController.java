@@ -180,13 +180,13 @@ public class UserController extends BaseResourceController<User, User, User>  {
 
 	private void updateInfo(User existedUser, User user) {
 		existedUser.setTitle(user.getTitle());
+		existedUser.setFirstName(user.getFirstName());
 		existedUser.setLastName(user.getLastName());
 		existedUser.setEmail(user.getEmail());
 		existedUser.setLoginType(user.getLoginType());
 		existedUser.setStatus(user.getStatus());
 		existedUser.setReferralCode(user.getReferralCode());
 		existedUser.setUserType(user.getUserType());
-	//	existedUser.setPermissions(user.getPermissions());	
 	}
 
 	//generate a new activation code and timeout for a user
@@ -315,19 +315,26 @@ public class UserController extends BaseResourceController<User, User, User>  {
 			currentUser.setFirstName(user.getFirstName());
 			currentUser.setLastName(user.getLastName());
 			currentUser.setEmail(user.getEmail());
+			
+			SimpleResult simpleResult = new SimpleResult();
 			if (!StringUtils.isNullOrEmpty(new_pwd)) {
 				if (!passwordEncoder.matches(current_pwd, currentUser.getPassword())) {
-					model.addAttribute("msg", "Wrong current password!");
-					return "user/account_settings_result"; 
+					String message = this.getMessage("settings.error.incorrectpwd");
+					simpleResult.setResStatus(ResultStatus.ERROR.getValue());
+					simpleResult.setMessage(message);
+					redirectAttributes.addFlashAttribute("result", simpleResult);
+					return "redirect:/user/settings"; 
 				}
 				String encoded_new_pwd = this.passwordEncoder.encode(new_pwd);
 				currentUser.setPassword(encoded_new_pwd);
 			}
 
 			userService.saveOrUpdate(currentUser);
-			
-			model.addAttribute("msg", "Account settings changed successfully!");
-			return "user/account_settings_result"; 
+			String message = this.getMessage("settings.update.success");
+			simpleResult.setResStatus(ResultStatus.SUCCESS.getValue());
+			simpleResult.setMessage(message);
+			redirectAttributes.addFlashAttribute("result", simpleResult);
+			return "redirect:/user/settings"; 
 	}
 
 
@@ -335,9 +342,7 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	// show account settings
 	@RequestMapping(value = "/user/settings", method = RequestMethod.GET)
 	public String showAccountSettings(Model model) {
-		//findLoggedUserInfo(model);		
 		User loggedUser = userService.getById((int) model.getAttribute("userId"));
-		
 		model.addAttribute("user", loggedUser);
 		return "user/account_settings";
 	}
