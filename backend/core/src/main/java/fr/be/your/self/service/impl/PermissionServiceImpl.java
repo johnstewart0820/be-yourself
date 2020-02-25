@@ -12,13 +12,13 @@ import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.service.PermissionService;
 
 @Service
-public class PermissionServiceImpl extends BaseServiceImpl<Permission> implements PermissionService {
+public class PermissionServiceImpl extends BaseServiceImpl<Permission, Integer> implements PermissionService {
 	
 	@Autowired
 	private PermissionRepository repository;
 	
 	@Override
-	protected BaseRepository<Permission> getRepository() {
+	protected BaseRepository<Permission, Integer> getRepository() {
 		return this.repository;
 	}
 

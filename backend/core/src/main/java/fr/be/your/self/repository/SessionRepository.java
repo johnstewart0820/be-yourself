@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import fr.be.your.self.model.Session;
 
 @Repository
-public interface SessionRepository extends BaseRepository<Session> {
+public interface SessionRepository extends BaseRepository<Session, Integer> {
 	
 	long countByTitleContainsIgnoreCase(String title);
     

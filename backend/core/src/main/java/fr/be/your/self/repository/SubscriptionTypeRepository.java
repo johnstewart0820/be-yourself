@@ -6,7 +6,7 @@ import org.springframework.data.domain.Sort;
 
 import fr.be.your.self.model.SubscriptionType;
 
-public interface SubscriptionTypeRepository extends BaseRepository<SubscriptionType>  {
+public interface SubscriptionTypeRepository extends BaseRepository<SubscriptionType, Integer>  {
 
 	Page<SubscriptionType> findAllByNameContainsIgnoreCase(String text, Pageable pageable);
 

@@ -22,7 +22,7 @@ import fr.be.your.self.service.UserService;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + AdminUserController.NAME)
-public class AdminUserController extends BaseResourceController<User, User, User> {
+public class AdminUserController extends BaseResourceController<User, User, User, Integer> {
 	
 	public static final String NAME = "admin-user";
 	
@@ -36,7 +36,7 @@ public class AdminUserController extends BaseResourceController<User, User, User
 	
 	@Override
 	protected String getDefaultPageTitle() {
-		return this.getMessage("title.admin-user", "User management");
+		return this.getMessage("title.admin.user", "User management");
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class AdminUserController extends BaseResourceController<User, User, User
 	}
 
 	@Override
-	protected BaseService<User> getService() {
+	protected BaseService<User, Integer> getService() {
 		return this.userService;
 	}
 	

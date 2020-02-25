@@ -1,5 +1,6 @@
 package fr.be.your.self.service;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,18 +10,18 @@ import org.springframework.data.domain.Sort;
 
 import fr.be.your.self.dto.PageableResponse;
 
-public interface BaseService<T> {
+public interface BaseService<T, K extends Serializable> {
 	
 	/**
 	 * @return default data sort, format column|{asc|desc}
 	 **/
 	public String getDefaultSort();
 	
-	public T getById(Integer id);
+	public T getById(K id);
 
-	public List<T> getByIds(Collection<Integer> ids);
+	public List<T> getByIds(Collection<K> ids);
 	
-	public List<T> getByIds(int...ids);
+	public List<T> getByIds(@SuppressWarnings("unchecked") K...ids);
 	
 	public List<T> getAll(Sort sort);
 	
@@ -34,7 +35,7 @@ public interface BaseService<T> {
 
 	public T update(T domain);
 
-	public boolean delete(Integer id);
+	public boolean delete(K id);
 
 	public Iterable<T> findAll();
 	

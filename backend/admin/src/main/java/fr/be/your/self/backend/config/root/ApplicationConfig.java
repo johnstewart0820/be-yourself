@@ -87,6 +87,9 @@ public class ApplicationConfig {
 	@Value("${auth.page.allow.social:false}")
 	private boolean allowSocialOnAuthPage;
 	
+	@Value("${data.option.price.scale:-1}")
+	private int priceScale;
+	
 	@Autowired
 	private Environment env;
 	
@@ -119,6 +122,7 @@ public class ApplicationConfig {
 				this.activateCodeLength, this.activateCodeTimeout);
 		setting.setAuthenticationConfiguration(this.displayHeaderOnAuthPage, this.allowRegisterOnAuthPage, this.allowSocialOnAuthPage);
 		setting.setTempPwdLength(this.tempPasswordLength);
+		setting.setNumberOptions(this.priceScale);
 		
 		for (final String fileExt : this.imageFileExtensions) {
 			final String mimeType = this.env.getProperty("setting.default.mime.type.mapping." + fileExt.toLowerCase());

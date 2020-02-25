@@ -19,14 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,16 +57,14 @@ import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
-import fr.be.your.self.security.oauth2.AuthenticationUserDetails;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.StringUtils;
-import net.bytebuddy.matcher.ModifierMatcher.Mode;
 
 @Controller
-public class UserController extends BaseResourceController<User, User, User>  {
+public class UserController extends BaseResourceController<User, User, User, Integer>  {
 	public static final String NAME = "user";
 
 	private static final String ACTIVATE_URL = Constants.PATH.WEB_ADMIN_PREFIX 
@@ -531,7 +526,7 @@ public class UserController extends BaseResourceController<User, User, User>  {
 	}
 
 	@Override
-	protected BaseService<User> getService() {
+	protected BaseService<User, Integer> getService() {
 		return this.userService;
 	}
 	

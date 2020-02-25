@@ -19,13 +19,13 @@ import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class UserServiceImpl extends BaseServiceImpl<User> implements UserService {
+public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements UserService {
 	
 	@Autowired
 	private UserRepository repository;
 	
 	@Override
-	protected BaseRepository<User> getRepository() {
+	protected BaseRepository<User, Integer> getRepository() {
 		return this.repository;
 	}
 

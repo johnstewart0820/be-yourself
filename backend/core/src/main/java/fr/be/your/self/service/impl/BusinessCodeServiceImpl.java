@@ -7,26 +7,26 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.be.your.self.model.SessionCategory;
+import fr.be.your.self.model.BusinessCode;
 import fr.be.your.self.repository.BaseRepository;
-import fr.be.your.self.repository.SessionCategoryRepository;
-import fr.be.your.self.service.SessionCategoryService;
+import fr.be.your.self.repository.BusinessCodeRepository;
+import fr.be.your.self.service.BusinessCodeService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class SessionCategoryServiceImpl extends BaseServiceImpl<SessionCategory, Integer> implements SessionCategoryService {
+public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, String> implements BusinessCodeService {
 	
 	@Autowired
-	private SessionCategoryRepository repository;
+	private BusinessCodeRepository repository;
 
 	@Override
-	protected BaseRepository<SessionCategory, Integer> getRepository() {
+	protected BaseRepository<BusinessCode, String> getRepository() {
 		return this.repository;
 	}
 	
 	@Override
 	public String getDefaultSort() {
-		return "name|asc";
+		return "code|asc";
 	}
 	
 	@Override
@@ -36,20 +36,20 @@ public class SessionCategoryServiceImpl extends BaseServiceImpl<SessionCategory,
 			return this.repository.count();
 		}
 		
-		return this.repository.countByNameContainsIgnoreCase(text);
+		return this.repository.countByCodeContainsIgnoreCase(text);
 	}
 
 	@Override
-	protected Iterable<SessionCategory> getList(String text, Sort sort) {
+	protected Iterable<BusinessCode> getList(String text, Sort sort) {
 		return StringUtils.isNullOrSpace(text)
 				? this.repository.findAll(sort) 
-				: this.repository.findAllByNameContainsIgnoreCase(text, sort);
+				: this.repository.findAllByCodeContainsIgnoreCase(text, sort);
 	}
 
 	@Override
-	protected Page<SessionCategory> getListByPage(String text, Pageable pageable) {
+	protected Page<BusinessCode> getListByPage(String text, Pageable pageable) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll(pageable)
-				: this.repository.findAllByNameContainsIgnoreCase(text, pageable);
+				: this.repository.findAllByCodeContainsIgnoreCase(text, pageable);
 	}
 }

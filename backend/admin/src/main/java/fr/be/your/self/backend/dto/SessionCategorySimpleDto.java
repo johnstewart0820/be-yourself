@@ -43,6 +43,10 @@ public class SessionCategorySimpleDto extends BaseDto {
 		}
 	}
 	
+	public void copyToDomain(SessionCategory domain) {
+		domain.setName(this.getName());
+	}
+	
 	public int getId() {
 		return id;
 	}

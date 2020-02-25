@@ -22,7 +22,7 @@ public abstract class BaseController<T> {
 	@Autowired
 	protected DataSetting dataSetting;
 	
-	protected abstract BaseService<T> getService();
+	protected abstract BaseService<T, Integer> getService();
 	
 	@GetMapping("")
 	public ResponseEntity<?> search(

@@ -16,7 +16,7 @@ public class UserController extends BaseController<User> {
 	private UserService userService;
 	
 	@Override
-	protected BaseService<User> getService() {
+	protected BaseService<User, Integer> getService() {
 		return this.userService;
 	}
 	
