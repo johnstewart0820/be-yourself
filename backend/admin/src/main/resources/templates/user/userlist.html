@@ -60,7 +60,6 @@
 												<option value="B2C">B2C</option>
 												<option value="PRO">PRO</option>
 												<option value="ADM">ADMIN</option>
-												<option value="SAM">SUPER ADMIN</option>
 											</select>
 										</div>
 									</div>
@@ -130,23 +129,7 @@
 
 									<td scope="col">Subscription Type</td>
 									<td th:text="${user.userTypeDescription}"></td>
-									
-									<!-- td class="text-right">
-										<div class="dropdown">
-											<a class="btn btn-sm btn-icon-only text-light" href="#"
-												role="button" data-toggle="dropdown" aria-haspopup="true"
-												aria-expanded="false"> <i class="fas fa-ellipsis-v"></i>
-											</a>
-											<div
-												class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-												<a class="dropdown-item"
-													th:href="@{/user/{id}/update(id=${user.id})}">Update</a> <a
-													class="dropdown-item"
-													th:href="@{/user/{id}/delete(id=${user.id})}">Delete</a>
-											</div>
-										</div>
-									</td-->
-									
+																	
 									<td class="text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="@{/user/{id}/update(id=${user.id})}" th:title="#{action.edit.title}">
 											<span class="btn-inner--icon">

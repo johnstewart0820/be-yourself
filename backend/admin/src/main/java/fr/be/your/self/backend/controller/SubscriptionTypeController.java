@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -22,8 +20,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.SubscriptionTypeDto;
@@ -39,8 +35,6 @@ public class SubscriptionTypeController
 		extends BaseResourceController<SubscriptionType, SubscriptionType, SubscriptionTypeDto, Integer> {
 
 	public static final String NAME = "subtype";
-
-	private static final String DEFAULT_URL = "/subtype/list/page/1";
 	
 	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
 		
@@ -48,7 +42,10 @@ public class SubscriptionTypeController
 			SORTABLE_COLUMNS.add("name");
 			SORTABLE_COLUMNS.add("duration");
 			SORTABLE_COLUMNS.add("canal");
-		/* SORTABLE_COLUMNS.add("price"); */
+			SORTABLE_COLUMNS.add("price");
+			SORTABLE_COLUMNS.add("autoRenew");
+			SORTABLE_COLUMNS.add("status");
+
 		}
 
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX + Constants.PATH.WEB_ADMIN.MEDIA
@@ -84,23 +81,7 @@ public class SubscriptionTypeController
 
 	}
 
-	@RequestMapping(value = "/list/page/{page}")
-	public String listUserPageByPage(@PathVariable("page") int page,
-			@RequestParam(value = "nb_per_page", required = false, defaultValue = "10") Integer nb, Model model) {
 
-		PageRequest pageable = PageRequest.of(page - 1, nb);
-		Page<SubscriptionType> subtypePage;
-
-		return "subtype/subtype-list";
-	}
-
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String saveOrUpdateSubType(@ModelAttribute @Validated SubscriptionType subtype, HttpServletRequest request,
-			BindingResult result, Model model, final RedirectAttributes redirectAttributes) {
-		SubscriptionType savedSubtype = subTypeService.saveOrUpdate(subtype);
-		return "redirect:" + DEFAULT_URL; // back to list of users
-
-	}
 
 	@PostMapping("/create")
 	@Transactional
@@ -237,10 +218,6 @@ public class SubscriptionTypeController
 		return BASE_MEDIA_URL;
 	}
 
-	// default page
-	@RequestMapping(value = "/management")
-	public String showDefaultSubscriptionTypePage(Model model) {
-		return "redirect:" + DEFAULT_URL;
-	}
+
 
 }
