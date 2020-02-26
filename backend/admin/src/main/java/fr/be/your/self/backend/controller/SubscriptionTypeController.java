@@ -32,7 +32,7 @@ import fr.be.your.self.service.SubscriptionTypeService;
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SubscriptionTypeController.NAME)
 public class SubscriptionTypeController
-		extends BaseResourceController<SubscriptionType, SubscriptionType, SubscriptionTypeDto> {
+		extends BaseResourceController<SubscriptionType, SubscriptionType, SubscriptionTypeDto, Integer> {
 
 	public static final String NAME = "subtype";
 	
@@ -185,7 +185,8 @@ public class SubscriptionTypeController
 
 	@Override
 	protected String getDefaultPageTitle() {
-		return this.getMessage(this.getName() + ".page.title", "Subscription type management");
+		final String baseMessageKey = this.getName().replace('-', '.');
+		return this.getMessage(baseMessageKey + ".page.title", "Subscription type management");
 	}
 
 	@Override
@@ -194,7 +195,7 @@ public class SubscriptionTypeController
 	}
 
 	@Override
-	protected BaseService<SubscriptionType> getService() {
+	protected BaseService<SubscriptionType, Integer> getService() {
 		return this.subTypeService;
 	}
 

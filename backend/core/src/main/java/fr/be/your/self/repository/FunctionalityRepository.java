@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import fr.be.your.self.model.Functionality;
 
 @Repository
-public interface FunctionalityRepository extends BaseRepository<Functionality> {
+public interface FunctionalityRepository extends BaseRepository<Functionality, Integer> {
 
 	public Optional<Functionality> findByPath(String path);
 

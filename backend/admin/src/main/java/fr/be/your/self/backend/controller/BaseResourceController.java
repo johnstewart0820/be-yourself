@@ -2,6 +2,7 @@ package fr.be.your.self.backend.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -49,7 +50,7 @@ import fr.be.your.self.model.PO;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.util.StringUtils;
 
-public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, DetailDto> extends BaseController {
+public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailDto, K extends Serializable> extends BaseController {
 	
 	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 	
@@ -76,7 +77,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		this.logger = LoggerFactory.getLogger(this.getClass());
 	}
 
-	protected abstract BaseService<T> getService();
+	protected abstract BaseService<T, K> getService();
 	
 	protected abstract String getName();
 	
@@ -376,7 +377,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	@GetMapping(value = { "/edit/{id}" })
-    public String editPage(@PathVariable(name = "id", required = true) Integer id,
+    public String editPage(@PathVariable(name = "id", required = true) K id,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		RedirectAttributes redirectAttributes, Model model) {
 		return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
@@ -384,7 +385,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	
 	@SuppressWarnings("unchecked")
 	protected String redirectEditPage(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-			RedirectAttributes redirectAttributes, Model model, Integer id, DetailDto dto) {
+			RedirectAttributes redirectAttributes, Model model, K id, DetailDto dto) {
 		
 		T domain = null;
 		if (this.domainClazz == this.detailDtoClazz) {
@@ -446,7 +447,7 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	}
 	
 	@RequestMapping(value = { "/view/{id}" }, method = { RequestMethod.GET, RequestMethod.POST })
-    public String viewPage(@PathVariable(name = "id", required = true) Integer id,
+    public String viewPage(@PathVariable(name = "id", required = true) K id,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		RedirectAttributes redirectAttributes, Model model) {
 		
@@ -623,6 +624,10 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return createFieldError(result, fieldName, messageCode, null, "");
 	}
 	
+	protected final ObjectError createRequiredFieldError(BindingResult result, String fieldName, String defaultMessage) {
+		return this.createFieldError(result, fieldName, "required", null, defaultMessage);
+	}
+	
 	protected final ObjectError createInvalidImageError(BindingResult result, String fileContentType, 
 			String fieldName, String defaultMessage) {
 		final String supportImageExtensions = String.join(", ", this.dataSetting.getImageFileExtensions());
@@ -655,8 +660,8 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return this.createFieldError(result, fieldName, "too.large", messageArguments, defaultMessage);
 	}
 	
-	protected final ObjectError createIdNotFoundError(BindingResult result, Integer id) {
-		final Object[] messageArguments = id == null || id.intValue() <= 0 ? null : new Integer[] { id };
+	protected final ObjectError createIdNotFoundError(BindingResult result, K id) {
+		final Object[] messageArguments = id == null ? null : new Object[] { id };
 		
 		return new ObjectError(result.getObjectName(), new String[] { "error.id.not.found" }, 
 				messageArguments, "Not found");
@@ -669,11 +674,12 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 	/**************************************************************************************/
 	/********************* MESSAGE METHODS ************************************************/
 	/**************************************************************************************/
-	protected String getIdNotFoundMessage(Integer idValue) {
+	protected String getIdNotFoundMessage(K idValue) {
 		final String baseMessageKey = this.getName().replace('-', '.');
 		final String dataName = this.getMessage(baseMessageKey + ".name");
 		
-		final String message = this.getMessage("error.message.id.not.found", new String[] { dataName, idValue.toString() }, null);
+		final String[] messageParams = new String[] { dataName, idValue == null ? "" : idValue.toString() };
+		final String message = this.getMessage("error.message.id.not.found", messageParams, null);
 		
 		if (message.startsWith(dataName)) {
 			return StringUtils.upperCaseFirst(message);
@@ -682,11 +688,12 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return message;
 	}
 	
-	protected String getDeleteByIdErrorMessage(Integer idValue) {
+	protected String getDeleteByIdErrorMessage(K idValue) {
 		final String baseMessageKey = this.getName().replace('-', '.');
 		final String dataName = this.getMessage(baseMessageKey + ".name");
 		
-		final String message = this.getMessage("error.message.cannot.delete.id", new String[] { dataName, idValue.toString() }, null);
+		final String[] messageParams = new String[] { dataName, idValue == null ? "" : idValue.toString() };
+		final String message = this.getMessage("error.message.cannot.delete.id", messageParams, null);
 		
 		if (message.startsWith(dataName)) {
 			return StringUtils.upperCaseFirst(message);
@@ -695,11 +702,12 @@ public abstract class BaseResourceController<T extends PO<Integer>, SimpleDto, D
 		return message;
 	}
 	
-	protected String getDeleteSuccessMessage(Integer idValue) {
+	protected String getDeleteSuccessMessage(K idValue) {
 		final String baseMessageKey = this.getName().replace('-', '.');
 		final String dataName = this.getMessage(baseMessageKey + ".name");
 		
-		final String message = this.getMessage("success.message.delete", new String[] { dataName, idValue.toString() }, null);
+		final String[] messageParams = new String[] { dataName, idValue == null ? "" : idValue.toString() };
+		final String message = this.getMessage("success.message.delete", messageParams, null);
 		
 		if (message.startsWith(dataName)) {
 			return StringUtils.upperCaseFirst(message);

@@ -41,7 +41,7 @@ import fr.be.your.self.util.StringUtils;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SessionController.NAME)
-public class SessionController extends BaseResourceController<Session, Session, SessionDto> {
+public class SessionController extends BaseResourceController<Session, Session, SessionDto, Integer> {
 	
 	public static final String NAME = "session";
 	
@@ -72,7 +72,8 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	
 	@Override
 	protected String getDefaultPageTitle() {
-		return this.getMessage(this.getName() + ".page.title", "Session management");
+		final String baseMessageKey = this.getName().replace('-', '.');
+		return this.getMessage(baseMessageKey + ".page.title", "Session management");
 	}
 	
 	@Override
@@ -81,7 +82,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	}
 	
 	@Override
-	protected BaseService<Session> getService() {
+	protected BaseService<Session, Integer> getService() {
 		return this.mainService;
 	}
 	
@@ -205,7 +206,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	@Transactional
     public String createDomain(
     		@Validated @ModelAttribute("dto") SessionDto dto, 
-    		@RequestParam(value = "categoryIds" , required = false) int[] categoryIds,
+    		@RequestParam(value = "categoryIds" , required = false) Integer[] categoryIds,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -214,13 +215,12 @@ public class SessionController extends BaseResourceController<Session, Session, 
         }
         
         // ====> Session category
-        //final Set<Integer> categoryIds = dto.getCategoryIds();
         final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
         
         // ====> Validate image and content file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final ObjectError error = this.createFieldError(result, "image", "required", "Image is required");
+        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image is required");
         	result.addError(error);
         	
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
@@ -228,7 +228,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         
         final MultipartFile uploadContentFile = dto.getUploadContentFile();
         if (uploadContentFile == null || uploadContentFile.isEmpty()) {
-        	final ObjectError error = this.createFieldError(result, "contentFile", "required", "Content file is required");
+        	final ObjectError error = this.createRequiredFieldError(result, "contentFile", "Content file is required");
         	result.addError(error);
         	
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
@@ -248,7 +248,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         }
         
         // ====> Update domain
-        final String uploadFileName = uploadImageFilePath.getFileName().toString();
+        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
         final String uploadContentFileName = uploadContentFilePath.getFileName().toString();
         final String contentFileContentType = this.getFileContentType(uploadContentFilePath, this.dataSetting.getMediaMimeTypes());
         
@@ -256,7 +256,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
         dto.copyToDomain(domain);
         
         domain.setCategories(categories);
-        domain.setImage(uploadFileName);
+        domain.setImage(uploadImageFileName);
         domain.setContentFile(uploadContentFileName);
         domain.setContentMimeType(contentFileContentType);
         
@@ -286,7 +286,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
     public String updateDomain(
     		@PathVariable("id") Integer id, 
     		@Validated @ModelAttribute("dto") SessionDto dto, 
-    		@RequestParam(value = "categoryIds" , required = false) int[] categoryIds,
+    		@RequestParam(value = "categoryIds" , required = false) Integer[] categoryIds,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -307,7 +307,6 @@ public class SessionController extends BaseResourceController<Session, Session, 
         dto.copyToDomain(domain);
         
         // ====> Session category
-        //final Set<Integer> categoryIds = dto.getCategoryIds();
         final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
         domain.setCategories(categories);
         
@@ -356,6 +355,11 @@ public class SessionController extends BaseResourceController<Session, Session, 
         if (savedDomain == null || result.hasErrors()) {
         	this.deleteUploadFile(uploadImageFilePath);
         	this.deleteUploadFile(uploadContentFilePath);
+        	
+        	if (!result.hasErrors()) {
+	        	final ObjectError error = this.createProcessingError(result);
+	        	result.addError(error);
+        	}
         	
         	dto.setId(id);
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);

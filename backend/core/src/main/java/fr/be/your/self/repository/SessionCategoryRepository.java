@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import fr.be.your.self.model.SessionCategory;
 
 @Repository
-public interface SessionCategoryRepository extends BaseRepository<SessionCategory> {
+public interface SessionCategoryRepository extends BaseRepository<SessionCategory, Integer> {
 	
 	long countByNameContainsIgnoreCase(String name);
     

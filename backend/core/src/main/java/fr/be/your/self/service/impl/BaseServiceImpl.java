@@ -1,5 +1,6 @@
 package fr.be.your.self.service.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,11 +18,11 @@ import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.service.BaseService;
 
-public abstract class BaseServiceImpl<T> implements BaseService<T> {
+public abstract class BaseServiceImpl<T, K extends Serializable> implements BaseService<T, K> {
 	
 	protected final static String TEXT_SEARCH_KEY = "q";
 	
-	protected abstract BaseRepository<T> getRepository();
+	protected abstract BaseRepository<T, K> getRepository();
 	
 	protected abstract Iterable<T> getList(String text, Sort sort);
 	
@@ -29,14 +30,14 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public T getById(Integer id) {
+	public T getById(K id) {
 		final Optional<T> domain = this.getRepository().findById(id);
 		return domain.isPresent() ? domain.get() : null;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<T> getByIds(Collection<Integer> ids) {
+	public List<T> getByIds(Collection<K> ids) {
 		if (ids == null || ids.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -54,12 +55,12 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<T> getByIds(int...ids) {
+	public List<T> getByIds(@SuppressWarnings("unchecked") K...ids) {
 		if (ids == null || ids.length == 0) {
 			return Collections.emptyList();
 		}
 		
-		final List<Integer> domainIds = Arrays.stream(ids).boxed().collect(Collectors.toList());
+		final List<K> domainIds = Arrays.stream(ids).collect(Collectors.toList());
 		return this.getByIds(domainIds);
 	}
 	
@@ -141,7 +142,7 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
 	
 	@Override
 	@Transactional
-	public boolean delete(Integer id) {
+	public boolean delete(K id) {
 		this.getRepository().deleteById(id);
 		return true;
 	}

@@ -13,13 +13,13 @@ import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class FunctionalityServiceImpl extends BaseServiceImpl<Functionality> implements FunctionalityService {
+public class FunctionalityServiceImpl extends BaseServiceImpl<Functionality, Integer> implements FunctionalityService {
 	
 	@Autowired
 	private FunctionalityRepository repository;
 
 	@Override
-	protected BaseRepository<Functionality> getRepository() {
+	protected BaseRepository<Functionality, Integer> getRepository() {
 		return this.repository;
 	}
 	

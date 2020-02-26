@@ -41,6 +41,8 @@ public class DataSetting {
 	private boolean allowRegisterOnAuthPage;
 	private boolean allowSocialOnAuthPage;
 	
+	private int priceScale;
+	
 	public DataSetting() {
 		this.defaultMimeTypeMappings = new HashMap<String, String>();
 	}
@@ -149,6 +151,10 @@ public class DataSetting {
 		return allowSocialOnAuthPage;
 	}
 	
+	public int getPriceScale() {
+		return priceScale;
+	}
+
 	/******************** SETTER **************************/
 	public void setDataPageSize(Set<Integer> supportPageSizes, int defaultPageSize) {
 		this.supportPageSizes = supportPageSizes;
@@ -214,6 +220,10 @@ public class DataSetting {
 		this.allowSocialOnAuthPage = allowSocialOnAuthPage;
 	}
 
+	public void setNumberOptions(int priceScale) {
+		this.priceScale = priceScale;
+	}
+	
 	public int getTempPwdLength() {
 		return tempPwdLength;
 	}

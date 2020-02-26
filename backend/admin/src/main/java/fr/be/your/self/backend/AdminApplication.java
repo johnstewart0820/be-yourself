@@ -155,6 +155,14 @@ public class AdminApplication implements CommandLineRunner {
 				
 				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 			}
+			
+			// Business code management
+			{
+				final String path = "/business-code";
+				final String name = "Business code management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

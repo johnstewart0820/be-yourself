@@ -19,13 +19,13 @@ import fr.be.your.self.service.SessionService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class SessionServiceImpl extends BaseServiceImpl<Session> implements SessionService {
+public class SessionServiceImpl extends BaseServiceImpl<Session, Integer> implements SessionService {
 	
 	@Autowired
 	private SessionRepository repository;
 
 	@Override
-	protected BaseRepository<Session> getRepository() {
+	protected BaseRepository<Session, Integer> getRepository() {
 		return this.repository;
 	}
 	

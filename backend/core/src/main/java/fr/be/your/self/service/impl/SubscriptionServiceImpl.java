@@ -13,7 +13,7 @@ import fr.be.your.self.service.SubscriptionService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class SubscriptionServiceImpl extends BaseServiceImpl<Subscription> implements SubscriptionService {
+public class SubscriptionServiceImpl extends BaseServiceImpl<Subscription, Integer> implements SubscriptionService {
 
 	@Autowired
 	SubscriptionRepository subscriptionRepo;
@@ -30,7 +30,7 @@ public class SubscriptionServiceImpl extends BaseServiceImpl<Subscription> imple
 	}
 
 	@Override
-	protected BaseRepository<Subscription> getRepository() {
+	protected BaseRepository<Subscription, Integer> getRepository() {
 		return subscriptionRepo;
 	}
 

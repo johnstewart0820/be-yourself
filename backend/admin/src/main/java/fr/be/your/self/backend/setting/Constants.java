@@ -14,6 +14,7 @@ public final class Constants {
 			
 			public static final String SESSION_CATEGORY = "/session-category";
 			public static final String SESSION = "/session";
+			public static final String BUSINESS_CODE = "/business-code";
 		}
 	}
 	
@@ -46,10 +47,6 @@ public final class Constants {
 		
 		public static interface WEB_ADMIN {
 			public static final String MEDIA = "/media";
-			//public static final String ADMIN_USER = "/admin-user";
-			
-			public static final String SESSION = "/session";
-			public static final String SESSION_CATEGORY = "/session-category";
 		}
 	}
 }

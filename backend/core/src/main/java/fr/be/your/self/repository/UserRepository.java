@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import fr.be.your.self.model.User;
 
 @Repository
-public interface UserRepository extends BaseRepository<User> {
+public interface UserRepository extends BaseRepository<User, Integer> {
     
 	Boolean existsByEmail(String email);
     

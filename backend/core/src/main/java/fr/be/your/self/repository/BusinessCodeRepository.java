@@ -10,8 +10,14 @@ import org.springframework.stereotype.Repository;
 import fr.be.your.self.model.BusinessCode;
 
 @Repository
-public interface BusinessCodeRepository extends BaseRepository<BusinessCode> {
+public interface BusinessCodeRepository extends BaseRepository<BusinessCode, String> {
 	
+	long countByCodeContainsIgnoreCase(String code);
+	
+	Iterable<BusinessCode> findAllByCodeContainsIgnoreCase(String code, Sort sort);
+    
+    Page<BusinessCode> findAllByCodeContainsIgnoreCase(String code, Pageable pageable);
+    
 	long countByCodeType(int codeType);
     
     Iterable<BusinessCode> findAllByCodeType(int codeType, Sort sort);

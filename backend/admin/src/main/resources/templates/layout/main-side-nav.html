@@ -143,6 +143,12 @@
 							</a>
 				  		</li>
 				  		
+				  		<li class="nav-item" th:if="${permission.hasPermission('/business-code')}">
+							<a class="nav-link" th:href="@{/business-code}">
+					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.business.code}"></span>
+							</a>
+				  		</li>
+				  		
 				  		<li class="nav-item" th:if="${permission.hasPermission('/admin-user')}">
 							<a class="nav-link " href="../examples/maps.html">
 					  			<i class="ni ni-pin-3 text-orange"></i> <span th:text="#{greeting}"></span>

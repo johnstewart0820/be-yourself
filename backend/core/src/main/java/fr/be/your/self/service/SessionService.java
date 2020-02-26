@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.model.Session;
 
-public interface SessionService extends BaseService<Session> {
+public interface SessionService extends BaseService<Session, Integer> {
 	
 	public long count(String text, List<Integer> categoryIds);
 

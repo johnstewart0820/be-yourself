@@ -13,13 +13,13 @@ import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class SubscriptionTypeServiceImpl extends BaseServiceImpl<SubscriptionType> implements SubscriptionTypeService {
+public class SubscriptionTypeServiceImpl extends BaseServiceImpl<SubscriptionType, Integer> implements SubscriptionTypeService {
 
 	@Autowired
 	SubscriptionTypeRepository subtypeRepo;
 
 	@Override
-	protected BaseRepository<SubscriptionType> getRepository() {
+	protected BaseRepository<SubscriptionType, Integer> getRepository() {
 		return subtypeRepo;
 	}
 

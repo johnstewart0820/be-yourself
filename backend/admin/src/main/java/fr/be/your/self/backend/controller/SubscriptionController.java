@@ -33,7 +33,7 @@ import fr.be.your.self.service.UserService;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SubscriptionController.NAME)
-public class SubscriptionController extends BaseResourceController<Subscription, Subscription, SubscriptionDto> {
+public class SubscriptionController extends BaseResourceController<Subscription, Subscription, SubscriptionDto, Integer> {
 	public static final String NAME = "subscription";
 
 	@Autowired
@@ -56,7 +56,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 	}
 	
 	@Override
-	protected BaseService<Subscription> getService() {
+	protected BaseService<Subscription, Integer> getService() {
 		return subscriptionService;
 	}
 
@@ -67,7 +67,8 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 
 	@Override
 	protected String getDefaultPageTitle() {
-		return this.getMessage(this.getName() + ".page.title", "Session management");
+		final String baseMessageKey = this.getName().replace('-', '.');
+		return this.getMessage(baseMessageKey + ".page.title", "Session management");
 	}
 
 	@Override

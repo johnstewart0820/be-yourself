@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 
-public interface UserService extends BaseService<User> {
+public interface UserService extends BaseService<User, Integer> {
 	
 	public boolean existsEmail(String email);
 	
