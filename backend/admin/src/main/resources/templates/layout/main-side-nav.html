@@ -143,9 +143,9 @@
 							</a>
 				  		</li>
 				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/business-code')}">
-							<a class="nav-link" th:href="@{/business-code}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.business.code}"></span>
+				  		<li class="nav-item" th:if="${permission.hasPermission('/discount-code-0', '/discount-code-1', '/discount-code-2', '/discount-code-3')}">
+							<a class="nav-link" th:href="@{/discount-code}">
+					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.discount.code}"></span>
 							</a>
 				  		</li>
 				  		

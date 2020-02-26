@@ -41,6 +41,18 @@ b, strong {
     padding-top: 10px;
 }
 
+@media (min-width: 768px) {
+	.md-text-right {
+		text-align: right;
+	}
+}
+
+@media (min-width: 576px) {
+	.sm-form-group {
+    	margin-bottom: 1rem;
+	}
+}
+
 /********* Modal *************/
 .modal-header.modal-header-warning {
 	background-color: #fb6340; 
@@ -156,4 +168,35 @@ table.dataTable td.action-column {
 table.dataTable td.action-column .btn {
 	/*padding: .625rem 1.25rem;*/
 	padding: .5rem .8rem;	
+}
+
+table.dataTable thead .sorting:before {
+	font-family:"Font Awesome 5 Free";
+	content: "\f161";
+	right: 1em;
+}
+
+table.dataTable thead .sorting:after {
+	content: "" !important;
+}
+
+table.dataTable thead .sorting_asc:before, 
+table.dataTable thead .sorting_asc_disabled:before {
+	font-family:"Font Awesome 5 Free";
+	content: "\f161";
+	right: 1em;
+}
+
+table.dataTable thead .sorting_asc:after, 
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_desc:before, 
+table.dataTable thead .sorting_desc_disabled:before {
+	content: "" !important;
+}
+
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc_disabled:after {
+	font-family:"Font Awesome 5 Free";
+	content: "\f160";
+	right: 1em;
 }

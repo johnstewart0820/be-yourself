@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,6 +45,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.common.ErrorStatusCode;
+import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.PO;
@@ -69,7 +71,22 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 	public BaseResourceController() {
 		super();
 		
-		final ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericSuperclass();
+		Class<?> superClazz = this.getClass();
+		Type genericType = superClazz.getGenericSuperclass();
+		while (!(genericType instanceof ParameterizedType)) {
+			superClazz = superClazz.getSuperclass();
+			genericType = superClazz.getGenericSuperclass();
+			
+			if (superClazz.equals(BaseResourceController.class)) {
+				break;
+			}
+		}
+		
+		if (genericType instanceof Class) {
+			throw new RuntimeException();
+		}
+		
+		final ParameterizedType parameterizedType = (ParameterizedType) genericType;
 		this.domainClazz = ((Class<T>) parameterizedType.getActualTypeArguments()[0]);
 		this.simpleDtoClazz = ((Class<SimpleDto>) parameterizedType.getActualTypeArguments()[1]);
 		this.detailDtoClazz = ((Class<DetailDto>) parameterizedType.getActualTypeArguments()[2]);
@@ -81,7 +98,7 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 	
 	protected abstract String getName();
 	
-	protected abstract String getDefaultPageTitle();
+	protected abstract String getDefaultPageTitle(String baseMessageKey);
 	
 	protected abstract String getUploadDirectoryName();
 	
@@ -105,13 +122,34 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 			Model model, T domain, DetailDto dto) throws BusinessException {
 	}
 	
+	protected boolean isEditableDomain(Model model, T domain) {
+		return domain != null;
+	}
+	
+	protected boolean isViewableDomain(Model model, T domain) {
+		return domain != null;
+	}
+	
+	protected UserPermission getGlobalPermission(Model model, PermissionDto permission) {
+		final String pageName = this.getName();
+		if (permission.hasWritePermission(pageName)) {
+			return UserPermission.WRITE;
+		}
+		
+		if (permission.hasPermission(pageName)) {
+			return UserPermission.READONLY;
+		}
+		
+		return UserPermission.DENIED;
+	}
+	
 	@Override
 	public void initAttributes(HttpSession session, HttpServletRequest request, 
 			HttpServletResponse response, Model model, PermissionDto permission) {
 		
-		final String pageName = this.getName();
-		final boolean writePermission = permission.hasWritePermission(pageName);
-		final boolean readPermission = writePermission || permission.hasPermission(pageName);
+		final UserPermission globalPermission = this.getGlobalPermission(model, permission);
+		final boolean writePermission = UserPermission.WRITE == globalPermission;
+		final boolean readPermission = writePermission || UserPermission.READONLY == globalPermission;
 		
 		if (!readPermission) {
 			try {
@@ -121,14 +159,15 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 			} catch (IOException e) {}
 		}
 		
+		final String pageName = this.getName();
 		final String baseMessageKey = pageName.replace('-', '.');
 		
 		model.addAttribute("writePermission", writePermission);
 		model.addAttribute("readPermission", readPermission);
 		
 		model.addAttribute("pageName", pageName);
-		model.addAttribute("pageTitle", this.getDefaultPageTitle());
 		model.addAttribute("baseMessageKey", baseMessageKey);
+		model.addAttribute("pageTitle", this.getDefaultPageTitle(baseMessageKey));
 		model.addAttribute("baseURL", this.getBaseURL());
 		
 		final String baseImageURL = this.getBaseMediaURL();
@@ -395,7 +434,7 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		if (domain == null) {
 			domain = this.getService().getById(id);
 			
-			if (domain == null) {
+			if (!this.isEditableDomain(model, domain)) {
 				final String message = this.getIdNotFoundMessage(id);
 				
 				redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "edit");
@@ -452,7 +491,7 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
     		RedirectAttributes redirectAttributes, Model model) {
 		
 		final T domain = this.getService().getById(id);
-		if (domain == null) {
+		if (!this.isViewableDomain(model, domain)) {
 			final String message = this.getIdNotFoundMessage(id);
 			
 			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "view");

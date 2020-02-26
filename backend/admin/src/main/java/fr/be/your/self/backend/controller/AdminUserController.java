@@ -35,7 +35,7 @@ public class AdminUserController extends BaseResourceController<User, User, User
 	}
 	
 	@Override
-	protected String getDefaultPageTitle() {
+	protected String getDefaultPageTitle(String baseMessageKey) {
 		return this.getMessage("title.admin.user", "User management");
 	}
 	

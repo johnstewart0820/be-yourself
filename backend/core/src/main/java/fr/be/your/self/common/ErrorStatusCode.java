@@ -4,6 +4,7 @@ public enum ErrorStatusCode {
 	
 	UNAUTHORIZED("unauthorized"),
 	INVALID_CREDENTIALS("invalid.credentials"),
+	INVALID_PERMISSION("invalid.permission"),
 	
 	PROCESSING_ERROR("processing.error"),
 	

@@ -26,7 +26,7 @@ public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, Strin
 	
 	@Override
 	public String getDefaultSort() {
-		return "code|asc";
+		return "name|asc";
 	}
 	
 	@Override
@@ -36,20 +36,20 @@ public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, Strin
 			return this.repository.count();
 		}
 		
-		return this.repository.countByCodeContainsIgnoreCase(text);
+		return this.repository.countByNameContainsIgnoreCase(text);
 	}
 
 	@Override
 	protected Iterable<BusinessCode> getList(String text, Sort sort) {
 		return StringUtils.isNullOrSpace(text)
 				? this.repository.findAll(sort) 
-				: this.repository.findAllByCodeContainsIgnoreCase(text, sort);
+				: this.repository.findAllByNameContainsIgnoreCase(text, sort);
 	}
 
 	@Override
 	protected Page<BusinessCode> getListByPage(String text, Pageable pageable) {
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll(pageable)
-				: this.repository.findAllByCodeContainsIgnoreCase(text, pageable);
+				: this.repository.findAllByNameContainsIgnoreCase(text, pageable);
 	}
 }

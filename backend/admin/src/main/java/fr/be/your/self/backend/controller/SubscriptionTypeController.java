@@ -203,8 +203,7 @@ public class SubscriptionTypeController
 	}
 
 	@Override
-	protected String getDefaultPageTitle() {
-		final String baseMessageKey = this.getName().replace('-', '.');
+	protected String getDefaultPageTitle(String baseMessageKey) {
 		return this.getMessage(baseMessageKey + ".page.title", "Subscription type management");
 	}
 

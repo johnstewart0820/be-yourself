@@ -1,16 +1,13 @@
 package fr.be.your.self.common;
 
-public enum BusinessCodeType {
-	B2B_MULTIPLE(0),
-	B2B_UNIQUE(1),
-	B2C_DISCOUNT_100(2),
-	B2C_DISCOUNT(3),
-	//GIFT_CARD(4),
+public enum BusinessCodeDiscountType {
+	PERCENTAGE(0),
+	AMOUNT(1),
 	UNKNOWN(-1);
 	
 	private final int value;
 	
-	BusinessCodeType(int value) {
+	BusinessCodeDiscountType(int value) {
 		this.value = value;
 	}
 
@@ -22,8 +19,8 @@ public enum BusinessCodeType {
 		return this.value != UNKNOWN.value;
 	}
 	
-	public static final BusinessCodeType parse(int value) {
-		final BusinessCodeType[] values = BusinessCodeType.values();
+	public static final BusinessCodeDiscountType parse(int value) {
+		final BusinessCodeDiscountType[] values = BusinessCodeDiscountType.values();
 		
 		for (int i = 0; i < values.length; i++) {
 			if (values[i].value == value) {

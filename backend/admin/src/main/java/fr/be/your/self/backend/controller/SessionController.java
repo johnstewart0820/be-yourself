@@ -71,8 +71,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	}
 	
 	@Override
-	protected String getDefaultPageTitle() {
-		final String baseMessageKey = this.getName().replace('-', '.');
+	protected String getDefaultPageTitle(String baseMessageKey) {
 		return this.getMessage(baseMessageKey + ".page.title", "Session management");
 	}
 	

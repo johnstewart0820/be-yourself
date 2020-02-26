@@ -56,8 +56,7 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	}
 	
 	@Override
-	protected String getDefaultPageTitle() {
-		final String baseMessageKey = this.getName().replace('-', '.');
+	protected String getDefaultPageTitle(String baseMessageKey) {
 		return this.getMessage(baseMessageKey + ".page.title", "Session Category management");
 	}
 	
