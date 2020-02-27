@@ -25,8 +25,11 @@ public class SubscriptionServiceImpl extends BaseServiceImpl<Subscription, Integ
 	
 	@Override
 	public long count(String text) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (StringUtils.isNullOrSpace(text)) {
+			return this.subscriptionRepo.count();
+		} else {
+			throw new UnsupportedOperationException("Count() method of subscription service does not support text parameter.");
+		}
 	}
 
 	@Override
@@ -51,7 +54,7 @@ public class SubscriptionServiceImpl extends BaseServiceImpl<Subscription, Integ
 	@Override
 	protected Page<Subscription> getListByPage(String text, Pageable pageable) {
 		if (!StringUtils.isNullOrEmpty(text)) {
-			throw new UnsupportedOperationException("Get list by text not supported!");
+			return this.subscriptionRepo.searchByFirstNameOrLastNameOrEmail(text, pageable);
 		}
 		return this.subscriptionRepo.findAll(pageable);
 	}

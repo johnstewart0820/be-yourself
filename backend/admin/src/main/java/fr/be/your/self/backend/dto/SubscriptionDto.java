@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 import fr.be.your.self.model.Subscription;
+import fr.be.your.self.model.SubscriptionType;
+import fr.be.your.self.model.User;
 
 public class SubscriptionDto  implements Serializable {
 
@@ -52,9 +54,9 @@ public class SubscriptionDto  implements Serializable {
 			this.status = domain.isStatus();
 			this.subscriptionEndDate = domain.getSubscriptionEndDate();
 			this.subscriptionStartDate = domain.getSubscriptionStartDate();
-			this.subtypeId = domain.getSubtypeId();
+			this.subtypeId = domain.getSubtype().getId();
 			this.terminationAsked = domain.isTerminationAsked();
-			this.userId = domain.getUserId();
+			this.userId = domain.getUser().getId();
 			this.validEndDate = domain.getValidEndDate();
 			this.validStartDate = domain.getValidStartDate();
 		
@@ -72,9 +74,7 @@ public class SubscriptionDto  implements Serializable {
 		domain.setStatus(status);
 		domain.setSubscriptionEndDate(subscriptionEndDate);
 		domain.setSubscriptionStartDate(subscriptionStartDate);
-		domain.setSubtypeId(subtypeId);
 		domain.setTerminationAsked(terminationAsked);
-		domain.setUserId(userId);
 		domain.setValidEndDate(validEndDate);
 		domain.setValidStartDate(validStartDate);
 		
@@ -86,6 +86,8 @@ public class SubscriptionDto  implements Serializable {
 	public void setId(int id) {
 		this.id = id;
 	}
+
+	
 	public int getUserId() {
 		return userId;
 	}

@@ -4,9 +4,12 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Subscription extends PO<Integer> {
@@ -14,8 +17,14 @@ public class Subscription extends PO<Integer> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	private int userId;
-	private int subtypeId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "userID")
+    private User user;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "subtypeId")
+	private SubscriptionType subtype;
+	
 	private boolean status;
 	private String ipAddress;
 	private int duration;
@@ -29,8 +38,24 @@ public class Subscription extends PO<Integer> {
 	private int paymentGateway;
 	private String code;
 	private int codeType;
+
 	
-	
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public SubscriptionType getSubtype() {
+		return subtype;
+	}
+
+	public void setSubtype(SubscriptionType subtype) {
+		this.subtype = subtype;
+	}
+
 	@Override
 	public Integer getId() {
 		return id;
@@ -40,27 +65,13 @@ public class Subscription extends PO<Integer> {
 	public String getDisplay() {
 		return "XXXX"; //TODO TVA use this
 	}
-
-	public int getUserId() {
-		return userId;
-	}
 	
 
 	public void setId(int id) {
 		this.id = id;
 	}
 
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
-
-	public int getSubtypeId() {
-		return subtypeId;
-	}
-
-	public void setSubtypeId(int subtypeId) {
-		this.subtypeId = subtypeId;
-	}
+	
 
 	public boolean isStatus() {
 		return status;

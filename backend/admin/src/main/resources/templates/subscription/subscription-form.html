@@ -143,13 +143,27 @@
 										</div>
 										<!-- Termination asked -->
 										<div class="form-group row">
-											<label for="status"
+											<label for="terminationAsked"
 												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.terminationasked|}"></label>
 											<div class="col-md-4 col-sm-8">
-												<input id="status" th:field="*{terminationAsked}" type="checkbox">
+												<input id="terminationAsked" th:field="*{terminationAsked}" type="checkbox">
 											</div>
-										</div>										
+										</div>		
+										<!-- Payment status -->
+										<div class="form-group row">
+											<label for="groupId"
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.paymentstatus|}"></label>
+											<div class="col-md-4 col-sm-8">
+												<select class="form-control" id="canal"
+													th:field="*{paymentStatus}">
+													<option th:each="paymentStatus : ${paymentStatus}"
+														th:value="${paymentStatus}" th:text="${subtype.name}">
+													</option>
+												</select>
+											</div>
+										</div>								
 									</div>
 								</div>
 							</fieldset>
