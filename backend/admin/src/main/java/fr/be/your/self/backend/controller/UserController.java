@@ -310,6 +310,7 @@ public class UserController extends BaseResourceController<User, User, User, Int
 			currentUser.setFirstName(user.getFirstName());
 			currentUser.setLastName(user.getLastName());
 			currentUser.setEmail(user.getEmail());
+			currentUser.setTitle(user.getTitle());
 			
 			SimpleResult simpleResult = new SimpleResult();
 			if (!StringUtils.isNullOrEmpty(new_pwd)) {
@@ -414,7 +415,7 @@ public class UserController extends BaseResourceController<User, User, User, Int
 	}
 
 	@RequestMapping("/user/exportcsv")
-	public void exportCSV(@RequestParam(value="selected_id", required=false) List<Integer> userId,
+	public void exportCSV(@RequestParam(value="selected_id", required=false) List<Integer> userIds,
 			HttpServletResponse response) throws Exception {
 
 		// set file name and content type
@@ -428,7 +429,7 @@ public class UserController extends BaseResourceController<User, User, User, Int
 				.withOrderedResults(false).build();
 
 		// write all users to csv file
-		List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv(userId).spliterator(), false)
+		List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv(userIds).spliterator(), false)
 				.collect(Collectors.toList());
 		
 		writer.write(usersList);

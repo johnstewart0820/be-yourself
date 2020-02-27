@@ -29,7 +29,7 @@ public class SubscriptionDto  implements Serializable {
 	private Date subscriptionEndDate;
 	private BigDecimal price;
 	private int paymentStatus;
-	private int paymentGateway;
+	private String paymentGateway;
 	private String code;
 	private int codeType;
 	
@@ -160,10 +160,10 @@ public class SubscriptionDto  implements Serializable {
 	public void setPaymentStatus(int paymentStatus) {
 		this.paymentStatus = paymentStatus;
 	}
-	public int getPaymentGateway() {
+	public String getPaymentGateway() {
 		return paymentGateway;
 	}
-	public void setPaymentGateway(int paymentGateway) {
+	public void setPaymentGateway(String paymentGateway) {
 		this.paymentGateway = paymentGateway;
 	}
 	public String getCode() {

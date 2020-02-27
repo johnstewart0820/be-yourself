@@ -1,5 +1,9 @@
 package fr.be.your.self.model;
 
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+
 import com.opencsv.bean.CsvBindByName;
 
 public class UserCSV {
@@ -25,9 +29,7 @@ public class UserCSV {
 	private String userType;
 
 	@CsvBindByName(column = "Subscription Type")	
-	private String subscriptionType = "XXXX"; //TODO TVA get this
-	
-	
+	private String subscriptionType; //TODO TVA get this
 
 
 	public UserCSV() {
@@ -42,9 +44,30 @@ public class UserCSV {
 		this.status = user.getStatus();
 		this.referralCode = user.getReferralCode();
 		this.userType = user.getUserType();
+		//Find the active subscription
+		Optional<Subscription> subscriptionOptional = user.getSubscriptions().stream().filter(x -> x.isStatus()).findAny();
+		
+		if (subscriptionOptional.isPresent()) {
+			this.subscriptionType = subscriptionOptional.get().getSubtype().getName();
+		} else { //Otherwise, find the last inactive subscription
+			List<Subscription> subscriptions = user.getSubscriptions();
+			if (subscriptions != null && subscriptions.size() > 0) {
+				Subscription subsription = subscriptions.get(0);
+				Date date = subsription.getSubscriptionEndDate();
+				for (Subscription sub : subscriptions) {
+					if (sub.getSubscriptionEndDate().after(date)) {
+						subsription = sub;
+						date = sub.getSubscriptionEndDate();
+					}
+					
+				}
+				this.subscriptionType = subsription.getSubtype().getName();
+			}
+		}
+		
+		
 	}
 	
-	//private String subscriptionType;
 	public String getTitle() {
 		return title;
 	}

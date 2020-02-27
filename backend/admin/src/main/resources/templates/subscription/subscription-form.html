@@ -156,14 +156,30 @@
 												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.paymentstatus|}"></label>
 											<div class="col-md-4 col-sm-8">
-												<select class="form-control" id="canal"
+												<select class="form-control" id="paymenstatus"
 													th:field="*{paymentStatus}">
-													<option th:each="paymentStatus : ${paymentStatus}"
-														th:value="${paymentStatus}" th:text="${subtype.name}">
+													<option th:each="paymentStatus : ${paymentStatuses}"
+														th:value="${paymentStatus}" th:text="#{'payment.status.' + ${paymentStatus}}">
 													</option>
 												</select>
 											</div>
-										</div>								
+										</div>		
+										<!-- Payment Gateway -->
+										<div class="form-group row">
+											<label for="groupId"
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.paymentgateway|}"></label>
+											<div class="col-md-4 col-sm-8">
+												<select class="form-control" id="gateway"
+													th:field="*{paymentGateway}">
+													<option th:each="paymentGateway : ${paymentGateways}"
+														th:value="${paymentGateway}" th:text="${paymentGateway}">
+													</option>
+												</select>
+											</div>
+										</div>
+										<!-- Code: TODO TVA -->
+										<!-- Automatic renewal: TODO TVA -->			
 									</div>
 								</div>
 							</fieldset>

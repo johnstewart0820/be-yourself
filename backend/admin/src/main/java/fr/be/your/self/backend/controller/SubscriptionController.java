@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,11 +34,15 @@ import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
 import fr.be.your.self.backend.dto.SubscriptionDto;
+import fr.be.your.self.backend.dto.SubscriptionTypeDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.PaymentGateway;
+import fr.be.your.self.common.PaymentStatus;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Session;
 import fr.be.your.self.model.Subscription;
+import fr.be.your.self.model.SubscriptionCsv;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
@@ -127,9 +132,11 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, Subscription domain, SubscriptionDto dto) throws BusinessException {
 		
-		final List<String> canals = Arrays.asList("WEB", "APP");
-		final List<Integer> durations = Arrays.asList(1, 3, 6, 12, 24);
-		
+		final List<String> canals = Arrays.asList("WEB", "APP"); //TODO TVA use config
+		final List<Integer> durations = Arrays.asList(1, 3, 6, 12, 24); //TODO TVA use config
+		final List<Integer> paymentStatuses = PaymentStatus.getPossibleIntValue();
+		final List<String> paymentGateways = PaymentGateway.getPossibleStrValue();
+
 		final String userDefaultSort = this.userService.getDefaultSort();
 		final Sort userSort = this.getSortRequest(userDefaultSort);
 		final List<User> users = userService.getAll(userSort);
@@ -137,11 +144,15 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		final String subtypeDefaultSort = this.subtypeService.getDefaultSort();
 		final Sort subtypeSort = this.getSortRequest(subtypeDefaultSort);
 		final List<SubscriptionType> subtypes = subtypeService.getAll(subtypeSort);
-
+		
+		
 		model.addAttribute("canals", canals); //TODO TVA check if we keep this
 		model.addAttribute("users", users);
 		model.addAttribute("subtypes", subtypes);
 		model.addAttribute("durations", durations);
+		model.addAttribute("paymentStatuses", paymentStatuses);
+		model.addAttribute("paymentGateways", paymentGateways);
+
 	}
 	
 	@PostMapping("/create")
@@ -175,6 +186,43 @@ public class SubscriptionController extends BaseResourceController<Subscription,
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
         
         return "redirect:" + this.getBaseURL();
+    }
+	
+	
+	@PostMapping("/update/{id}")
+	@Transactional
+    public String updateDomain(
+    		@PathVariable("id") Integer id, 
+    		@ModelAttribute @Validated SubscriptionDto dto, 
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
+		
+        if (result.hasErrors()) {
+        	dto.setId(id);
+        	return this.getFormView();
+        }
+        
+        Subscription domain = this.subscriptionService.getById(id);
+        
+        if (domain == null) {
+        	final ObjectError error = this.createIdNotFoundError(result, id);
+        	result.addError(error);
+        	
+        	dto.setId(id);
+        	return this.getFormView();
+        }
+        
+        dto.copyToDomain(domain);
+        SubscriptionType subtype = this.subtypeService.getById(dto.getSubtypeId());
+        User user = this.userService.getById(dto.getUserId());
+        domain.setSubtype(subtype);
+        domain.setUser(user);
+        final Subscription savedDomain = this.subscriptionService.update(domain);
+    
+        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+        
+        return "redirect:" + this.getBaseURL() + "/current-page";
     }
 	
 	@PostMapping(value = { "/delete/{id}" })
@@ -217,25 +265,25 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		return "redirect:" + this.getBaseURL() + "/current-page";
 	}
 	
-	@RequestMapping("/user/exportcsv")
-	public void exportCSV(@RequestParam(value="selected_id", required=false) List<Integer> subscriptionIds,
+	@RequestMapping("/exportcsv")
+	public void exportCsvFile(@RequestParam(value="selected_id", required=false) List<Integer> subscriptionIds,
 			HttpServletResponse response) throws Exception {
-
-		// set file name and content type
-
+		
 		response.setContentType("text/csv");
-		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + CSV_SUBSCRIPTION_EXPORT_FILE + "\"");
+		response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+				"attachment; filename=\"" + CSV_SUBSCRIPTION_EXPORT_FILE + "\"");
 
 		// create a csv writer
-		StatefulBeanToCsv<UserCSV> writer = new StatefulBeanToCsvBuilder<UserCSV>(response.getWriter())
+		StatefulBeanToCsv<SubscriptionCsv> writer = new StatefulBeanToCsvBuilder<SubscriptionCsv>(response.getWriter())
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 				.withOrderedResults(false).build();
 
-		// write all users to csv file
-		/*List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv(userId).spliterator(), false)
+		// write subscriptions to csv file
+		List<SubscriptionCsv> subscriptions = StreamSupport
+				.stream(subscriptionService.extractSubscriptionCsv(subscriptionIds).spliterator(), false)
 				.collect(Collectors.toList());
 	
-		writer.write(usersList);	*/
+		writer.write(subscriptions);
 	}
 	
 }

@@ -1,5 +1,8 @@
 package fr.be.your.self.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum PaymentStatus {
 	PENDING(0),
 	VALIDATED(1),
@@ -27,6 +30,17 @@ public enum PaymentStatus {
 		}
 		
 		return UNKNOWN;
+	}
+	
+	public static List<Integer> getPossibleIntValue(){
+		List<Integer> res = new ArrayList<>();
+		for (PaymentStatus status : PaymentStatus.values()) {
+			if (status != UNKNOWN) {
+				res.add(status.getValue());
+			}
+		}
+		
+		return res;
 	}
 	
 }

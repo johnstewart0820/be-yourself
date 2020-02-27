@@ -47,6 +47,17 @@ public class User extends PO<Integer> {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
 	private List<Permission> permissions;
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	private List<Subscription> subscriptions;
+	
+	public List<Subscription> getSubscriptions() {
+		return subscriptions;
+	}
+
+	public void setSubscriptions(List<Subscription> subscriptions) {
+		this.subscriptions = subscriptions;
+	}
+
 	private String activateCode;
 
 	private long activateTimeout;
