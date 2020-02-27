@@ -3,6 +3,7 @@ package fr.be.your.self.backend.dto;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import fr.be.your.self.common.BusinessCodeDiscountType;
 import fr.be.your.self.common.BusinessCodeStatus;
 import fr.be.your.self.common.BusinessCodeType;
 import fr.be.your.self.model.BusinessCode;
@@ -13,12 +14,12 @@ public class BusinessCodeDto extends BaseDto {
 	 */
 	private static final long serialVersionUID = 8615171831998913884L;
 
-	private String code;
+	private String name;
 
 	/**
 	 * {@link BusinessCodeType#getValue()}
 	 **/
-	private int codeType;
+	private int type;
 
 	/**
 	 * {@link BusinessCodeStatus#getValue()}
@@ -37,12 +38,12 @@ public class BusinessCodeDto extends BaseDto {
 	/**
 	 * Maximum users amount for B2B
 	 **/
-	private int maxUserCount;
+	private int maxUserAmount;
 
 	/**
 	 * Number of times the code has been used for B2B
 	 **/
-	private int usedTimes;
+	private int usedAmount;
 
 	/**
 	 * Price of the deal (euro) for B2B
@@ -56,101 +57,83 @@ public class BusinessCodeDto extends BaseDto {
 	private BigDecimal pricePerUser;
 
 	/**
-	 * The maximum amount of usage is 1 for B2C100
+	 * The type of reduction for B2C, with other is percentage always
+	 * {@link BusinessCodeDiscountType#getValue()}
 	 **/
-	private int maxUsageCount;
+	private int discountType;
 
 	/**
-	 * A percentage of reduction for B2C, with B2C100 is 100 always
+	 * A value of reduction for B2C, with B2C100 is 100 always
 	 **/
-	private BigDecimal discountPercentage;
+	private BigDecimal discountValue;
 
-	private BigDecimal priceGiftCard;
-
-	private String buyerEmailGiftCard;
-
-	private String userEmailGiftCard;
-
-	private long durationGiftCard;
+	private boolean editable;
 
 	public BusinessCodeDto() {
 		super();
-		
+
 		this.pricePerUser = BigDecimal.ZERO;
+		this.editable = true;
 	}
 
-	public BusinessCodeDto(BusinessCode domain, int priceScale) {
+	public BusinessCodeDto(BusinessCode domain) {
 		super(domain);
-		
+
 		this.pricePerUser = BigDecimal.ZERO;
-		
+		this.editable = true;
+
 		if (domain != null) {
-			this.code = domain.getCode();
-			this.codeType = domain.getCodeType();
+			this.name = domain.getName();
+			this.type = domain.getType();
 			this.status = domain.getStatus();
 			this.startDate = domain.getStartDate();
 			this.endDate = domain.getEndDate();
 			this.beneficiary = domain.getBeneficiary();
-			this.maxUserCount = domain.getMaxUserCount();
-			this.usedTimes = domain.getUsedTimes();
+			this.maxUserAmount = domain.getUsedAmount();
+			this.usedAmount = domain.getUsedAmount();
 			this.dealPrice = domain.getDealPrice();
-			this.maxUsageCount = domain.getMaxUsageCount();
-			this.discountPercentage = domain.getDiscountPercentage();
-			this.priceGiftCard = domain.getPriceGiftCard();
-			this.buyerEmailGiftCard = domain.getBuyerEmailGiftCard();
-			this.userEmailGiftCard = domain.getUserEmailGiftCard();
-			this.durationGiftCard = domain.getDurationGiftCard();
-			
-			if (this.dealPrice != null) {
-				if (priceScale < 0) { 
-					this.pricePerUser = this.dealPrice.divide(new BigDecimal(this.maxUserCount), BigDecimal.ROUND_HALF_UP);
-				} else {
-					this.pricePerUser = this.dealPrice.divide(new BigDecimal(this.maxUserCount), priceScale, BigDecimal.ROUND_HALF_UP);
-				}
-			}
+			this.pricePerUser = domain.getPricePerUser();
+			this.discountType = domain.getDiscountType();
+			this.discountValue = domain.getDiscountValue();
 		}
 	}
 
 	public void copyToDomain(BusinessCode domain) {
-		domain.setCode(code);
-		domain.setCodeType(codeType);
+		domain.setName(name);
+		domain.setType(type);
 		domain.setStatus(status);
 		domain.setStartDate(startDate);
 		domain.setEndDate(endDate);
 		domain.setBeneficiary(beneficiary);
-		domain.setMaxUserCount(maxUserCount);
-		domain.setUsedTimes(usedTimes);
+		domain.setMaxUserAmount(maxUserAmount);
+		domain.setUsedAmount(usedAmount);
 		domain.setDealPrice(dealPrice);
-		domain.setMaxUsageCount(maxUsageCount);
-		domain.setDiscountPercentage(discountPercentage);
-		domain.setPriceGiftCard(priceGiftCard);
-		domain.setBuyerEmailGiftCard(buyerEmailGiftCard);
-		domain.setUserEmailGiftCard(userEmailGiftCard);
-		domain.setDurationGiftCard(durationGiftCard);
+		domain.setDiscountType(discountType);
+		domain.setDiscountValue(discountValue);
 	}
-	
+
 	public String getId() {
-		return code;
+		return name;
 	}
 
 	public void setId(String id) {
-		this.code = id;
+		this.name = id;
 	}
 	
-	public String getCode() {
-		return code;
+	public String getName() {
+		return name;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public int getCodeType() {
-		return codeType;
+	public int getType() {
+		return type;
 	}
 
-	public void setCodeType(int codeType) {
-		this.codeType = codeType;
+	public void setType(int type) {
+		this.type = type;
 	}
 
 	public int getStatus() {
@@ -185,20 +168,20 @@ public class BusinessCodeDto extends BaseDto {
 		this.beneficiary = beneficiary;
 	}
 
-	public int getMaxUserCount() {
-		return maxUserCount;
+	public int getMaxUserAmount() {
+		return maxUserAmount;
 	}
 
-	public void setMaxUserCount(int maxUserCount) {
-		this.maxUserCount = maxUserCount;
+	public void setMaxUserAmount(int maxUserAmount) {
+		this.maxUserAmount = maxUserAmount;
 	}
 
-	public int getUsedTimes() {
-		return usedTimes;
+	public int getUsedAmount() {
+		return usedAmount;
 	}
 
-	public void setUsedTimes(int usedTimes) {
-		this.usedTimes = usedTimes;
+	public void setUsedAmount(int usedAmount) {
+		this.usedAmount = usedAmount;
 	}
 
 	public BigDecimal getDealPrice() {
@@ -217,51 +200,27 @@ public class BusinessCodeDto extends BaseDto {
 		this.pricePerUser = pricePerUser;
 	}
 
-	public int getMaxUsageCount() {
-		return maxUsageCount;
+	public int getDiscountType() {
+		return discountType;
 	}
 
-	public void setMaxUsageCount(int maxUsageCount) {
-		this.maxUsageCount = maxUsageCount;
+	public void setDiscountType(int discountType) {
+		this.discountType = discountType;
 	}
 
-	public BigDecimal getDiscountPercentage() {
-		return discountPercentage;
+	public BigDecimal getDiscountValue() {
+		return discountValue;
 	}
 
-	public void setDiscountPercentage(BigDecimal discountPercentage) {
-		this.discountPercentage = discountPercentage;
+	public void setDiscountValue(BigDecimal discountValue) {
+		this.discountValue = discountValue;
 	}
 
-	public BigDecimal getPriceGiftCard() {
-		return priceGiftCard;
+	public boolean isEditable() {
+		return editable;
 	}
 
-	public void setPriceGiftCard(BigDecimal priceGiftCard) {
-		this.priceGiftCard = priceGiftCard;
-	}
-
-	public String getBuyerEmailGiftCard() {
-		return buyerEmailGiftCard;
-	}
-
-	public void setBuyerEmailGiftCard(String buyerEmailGiftCard) {
-		this.buyerEmailGiftCard = buyerEmailGiftCard;
-	}
-
-	public String getUserEmailGiftCard() {
-		return userEmailGiftCard;
-	}
-
-	public void setUserEmailGiftCard(String userEmailGiftCard) {
-		this.userEmailGiftCard = userEmailGiftCard;
-	}
-
-	public long getDurationGiftCard() {
-		return durationGiftCard;
-	}
-
-	public void setDurationGiftCard(long durationGiftCard) {
-		this.durationGiftCard = durationGiftCard;
+	public void setEditable(boolean editable) {
+		this.editable = editable;
 	}
 }

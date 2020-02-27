@@ -41,7 +41,9 @@
 									th:data-select-all-text="#{data.display.button.select.all}"
 									th:data-deselect-all-text="#{data.display.button.deselect.all}"
 									th:title="#{|${baseMessageKey}.option.filter.category.title|}"
-									th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}">
+									th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}"
+									data-selected-text-format="count > 2" 
+									th:data-count-selected-text="#{|${baseMessageKey}.option.filter.category.many|}">
 									<option th:each="sessionCategory: ${sessionCategories}" 
 										th:value="${sessionCategory.id}" 
 										th:text="${sessionCategory.name}"

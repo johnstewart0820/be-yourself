@@ -90,6 +90,12 @@ public class ApplicationConfig {
 	@Value("${data.option.price.scale:-1}")
 	private int priceScale;
 	
+	@Value("${data.option.price.unit.symbol}")
+	private String priceUnitSymbol;
+	
+	@Value("${data.option.price.unit.name}")
+	private String priceUnitName;
+	
 	@Autowired
 	private Environment env;
 	
@@ -122,7 +128,7 @@ public class ApplicationConfig {
 				this.activateCodeLength, this.activateCodeTimeout);
 		setting.setAuthenticationConfiguration(this.displayHeaderOnAuthPage, this.allowRegisterOnAuthPage, this.allowSocialOnAuthPage);
 		setting.setTempPwdLength(this.tempPasswordLength);
-		setting.setNumberOptions(this.priceScale);
+		setting.setPriceOptions(this.priceScale, this.priceUnitSymbol, this.priceUnitName);
 		
 		for (final String fileExt : this.imageFileExtensions) {
 			final String mimeType = this.env.getProperty("setting.default.mime.type.mapping." + fileExt.toLowerCase());

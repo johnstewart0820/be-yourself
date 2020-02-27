@@ -538,7 +538,7 @@ public class UserController extends BaseResourceController<User, User, User, Int
 	}
 	
 	@Override
-	protected String getDefaultPageTitle() {
+	protected String getDefaultPageTitle(String baseMessageKey) {
 		return this.getMessage("user", "User management");
 	}
 	

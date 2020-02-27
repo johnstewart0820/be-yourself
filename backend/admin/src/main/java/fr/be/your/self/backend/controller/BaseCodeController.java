@@ -1,14 +1,12 @@
 package fr.be.your.self.backend.controller;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,45 +15,39 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.BusinessCodeDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.dto.PageableResponse;
+import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.BusinessCode;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.BusinessCodeService;
+import fr.be.your.self.util.StringUtils;
 
-@Controller
-@RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + BusinessCodeController.NAME)
-public class BusinessCodeController extends BaseResourceController<BusinessCode, BusinessCodeDto, BusinessCodeDto, String> {
-	
-	public static final String NAME = "business-code";
+public abstract class BaseCodeController extends BaseResourceController<BusinessCode, BusinessCodeDto, BusinessCodeDto, String> {
 	
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
 			+ Constants.FOLDER.MEDIA.BUSINESS_CODE;
 	
-	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
-	
-	static {
-		SORTABLE_COLUMNS.add("code");
-	}
-	
 	@Autowired
-	private BusinessCodeService mainService;
+	protected BusinessCodeService mainService;
 	
-	@Override
-	protected String getName() {
-		return NAME;
+	protected abstract void validateCreateDomain(BindingResult result, Model model, BusinessCode domain);
+	
+	protected abstract void validateUpdateDomain(BindingResult result, Model model, BusinessCode domain);
+	
+	/**
+	 * @return error message
+	 **/
+	protected abstract String validateDeleteDomain(Model model, BusinessCode domain);
+	
+	public BaseCodeController() {
+		super();
 	}
-	
-	@Override
-	protected String getDefaultPageTitle() {
-		final String baseMessageKey = this.getName().replace('-', '.');
-		return this.getMessage(baseMessageKey + ".page.title", "Business code management");
-	}
-	
+
 	@Override
 	protected String getUploadDirectoryName() {
 		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.BUSINESS_CODE;
@@ -67,23 +59,18 @@ public class BusinessCodeController extends BaseResourceController<BusinessCode,
 	}
 	
 	@Override
-	protected Set<String> getSortableColumns() {
-		return SORTABLE_COLUMNS;
-	}
-
-	@Override
 	protected BusinessCode newDomain() {
 		return new BusinessCode();
 	}
 
 	@Override
 	protected BusinessCodeDto createDetailDto(BusinessCode domain) {
-		return new BusinessCodeDto(domain, this.dataSetting.getPriceScale());
+		return new BusinessCodeDto(domain);
 	}
 
 	@Override
 	protected BusinessCodeDto createSimpleDto(BusinessCode domain) {
-		return new BusinessCodeDto(domain, this.dataSetting.getPriceScale());
+		return new BusinessCodeDto(domain);
 	}
 
 	@Override
@@ -91,23 +78,25 @@ public class BusinessCodeController extends BaseResourceController<BusinessCode,
 		return BASE_MEDIA_URL;
 	}
 	
-	/*
+	@Override
+	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Model model, Map<String, String> searchParams, PageableResponse<BusinessCodeDto> pageableDto)
+			throws BusinessException {
+		super.loadListPageOptions(session, request, response, model, searchParams, pageableDto);
+		
+		model.addAttribute("priceUnitSymbol", this.dataSetting.getPriceUnitSymbol());
+		model.addAttribute("priceUnitName", this.dataSetting.getPriceUnitName());
+	}
+
 	@Override
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, BusinessCode domain, BusinessCodeDto dto) throws BusinessException {
 		super.loadDetailFormOptions(session, request, response, model, domain, dto);
 		
-		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
-		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
-		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
-		
-		model.addAttribute("supportImageTypes", supportImageTypes);
-		model.addAttribute("supportImageExtensions", supportImageExtensions);
-		model.addAttribute("supportImageSize", supportImageSize);
-		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
+		model.addAttribute("priceUnitSymbol", this.dataSetting.getPriceUnitSymbol());
+		model.addAttribute("priceUnitName", this.dataSetting.getPriceUnitName());
 	}
-	*/
-	
+
 	@PostMapping("/create")
 	@Transactional
     public String createDomain(
@@ -115,11 +104,16 @@ public class BusinessCodeController extends BaseResourceController<BusinessCode,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         if (result.hasErrors()) {
-        	return this.getFormView();
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
         final BusinessCode domain = this.newDomain();
         dto.copyToDomain(domain);
+        
+        this.validateCreateDomain(result, model, domain);
+        if (result.hasErrors()) {
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        }
         
         final BusinessCode savedDomain = this.mainService.create(domain);
         
@@ -163,6 +157,12 @@ public class BusinessCodeController extends BaseResourceController<BusinessCode,
         
         dto.copyToDomain(domain);
         
+        this.validateUpdateDomain(result, model, domain);
+        if (result.hasErrors()) {
+        	dto.setId(id);
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        }
+        
         final BusinessCode savedDomain = this.mainService.update(domain);
         
         // ====> Error, delete upload file
@@ -201,6 +201,15 @@ public class BusinessCodeController extends BaseResourceController<BusinessCode,
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
+		final String errorMessage = this.validateDeleteDomain(model, domain);
+        if (!StringUtils.isNullOrSpace(errorMessage)) {
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, errorMessage);
+	        
+			return "redirect:" + this.getBaseURL() + "/current-page";
+        }
+        
 		final boolean result = this.mainService.delete(id);
 		if (result) {
 			// ====> Success

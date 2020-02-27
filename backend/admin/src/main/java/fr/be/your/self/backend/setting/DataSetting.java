@@ -42,6 +42,8 @@ public class DataSetting {
 	private boolean allowSocialOnAuthPage;
 	
 	private int priceScale;
+	private String priceUnitSymbol;
+	private String priceUnitName;
 	
 	public DataSetting() {
 		this.defaultMimeTypeMappings = new HashMap<String, String>();
@@ -155,6 +157,14 @@ public class DataSetting {
 		return priceScale;
 	}
 
+	public String getPriceUnitSymbol() {
+		return priceUnitSymbol;
+	}
+
+	public String getPriceUnitName() {
+		return priceUnitName;
+	}
+
 	/******************** SETTER **************************/
 	public void setDataPageSize(Set<Integer> supportPageSizes, int defaultPageSize) {
 		this.supportPageSizes = supportPageSizes;
@@ -220,8 +230,10 @@ public class DataSetting {
 		this.allowSocialOnAuthPage = allowSocialOnAuthPage;
 	}
 
-	public void setNumberOptions(int priceScale) {
+	public void setPriceOptions(int priceScale, String priceUnitSymbol, String priceUnitName) {
 		this.priceScale = priceScale;
+		this.priceUnitSymbol = priceUnitSymbol;
+		this.priceUnitName = priceUnitName;
 	}
 	
 	public int getTempPwdLength() {

@@ -19,6 +19,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import fr.be.your.self.backend.config.rest.RestConfig;
 import fr.be.your.self.backend.config.web.WebMvcConfig;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.BusinessCodeType;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
@@ -156,13 +157,43 @@ public class AdminApplication implements CommandLineRunner {
 				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 			}
 			
-			// Business code management
+			// Discount code management
 			{
-				final String path = "/business-code";
-				final String name = "Business code management";
+				final String path = "/discount-code-" + BusinessCodeType.B2B_MULTIPLE.getValue();
+				final String name = "B2B multiple code management";
 				
 				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 			}
+			
+			{
+				final String path = "/discount-code-" + BusinessCodeType.B2B_UNIQUE.getValue();
+				final String name = "B2B unique code management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			
+			{
+				final String path = "/discount-code-" + BusinessCodeType.B2C_DISCOUNT_100.getValue();
+				final String name = "B2C discount 100% code management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			
+			{
+				final String path = "/discount-code-" + BusinessCodeType.B2C_DISCOUNT.getValue();
+				final String name = "B2C discount code management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			
+			/*
+			{
+				final String path = "/discount-code-" + BusinessCodeType.GIFT_CARD.getValue();
+				final String name = "Gift card management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
