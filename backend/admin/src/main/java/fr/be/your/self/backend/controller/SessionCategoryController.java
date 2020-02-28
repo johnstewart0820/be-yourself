@@ -1,8 +1,8 @@
 package fr.be.your.self.backend.controller;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,10 +41,10 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
 			+ Constants.FOLDER.MEDIA.SESSION_CATEGORY;
 	
-	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
+	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 	
 	static {
-		SORTABLE_COLUMNS.add("name");
+		SORTABLE_COLUMNS.put("name", new String[] { "name" });
 	}
 	
 	@Autowired
@@ -71,7 +71,7 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	}
 	
 	@Override
-	protected Set<String> getSortableColumns() {
+	protected Map<String, String[]> getSortableColumns() {
 		return SORTABLE_COLUMNS;
 	}
 

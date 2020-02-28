@@ -6,7 +6,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
@@ -45,7 +45,6 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.ResultStatus;
 import fr.be.your.self.backend.dto.SimpleResult;
-import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.LoginType;
@@ -99,7 +98,7 @@ public class UserController extends BaseResourceController<User, User, User, Int
 
 	
 	@Override
-	protected Set<String> getSortableColumns() {
+	protected Map<String, String[]> getSortableColumns() {
 		// TODO Auto-generated method stub
 		return null;
 	}

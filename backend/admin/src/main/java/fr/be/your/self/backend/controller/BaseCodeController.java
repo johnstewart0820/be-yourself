@@ -107,8 +107,15 @@ public abstract class BaseCodeController extends BaseResourceController<Business
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
+        if (dto.getStartDate() != null && dto.getStartDate().getTime() > dto.getEndDate().getTime()) {
+        	final ObjectError error = this.createFieldError(result, "startDate", "before.end.date", null, "The start date must before end date");
+        	result.addError(error);
+        	
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        }
+        
         final BusinessCode domain = this.newDomain();
-        dto.copyToDomain(domain);
+        dto.copyToDomain(domain, true);
         
         this.validateCreateDomain(result, model, domain);
         if (result.hasErrors()) {
@@ -146,6 +153,14 @@ public abstract class BaseCodeController extends BaseResourceController<Business
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
+        if (dto.getStartDate() != null && dto.getStartDate().getTime() > dto.getEndDate().getTime()) {
+        	final ObjectError error = this.createFieldError(result, "startDate", "before.end.date", null, "The start date must before end date");
+        	result.addError(error);
+        	
+        	dto.setId(id);
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        }
+        
         BusinessCode domain = this.mainService.getById(id);
         if (domain == null) {
         	final ObjectError error = this.createIdNotFoundError(result, id);
@@ -155,7 +170,7 @@ public abstract class BaseCodeController extends BaseResourceController<Business
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
-        dto.copyToDomain(domain);
+        dto.copyToDomain(domain, false);
         
         this.validateUpdateDomain(result, model, domain);
         if (result.hasErrors()) {

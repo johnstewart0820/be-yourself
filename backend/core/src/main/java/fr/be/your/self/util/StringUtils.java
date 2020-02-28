@@ -48,6 +48,17 @@ public class StringUtils {
 	      .toString();
 	}
 	
+	public static final String randomNumeric(int length) {
+		final int leftLimit = 48; // letter '0'
+		final int rightLimit = 57; // letter '9'
+		final Random random = new Random();
+	 
+	    return random.ints(leftLimit, rightLimit + 1)
+	      .limit(length)
+	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+	      .toString();
+	}
+	
 	public static final String randomAlphanumeric(int length) {
 		final int leftLimit = 48; // numeral '0'
 		final int rightLimit = 122; // letter 'z'

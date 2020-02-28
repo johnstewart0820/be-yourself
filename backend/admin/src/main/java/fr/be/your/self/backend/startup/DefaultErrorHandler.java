@@ -125,6 +125,8 @@ public class DefaultErrorHandler {
     
     @ExceptionHandler(value = Exception.class)
     public String handleException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+    	logger.error("Business error", exception);
+    	
     	if (!this.isApiRequest(request)) {
     		return "redirect:" + ACCESS_DENIED_URL;	
     	}

@@ -1,6 +1,8 @@
 package fr.be.your.self.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.be.your.self.common.UserStatus;
+import fr.be.your.self.common.UserType;
+import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.repository.BaseRepository;
@@ -20,10 +24,10 @@ import fr.be.your.self.util.StringUtils;
 
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements UserService {
-	
+
 	@Autowired
 	private UserRepository repository;
-	
+
 	@Override
 	protected BaseRepository<User, Integer> getRepository() {
 		return this.repository;
@@ -33,7 +37,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	public String getDefaultSort() {
 		return "email|asc";
 	}
-	
+
 	@Override
 	public boolean existsEmail(String email) {
 		return this.repository.existsByEmail(email);
@@ -41,11 +45,12 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 
 	@Override
 	protected Iterable<User> getList(String text, Sort sort) {
-		return StringUtils.isNullOrSpace(text) 
-				? this.repository.findAll(sort) 
-				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text, sort);
+		return StringUtils.isNullOrSpace(text) ? this.repository.findAll(sort)
+				: this.repository
+						.findAllByEmailContainsIgnoreCaseOrFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(text,
+								text, text, sort);
 	}
-	
+
 	@Override
 	public Iterable<User> findAll() {
 		return this.repository.findAll();
@@ -53,15 +58,134 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 
 	@Override
 	protected Page<User> getListByPage(String text, Pageable pageable) {
-		return StringUtils.isNullOrSpace(text) 
-				? this.repository.findAll(pageable)
-				: this.repository.findAllByEmailOrFirstNameOrLastName(text, text, text, pageable);
+		return StringUtils.isNullOrSpace(text) ? this.repository.findAll(pageable)
+				: this.repository
+						.findAllByEmailContainsIgnoreCaseOrFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(text,
+								text, text, pageable);
 	}
-	
-	 public Page<User> getPaginatedUsers(Pageable pageable) {
-	        return this.repository.findAll(pageable);
-	 }
-	
+
+	public Page<User> getPaginatedUsers(Pageable pageable) {
+		return this.repository.findAll(pageable);
+	}
+
+	@Override
+	public PageableResponse<User> searchByName(String firstNameOrLastName, Pageable pageable, Sort sort) {
+		final PageableResponse<User> result = new PageableResponse<>();
+		result.setTotalItems(0);
+		result.setTotalPages(0);
+		result.setPageIndex(0);
+		result.setPageSize(-1);
+		
+		if (pageable == null) {
+			final Iterable<User> domains = StringUtils.isNullOrSpace(firstNameOrLastName) 
+					? this.repository.findAll(sort == null ? Sort.unsorted() : sort)
+					: this.repository.findAllByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(
+							firstNameOrLastName, firstNameOrLastName, sort == null ? Sort.unsorted() : sort);
+
+			if (domains == null) {
+				result.setItems(Collections.emptyList());
+			} else {
+				final List<User> users = new ArrayList<>();
+				domains.forEach(users::add);
+				
+				result.setItems(users);
+				result.setTotalItems(users.size());
+				result.setTotalPages(1);
+				result.setPageIndex(1);
+			}
+			
+			return result;
+		}
+		
+		final Page<User> pageDomain = StringUtils.isNullOrSpace(firstNameOrLastName) 
+				? this.repository.findAll(pageable)
+				: this.repository.findAllByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(firstNameOrLastName, firstNameOrLastName, pageable);
+		if (pageDomain == null) {
+			result.setItems(Collections.emptyList());
+			return result;
+		}
+		
+		final int pageIndex = pageable.getPageNumber() + 1;
+		final int pageSize = pageable.getPageSize();
+		
+		result.setItems(pageDomain.getContent());
+		result.setTotalItems(pageDomain.getTotalElements());
+		result.setTotalPages(pageDomain.getTotalPages());
+		result.setPageIndex(pageIndex);
+		result.setPageSize(pageSize);
+		
+		return result;
+	}
+
+	@Override
+	public PageableResponse<User> searchProfessionalByName(String firstNameOrLastName, Pageable pageable, Sort sort) {
+		final PageableResponse<User> result = new PageableResponse<>();
+		result.setTotalItems(0);
+		result.setTotalPages(0);
+		result.setPageIndex(0);
+		result.setPageSize(-1);
+		
+		if (pageable == null) {
+			final Sort userSort = sort == null ? Sort.unsorted() : sort;
+			final Iterable<User> domains = StringUtils.isNullOrSpace(firstNameOrLastName) 
+					? this.repository.findAllByUserTypeAndStatus(UserType.PROFESSIONAL.getValue(), 
+							UserStatus.ACTIVE.getValue(), userSort)
+					: this.repository.findAllByUserTypeAndStatusAndFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(
+							UserType.PROFESSIONAL.getValue(), UserStatus.ACTIVE.getValue(), 
+							firstNameOrLastName, firstNameOrLastName, userSort);
+
+			if (domains == null) {
+				result.setItems(Collections.emptyList());
+			} else {
+				final List<User> users = new ArrayList<>();
+				domains.forEach(users::add);
+				
+				result.setItems(users);
+				result.setTotalItems(users.size());
+				result.setTotalPages(1);
+				result.setPageIndex(1);
+			}
+			
+			return result;
+		}
+		
+		final Page<User> pageDomain = StringUtils.isNullOrSpace(firstNameOrLastName) 
+				? this.repository.findAllByUserTypeAndStatus(UserType.PROFESSIONAL.getValue(), 
+						UserStatus.ACTIVE.getValue(), pageable)
+				: this.repository.findAllByUserTypeAndStatusAndFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(
+						UserType.PROFESSIONAL.getValue(), UserStatus.ACTIVE.getValue(),
+						firstNameOrLastName, firstNameOrLastName, pageable);
+		if (pageDomain == null) {
+			result.setItems(Collections.emptyList());
+			return result;
+		}
+		
+		final int pageIndex = pageable.getPageNumber() + 1;
+		final int pageSize = pageable.getPageSize();
+		
+		result.setItems(pageDomain.getContent());
+		result.setTotalItems(pageDomain.getTotalElements());
+		result.setTotalPages(pageDomain.getTotalPages());
+		result.setPageIndex(pageIndex);
+		result.setPageSize(pageSize);
+		
+		return result;
+	}
+
+	@Override
+	public List<User> getActivateProfessionals(Collection<Integer> ids, Sort sort) {
+		final Iterable<User> domains = this.repository.findAllByIdInAndUserTypeAndStatus(ids, UserType.PROFESSIONAL.getValue(), 
+				UserStatus.ACTIVE.getValue(), sort == null ? Sort.unsorted() : sort);
+		
+		if (domains == null) {
+			return Collections.emptyList();
+		}
+		
+		final List<User> users = new ArrayList<>();
+		domains.forEach(users::add);
+		
+		return users;
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -69,10 +193,11 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		if (StringUtils.isNullOrSpace(text)) {
 			return this.repository.count();
 		}
-		
-		return this.repository.countByEmailOrFirstNameOrLastName(text, text, text);
+
+		return this.repository.countByEmailContainsIgnoreCaseOrFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(
+				text, text, text);
 	}
-	
+
 	@Override
 	public User saveOrUpdate(User user) {
 		return this.repository.save(user);
@@ -98,16 +223,16 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	public User getByEmail(String email) {
 		return this.repository.findByEmail(email);
 	}
-	
+
 	@Override
 	public List<UserCSV> extractUserCsv(List<Integer> ids) {
-		Iterable<User> users= this.repository.findAllById(ids);
+		Iterable<User> users = this.repository.findAllById(ids);
 		List<UserCSV> returnList = new ArrayList<UserCSV>();
-		for (User user: users) {
+		for (User user : users) {
 			UserCSV userCSV = new UserCSV(user);
 			returnList.add(userCSV);
 		}
-		
+
 		return returnList;
 	}
 
@@ -128,7 +253,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	}
 
 	@Override
-	public Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable) {
-		return this.repository.findAllByEmailOrFirstNameOrLastName(email, firstName, lastName, pageable);
+	public Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName,
+			Pageable pageable) {
+		return this.repository
+				.findAllByEmailContainsIgnoreCaseOrFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(email,
+						firstName, lastName, pageable);
 	}
 }

@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -26,11 +27,6 @@ public class Session extends PO<Integer> {
 	@NotEmpty(message = "{session.error.title.not.empty}")
 	@NotNull(message = "{session.error.title.not.empty}")
 	private String title;
-	
-	@Column(name = "Subtitle", length = 255)
-	@NotEmpty(message = "{session.error.subtitle.not.empty}")
-	@NotNull(message = "{session.error.subtitle.not.empty}")
-	private String subtitle;
 	
 	@Column(name = "Image", length = 255)
 	private String image;
@@ -58,6 +54,10 @@ public class Session extends PO<Integer> {
 			inverseJoinColumns = @JoinColumn(name = "CategoryId"))
     private List<SessionCategory> categories;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "voiceId")
+	private User voice;
+	
 	@Override
 	public Integer getId() {
 		return id;
@@ -78,14 +78,6 @@ public class Session extends PO<Integer> {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getSubtitle() {
-		return subtitle;
-	}
-
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
 	}
 
 	public String getImage() {
@@ -142,5 +134,13 @@ public class Session extends PO<Integer> {
 
 	public void setCategories(List<SessionCategory> categories) {
 		this.categories = categories;
+	}
+
+	public User getVoice() {
+		return voice;
+	}
+
+	public void setVoice(User voice) {
+		this.voice = voice;
 	}
 }

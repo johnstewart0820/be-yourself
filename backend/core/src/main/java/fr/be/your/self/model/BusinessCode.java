@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 
 import fr.be.your.self.common.BusinessCodeDiscountType;
 import fr.be.your.self.common.BusinessCodeStatus;
@@ -171,5 +173,15 @@ public class BusinessCode extends PO<String> {
 
 	public void setDiscountValue(BigDecimal discountValue) {
 		this.discountValue = discountValue;
+	}
+	
+	@PrePersist
+	@PreUpdate
+	protected void calcPricePerUser() {
+		pricePerUser = BigDecimal.ZERO;
+		
+		if (dealPrice != null && dealPrice.signum() > 0 && maxUserAmount > 0) {
+			pricePerUser = dealPrice.divide(new BigDecimal(maxUserAmount));
+		}
 	}
 }

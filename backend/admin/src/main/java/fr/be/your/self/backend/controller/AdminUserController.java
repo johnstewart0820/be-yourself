@@ -1,6 +1,6 @@
 package fr.be.your.self.backend.controller;
 
-import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,7 +50,7 @@ public class AdminUserController extends BaseResourceController<User, User, User
 	}
 	
 	@Override
-	protected Set<String> getSortableColumns() {
+	protected Map<String, String[]> getSortableColumns() {
 		// TODO Auto-generated method stub
 		return null;
 	}

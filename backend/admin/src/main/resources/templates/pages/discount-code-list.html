@@ -36,19 +36,39 @@
 						
 						<div class="row form-search-container">
 							<div class="col-md-9 col-sm-12">
-								<select id="type-filter" class="selectpicker show-tick" multiple 
-									data-actions-box="true" data-live-search="true" 
-									th:data-select-all-text="#{data.display.button.select.all}"
-									th:data-deselect-all-text="#{data.display.button.deselect.all}"
-									th:title="#{|${baseMessageKey}.option.filter.type.title|}"
-									th:data-none-selected-text="#{|${baseMessageKey}.option.filter.type.title|}"
-									data-selected-text-format="count > 2" 
-									th:data-count-selected-text="#{|${baseMessageKey}.option.filter.type.many|}">
-									<option th:each="codeType: ${availableCodeTypes}" 
-										th:value="${codeType}" 
-										th:text="#{|discount.code.type.${codeType}|}"
-										th:selected="${#arrays.contains(filterCodeTypes, codeType)}"></option>
-								</select>
+								<form role="form" th:action="${baseURL} + '/search'" method="get">
+									<div class="form-group mb-0">
+										<div class="input-group input-group-alternative">
+											<!-- 
+											<select id="type-filter" class="selectpicker show-tick" multiple 
+												data-actions-box="true" data-live-search="true" 
+												th:data-select-all-text="#{data.display.button.select.all}"
+												th:data-deselect-all-text="#{data.display.button.deselect.all}"
+												th:title="#{|${baseMessageKey}.option.filter.type.title|}"
+												th:data-none-selected-text="#{|${baseMessageKey}.option.filter.type.title|}"
+												data-selected-text-format="count > 2" 
+												th:data-count-selected-text="#{|${baseMessageKey}.option.filter.type.many|}">
+												<option th:each="codeType: ${availableCodeTypes}" 
+													th:value="${codeType}" 
+													th:text="#{|discount.code.type.${codeType}|}"
+													th:selected="${#arrays.contains(filteredCodeTypes, codeType)}"></option>
+											</select>
+											-->
+											
+											<th:block th:if="${baseURL != null && baseURL != ''}">
+												<div class="input-group-prepend">
+													<span class="input-group-text">
+														<i class="fas fa-search"></i>
+													</span>
+												</div>
+												<input class="form-control" type="text" name="q" 
+													th:placeholder="#{search.placeholder}" th:value="${search}">
+											</th:block>
+										</div>
+									</div>
+									<input type="hidden" name="action" value="update-filter">
+									<input type="submit" style="display: none" />
+								</form>
 							</div>
 							
 							<div class="col-md-3 col-sm-12 text-right">
@@ -69,12 +89,13 @@
 						<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col" width="40%" th:text="#{|${baseMessageKey}.detail.name|}"></th>
-									<th scope="col" width="20%" th:text="#{|${baseMessageKey}.detail.discount.value|}"></th>
-									<th scope="col" width="20%" th:text="#{|${baseMessageKey}.detail.type|}"></th>
+									<th scope="col" width="65%" th:text="#{|${baseMessageKey}.detail.name|}"></th>
+									<th scope="col" width="5%" style="min-width: 100px;" th:text="#{|${baseMessageKey}.detail.discount.value|}"></th>
+									<th scope="col" width="5%" style="min-width: 80px;" th:text="#{|${baseMessageKey}.detail.type|}"></th>
 									<th scope="col" width="5%" style="min-width: 60px;" th:text="#{|${baseMessageKey}.detail.start.date|}"></th>
 									<th scope="col" width="5%" style="min-width: 60px;" th:text="#{|${baseMessageKey}.detail.end.date|}"></th>
-									<th scope="col" width="5%" style="min-width: 60px;" th:text="#{|${baseMessageKey}.detail.status|}"></th>
+									<th scope="col" width="5%" style="min-width: 40px;" th:text="#{|${baseMessageKey}.detail.status|}"></th>
+									<th scope="col" width="5%" style="min-width: 60px;" th:text="#{|${baseMessageKey}.detail.used.amount|}"></th>
 									<th scope="col" width="5%" style="min-width: 80px;" class="no-sort" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
@@ -83,11 +104,24 @@
 									<th scope="row" nowrap>
 										<span class="mb-0 text-sm" th:utext="${item.name}"></span>
 									</th>
-									<td nowrap>
-										<span th:text="${item.discountValue}"></span>
-										<th:block th:switch="${item.discountType}">
-											<span th:case="0">%</span>
-											<span th:case="*" th:text="${priceUnitSymbol}"></span>
+									<td nowrap class="text-right">
+										<th:block th:switch="${item.type}">
+											<th:block th:case="3">
+												<th:block th:switch="${item.discountType}">
+													<th:block th:case="0">
+														<th:block th:case="item.discountValue">
+															<span th:case="100">100</span>
+															<span th:case="*" th:text="${item.discountValue}"></span>
+														</th:block>
+														<span>%</span>
+													</th:block>
+													<th:block th:case="*">
+														<span th:text="${item.discountValue}"></span>
+														<span th:text="${priceUnitSymbol}"></span>
+													</th:block>
+												</th:block>
+											</th:block>
+											<span th:case="*">100%</span>
 										</th:block>
 									</td>
 									<td nowrap>
@@ -101,6 +135,9 @@
 									</td>
 									<td nowrap>
 										<span th:utext="#{|${baseMessageKey}.status.${item.status}|}"></span>
+									</td>
+									<td nowrap class="text-center">
+										<span th:utext="${item.usedAmount}"></span>
 									</td>
 									<td class="action-column text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
@@ -138,7 +175,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
-			const sortableColumnMaps = { 'name': 0, 'discountValue': 1, 'type' : 2, 'startDate': 3, 'endDate': 4, 'status': 5 };
+			const sortableColumnMaps = { 'name': 0, 'discountValue': 1, 'type' : 2, 'startDate': 3, 'endDate': 4, 'status': 5, 'usedAmount': 6 };
 			
 			function confirmDelete(id) {
 				const deleteUrl = '[[${baseURL}]]/delete/' + id;
@@ -159,7 +196,7 @@
 				$('#type-filter').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 					const selectedCodeTypes = $('#type-filter').val();
 					
-					window.location = '[[${baseURL}]]/search?action=update-filter&codeTypes=' + encodeURIComponent(selectedCodeTypes.join(','));
+					window.location = '[[${baseURL}]]/search?action=update-filter&filterCodeTypes=' + encodeURIComponent(selectedCodeTypes.join(','));
 				});
 				
 				$('#display-page-option').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {

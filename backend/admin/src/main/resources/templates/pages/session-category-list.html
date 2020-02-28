@@ -35,7 +35,24 @@
 						</div>
 						
 						<div class="row form-search-container">
-							<div class="col-md-12 col-sm-12 text-right">
+							<div class="col-md-9 col-sm-12">
+								<form role="form" th:action="${baseURL} + '/search'" method="get">
+									<div class="form-group mb-0">
+										<div class="input-group input-group-alternative">
+											<div class="input-group-prepend">
+												<span class="input-group-text">
+													<i class="fas fa-search"></i>
+												</span>
+											</div>
+											<input class="form-control" type="text" name="q" 
+												th:placeholder="#{search.placeholder}" th:value="${search}">
+										</div>
+									</div>
+									<input type="hidden" name="action" value="update-filter">
+									<input type="submit" style="display: none" />
+								</form>
+							</div>
+							<div class="col-md-3 col-sm-12 text-right">
 								<select id="display-page-option" class="selectpicker show-tick" 
 									th:data-none-selected-text="#{data.display.page.option.title}">
 									<option th:each="pageSize: ${supportPageSizes}" 

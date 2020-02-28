@@ -1,10 +1,10 @@
 package fr.be.your.self.backend.controller;
 
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,21 +27,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import fr.be.your.self.backend.dto.IdNameDto;
 import fr.be.your.self.backend.dto.SessionDto;
+import fr.be.your.self.backend.dto.SessionSimpleDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Session;
 import fr.be.your.self.model.SessionCategory;
+import fr.be.your.self.model.User;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.SessionCategoryService;
 import fr.be.your.self.service.SessionService;
+import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.NumberUtils;
 import fr.be.your.self.util.StringUtils;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SessionController.NAME)
-public class SessionController extends BaseResourceController<Session, Session, SessionDto, Integer> {
+public class SessionController extends BaseResourceController<Session, SessionSimpleDto, SessionDto, Integer> {
 	
 	public static final String NAME = "session";
 	
@@ -49,14 +53,14 @@ public class SessionController extends BaseResourceController<Session, Session, 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
 			+ Constants.FOLDER.MEDIA.SESSION;
 	
-	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
+	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 	
 	static {
-		SORTABLE_COLUMNS.add("title");
-		SORTABLE_COLUMNS.add("subtitle");
-		SORTABLE_COLUMNS.add("duration");
-		SORTABLE_COLUMNS.add("free");
-		SORTABLE_COLUMNS.add("created");
+		SORTABLE_COLUMNS.put("title", new String[] { "title" });
+		SORTABLE_COLUMNS.put("voice", new String[] { "voice.firstName", "voice.lastName" });
+		SORTABLE_COLUMNS.put("duration", new String[] { "duration" });
+		SORTABLE_COLUMNS.put("free", new String[] { "free" });
+		SORTABLE_COLUMNS.put("created", new String[] { "created" });
 	}
 	
 	@Autowired
@@ -64,6 +68,9 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	
 	@Autowired
 	private SessionCategoryService sessionCategoryService;
+	
+	@Autowired
+	private UserService userService;
 	
 	@Override
 	protected String getName() {
@@ -86,7 +93,7 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	}
 	
 	@Override
-	protected Set<String> getSortableColumns() {
+	protected Map<String, String[]> getSortableColumns() {
 		return SORTABLE_COLUMNS;
 	}
 
@@ -111,8 +118,18 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	}
 
 	@Override
-	protected Session createSimpleDto(Session domain) {
-		return domain;
+	protected SessionSimpleDto createSimpleDto(Session domain) {
+		final SessionSimpleDto dto = new SessionSimpleDto(domain);
+		
+		if (this.isValidAudioContentType(dto.getContentMimeType())) {
+			dto.setContentFileType(Constants.MEDIA_TYPE.AUDIO);
+		} else if (this.isValidVideoContentType(dto.getContentMimeType())) {
+			dto.setContentFileType(Constants.MEDIA_TYPE.VIDEO);
+		} else {
+			dto.setContentFileType(Constants.MEDIA_TYPE.IMAGE);
+		}
+		
+		return dto;
 	}
 
 	@Override
@@ -122,28 +139,46 @@ public class SessionController extends BaseResourceController<Session, Session, 
 	
 	@Override
 	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
-			Model model, Map<String, String> searchParams, PageableResponse<Session> pageableDto) throws BusinessException {
+			Model model, Map<String, String> searchParams, PageableResponse<SessionSimpleDto> pageableDto) throws BusinessException {
 		super.loadListPageOptions(session, request, response, model, searchParams, pageableDto);
 		
 		final String categoryDefaultSort = this.sessionCategoryService.getDefaultSort();
 		final Sort categorySort = this.getSortRequest(categoryDefaultSort);
 		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll(categorySort);
-		model.addAttribute("sessionCategories", sessionCategories);
 		
-		final Set<Integer> filterCategoryIds = new HashSet<Integer>();
+		final String searchCategoryIds = searchParams.get("filterCategoryIds");
+		final List<Integer> filteredCategoryIds = NumberUtils.parseIntegers(searchCategoryIds, ",");
 		
-		final String categoryIds = searchParams.get("categoryIds");
-		if (!StringUtils.isNullOrSpace(categoryIds)) {
-			final String[] categoryIdValues = categoryIds.split(",");
-			for (String categoryIdValue : categoryIdValues) {
-				final Integer categoryId = NumberUtils.parseInteger(categoryIdValue);
-				if (categoryId != null) {
-					filterCategoryIds.add(categoryId);
+		final List<IdNameDto<Integer>> filteredVoices = new ArrayList<>();
+		
+		final String userDefaultSort = this.userService.getDefaultSort();
+		final Sort userSort = this.getSortRequest(userDefaultSort);
+		
+		final String searchVoiceIds = searchParams.get("filterVoiceIds");
+		final List<Integer> filteredVoiceIds = NumberUtils.parseIntegers(searchVoiceIds, ",");
+		if (filteredVoiceIds != null && !filteredVoiceIds.isEmpty()) {
+			final List<User> professionals = this.userService.getActivateProfessionals(filteredVoiceIds, userSort);
+			
+			for (User professional : professionals) {
+				filteredVoices.add(new IdNameDto<Integer>(professional));
+			}
+		} else {
+			/*
+			final PageRequest pageable = this.getPageRequest(1, this.dataSetting.getDefaultDropdownSearchPageSize(), userSort);
+			final PageableResponse<User> professionals = this.userService.searchProfessionalByName(null, pageable, userSort);
+			
+			if (professionals.getItems() != null) {
+				for (User professional : professionals.getItems()) {
+					filteredVoices.add(new IdNameDto(professional));
 				}
 			}
+			*/
 		}
 		
-		model.addAttribute("filterCategoryIds", filterCategoryIds);
+		model.addAttribute("sessionCategories", sessionCategories);
+		model.addAttribute("filteredCategoryIds", filteredCategoryIds);
+		model.addAttribute("filteredVoiceIds", filteredVoiceIds);
+		model.addAttribute("filteredVoices", filteredVoices);
 	}
 
 	@Override
@@ -191,14 +226,22 @@ public class SessionController extends BaseResourceController<Session, Session, 
 		final Sort categorySort = this.getSortRequest(categoryDefaultSort);
 		final List<SessionCategory> sessionCategories = this.sessionCategoryService.getAll(categorySort);
 		model.addAttribute("sessionCategories", sessionCategories);
+		
+		if (domain != null) {
+			final User voice = domain.getVoice();
+			if (voice != null) {
+				model.addAttribute("voiceName", voice.getDisplay());
+			}
+		}
 	}
 
 	@Override
 	protected PageableResponse<Session> pageableSearch(Map<String, String> searchParams, PageRequest pageable, Sort sort) {
 		final String search = searchParams.get("q");
-		final List<Integer> filterCategoryIds = NumberUtils.parseIntegers(searchParams.get("categoryIds"), ",");
+		final List<Integer> filterCategoryIds = NumberUtils.parseIntegers(searchParams.get("filterCategoryIds"), ",");
+		final List<Integer> filterVoiceIds = NumberUtils.parseIntegers(searchParams.get("filterVoiceIds"), ",");
 		
-		return this.mainService.pageableSearch(search, filterCategoryIds, pageable, sort);
+		return this.mainService.pageableSearch(search, filterCategoryIds, filterVoiceIds, pageable, sort);
 	}
 
 	@PostMapping("/create")
@@ -308,6 +351,27 @@ public class SessionController extends BaseResourceController<Session, Session, 
         // ====> Session category
         final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
         domain.setCategories(categories);
+        
+        final Integer voiceId = dto.getVoiceId();
+        if (voiceId == null) {
+        	domain.setVoice(null);
+        } else {
+        	final User currentVoice = domain.getVoice();
+        	
+        	if (currentVoice == null || currentVoice.getId() != voiceId) {
+        		final User voice = this.userService.getById(voiceId);
+        		
+        		if (voice == null) {
+        			final ObjectError error = this.createFieldError(result, "voiceId", "not.found", new Object[] { voiceId }, "Cannot find voice #" + voiceId);
+                	result.addError(error);
+                	
+                	dto.setId(id);
+                	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        		}
+        		
+        		domain.setVoice(voice);
+        	}
+        }
         
         // ====> Process upload image and content file
         String deleteImageFileName = null;

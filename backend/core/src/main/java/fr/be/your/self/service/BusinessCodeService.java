@@ -4,4 +4,6 @@ import fr.be.your.self.model.BusinessCode;
 
 public interface BusinessCodeService extends BaseService<BusinessCode, String> {
 
+	public boolean existsName(String name);
+	
 }

@@ -2,6 +2,7 @@ package fr.be.your.self.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PageableResponse<T> implements Serializable {
@@ -18,8 +19,16 @@ public class PageableResponse<T> implements Serializable {
 	private int pageSize;
 	private long totalPages;
 
+	public static PageableResponse<?> emptyPageableResponse() {
+		return new PageableResponse<>(Collections.emptyList());
+	}
+	
 	public PageableResponse() {
 		super();
+		
+		this.pageIndex = 0;
+		this.pageSize = -1;
+		this.totalPages = 0;
 	}
 
 	public PageableResponse(List<T> items) {

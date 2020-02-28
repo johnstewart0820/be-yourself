@@ -12,6 +12,8 @@ import fr.be.your.self.model.BusinessCode;
 @Repository
 public interface BusinessCodeRepository extends BaseRepository<BusinessCode, String> {
 	
+	Boolean existsByNameIgnoreCase(String name);
+	
 	long countByNameContainsIgnoreCase(String name);
 	
 	Iterable<BusinessCode> findAllByNameContainsIgnoreCase(String name, Sort sort);

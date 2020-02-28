@@ -36,19 +36,51 @@
 						
 						<div class="row form-search-container">
 							<div class="col-md-9 col-sm-12">
-								<select id="category-filter" class="selectpicker" multiple 
-									data-actions-box="true" data-live-search="true" 
-									th:data-select-all-text="#{data.display.button.select.all}"
-									th:data-deselect-all-text="#{data.display.button.deselect.all}"
-									th:title="#{|${baseMessageKey}.option.filter.category.title|}"
-									th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}"
-									data-selected-text-format="count > 2" 
-									th:data-count-selected-text="#{|${baseMessageKey}.option.filter.category.many|}">
-									<option th:each="sessionCategory: ${sessionCategories}" 
-										th:value="${sessionCategory.id}" 
-										th:text="${sessionCategory.name}"
-										th:selected="${#arrays.contains(filterCategoryIds, sessionCategory.id)}"></option>
-								</select>
+								<form role="form" th:action="${baseURL} + '/search'" method="get">
+									<div class="form-group mb-0">
+										<div class="input-group input-group-alternative">
+											<select id="category-filter" class="selectpicker show-tick" multiple 
+												data-actions-box="true" data-live-search="true" 
+												th:data-select-all-text="#{data.display.button.select.all}"
+												th:data-deselect-all-text="#{data.display.button.deselect.all}"
+												th:title="#{|${baseMessageKey}.option.filter.category.title|}"
+												th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}"
+												data-selected-text-format="count > 2" 
+												th:data-count-selected-text="#{|${baseMessageKey}.option.filter.category.many|}">
+												<option th:each="sessionCategory: ${sessionCategories}" 
+													th:value="${sessionCategory.id}" 
+													th:text="${sessionCategory.name}"
+													th:selected="${#arrays.contains(filteredCategoryIds, sessionCategory.id)}"></option>
+											</select>
+											
+											<select id="voice-filter" class="voice-selectpicker show-tick" multiple
+												data-actions-box="false" data-live-search="true" 
+												th:data-select-all-text="#{data.display.button.select.all}"
+												th:data-deselect-all-text="#{data.display.button.deselect.all}"
+												th:title="#{|${baseMessageKey}.option.filter.voice.title|}"
+												th:data-none-selected-text="#{|${baseMessageKey}.option.filter.voice.title|}"
+												data-selected-text-format="count > 2" 
+												th:data-count-selected-text="#{|${baseMessageKey}.option.filter.voice.many|}">
+												<option th:each="filteredVoice: ${filteredVoices}" 
+													th:value="${filteredVoice.id}" 
+													th:text="${filteredVoice.name}"
+													th:selected="${#arrays.contains(filteredVoiceIds, filteredVoice.id)}"></option>
+											</select>
+											
+											<th:block th:if="${baseURL != null && baseURL != ''}">
+												<div class="input-group-prepend">
+													<span class="input-group-text">
+														<i class="fas fa-search"></i>
+													</span>
+												</div>
+												<input class="form-control" type="text" name="q" 
+													th:placeholder="#{search.placeholder}" th:value="${search}">
+											</th:block>
+										</div>
+									</div>
+									<input type="hidden" name="action" value="update-filter">
+									<input type="submit" style="display: none" />
+								</form>
 							</div>
 							
 							<div class="col-md-3 col-sm-12 text-right">
@@ -69,8 +101,9 @@
 						<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col" width="42%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
-									<th scope="col" width="40%" class="no-sort" th:text="#{|${baseMessageKey}.detail.categories|}"></th>
+									<th scope="col" width="32%" th:text="#{|${baseMessageKey}.detail.title|}"></th>
+									<th scope="col" width="25%" class="no-sort" th:text="#{|${baseMessageKey}.detail.categories|}"></th>
+									<th scope="col" width="25%" th:text="#{|${baseMessageKey}.detail.voice.id|}"></th>
 									<th scope="col" width="5%" style="min-width: 60px;" th:text="#{|${baseMessageKey}.detail.duration|}"></th>
 									<th scope="col" width="3%" style="min-width: 30px;" th:text="#{|${baseMessageKey}.detail.free|}"></th>
 									<th scope="col" width="5%" style="min-width: 110px;" th:text="#{data.detail.created}"></th>
@@ -100,6 +133,9 @@
 											<li th:each="category : ${item.categories}" th:utext="${category.name}"></li>
 										</ul>
 									</td>
+									<td nowrap>
+										<span th:utext="${item.voiceName}"></span>
+									</td>
 									<td nowrap class="text-center">
 										<span th:utext="${item.duration}"></span>
 									</td>
@@ -108,10 +144,7 @@
 										<i th:case="false" class="fas fa-times"></i>
 									</td>
 									<td nowrap>
-										<span th:text="${#dates.format(item.created, dateTimeFormat)}"></span>
-										<!-- 
-										<span th:utext="${item.subtitle}"></span>
-										-->
+										<span th:text="${#dates.format(item.createdTime, dateTimeFormat)}"></span>
 									</td>
 									<td class="action-column text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
@@ -149,13 +182,59 @@
 
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
-			const sortableColumnMaps = { 'title': 0, 'duration' : 2, 'free': 3, 'created': 4 };
+			const sortableColumnMaps = { 'title': 0, 'voice': 2, 'duration': 3, 'free': 4, 'created': 5 };
 			
 			function confirmDelete(id) {
 				const deleteUrl = '[[${baseURL}]]/delete/' + id;
 				
 				$('#confirm-delete-form').attr('action', deleteUrl);
 				showModal('confirm-delete-modal');
+			}
+			
+			function initializeVoiceSelectPicker() {
+				var voiceSelectpickerOptions = {
+					ajax: {
+						url: '[[${rootURL}]]/common/search',
+						type: 'GET',
+						dataType: 'json',
+						data: function() {
+							return {
+								dataType: 'professional',
+								q: '{{{q}}}'
+							};
+						}
+					},
+					locale: {
+						searchPlaceholder: '[[#{|${baseMessageKey}.option.filter.voice.title|}]]',
+						statusSearching: '[[#{searching.placeholder}]]',
+						statusInitialized: '[[#{|${baseMessageKey}.option.filter.voice.search.initialized|}]]',
+						currentlySelected: '[[#{|${baseMessageKey}.option.filter.voice.search.currently.selected|}]]',
+						emptyTitle: '[[#{|${baseMessageKey}.option.filter.voice.search.empty.title|}]]',
+						errorText: '[[#{|${baseMessageKey}.option.filter.voice.search.error.text|}]]',
+						statusNoResults: '[[#{|${baseMessageKey}.option.filter.voice.search.status.no.results|}]]'
+						
+					},
+					preprocessData: function(data) {
+						let result = [];
+						
+						const dtos = data.items || [];
+						
+						for (i = 0; i < dtos.length; i++) {
+							result.push($.extend(true, dtos[i], {
+								text : dtos[i].name,
+								value: dtos[i].id
+							}));
+						}
+						
+						return result;
+					}
+				};
+				
+				$('.voice-selectpicker')
+					.selectpicker()
+					.ajaxSelectPicker(voiceSelectpickerOptions);
+				
+				$('.voice-selectpicker').trigger('change');
 			}
 			
 			$(function() {
@@ -165,12 +244,20 @@
 				
 				buildDataTable(dataTableId, sortableColumnMaps, defaultSort, sortUrl);
 				
-				$('select').selectpicker();
+				$('.selectpicker').selectpicker();
+				initializeVoiceSelectPicker();
 				
 				$('#category-filter').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 					const selectedCategoryIds = $('#category-filter').val();
 					
-					window.location = '[[${baseURL}]]/search?action=update-filter&categoryIds=' + encodeURIComponent(selectedCategoryIds.join(','));
+					window.location = '[[${baseURL}]]/search?action=update-filter&filterCategoryIds=' + encodeURIComponent(selectedCategoryIds.join(','));
+				});
+				
+				$('#voice-filter').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+					const selectedVoiceIds = $('#voice-filter').val();
+					//console.log(selectedVoiceIds);
+					
+					window.location = '[[${baseURL}]]/search?action=update-filter&filterVoiceIds=' + encodeURIComponent(selectedVoiceIds.join(','));
 				});
 				
 				$('#display-page-option').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {

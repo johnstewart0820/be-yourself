@@ -5,7 +5,7 @@ public enum BusinessCodeType {
 	B2B_UNIQUE(1),
 	B2C_DISCOUNT_100(2),
 	B2C_DISCOUNT(3),
-	//GIFT_CARD(4),
+	GIFT_CARD(4),
 	UNKNOWN(-1);
 	
 	private final int value;

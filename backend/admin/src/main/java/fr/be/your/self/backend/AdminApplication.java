@@ -81,17 +81,55 @@ public class AdminApplication implements CommandLineRunner {
 		return permission;
 	}
 	
+	private void deleteFunctionality(User adminUser, String path) {
+		final Optional<Functionality> optionalFunctionality = this.functionalityRepository.findByPath(path);
+		if (!optionalFunctionality.isPresent()) {
+			return;
+		}
+		
+		Functionality functionality = optionalFunctionality.get();
+		if (functionality == null) {
+			return;
+		}
+		
+		final Optional<Permission> optionalPermission = this.permissionRepository.findByUserIdAndFunctionalityId(adminUser.getId(), functionality.getId());
+		if (optionalPermission.isPresent()) {
+			final Permission permission = optionalPermission.get();
+			
+			if (permission != null) {
+				this.permissionRepository.delete(permission);
+			}
+		}
+		
+		this.functionalityRepository.delete(functionality);
+	}
+	
+	private User createProfessional(String name, String email) {
+		User user = userRepository.findByEmail(email);
+		
+		if (user != null) {
+			return user;
+		}
+		
+		final String password = this.passwordEncoder.encode("123456");
+		
+		user = new User(email, password, UserType.PROFESSIONAL.getValue(), name, "");
+		user.setStatus(UserStatus.ACTIVE.getValue());
+		
+		return userRepository.save(user);
+	}
+	
 	@Override
 	public void run(String... args) throws Exception {
-		final String email = "admin@gmail.com";
+		final String adminEmail = "admin@gmail.com";
 		
 		try {
-			User adminUser = userRepository.findByEmail(email);
+			User adminUser = userRepository.findByEmail(adminEmail);
 			
 			if (adminUser == null) {
 				final String password = this.passwordEncoder.encode("123456");
 				
-				adminUser = new User(email, password, UserType.ADMIN.getValue(), "Administrator", "");
+				adminUser = new User(adminEmail, password, UserType.ADMIN.getValue(), "Administrator", "");
 				adminUser.setStatus(UserStatus.ACTIVE.getValue());
 				
 				adminUser = userRepository.save(adminUser);
@@ -159,41 +197,66 @@ public class AdminApplication implements CommandLineRunner {
 			
 			// Discount code management
 			{
+				final String path = "/discount-code";
+				final String name = "Discount code management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			
+			{
 				final String path = "/discount-code-" + BusinessCodeType.B2B_MULTIPLE.getValue();
 				final String name = "B2B multiple code management";
 				
-				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				this.deleteFunctionality(adminUser, path);
 			}
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.B2B_UNIQUE.getValue();
 				final String name = "B2B unique code management";
 				
-				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				this.deleteFunctionality(adminUser, path);
 			}
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.B2C_DISCOUNT_100.getValue();
 				final String name = "B2C discount 100% code management";
 				
-				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				this.deleteFunctionality(adminUser, path);
 			}
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.B2C_DISCOUNT.getValue();
 				final String name = "B2C discount code management";
 				
-				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				this.deleteFunctionality(adminUser, path);
 			}
 			
-			/*
 			{
 				final String path = "/discount-code-" + BusinessCodeType.GIFT_CARD.getValue();
 				final String name = "Gift card management";
 				
-				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+				this.deleteFunctionality(adminUser, path);
 			}
-			*/
+			
+			// Create temp user
+			{
+				final String name = "David Jame";
+				final String email = "david.jame@gmail.com";
+				this.createProfessional(name, email);
+				
+			}
+			
+			{
+				final String name = "David Beckam";
+				final String email = "david.beckam@gmail.com";
+				this.createProfessional(name, email);
+				
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

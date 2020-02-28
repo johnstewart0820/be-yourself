@@ -1,9 +1,9 @@
 package fr.be.your.self.backend.controller;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,27 +35,26 @@ public class SubscriptionTypeController
 		extends BaseResourceController<SubscriptionType, SubscriptionType, SubscriptionTypeDto, Integer> {
 
 	public static final String NAME = "subtype";
-	
-	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
-		
-		static {
-			SORTABLE_COLUMNS.add("name");
-			SORTABLE_COLUMNS.add("duration");
-			SORTABLE_COLUMNS.add("canal");
-			SORTABLE_COLUMNS.add("price");
-			SORTABLE_COLUMNS.add("autoRenew");
-			SORTABLE_COLUMNS.add("status");
 
-		}
+	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
+
+	static {
+		SORTABLE_COLUMNS.put("name", new String[] { "name" });
+		SORTABLE_COLUMNS.put("duration", new String[] { "duration" });
+		SORTABLE_COLUMNS.put("canal", new String[] { "canal" });
+		SORTABLE_COLUMNS.put("price", new String[] { "price" });
+		SORTABLE_COLUMNS.put("autoRenew", new String[] { "autoRenew" });
+		SORTABLE_COLUMNS.put("status", new String[] { "status" });
+	}
 
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX + Constants.PATH.WEB_ADMIN.MEDIA
 			+ Constants.FOLDER.MEDIA.SESSION;
 
 	@Autowired
 	private SubscriptionTypeService subTypeService;
-	
+
 	@Override
-	protected Set<String> getSortableColumns() {
+	protected Map<String, String[]> getSortableColumns() {
 		return SORTABLE_COLUMNS;
 	}
 
@@ -63,16 +62,16 @@ public class SubscriptionTypeController
 	protected String getFormView() {
 		return "subtype/subtype_form";
 	}
-	
+
 	@Override
 	protected String getListView() {
 		return "subtype/subtype-list";
 	}
-	
+
 	@Override
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, SubscriptionType domain, SubscriptionTypeDto dto) throws BusinessException {
-		
+
 		final List<String> canals = Arrays.asList("WEB", "APP");
 		final List<Integer> durations = Arrays.asList(1, 3, 6, 12, 24);
 
@@ -81,100 +80,91 @@ public class SubscriptionTypeController
 
 	}
 
-
-
 	@PostMapping("/create")
 	@Transactional
-    public String createDomain(
-    		@ModelAttribute @Validated SubscriptionTypeDto dto, 
-    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
-		
-        if (result.hasErrors()) {
-        	return this.getFormView();
-        }
-        
-       
-        final SubscriptionType domain = this.newDomain();
-        dto.copyToDomain(domain);
-        
-        final SubscriptionType savedDomain = this.subTypeService.create(domain);
-        
-        // Error, delete upload file
-        if (savedDomain == null || result.hasErrors()) {
+	public String createDomain(@ModelAttribute @Validated SubscriptionTypeDto dto, HttpSession session,
+			HttpServletRequest request, HttpServletResponse response, BindingResult result,
+			RedirectAttributes redirectAttributes, Model model) {
 
-        	return this.getFormView();
-        }   
-        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-        
-        return "redirect:" + this.getBaseURL();
-    }
-	
-	
+		if (result.hasErrors()) {
+			return this.getFormView();
+		}
+
+		final SubscriptionType domain = this.newDomain();
+		dto.copyToDomain(domain);
+
+		final SubscriptionType savedDomain = this.subTypeService.create(domain);
+
+		// Error, delete upload file
+		if (savedDomain == null || result.hasErrors()) {
+
+			return this.getFormView();
+		}
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
+		redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+
+		return "redirect:" + this.getBaseURL();
+	}
+
 	@PostMapping("/update/{id}")
 	@Transactional
-    public String updateDomain(
-    		@PathVariable("id") Integer id, 
-    		@ModelAttribute @Validated SubscriptionTypeDto dto, 
-    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
-		
-        if (result.hasErrors()) {
-        	dto.setId(id);
-        	return this.getFormView();
-        }
-        
-        SubscriptionType domain = this.subTypeService.getById(id);
-        if (domain == null) {
-        	final ObjectError error = this.createIdNotFoundError(result, id);
-        	result.addError(error);
-        	
-        	dto.setId(id);
-        	return this.getFormView();
-        }
-        
-        dto.copyToDomain(domain);
-        
-        final SubscriptionType savedDomain = this.subTypeService.update(domain);
-    
-        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-        
-        return "redirect:" + this.getBaseURL() + "/current-page";
-    }
-	
+	public String updateDomain(@PathVariable("id") Integer id, @ModelAttribute @Validated SubscriptionTypeDto dto,
+			HttpSession session, HttpServletRequest request, HttpServletResponse response, BindingResult result,
+			RedirectAttributes redirectAttributes, Model model) {
+
+		if (result.hasErrors()) {
+			dto.setId(id);
+			return this.getFormView();
+		}
+
+		SubscriptionType domain = this.subTypeService.getById(id);
+		if (domain == null) {
+			final ObjectError error = this.createIdNotFoundError(result, id);
+			result.addError(error);
+
+			dto.setId(id);
+			return this.getFormView();
+		}
+
+		dto.copyToDomain(domain);
+
+		final SubscriptionType savedDomain = this.subTypeService.update(domain);
+
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+		redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+
+		return "redirect:" + this.getBaseURL() + "/current-page";
+	}
+
 	@PostMapping(value = { "/delete/{id}" })
 	@Transactional
-    public String deletePage(
-    		@PathVariable(name = "id", required = true) Integer id,
-    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		RedirectAttributes redirectAttributes, Model model) {
-		
+	public String deletePage(@PathVariable(name = "id", required = true) Integer id, HttpSession session,
+			HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes,
+			Model model) {
+
 		final SubscriptionType domain = this.subTypeService.getById(id);
 		if (domain == null) {
 			final String message = this.getIdNotFoundMessage(id);
-			
+
 			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        
+			redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+			redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
-		
-		
+
 		final boolean result = this.subTypeService.delete(id);
 		if (result) {
-			
+
 			return "redirect:" + this.getBaseURL();
 		}
-		
+
 		final String message = this.getDeleteByIdErrorMessage(id);
-		
+
 		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-        
+		redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+		redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+
 		return "redirect:" + this.getBaseURL() + "/current-page";
 	}
 
@@ -217,7 +207,5 @@ public class SubscriptionTypeController
 	protected String getBaseMediaURL() {
 		return BASE_MEDIA_URL;
 	}
-
-
 
 }

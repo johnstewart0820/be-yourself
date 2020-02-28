@@ -52,4 +52,10 @@ public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, Strin
 				? this.repository.findAll(pageable)
 				: this.repository.findAllByNameContainsIgnoreCase(text, pageable);
 	}
+
+	@Override
+	public boolean existsName(String name) {
+		final Boolean existed = this.repository.existsByNameIgnoreCase(name);
+		return existed == null ? false : existed.booleanValue();
+	}
 }

@@ -1,6 +1,7 @@
 package fr.be.your.self.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,22 +60,35 @@ public class SessionServiceImpl extends BaseServiceImpl<Session, Integer> implem
 	}
 
 	@Override
-	public long count(String text, List<Integer> categoryIds) {
+	public long count(String text, List<Integer> categoryIds, Collection<Integer> voiceIds) {
 		if (categoryIds == null || categoryIds.isEmpty()) {
-			return this.count(text);
+			
+			if (voiceIds == null || voiceIds.isEmpty()) {
+				return this.count(text);
+			}
+			
+			return this.repository.countByVoice(text, voiceIds);
 		}
 		
-		return this.repository.count(text, categoryIds);
+		if (voiceIds == null || voiceIds.isEmpty()) {
+			return this.repository.countByCategory(text, categoryIds);
+		}
+		
+		return this.repository.count(text, categoryIds, voiceIds);
 	}
 
 	@Override
-	public PageableResponse<Session> pageableSearch(String text, List<Integer> categoryIds, Pageable pageable, Sort sort) {
+	public PageableResponse<Session> pageableSearch(String text, 
+			Collection<Integer> categoryIds, Collection<Integer> voiceIds, 
+			Pageable pageable, Sort sort) {
 		if (categoryIds == null || categoryIds.isEmpty()) {
-			return this.pageableSearch(text, pageable, sort);
+			if (voiceIds == null || voiceIds.isEmpty()) {
+				return this.pageableSearch(text, pageable, sort);
+			}
 		}
 		
 		if (pageable == null) {
-			final List<Session> items = this.search(text, categoryIds, sort);
+			final List<Session> items = this.search(text, categoryIds, voiceIds, sort);
 			
 			final PageableResponse<Session> result = new PageableResponse<>();
 			result.setItems(items);
@@ -86,7 +100,15 @@ public class SessionServiceImpl extends BaseServiceImpl<Session, Integer> implem
 			return result;
 		}
 		
-		final Page<Session> pageDomain = this.repository.findAll(text, categoryIds, pageable);
+		Page<Session> pageDomain;
+		if (categoryIds == null || categoryIds.isEmpty()) {
+			pageDomain = this.repository.findAllByVoice(text, voiceIds, pageable);
+		} else if (voiceIds == null || voiceIds.isEmpty()) {
+			pageDomain = this.repository.findAllByCategory(text, categoryIds, pageable);
+		} else {
+			pageDomain = this.repository.findAll(text, categoryIds, voiceIds, pageable);
+		}
+		
 		if (pageDomain == null) {
 			return null;
 		}
@@ -105,13 +127,21 @@ public class SessionServiceImpl extends BaseServiceImpl<Session, Integer> implem
 	}
 
 	@Override
-	public List<Session> search(String text, List<Integer> categoryIds, Sort sort) {
-		if (categoryIds == null || categoryIds.isEmpty()) {
-			return this.search(text, sort);
-		}
+	public List<Session> search(String text, Collection<Integer> categoryIds, Collection<Integer> voiceIds, Sort sort) {
+		Iterable<Session> domains;
 		
-		final Iterable<Session> domains = this.repository.findAll(text, 
-				categoryIds, sort == null ? Sort.unsorted() : sort); 
+		final Sort domainSort = sort == null ? Sort.unsorted() : sort;
+		if (categoryIds == null || categoryIds.isEmpty()) {
+			if (voiceIds == null || voiceIds.isEmpty()) {
+				return this.search(text, sort);
+			}
+			
+			domains = this.repository.findAllByVoice(text, voiceIds, domainSort); 
+		} else if (voiceIds == null || voiceIds.isEmpty()) {
+			domains = this.repository.findAllByCategory(text, categoryIds, domainSort);
+		} else {
+			domains = this.repository.findAll(text, categoryIds, voiceIds, domainSort);	
+		}
 		
 		if (domains == null) {
 			return Collections.emptyList();

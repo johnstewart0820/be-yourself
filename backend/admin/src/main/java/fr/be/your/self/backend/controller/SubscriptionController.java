@@ -1,19 +1,15 @@
 package fr.be.your.self.backend.controller;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
@@ -34,9 +30,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
 import fr.be.your.self.backend.dto.SubscriptionDto;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
-import fr.be.your.self.model.Session;
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
@@ -45,7 +39,6 @@ import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.SubscriptionService;
 import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.service.UserService;
-import fr.be.your.self.util.NumberUtils;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SubscriptionController.NAME)
@@ -64,10 +57,10 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 	public static String CSV_SUBSCRIPTION_EXPORT_FILE = "subscription.csv";
 
 	
-	private static final Set<String> SORTABLE_COLUMNS = new HashSet<String>();
+	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 
 	static {
-		SORTABLE_COLUMNS.add("name");
+		SORTABLE_COLUMNS.put("name", new String[] { "name" });
 		//TODO TVA add sortable columns
 	}
 	
@@ -118,7 +111,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 	}
 
 	@Override
-	protected Set<String> getSortableColumns() {
+	protected Map<String, String[]> getSortableColumns() {
 		return SORTABLE_COLUMNS;
 	}
 

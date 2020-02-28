@@ -41,6 +41,15 @@ b, strong {
     padding-top: 10px;
 }
 
+.bootstrap-select .bs-searchbox .form-control {
+	border: 1px solid #ced4da;
+}
+
+label.disabled {
+	color: #a0a0a0;
+	cursor: not-allowed;
+}
+
 @media (min-width: 768px) {
 	.md-text-right {
 		text-align: right;

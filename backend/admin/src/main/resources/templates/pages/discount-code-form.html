@@ -106,8 +106,10 @@
 											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
 												<div class="input-group">
 													<input type="text" class="form-control datepicker" 
-														th:field="*{startDate}" id="startDate"
-														th:placeholder="#{|${baseMessageKey}.detail.start.date.placeholder|}" />
+														th:field="*{startDate}" id="startDate" 
+														th:placeholder="#{|${baseMessageKey}.detail.start.date.placeholder|}" 
+														th:data-date-format="${dateFormat.toLowerCase()}" 
+														autocomplete="off" />
 													<div class="input-group-prepend">
 														<span class="input-group-text"><i class="fas fa-calendar"></i></span>
 													</div>
@@ -115,24 +117,31 @@
 												<div class="invalid-feedback" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
 											</div>
 											
-											<label for="endDate" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+											<label id="endDateLabel" for="endDate" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
 												th:text="#{|${baseMessageKey}.detail.end.date|}"></label>
 											<div class="col-md-4 col-sm-9 col-xs-12">
-												<input type="text" class="form-control" 
-													th:field="*{endDate}" id="endDate"
-													th:placeholder="#{|${baseMessageKey}.detail.end.date.placeholder|}" 
-													required="required" />
+												<div class="input-group">
+													<input type="text" class="form-control datepicker" 
+														th:field="*{endDate}" id="endDate"
+														th:placeholder="#{|${baseMessageKey}.detail.end.date.placeholder|}" 
+														th:data-date-format="${dateFormat.toLowerCase()}" 
+														required="required" autocomplete="off" />
+													<div class="input-group-prepend">
+														<span class="input-group-text"><i class="fas fa-calendar"></i></span>
+													</div>
+												</div>
 												<div class="invalid-feedback" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></div>
 											</div>
 										</div>
 										
 										<div class="form-group row" id="discountGroup">
 											<label id="discountTypeLabel" for="discountType" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs sm-form-group" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
 												th:text="#{|${baseMessageKey}.detail.discount.type|}"></label>
 											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
 												<select class="form-control selectpicker show-tick"
-													th:field="*{discountType}" id="discountType" 
+													th:field="*{discountType}" id="discountType" required="required" 
 													th:data-none-selected-text="#{|${baseMessageKey}.detail.discount.type.placeholder|}">
 													<option value="0" th:text="#{discount.code.discount.type.0}"></option>
 													<option value="1" th:text="#{discount.code.discount.type.1}"></option>
@@ -141,55 +150,68 @@
 											</div>
 										
 											<label id="discountValueLabel" for="discountValue" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs md-text-right" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
 												th:text="#{|${baseMessageKey}.detail.discount.value|}"></label>
 											<div class="col-md-4 col-sm-9 col-xs-12">
-												<input type="number" class="form-control" 
-													th:field="*{discountValue}" id="discountValue"
-													th:placeholder="#{|${baseMessageKey}.detail.discount.value.placeholder|}" />
+												<div class="input-group">
+													<input type="number" class="form-control" 
+														th:field="*{discountValue}" id="discountValue"
+														th:placeholder="#{|${baseMessageKey}.detail.discount.value.placeholder|}" 
+														required="required" />
+													<div class="input-group-prepend" id="discountPercentageUnit">
+														<span class="input-group-text">%</span>
+													</div>
+													<div class="input-group-prepend" id="discountAmountUnit">
+														<span class="input-group-text" th:utext="${priceUnitSymbol}"></span>
+													</div>
+												</div>
 												<div class="invalid-feedback" th:if="${#fields.hasErrors('discountValue')}" th:errors="*{discountValue}"></div>
 											</div>
 										</div>
 										
-										<div class="form-group row">
-											<label for="maxUserAmount" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
-												th:text="#{|${baseMessageKey}.detail.max.user.amount|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
-												<input type="number" class="form-control" 
-													th:field="*{maxUserAmount}" id="maxUserAmount"
-													th:placeholder="#{|${baseMessageKey}.detail.max.user.amount.placeholder|}" 
-													required="required" />
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('maxUserAmount')}" th:errors="*{maxUserAmount}"></div>
-											</div>
-										
-											<th:block th:if="${action != 'create'}">
-												<label for="usedAmount" class="label form-control-label col-md-2 col-sm-3 hidden-xs md-text-right" 
-													th:text="#{|${baseMessageKey}.detail.used.amount|}"></label>
-												<div class="col-md-4 col-sm-9 col-xs-12" th:title="#{|${baseMessageKey}.detail.used.amount.placeholder|}">
-													<span th:text="${dto.usedAmount}"></span>
-												</div>
-											</th:block>
-										</div>
-										
-										<div class="form-group row" id="dealPriceGroup">
+										<div class="form-group row" id="b2b100EditableContainer">
 											<label id="dealPriceLabel" for="dealPrice" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs sm-form-group" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
 												th:text="#{|${baseMessageKey}.detail.deal.price|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
-												<input type="number" class="form-control" 
-													th:field="*{dealPrice}" id="dealPrice"
-													th:placeholder="#{|${baseMessageKey}.detail.deal.price.placeholder|}" 
-													required="required" />
+											<div id="dealPriceContainer" class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
+												<div class="input-group">
+													<input type="number" class="form-control" 
+														th:field="*{dealPrice}" id="dealPrice"
+														th:placeholder="#{|${baseMessageKey}.detail.deal.price.placeholder|}" />
+													<div class="input-group-prepend">
+														<span class="input-group-text" th:utext="${priceUnitSymbol}"></span>
+													</div>
+												</div>
 												<div class="invalid-feedback" th:if="${#fields.hasErrors('dealPrice')}" th:errors="*{dealPrice}"></div>
 											</div>
+											
+											<label id="maxUserAmountLabel" for="maxUserAmount" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+												th:text="#{|${baseMessageKey}.detail.max.user.amount|}"></label>
+											<div class="col-md-4 col-sm-9 col-xs-12">
+												<input type="number" class="form-control" 
+													th:field="*{maxUserAmount}" id="maxUserAmount"
+													th:placeholder="#{|${baseMessageKey}.detail.max.user.amount.placeholder|}" />
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('maxUserAmount')}" th:errors="*{maxUserAmount}"></div>
+											</div>
+										</div>
 										
-											<th:block th:if="${action != 'create'}">
-												<label for="pricePerUser" class="label form-control-label col-md-2 col-sm-3 hidden-xs md-text-right" 
-													th:text="#{|${baseMessageKey}.detail.price.per.user|}"></label>
-												<div class="col-md-4 col-sm-9 col-xs-12" th:title="#{|${baseMessageKey}.detail.price.per.user.placeholder|}">
-													<span th:text="${dto.pricePerUser}"></span>
-												</div>
-											</th:block>
+										<div class="form-group row" id="b2b100ViewContainer" th:if="${action != 'create'}">
+											<label id="pricePerUserLabel" for="pricePerUser" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
+												th:text="#{|${baseMessageKey}.detail.price.per.user|}"></label>
+											<div id="pricePerUserContainer" class="col-md-4 col-sm-9 col-xs-12 sm-form-group" 
+												th:title="#{|${baseMessageKey}.detail.price.per.user.placeholder|}">
+												<span th:text="${dto.pricePerUser}"></span>
+												<span th:utext="${priceUnitSymbol}"></span>
+											</div>
+											
+											<label id="usedAmountLabel" for="usedAmount" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+												th:text="#{|${baseMessageKey}.detail.used.amount|}"></label>
+											<div class="col-md-4 col-sm-9 col-xs-12" th:title="#{|${baseMessageKey}.detail.used.amount.placeholder|}">
+												<span th:text="${dto.usedAmount}"></span>
+											</div>
 										</div>
 										
 										<div class="form-group row">
@@ -237,12 +259,91 @@
 
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
+			const createMode = [[${action == 'create'}]];
+			
+			function changeCodeType(codeType) {
+				// B2B => show beneficiary (company)
+				if (codeType == 0 || codeType == 1) {
+					$('#beneficiaryGroup').show();
+				} else {
+					$('#beneficiaryGroup').hide();
+				}
+				
+				// B2B Multiple 100%
+				if (codeType == 0) {
+					$('#b2b100EditableContainer').show();
+					$('#b2b100ViewContainer').show();
+					
+					$('#dealPrice').prop('required', true);
+					$('#maxUserAmount').prop('required', true);
+				} else {
+					$('#b2b100EditableContainer').hide();
+					$('#b2b100ViewContainer').hide();
+					
+					$('#dealPrice').prop('required', false);
+					$('#maxUserAmount').prop('required', false);
+				}
+				
+				// B2C 100% Discount
+				if (codeType == 2) {
+					$('#startDateLabel').removeClass('required-field');
+					$('#startDate').prop('required', false);
+				} else {
+					$('#startDateLabel').addClass('required-field');
+					$('#startDate').prop('required', true);
+				}
+				
+				// B2C Discount
+				if (codeType == 3) {
+					$('#discountType').prop('disabled', false);
+					$('#discountValue').prop('disabled', false);
+					$('#discountTypeLabel').removeClass('disabled');
+					$('#discountValueLabel').removeClass('disabled');
+				} else {
+					$('#discountType').val(0);
+					$('#discountValue').val(100);
+					$('#discountType').prop('disabled', true);
+					$('#discountValue').prop('disabled', true);
+					$('#discountTypeLabel').addClass('disabled');
+					$('#discountValueLabel').addClass('disabled');
+				}
+			}
+			
+			function changeDiscountType(discountType) {
+				// Percentage
+				if (discountType == 0) {
+					$('#discountPercentageUnit').show();
+					$('#discountAmountUnit').hide();
+				} else {
+					$('#discountPercentageUnit').hide();
+					$('#discountAmountUnit').show();
+				}
+			}
+			
 			$(function() {
 				$('select').selectpicker();
 				
 				$('.datepicker').datepicker({
 		            uiLibrary: 'bootstrap4'
 		        });
+				
+				$('#type').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+					const selectedCodeType = $('#type').val();
+					changeCodeType(selectedCodeType);
+				});
+				
+				$('#discountType').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+					const selectedDiscountType = $('#discountType').val();
+					changeDiscountType(selectedDiscountType);
+				});
+				
+				changeCodeType([[${dto.type}]]);
+				changeDiscountType([[${dto.discountType}]]);
+				
+				if (!createMode) {
+					//$('#startDate').datepicker('update', new Date('[[${#dates.format(dto.startDate, 'yyyy-MM-dd')}]]'));
+					//$('#endDate').datepicker('update', new Date('[[${#dates.format(dto.endDate, 'yyyy-MM-dd')}]]'));
+				}
 				
 		    	showOnLoadedModal();
 		    });

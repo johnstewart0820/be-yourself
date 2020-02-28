@@ -63,18 +63,6 @@
 											</div>
 										</div>
 										
-										<div class="form-group row">
-											<label for="subtitle" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
-												th:text="#{|${baseMessageKey}.detail.subtitle|}"></label>
-											<div class="col-md-10 col-sm-9 col-xs-12">
-												<input type="text" class="form-control" 
-													th:field="*{subtitle}" id="subtitle"
-													th:placeholder="#{|${baseMessageKey}.detail.subtitle.placeholder|}" 
-													required="required" />
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('subtitle')}" th:errors="*{subtitle}"></div>
-											</div>
-										</div>
-										
 										<th:block th:switch="${action}">
 											<div th:case="create" class="form-group row">
 												<label for="uploadImageFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
@@ -196,6 +184,29 @@
 											</div>
 										</div>
 										
+										<div class="form-group row">
+											<label for="voiceId" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+												th:text="#{|${baseMessageKey}.detail.voice.id|}"></label>
+											<th:block th:switch="${writePermission}">
+												<div th:case="true" class="col-md-10 col-sm-9 col-xs-12">
+													<select class="form-control voice-selectpicker show-tick" 
+														th:field="*{voiceId}" id="voiceId" required="required" 
+														data-actions-box="false" data-live-search="true" 
+														th:title="#{|${baseMessageKey}.detail.voice.id.placeholder|}"
+														th:data-none-selected-text="#{|${baseMessageKey}.detail.voice.id.placeholder|}">
+														
+														<option th:if="${action != 'create' && dto.voiceId != null}" 
+															th:value="${dto.voiceId}" 
+															th:text="${voiceName}"></option>
+													</select>
+													<div class="invalid-feedback" th:if="${#fields.hasErrors('voiceId')}" th:errors="*{voiceId}"></div>
+												</div>
+												<div th:case="*" class="col-md-10 col-sm-9 col-xs-12">
+													<span th:utext="${voiceName}"></span>
+												</div>
+											</th:block>
+										</div>
+										
 										<div th:if="${writePermission}" class="form-group row">
 											<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
 												<div class="form-action-buttons-row">
@@ -299,9 +310,55 @@
 					'media-file-type-modal', 'media-file-size-modal');
 			}
 			
-		    $(function() {
-				$('select').selectpicker();
+			function initializeVoiceSelectPicker() {
+				var voiceSelectpickerOptions = {
+					ajax: {
+						url: '[[${rootURL}]]/common/search',
+						type: 'GET',
+						dataType: 'json',
+						data: function() {
+							return {
+								dataType: 'professional',
+								q: '{{{q}}}'
+							};
+						}
+					},
+					locale: {
+						searchPlaceholder: '[[#{|${baseMessageKey}.option.select.voice.title|}]]',
+						statusSearching: '[[#{searching.placeholder}]]',
+						statusInitialized: '[[#{|${baseMessageKey}.option.select.voice.search.initialized|}]]',
+						currentlySelected: '[[#{|${baseMessageKey}.option.select.voice.search.currently.selected|}]]',
+						emptyTitle: '[[#{|${baseMessageKey}.option.select.voice.search.empty.title|}]]',
+						errorText: '[[#{|${baseMessageKey}.option.select.voice.search.error.text|}]]',
+						statusNoResults: '[[#{|${baseMessageKey}.option.select.voice.search.status.no.results|}]]'
+					},
+					preprocessData: function(data) {
+						let result = [];
+						
+						const dtos = data.items || [];
+						
+						for (i = 0; i < dtos.length; i++) {
+							result.push($.extend(true, dtos[i], {
+								text : dtos[i].name,
+								value: dtos[i].id
+							}));
+						}
+						
+						return result;
+					}
+				};
 				
+				$('.voice-selectpicker')
+					.selectpicker()
+					.ajaxSelectPicker(voiceSelectpickerOptions);
+				
+				$('.voice-selectpicker').trigger('change');
+			}
+			
+		    $(function() {
+		    	$('.selectpicker').selectpicker();
+		    	initializeVoiceSelectPicker();
+		    	
 		    	audioPlayer = new Plyr('#audioPlayer', { invertTime: false });
 		    	videoPlayer = new Plyr('#videoPlayer', { invertTime: false });
 		    	

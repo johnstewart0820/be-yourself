@@ -72,6 +72,7 @@ public class BusinessCodeDto extends BaseDto {
 	public BusinessCodeDto() {
 		super();
 
+		this.dealPrice = BigDecimal.ZERO;
 		this.pricePerUser = BigDecimal.ZERO;
 		this.editable = true;
 	}
@@ -79,6 +80,7 @@ public class BusinessCodeDto extends BaseDto {
 	public BusinessCodeDto(BusinessCode domain) {
 		super(domain);
 
+		this.dealPrice = BigDecimal.ZERO;
 		this.pricePerUser = BigDecimal.ZERO;
 		this.editable = true;
 
@@ -86,30 +88,33 @@ public class BusinessCodeDto extends BaseDto {
 			this.name = domain.getName();
 			this.type = domain.getType();
 			this.status = domain.getStatus();
-			this.startDate = domain.getStartDate();
-			this.endDate = domain.getEndDate();
 			this.beneficiary = domain.getBeneficiary();
-			this.maxUserAmount = domain.getUsedAmount();
+			this.maxUserAmount = domain.getMaxUserAmount();
 			this.usedAmount = domain.getUsedAmount();
 			this.dealPrice = domain.getDealPrice();
 			this.pricePerUser = domain.getPricePerUser();
 			this.discountType = domain.getDiscountType();
 			this.discountValue = domain.getDiscountValue();
+			this.startDate = domain.getStartDate();
+			this.endDate = domain.getEndDate();
 		}
 	}
 
-	public void copyToDomain(BusinessCode domain) {
-		domain.setName(name);
-		domain.setType(type);
+	public void copyToDomain(BusinessCode domain, boolean createMode) {
 		domain.setStatus(status);
-		domain.setStartDate(startDate);
-		domain.setEndDate(endDate);
 		domain.setBeneficiary(beneficiary);
 		domain.setMaxUserAmount(maxUserAmount);
 		domain.setUsedAmount(usedAmount);
 		domain.setDealPrice(dealPrice);
 		domain.setDiscountType(discountType);
 		domain.setDiscountValue(discountValue);
+		domain.setStartDate(startDate);
+		domain.setEndDate(endDate);
+		
+		if (createMode) {
+			domain.setName(name);
+			domain.setType(type);			
+		}
 	}
 
 	public String getId() {
@@ -119,7 +124,7 @@ public class BusinessCodeDto extends BaseDto {
 	public void setId(String id) {
 		this.name = id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
