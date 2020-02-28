@@ -43,7 +43,7 @@ public class PermissionServiceImpl extends BaseServiceImpl<Permission, Integer> 
 	}
 
 	@Override
-	public Page<Permission> getPaginatedUsers(Pageable pageable) {
+	public Page<Permission> getPaginatedObjects(Pageable pageable) {
 		return null;
 	}
 

@@ -32,6 +32,8 @@ public class SubscriptionDto  implements Serializable {
 	private String paymentGateway;
 	private String code;
 	private int codeType;
+	private String canal;
+
 	
 	public SubscriptionDto() {
 		
@@ -44,6 +46,7 @@ public class SubscriptionDto  implements Serializable {
 		
 		if (domain != null) {
 			this.id = domain.getId().intValue();
+			this.canal = domain.getCanal();
 			this.code = domain.getCode();
 			this.codeType = domain.getCodeType();
 			this.duration = domain.getDuration();
@@ -64,6 +67,7 @@ public class SubscriptionDto  implements Serializable {
 	}
 
 	public void copyToDomain(Subscription domain) {
+		domain.setCanal(canal);
 		domain.setCode(code);
 		domain.setCodeType(codeType);
 		domain.setDuration(duration);
@@ -77,7 +81,6 @@ public class SubscriptionDto  implements Serializable {
 		domain.setTerminationAsked(terminationAsked);
 		domain.setValidEndDate(validEndDate);
 		domain.setValidStartDate(validStartDate);
-		
 	}
 	
 	public int getId() {
@@ -177,6 +180,12 @@ public class SubscriptionDto  implements Serializable {
 	}
 	public void setCodeType(int codeType) {
 		this.codeType = codeType;
+	}
+	public String getCanal() {
+		return canal;
+	}
+	public void setCanal(String canal) {
+		this.canal = canal;
 	}
 	
 	

@@ -1,5 +1,7 @@
 package fr.be.your.self.backend.controller;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,22 +25,32 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
+import fr.be.your.self.backend.dto.ResultStatus;
+import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.dto.SubscriptionDto;
 import fr.be.your.self.backend.dto.SubscriptionTypeDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.CsvUtils;
+import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.PaymentGateway;
 import fr.be.your.self.common.PaymentStatus;
+import fr.be.your.self.common.UserStatus;
+import fr.be.your.self.common.UserType;
+import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Session;
@@ -51,6 +64,7 @@ import fr.be.your.self.service.SubscriptionService;
 import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.NumberUtils;
+import fr.be.your.self.util.StringUtils;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SubscriptionController.NAME)
@@ -284,6 +298,97 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 				.collect(Collectors.toList());
 	
 		writer.write(subscriptions);
+	}
+	
+	
+	@PostMapping(value = "/importcsv")
+	@Transactional
+	public String fileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, Model model)
+			throws IOException {
+
+		SimpleResult result = new SimpleResult(ResultStatus.UNKNOWN.getValue(), "Unknown status");
+		result.setFunctionalityName("Upload users CSV file!");
+		
+		if (file.isEmpty()) {
+			result.setResStatus(ResultStatus.ERROR.getValue());
+			result.setMessage("File is empty");
+			return this.getBaseURL() + "/upload_csv_form";
+		}
+
+		List<SubscriptionCsv> subscriptionsCsv;
+		try {
+			subscriptionsCsv = CsvUtils.SINGLETON.readCsvFile(file, SubscriptionCsv.class);
+		} catch (Exception e) {
+			result.setResStatus(ResultStatus.ERROR.getValue());
+			result.setMessage("Exception occured while reading CSV file: " + e.getMessage());
+			return "/subscription/simple_status";
+		}
+						
+		model.addAttribute("result", result);
+		
+		for (SubscriptionCsv subscription : subscriptionsCsv) {
+			if (StringUtils.isNullOrEmpty(subscription.getEmail()) || !EmailValidator.getInstance().isValid(subscription.getEmail())) {
+				result.setResStatus(ResultStatus.ERROR.getValue());
+				result.setMessage("ERROR: Email field of user " + subscription.getFullName() + " is empty or not valid!");
+			}
+			if (StringUtils.isNullOrEmpty(subscription.getSubtype())) {
+				result.setResStatus(ResultStatus.ERROR.getValue());
+				result.setMessage("ERROR: Subscription type field of user " + subscription.getFullName() + " is empty or not valid!");
+			} else {
+				if (!this.subtypeService.existsByName(subscription.getSubtype())) {
+					result.setResStatus(ResultStatus.ERROR.getValue());
+					result.setMessage("ERROR: Subscription type  '" + subscription.getSubtype() + "' does not exist");
+				}
+			}
+		}
+		
+		if (result.getResStatus() == ResultStatus.ERROR.getValue()) {
+			return this.getBaseURL() + "/simple_status";
+			
+		}
+		
+		for (SubscriptionCsv subCsv : subscriptionsCsv) {
+			User user;
+			try {
+				Subscription sub = CsvUtils.SINGLETON.createSubscriptionFromCsv(subCsv);
+
+				String email = subCsv.getEmail();
+				if (this.userService.existsEmail(email)) {
+					user = this.userService.getByEmail(email);
+				} else {
+					// Create a new user with login type pwd;
+					user = new User();
+					user.setFirstName(subCsv.getFirstName());
+					user.setLastName(subCsv.getLastName());
+					user.setEmail(email);
+					user.setLoginType(LoginType.PASSWORD.getValue());
+					user.setTitle(subCsv.getTitle());
+					user.setStatus(UserStatus.DRAFT.getValue());
+					user.setUserType(UserType.B2C.getValue());
+					user = this.userService.create(user);
+					//TODO TVA: send mail to user
+				}
+				SubscriptionType subtype = this.subtypeService.findAllByNameContainsIgnoreCase(subCsv.getSubtype()).iterator().next();
+				sub.setUser(user);
+				sub.setSubtype(subtype);
+				this.subscriptionService.create(sub);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		
+		result.setResStatus(ResultStatus.SUCCESS.getValue());
+		result.setMessage("File imported successfully!");
+		return this.getBaseURL() + "/simple_status";
+	}
+	
+	// show upload csv form
+	@GetMapping(value = "/upload_csv_form")
+	public String showUploadUserForm(Model model) {
+		return this.getBaseURL() + "/upload_csv_form";
 	}
 	
 }

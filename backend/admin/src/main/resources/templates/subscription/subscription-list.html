@@ -51,7 +51,7 @@ abcdef
 							<a href="#select_subscriptions" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
 							<a href="#" class="btn btn-sm btn-primary" onclick="document.getElementById('select_subscription_form').submit();">Export
 							CSV</a> 
-							<a href="#" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
+							<a th:href="${writePermission ? baseURL + '/upload_csv_form' : 'javascript:;'}" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
 								</div>
 									
 					</div>

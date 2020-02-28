@@ -8,7 +8,7 @@ import com.opencsv.bean.CsvBindByName;
 public class SubscriptionCsv {
 	public static String DATE_FORMAT = "dd-MM-yyyy";
 
-	@CsvBindByName(column = "Civility")
+	@CsvBindByName(column = "Title")
 	private String title;
 
 	@CsvBindByName(column = "Last name")
@@ -201,6 +201,10 @@ public class SubscriptionCsv {
 
 	public void setPaymenGateway(String paymenGateway) {
 		this.paymenGateway = paymenGateway;
+	}
+
+	public String getFullName() {
+		return firstName + " " + lastName;
 	}
 	
 	

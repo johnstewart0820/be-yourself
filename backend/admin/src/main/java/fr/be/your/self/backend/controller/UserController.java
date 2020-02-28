@@ -392,7 +392,7 @@ public class UserController extends BaseResourceController<User, User, User, Int
 		} else if (status != null && status != -2) {
 			userPage = userService.findAllByStatus(status, pageable);
 		} 	else {
-			userPage = userService.getPaginatedUsers(pageable);
+			userPage = userService.getPaginatedObjects(pageable);
 		}
 		
 		int totalPages = userPage.getTotalPages();
