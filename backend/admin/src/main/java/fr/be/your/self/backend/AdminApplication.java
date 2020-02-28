@@ -103,7 +103,7 @@ public class AdminApplication implements CommandLineRunner {
 			
 			// User management
 			{
-				final String path = "/user";
+				final String path = "/users";
 				final String name = "User Management";
 				
 				this.updatePermission(adminUser, path, name, UserPermission.WRITE);

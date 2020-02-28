@@ -45,10 +45,10 @@ public class User extends PO<Integer> {
 
 	private String userType;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user"/* , cascade = CascadeType.ALL, orphanRemoval = true */)
 	private List<Permission> permissions;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user"/* , cascade = CascadeType.ALL, orphanRemoval = true */)
 	private List<Subscription> subscriptions;
 	
 	public List<Subscription> getSubscriptions() {

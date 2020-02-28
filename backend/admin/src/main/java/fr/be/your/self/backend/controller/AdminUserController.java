@@ -20,7 +20,7 @@ import fr.be.your.self.model.User;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.UserService;
 
-@Controller
+//@Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + AdminUserController.NAME)
 public class AdminUserController extends BaseResourceController<User, User, User, Integer> {
 	
