@@ -35,9 +35,10 @@ public class Subscription extends PO<Integer> {
 	private boolean terminationAsked;
 	private BigDecimal price;
 	private int paymentStatus;
-	private int paymentGateway;
+	private String paymentGateway;
 	private String code;
 	private int codeType;
+	private String canal;
 
 	
 	public User getUser() {
@@ -153,11 +154,11 @@ public class Subscription extends PO<Integer> {
 		this.paymentStatus = paymentStatus;
 	}
 
-	public int getPaymentGateway() {
+	public String getPaymentGateway() {
 		return paymentGateway;
 	}
 
-	public void setPaymentGateway(int paymentGateway) {
+	public void setPaymentGateway(String paymentGateway) {
 		this.paymentGateway = paymentGateway;
 	}
 
@@ -177,5 +178,12 @@ public class Subscription extends PO<Integer> {
 		this.codeType = codeType;
 	}
 
+	public String getCanal() {
+		return canal;
+	}
+
+	public void setCanal(String canal) {
+		this.canal = canal;
+	}
 
 }

@@ -49,14 +49,12 @@ public class UserDto implements Serializable {
 	
 	
 	public void copyToDomain(User domain) {
-		domain.setActivateCode(this.activateCode);
-		domain.setActivateTimeout(this.activateTimeout);
 		domain.setEmail(this.email);
 		domain.setFirstName(this.firstName);
 		domain.setId(this.id);
 		domain.setLastName(this.lastName);
 		domain.setLoginType(this.loginType);
-		domain.setPermissions(this.permissions);
+		//TODO TVA check why we need to comment heredomain.setPermissions(this.permissions);
 		domain.setReferralCode(this.referralCode);
 		domain.setStatus(this.status);
 		domain.setTitle(this.title);
@@ -138,5 +136,8 @@ public class UserDto implements Serializable {
 		this.activateTimeout = activateTimeout;
 	}
 	
+	public String getFullname() {
+		return firstName + " " + lastName;
+	}
 	
 }

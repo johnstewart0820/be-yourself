@@ -39,8 +39,7 @@ public interface BaseService<T, K extends Serializable> {
 
 	public Iterable<T> findAll();
 	
-	// TODO: TVA - Change method name
-	public Page<T> getPaginatedUsers(Pageable pageable);
+	public Page<T> getPaginatedObjects(Pageable pageable);
 
 	public <S extends T> Iterable<S> saveAll(Iterable<S> entities);
 }

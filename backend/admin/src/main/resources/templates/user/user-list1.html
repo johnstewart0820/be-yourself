@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+<title>Home</title>
+	
+</head>
+<body>
+	<div layout:fragment="content">
+		<form id="select_form" th:action="@{/user/list/page/1}" method="post">
+			<div class="row">
+				<div class="col-md-6">
+					<th:block th:if="${writePermission}">
+						<a class="btn btn-icon btn-2 btn-primary"
+							th:href="${baseURL + '/add'}"> <span class="btn-inner--icon">
+								<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
+						</span>
+						</a>
+					</th:block>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<div class="input-group mb-4">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><i
+									class="ni ni-zoom-split-in"></i></span>
+							</div>
+							<input class="form-control" placeholder="Search" id="search_box" name="search_box" 	type="text">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush">
+							<tr>
+								<td>
+									<div class="form-group">
+										<div class="input-group input-group-alternative mb-3">
+											<select id="nb_per_page" name="nb_per_page"
+												class="form-control" onchange="this.form.submit()">
+												<option value="2">SHOW 2 USERS</option>
+												<option value="10">SHOW 10 USERS</option>
+												<option value="20">SHOW 20 USERS</option>
+												<option value="50">SHOW 50 USERS</option>
+												<option value="100000">SHOW ALL USERS</option>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<div class="input-group input-group-alternative mb-3">
+											<select id="filter_role" name="filter_role"
+												class="form-control">
+												<option value="">FILTER BY ROLE</option>
+												<option value="B2B">B2B</option>
+												<option value="B2C">B2C</option>
+												<option value="PRO">PRO</option>
+												<option value="ADM">ADMIN</option>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="form-group">
+										<div class="input-group input-group-alternative mb-3">
+											<select id="filter_status" name="filter_status"
+												class="form-control">
+												<option value="-2">FILTER BY STATUS</option>
+												<option value="0">DRAFT</option>
+												<option value="1">ACTIVE</option>
+												<option value="2">INACTIVE</option>
+												<option value="-1">UNKNOWN</option>
+											</select>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+
+					</div>
+				</div>
+			</div>
+		</form>
+
+		<div class="row mb-3">
+			<div class="col">
+					<a href="#select_users" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
+					<a href="#" class="btn btn-sm btn-primary" onclick="document.getElementById('select_user_form').submit();">Export
+					CSV</a> 
+					<a href="/user/uploadform" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
+					<a href="/user/resetpwdbyemail" class="btn btn-sm btn-primary" th:if="${writePermission}">Reset password by email</a>
+			</div>
+		</div>
+	
+		<!-- Table -->
+		<div class="row">
+			<div class="col">
+				<div class="card shadow">
+					<div class="card-header border-0">
+						<h3 class="mb-0">Users list</h3>
+					</div>
+					<form id="select_user_form"  th:action="@{/user/exportcsv}" method="post">
+					
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush" id="user_table">
+							<thead class="thead-light">
+								<tr>
+									<th scope="col"></th>
+									<th scope="col">Email</th>
+									<th scope="col">FullName</th>
+									<th scope="col">Status</th>
+									<th scope="col">Subscription Type</th>
+									<th scope="col">Role</th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item : ${result.items}">
+									<td>
+										<input type="checkbox"  name="selected_id"  id="selected_id" th:value="${item.id}"></input>
+									</td>
+									<td><<!-- span th:text="${item.email}"> Email </span> --></td>
+									<td><span > Fullname </span></td>
+									<td ><!-- <span th:if="${item != null}" th:utext="#{'user.status.' + ${item.status}}"></span> --></td>
+
+									<td >Subscription Type</td>
+									<td><!-- <span th:if="${item != null}" th:utext="#{'user.type.' + ${item.userType}}"></span> --></td>
+																	
+									<!-- <td class="text-right" th:if="${writePermission}">
+										<a class="btn btn-icon btn-2 btn-primary" th:href="@{/user/{id}/update(id=${item.id})}" th:title="#{action.edit.title}">
+											<span class="btn-inner--icon">
+												<i class="fas fa-edit"></i>
+											</span>
+										</a>
+										
+										<button class="btn btn-icon btn-2 btn-danger" type="button" 
+											th:title="#{action.delete.title}" th:onclick="confirmDelete([[${item.id}]])">
+											<span class="btn-inner--icon">
+												<i class="fas fa-times"></i>
+											</span>
+										</button>
+									</td> -->
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					</form>
+					<!-- Begin paging 
+					<div class="card-footer py-4">
+						<nav aria-label="...">
+							<ul class="pagination justify-content-end mb-0">
+								<li class="page-item"><a class="page-link"
+									th:href="@{|/user/list/page/${userPage.number}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}" tabindex="-1"
+									th:if="${userPage.number > 0}"> <i
+										class="fas fa-angle-left"></i>
+								</a></li>
+
+								<li class="page-item" th:each="pageNumber : ${pageNumbers}"
+									th:classappend="${pageNumber==userPage.number + 1} ? active">
+									<a class="page-link"
+									th:href="@{|/user/list/page/${pageNumber}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}"
+									th:text=${pageNumber}>1</a>
+								</li>
+
+								<li class="page-item"><a class="page-link"
+									th:href="@{|/user/list/page/${userPage.number+2}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}"
+									tabindex="-1"
+									th:unless="${userPage.number == userPage.totalPages - 1}">
+										<i class="fas fa-angle-right"></i>
+								</a></li>
+
+							</ul>
+						</nav>
+					</div>
+					End paging -->
+				</div>
+			</div>
+		</div>
+		<!-- End table -->
+
+		<div class="modal fade" id="confirm-delete-modal" tabindex="-1"
+			role="dialog" aria-labelledby="deleteConfirmModal" aria-hidden="true"
+			data-backdrop="false">
+			<div class="modal-dialog modal-dialog-centered modal-7"
+				role="document">
+				<div class="modal-content">
+					<form id="confirm-delete-form" action="javascript:;" method="POST">
+						<div class="modal-header modal-header-danger">
+							<h3 class="modal-title" id="confirm-delete-modal-title"
+								th:utext="#{modal.confirm.delete.title}"></h3>
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p
+								th:utext="#{modal.confirm.delete.message(#{${baseMessageKey} + '.name'})}"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-danger"
+								th:utext="#{modal.button.yes}">Yes</button>
+							<button type="button" class="btn btn-secondary ml-auto"
+								data-dismiss="modal" th:utext="#{modal.button.no}">No</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	
+	
+	<section layout:fragment="scripts">
+	<script>
+		var nb_per_page = 10;
+		var filter_role = "";
+		var filter_status = -2;
+		var search_box = "";
+	</script>
+	
+	<script th:if="${filter_role != null}">
+		filter_role= "[[${filter_role}]]";
+	</script>
+	
+	<script th:if="${filter_status != null}">
+		filter_status= "[[${filter_status}]]";
+	</script>	
+	<script>
+	var select_all = false;
+	function confirmDelete(id) {
+		var url = '/user/' + id + '/delete';
+		
+		$('#confirm-delete-form').attr('action', url);
+		showModal('confirm-delete-modal');
+	}
+	
+	$(document).ready(function() {
+		  $('#user_table').DataTable({
+			    "sDom":  't'
+		  });
+
+		
+		$('#nb_per_page').val([[${nb_per_page}]]);
+		$('#filter_role').val(filter_role);
+		$("#filter_status").val(filter_status);
+		$("#search_box").val("[[${search_box}]]");
+		
+		$("select#filter_status").change(function() {
+			$("#filter_role").val($("#filter_role option:first").val());
+			 $( "#select_form" ).submit();
+
+		});
+		
+		$("select#filter_role").change(function() {
+			$("#filter_status").val($("#filter_status option:first").val());
+		    $( "#select_form" ).submit();
+
+		});
+		
+		$('a[href="#select_users"]').click(function(){
+			if (select_all == false) {
+				$("[name='selected_id']").prop('checked', true);    
+				select_all = true;
+			} else {
+				$("[name='selected_id']").prop('checked', false);    
+				select_all = false;
+			}
+		});
+		
+		
+		$('#search_box').on("keypress", function(e) {
+	        if (e.keyCode == 13) {
+	        	$("#filter_role").val($("#filter_role option:first").val());
+				$("#filter_status").val($("#filter_status option:first").val());
+			    $( "#select_form" ).submit();
+	        }
+		});
+	});
+</script>
+	
+	</section>
+
+</body>
+</html>

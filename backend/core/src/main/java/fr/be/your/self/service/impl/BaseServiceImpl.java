@@ -153,7 +153,7 @@ public abstract class BaseServiceImpl<T, K extends Serializable> implements Base
 	}
 
 	@Override
-	public Page<T> getPaginatedUsers(Pageable pageable) {
+	public Page<T> getPaginatedObjects(Pageable pageable) {
 		return this.getRepository().findAll(pageable);
 	}
 

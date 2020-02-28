@@ -42,22 +42,33 @@
 												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.user|}"></label>
 											<div class="col-md-4 col-sm-8">
-												<select class="form-control" id="canal" th:field="*{userId}">
+												<select class="form-control" id="userId" th:field="*{userId}">
 													<option th:each="user : ${users}" th:value="${user.id}"
 														th:text="${user.fullName}"></option>
 												</select>
 											</div>
 										</div>
-										<!-- Subscription type -->
+										<!-- Subscription type and canal -->
 										<div class="form-group row">
 											<label for="groupId"
 												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.subtype|}"></label>
 											<div class="col-md-4 col-sm-8">
-												<select class="form-control" id="canal"
+												<select class="form-control" id="subtypeId"
 													th:field="*{subtypeId}">
 													<option th:each="subtype : ${subtypes}"
 														th:value="${subtype.id}" th:text="${subtype.name}">
+													</option>
+												</select>
+											</div>
+											<label for="groupId"
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.canal|}"></label>
+											<div class="col-md-4 col-sm-8">
+												<select class="form-control" id="canal"
+													th:field="*{canal}">
+													<option th:each="canal : ${canals}"
+														th:value="${canal}" th:text="${canal}">
 													</option>
 												</select>
 											</div>
@@ -156,14 +167,30 @@
 												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.paymentstatus|}"></label>
 											<div class="col-md-4 col-sm-8">
-												<select class="form-control" id="canal"
+												<select class="form-control" id="paymenstatus"
 													th:field="*{paymentStatus}">
-													<option th:each="paymentStatus : ${paymentStatus}"
-														th:value="${paymentStatus}" th:text="${subtype.name}">
+													<option th:each="paymentStatus : ${paymentStatuses}"
+														th:value="${paymentStatus}" th:text="#{'payment.status.' + ${paymentStatus}}">
 													</option>
 												</select>
 											</div>
-										</div>								
+										</div>		
+										<!-- Payment Gateway -->
+										<div class="form-group row">
+											<label for="groupId"
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.paymentgateway|}"></label>
+											<div class="col-md-4 col-sm-8">
+												<select class="form-control" id="gateway"
+													th:field="*{paymentGateway}">
+													<option th:each="paymentGateway : ${paymentGateways}"
+														th:value="${paymentGateway}" th:text="${paymentGateway}">
+													</option>
+												</select>
+											</div>
+										</div>
+										<!-- Code: TODO TVA -->
+										<!-- Automatic renewal: TODO TVA -->			
 									</div>
 								</div>
 							</fieldset>

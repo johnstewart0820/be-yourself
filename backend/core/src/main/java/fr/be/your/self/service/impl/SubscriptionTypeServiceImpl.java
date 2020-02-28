@@ -54,4 +54,28 @@ public class SubscriptionTypeServiceImpl extends BaseServiceImpl<SubscriptionTyp
 		return this.subtypeRepo.save(subtype);
 	}
 
+	@Override
+	public Iterable<SubscriptionType> findAllByNameContainsIgnoreCase(String text) {
+		return this.subtypeRepo.findAllByNameContainsIgnoreCase(text);
+	}
+
+	@Override
+	public Boolean existsByName(String name) {
+		return this.subtypeRepo.existsByName(name);
+	}
+
+	@Override
+	public SubscriptionType findByName(String name) {
+		try {
+			return this.subtypeRepo.findByName(name);
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	
+
 }
