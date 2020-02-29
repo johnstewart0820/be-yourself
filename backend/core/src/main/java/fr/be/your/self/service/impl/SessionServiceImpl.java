@@ -1,8 +1,6 @@
 package fr.be.your.self.service.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,67 +87,41 @@ public class SessionServiceImpl extends BaseServiceImpl<Session, Integer> implem
 		
 		if (pageable == null) {
 			final List<Session> items = this.search(text, categoryIds, voiceIds, sort);
-			
-			final PageableResponse<Session> result = new PageableResponse<>();
-			result.setItems(items);
-			result.setTotalItems(items.size());
-			result.setTotalPages(1);
-			result.setPageIndex(1);
-			result.setPageSize(-1);
-			
-			return result;
+			return new PageableResponse<>(items);
 		}
 		
-		Page<Session> pageDomain;
 		if (categoryIds == null || categoryIds.isEmpty()) {
-			pageDomain = this.repository.findAllByVoice(text, voiceIds, pageable);
-		} else if (voiceIds == null || voiceIds.isEmpty()) {
-			pageDomain = this.repository.findAllByCategory(text, categoryIds, pageable);
-		} else {
-			pageDomain = this.repository.findAll(text, categoryIds, voiceIds, pageable);
+			final Page<Session> page = this.repository.findAllByVoice(text, voiceIds, pageable);
+			return new PageableResponse<>(page);
 		}
 		
-		if (pageDomain == null) {
-			return null;
+		if (voiceIds == null || voiceIds.isEmpty()) {
+			final Page<Session> page = this.repository.findAllByCategory(text, categoryIds, pageable);
+			return new PageableResponse<>(page);
 		}
 		
-		final int pageIndex = pageable.getPageNumber() + 1;
-		final int pageSize = pageable.getPageSize();
-		
-		final PageableResponse<Session> result = new PageableResponse<>();
-		result.setItems(pageDomain.getContent());
-		result.setTotalItems(pageDomain.getTotalElements());
-		result.setTotalPages(pageDomain.getTotalPages());
-		result.setPageIndex(pageIndex);
-		result.setPageSize(pageSize);
-		
-		return result;
+		final Page<Session> page = this.repository.findAll(text, categoryIds, voiceIds, pageable);
+		return new PageableResponse<>(page);
 	}
 
 	@Override
 	public List<Session> search(String text, Collection<Integer> categoryIds, Collection<Integer> voiceIds, Sort sort) {
-		Iterable<Session> domains;
-		
 		final Sort domainSort = sort == null ? Sort.unsorted() : sort;
 		if (categoryIds == null || categoryIds.isEmpty()) {
 			if (voiceIds == null || voiceIds.isEmpty()) {
 				return this.search(text, sort);
 			}
 			
-			domains = this.repository.findAllByVoice(text, voiceIds, domainSort); 
-		} else if (voiceIds == null || voiceIds.isEmpty()) {
-			domains = this.repository.findAllByCategory(text, categoryIds, domainSort);
-		} else {
-			domains = this.repository.findAll(text, categoryIds, voiceIds, domainSort);	
+			final Iterable<Session> domains = this.repository.findAllByVoice(text, voiceIds, domainSort);
+			return this.toList(domains);
 		}
 		
-		if (domains == null) {
-			return Collections.emptyList();
+		if (voiceIds == null || voiceIds.isEmpty()) {
+			final Iterable<Session> domains = this.repository.findAllByCategory(text, categoryIds, domainSort);
+			return this.toList(domains);
 		}
 		
-		final List<Session> result = new ArrayList<>();
-		domains.forEach(result::add);
-		
-		return result;
+		final Iterable<Session> domains = this.repository.findAll(text, categoryIds, voiceIds, domainSort);	
+		return this.toList(domains);
 	}
 }

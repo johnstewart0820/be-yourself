@@ -1,6 +1,5 @@
 package fr.be.your.self.backend.controller;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,36 +18,35 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import fr.be.your.self.backend.dto.SessionCategoryDto;
-import fr.be.your.self.backend.dto.SessionCategorySimpleDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
-import fr.be.your.self.model.SessionCategory;
+import fr.be.your.self.model.Gift;
 import fr.be.your.self.service.BaseService;
-import fr.be.your.self.service.SessionCategoryService;
-import fr.be.your.self.util.StringUtils;
+import fr.be.your.self.service.GiftService;
 
 @Controller
-@RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SessionCategoryController.NAME)
-public class SessionCategoryController extends BaseResourceController<SessionCategory, SessionCategorySimpleDto, SessionCategoryDto, Integer> {
+@RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + GiftController.NAME)
+public class GiftController extends BaseResourceController<Gift, Gift, Gift, Integer> {
 	
-	public static final String NAME = "session-category";
+	public static final String NAME = "gift";
 	
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
-			+ Constants.FOLDER.MEDIA.SESSION_CATEGORY;
+			+ Constants.FOLDER.MEDIA.GIFT;
 	
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 	
 	static {
 		SORTABLE_COLUMNS.put("name", new String[] { "name" });
+		SORTABLE_COLUMNS.put("price", new String[] { "price" });
+		SORTABLE_COLUMNS.put("duration", new String[] { "duration" });
 	}
 	
 	@Autowired
-	private SessionCategoryService mainService;
+	private GiftService mainService;
 	
 	@Override
 	protected String getName() {
@@ -57,16 +55,16 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	
 	@Override
 	protected String getDefaultPageTitle(String baseMessageKey) {
-		return this.getMessage(baseMessageKey + ".page.title", "Session Category management");
+		return this.getMessage(baseMessageKey + ".page.title", "Gift management");
 	}
 	
 	@Override
 	protected String getUploadDirectoryName() {
-		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.SESSION_CATEGORY;
+		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.GIFT;
 	}
 	
 	@Override
-	protected BaseService<SessionCategory, Integer> getService() {
+	protected BaseService<Gift, Integer> getService() {
 		return this.mainService;
 	}
 	
@@ -76,18 +74,18 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	}
 
 	@Override
-	protected SessionCategory newDomain() {
-		return new SessionCategory();
+	protected Gift newDomain() {
+		return new Gift();
 	}
 
 	@Override
-	protected SessionCategoryDto createDetailDto(SessionCategory domain) {
-		return new SessionCategoryDto(domain);
+	protected Gift createDetailDto(Gift domain) {
+		return domain == null ? new Gift() : domain;
 	}
 
 	@Override
-	protected SessionCategorySimpleDto createSimpleDto(SessionCategory domain) {
-		return new SessionCategorySimpleDto(domain);
+	protected Gift createSimpleDto(Gift domain) {
+		return domain == null ? new Gift() : domain;
 	}
 
 	@Override
@@ -96,59 +94,41 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	}
 	
 	@Override
-	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
-			Model model, SessionCategory domain, SessionCategoryDto dto) throws BusinessException {
-		super.loadDetailFormOptions(session, request, response, model, domain, dto);
+	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Model model, Map<String, String> searchParams, PageableResponse<Gift> pageableDto)
+			throws BusinessException {
+		super.loadListPageOptions(session, request, response, model, searchParams, pageableDto);
 		
-		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
-		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
-		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
-		
-		model.addAttribute("supportImageTypes", supportImageTypes);
-		model.addAttribute("supportImageExtensions", supportImageExtensions);
-		model.addAttribute("supportImageSize", supportImageSize);
-		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
+		model.addAttribute("priceUnitSymbol", this.dataSetting.getPriceUnitSymbol());
+		model.addAttribute("priceUnitName", this.dataSetting.getPriceUnitName());
 	}
 
+	@Override
+	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Model model, Gift domain, Gift dto) throws BusinessException {
+		super.loadDetailFormOptions(session, request, response, model, domain, dto);
+		
+		model.addAttribute("priceUnitSymbol", this.dataSetting.getPriceUnitSymbol());
+		model.addAttribute("priceUnitName", this.dataSetting.getPriceUnitName());
+	}
+	
 	@PostMapping("/create")
 	@Transactional
     public String createDomain(
-    		@ModelAttribute("dto") @Validated SessionCategoryDto dto, 
+    		@ModelAttribute("dto") @Validated Gift dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         if (result.hasErrors()) {
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
-        // ====> Validate image file
-        final MultipartFile uploadImageFile = dto.getUploadImageFile();
-        if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image required");
-        	result.addError(error);
-        	
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
-        }
+        final Gift domain = this.newDomain();
+        dto.copy(domain);
         
-        // ====> Process upload image file
-        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
-        if (uploadImageFilePath == null) {
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
-        }
-        
-        // ====> Update domain
-        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
-        
-        final SessionCategory domain = this.newDomain();
-        dto.copyToDomain(domain);
-        
-        domain.setImage(uploadImageFileName);
-        
-        final SessionCategory savedDomain = this.mainService.create(domain);
+        final Gift savedDomain = this.mainService.create(domain);
         
         // ====> Error, delete upload file
         if (savedDomain == null || result.hasErrors()) {
-        	this.deleteUploadFile(uploadImageFilePath);
-        	
         	if (!result.hasErrors()) {
 	        	final ObjectError error = this.createProcessingError(result);
 	        	result.addError(error);
@@ -167,7 +147,7 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	@Transactional
     public String updateDomain(
     		@PathVariable("id") Integer id, 
-    		@ModelAttribute("dto") @Validated SessionCategoryDto dto, 
+    		@ModelAttribute("dto") @Validated Gift dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -176,7 +156,7 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
-        SessionCategory domain = this.mainService.getById(id);
+        Gift domain = this.mainService.getById(id);
         if (domain == null) {
         	final ObjectError error = this.createIdNotFoundError(result, id);
         	result.addError(error);
@@ -185,33 +165,12 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
-        dto.copyToDomain(domain);
+        dto.copy(domain);
         
-        // ====> Process upload image and content file
-        String deleteImageFileName = null;
-        Path uploadImageFilePath = null;
+        final Gift savedDomain = this.mainService.update(domain);
         
-        final MultipartFile uploadImageFile = dto.getUploadImageFile();
-        if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
-        	deleteImageFileName = domain.getImage();
-        	
-        	// ====> Process upload image file
-        	uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
-            if (uploadImageFilePath == null) {
-            	dto.setId(id);
-            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
-            }
-            
-            final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
-        	domain.setImage(uploadImageFileName);
-        }
-        
-        final SessionCategory savedDomain = this.mainService.update(domain);
-        
-        // ====> Error, delete upload file
+        // ====> Error
         if (savedDomain == null || result.hasErrors()) {
-        	this.deleteUploadFile(uploadImageFilePath);
-        	
         	if (!result.hasErrors()) {
 	        	final ObjectError error = this.createProcessingError(result);
 	        	result.addError(error);
@@ -221,9 +180,7 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
-        // ====> Success, delete old image file
-        this.deleteUploadFile(deleteImageFileName);
-        
+        // ====> Success
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
         
@@ -237,7 +194,7 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		RedirectAttributes redirectAttributes, Model model) {
 		
-		final SessionCategory domain = this.mainService.getById(id);
+		final Gift domain = this.mainService.getById(id);
 		if (domain == null) {
 			final String message = this.getIdNotFoundMessage(id);
 			
@@ -248,13 +205,9 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 			return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
-		final String deleteImageFileName = domain.getImage();
-		
 		final boolean result = this.mainService.delete(id);
 		if (result) {
-			// ====> Success, delete old image file
-			this.deleteUploadFile(deleteImageFileName);
-	        
+			// ====> Success
 			final String message = this.getDeleteSuccessMessage(id);
 			
 			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");

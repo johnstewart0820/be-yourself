@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+	<title th:text="#{|${baseMessageKey}.page.title|}"></title>
+</head>
+<body>
+	<th:block layout:fragment="stylesheets">
+		<style type="text/css">
+			#[[${pageName + '-data-form'}]] .image-preview {
+				max-height: 250px;
+			}
+		</style>
+	</th:block>
+	
+	<th:block layout:fragment="content">
+		<!-- Form -->
+		<div class="row">
+			<div class="col">
+				<div class="card shadow">
+					<div class="card-header border-0">
+						<div class="row">
+							<div class="col-lg-6 col-md-12">
+								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/current-page'}"
+									th:title="#{action.go.to.list.title}">
+									<span class="btn-inner--icon">
+										<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+									</span>
+								</a>
+							</div>
+							
+							<div class="col-lg-6 text-right d-md-none d-lg-block">
+								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
+							</div>
+						</div>
+					</div>
+					
+					<div class="card-body border-0">
+						<form action="#" th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
+							th:id="${pageName + '-data-form'}"
+							th:object="${dto}" method="post" enctype="multipart/form-data">
+							<fieldset th:disabled="${!writePermission}">
+								<div th:if="${param.error}">
+									<div class="alert alert-danger">Invalid username and password.</div>
+								</div>
+				
+								<div th:if="${param.logout}">
+									<div class="alert alert-info">You have been logged out.</div>
+								</div>
+								
+								<div class="row">
+									<div class="col-md-12 col-sm-12">
+										<div class="form-group row">
+											<label for="name" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.name|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<input type="text" class="form-control" 
+													th:field="*{name}" id="name"
+													th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
+													required="required" autofocus="autofocus" />
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<label for="description" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+												th:text="#{|${baseMessageKey}.detail.description|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<textarea class="form-control" rows="10"
+													th:field="*{description}" id="description"
+													th:placeholder="#{|${baseMessageKey}.detail.description.placeholder|}"></textarea>
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<label for="duration" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.duration|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<select class="form-control selectpicker show-tick"
+													th:field="*{duration}" id="duration" required="required" 
+													th:data-none-selected-text="#{|${baseMessageKey}.detail.duration.type.placeholder|}">
+													<option value="0" th:text="#{discount.code.discount.type.0}"></option>
+													<option value="1" th:text="#{discount.code.discount.type.1}"></option>
+												</select>
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<label for="price" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.price|}"></label>
+											<div class="col-md-10 col-sm-9 col-xs-12">
+												<div class="input-group">
+													<input type="number" class="form-control" 
+														th:field="*{price}" id="price"
+														th:placeholder="#{|${baseMessageKey}.detail.price.placeholder|}" 
+														required="required" />
+													<div class="input-group-prepend">
+														<span class="input-group-text" th:utext="${priceUnitSymbol}"></span>
+													</div>
+												</div>
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+											</div>
+										</div>
+										
+										<div th:if="${writePermission}" class="form-group row">
+											<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+												<div class="form-action-buttons-row">
+													<button type="submit" class="btn btn-primary" th:title="#{action.save.title}">
+														<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
+													</button>
+													
+													<a class="btn btn-outline-warning" th:href="${baseURL + '/current-page'}"
+														th:title="#{action.go.to.list.title}">
+														<span class="btn-inner--icon">
+															<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+														</span>
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<th:block th:replace="fragments/data-form-modals :: modals"></th:block>
+	</th:block>
+
+	<th:block layout:fragment="scripts">
+		<script type="text/javascript">
+			$(function() {
+				$('select').selectpicker();
+				
+		    	showOnLoadedModal();
+		    });
+		</script>
+	</th:block>
+</body>
+</html>

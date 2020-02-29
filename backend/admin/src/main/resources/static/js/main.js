@@ -236,7 +236,7 @@ function showModal(modalId, hideInteval) {
 }
 
 function showOnLoadedModal() {
-	showModal('on-load-modal', 5000);
+	showModal('on-load-modal', 3000);
 }
 
 function formatBytes(bytes, decimals) {

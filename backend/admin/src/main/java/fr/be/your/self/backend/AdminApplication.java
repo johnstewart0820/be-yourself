@@ -25,10 +25,12 @@ import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.Permission;
+import fr.be.your.self.model.Slideshow;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.repository.FunctionalityRepository;
 import fr.be.your.self.repository.PermissionRepository;
+import fr.be.your.self.repository.SlideshowRepository;
 import fr.be.your.self.repository.UserRepository;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
@@ -51,6 +53,9 @@ public class AdminApplication implements CommandLineRunner {
 	
 	@Autowired
 	private PermissionRepository permissionRepository;
+	
+	@Autowired
+	private SlideshowRepository slideshowRepository;
 	
 	private Permission updatePermission(User adminUser, String path, String name, UserPermission userPermission) {
 		final Optional<Functionality> optionalFunctionality = this.functionalityRepository.findByPath(path);
@@ -124,6 +129,12 @@ public class AdminApplication implements CommandLineRunner {
 		final String adminEmail = "admin@gmail.com";
 		
 		try {
+			final Iterable<Slideshow> defaultSlideshows = slideshowRepository.findAllByStartDateIsNull();
+			if (defaultSlideshows == null || !defaultSlideshows.iterator().hasNext()) {
+				Slideshow defaultSlideshow = new Slideshow();
+				slideshowRepository.save(defaultSlideshow);
+			}
+			
 			User adminUser = userRepository.findByEmail(adminEmail);
 			
 			if (adminUser == null) {
@@ -241,6 +252,22 @@ public class AdminApplication implements CommandLineRunner {
 				
 				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 				this.deleteFunctionality(adminUser, path);
+			}
+			
+			// Gift management
+			{
+				final String path = "/gift";
+				final String name = "Gift management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			
+			// Slideshow management
+			{
+				final String path = "/slideshow";
+				final String name = "Slideshow management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 			}
 			
 			// Create temp user

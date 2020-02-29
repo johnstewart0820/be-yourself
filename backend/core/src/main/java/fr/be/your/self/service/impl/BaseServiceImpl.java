@@ -43,14 +43,7 @@ public abstract class BaseServiceImpl<T, K extends Serializable> implements Base
 		}
 		
 		final Iterable<T> domains = this.getRepository().findAllById(ids);
-		if (domains == null) {
-			return Collections.emptyList();
-		}
-		
-		final List<T> result = new ArrayList<>();
-		domains.forEach(result::add);
-		
-		return result;
+		return this.toList(domains);
 	}
 
 	@Override
@@ -68,30 +61,14 @@ public abstract class BaseServiceImpl<T, K extends Serializable> implements Base
 	@Transactional(readOnly = true)
 	public List<T> getAll(Sort sort) {
 		final Iterable<T> domains = this.getRepository().findAll(sort == null ? Sort.unsorted() : sort);
-		
-		if (domains == null) {
-			return Collections.emptyList();
-		}
-		
-		final List<T> result = new ArrayList<>();
-		domains.forEach(result::add);
-		
-		return result;
+		return this.toList(domains);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> search(String text, Sort sort) {
 		final Iterable<T> domains = this.getList(text, sort == null ? Sort.unsorted() : sort);
-		
-		if (domains == null) {
-			return Collections.emptyList();
-		}
-		
-		final List<T> result = new ArrayList<>();
-		domains.forEach(result::add);
-		
-		return result;
+		return this.toList(domains);
 	}
 
 	@Override
@@ -99,33 +76,11 @@ public abstract class BaseServiceImpl<T, K extends Serializable> implements Base
 	public PageableResponse<T> pageableSearch(String text, Pageable pageable, Sort sort) throws RuntimeException {
 		if (pageable == null) {
 			final List<T> items = this.search(text, sort);
-			
-			final PageableResponse<T> result = new PageableResponse<>();
-			result.setItems(items);
-			result.setTotalItems(items.size());
-			result.setTotalPages(1);
-			result.setPageIndex(1);
-			result.setPageSize(-1);
-			
-			return result;
+			return new PageableResponse<>(items);
 		}
 		
-		final Page<T> pageDomain = this.getListByPage(text, pageable);
-		if (pageDomain == null) {
-			return null;
-		}
-		
-		final int pageIndex = pageable.getPageNumber() + 1;
-		final int pageSize = pageable.getPageSize();
-		
-		final PageableResponse<T> result = new PageableResponse<>();
-		result.setItems(pageDomain.getContent());
-		result.setTotalItems(pageDomain.getTotalElements());
-		result.setTotalPages(pageDomain.getTotalPages());
-		result.setPageIndex(pageIndex);
-		result.setPageSize(pageSize);
-		
-		return result;
+		final Page<T> page = this.getListByPage(text, pageable);
+		return new PageableResponse<>(page);
 	}
 	
 	@Override
@@ -160,5 +115,16 @@ public abstract class BaseServiceImpl<T, K extends Serializable> implements Base
 	@Override
 	public <S extends T> Iterable<S> saveAll(Iterable<S> entities) {
 		return this.getRepository().saveAll(entities);
+	}
+	
+	protected List<T> toList(Iterable<T> domains) {
+		if (domains == null) {
+			return Collections.emptyList();
+		}
+		
+		final List<T> result = new ArrayList<>();
+		domains.forEach(result::add);
+		
+		return result;
 	}
 }

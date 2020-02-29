@@ -70,31 +70,29 @@
 						<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col" width="80%" th:text="#{|${baseMessageKey}.detail.name|}"></th>
-									<th scope="col" class="no-sort" width="10%" th:text="#{|${baseMessageKey}.detail.session.count|}"></th>
+									<th scope="col" width="75%" 
+										th:utext="#{|${baseMessageKey}.list.name|}"
+										th:title="#{|${baseMessageKey}.list.name.placeholder|}"></th>
+									<th scope="col" width="10%" 
+										th:utext="#{|${baseMessageKey}.list.price|}"
+										th:title="#{|${baseMessageKey}.list.price.placeholder|}"></th>
+									<th scope="col" width="10%" 
+										th:utext="#{|${baseMessageKey}.list.duration|}"
+										th:title="#{|${baseMessageKey}.list.duration.placeholder|}"></th>
 									<th scope="col" class="no-sort" th:if="${readPermission}"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${result.items}">
 									<th scope="row" nowrap>
-										<div class="media align-items-center">
-											<a th:if="${item.image != null && item.image != ''}" 
-												th:href="${baseMediaURL + '/image/view/' + item.image}" 
-												class="avatar rounded-circle mr-3" target="_blank">
-												<img th:alt="${item.name}" th:src="${baseMediaURL + '/image/view/' + item.image}">
-											</a>
-											<a th:if="${item.image == null || item.image == ''}" 
-												href="javascript:;" class="avatar rounded-circle mr-3">
-												<img th:alt="${item.name}" th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
-											</a>
-											<div class="media-body">
-												<span class="mb-0 text-sm" th:text="${item.name}"></span>
-											</div>
-										</div>
+										<span class="mb-0 text-sm" th:text="${item.name}"></span>
 									</th>
 									<td class="text-center">
-										<span th:text="${item.sessionCount}"></span>
+										<span th:text="${item.price}"></span>
+										<span th:utext="${priceUnitSymbol}"></span>
+									</td>
+									<td class="text-center">
+										<span th:text="${item.duration}"></span>
 									</td>
 									<td class="text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
@@ -132,7 +130,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
-			const sortableColumnMaps = { 'name': 0, 'created': -1 };
+			const sortableColumnMaps = { 'name': 0, 'price': 1, 'duration': 2 };
 			
 			function confirmDelete(id) {
 				const deleteUrl = '[[${baseURL}]]/delete/' + id;

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+	<title th:text="#{|${baseMessageKey}.page.title|}"></title>
+</head>
+<body>
+	<th:block layout:fragment="stylesheets">
+		<style type="text/css">
+			.carousel-inner > .carousel-item > img,
+			.carousel-inner > .carousel-item > a > img {
+  				max-height: 120px !important;
+			}
+			
+			.group-header {
+				background-color: #ccc;
+			}
+			
+			.testimonial-group > .row {
+				display: inline-block;
+				overflow-x: auto;
+				white-space: nowrap;
+				width: 100%;
+			}
+			
+			.testimonial-group > .row > .col-image {
+				display: inline-block;
+				float: none;
+				
+				padding-bottom: 12px;
+				padding-top: 12px;
+				padding-left: 6px;
+				padding-right: 6px;
+				
+				position: relative;
+				font-size: 0;
+				vertical-align: top;
+			}
+			
+			.col-image img {
+				max-height: 150px;
+				min-height: 100px;
+				min-width: 100px;
+			}
+			
+			.col-image .closes {
+				position: absolute;
+				top: 15px;
+				right: 12px;
+				z-index: 100;
+				background-color: #f00;
+				padding: 2px 3px 6px 2px;
+				
+				color: #000;
+				font-weight: bold;
+				cursor: pointer;
+				
+				text-align: center;
+				font-size: 22px;
+				line-height: 10px;
+				border-radius: 50%;
+				border:1px solid #f00;
+			}
+			
+			.col-image:hover .closes {
+				opacity: 1;
+			}
+		</style>
+	</th:block>
+	
+	<th:block layout:fragment="content">
+		<div class="card shadow"> 
+			<div class="card-header border-0">
+				<div class="row">
+					<div class="col-12">
+						<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
+					</div>
+				</div>
+			</div>
+			
+			<div class="card-body border-0">
+				<div class="testimonial-group">
+ 					<div class="row">
+ 						<th:block th:if="${mainDto.images != null}">
+ 							<div th:each="item : ${mainDto.images}" 
+ 								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+ 								<span class="closes" title="Delete"
+ 									th:title="#{slideshow.action.delete.image.title}"
+ 									th:onclick="confirmDeleteMainImage([[${ item.id }]])">&times;</span>
+                   				<img th:src="${baseMediaURL + '/image/view/' + item.image}" 
+                   					class="img-fluid mx-auto d-block">
+ 							</div>
+ 						</th:block>
+ 						
+ 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+               				<img id="image-preview-main" 
+               					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
+               					class="img-fluid mx-auto d-block">
+						</div>
+						
+ 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+ 							<span class="closes" title="Delete">&times;</span>
+                   			<img src="https://source.unsplash.com/300x300/?perth,australia" class="img-fluid mx-auto d-block" alt="img1">
+               			</div>
+               			<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+               				<span class="closes" title="Delete">&times;</span>
+               				<img src="https://source.unsplash.com/300x300/?fremantle,australia" class="img-fluid mx-auto d-block" alt="img2">
+               			</div>
+               			<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+               				<span class="closes" title="Delete">&times;</span>
+               				<img src="https://source.unsplash.com/300x300/?west-australia" class="img-fluid mx-auto d-block" alt="img3">
+               			</div>
+               			<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+               				<span class="closes" title="Delete">&times;</span>
+               				<img src="https://source.unsplash.com/300x300/?perth" class="img-fluid mx-auto d-block" alt="img4">
+               			</div>
+		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+		                    <img src="https://source.unsplash.com/300x300/?quokka,perth" class="img-fluid mx-auto d-block" alt="img5">
+		                </div>
+		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+		                    <img src="https://source.unsplash.com/300x300/?margaretriver,australia" class="img-fluid mx-auto d-block" alt="img6">
+		                </div>
+		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+		                    <img src="https://source.unsplash.com/pWkk7iiCoDM/400x300" class="img-fluid mx-auto d-block" alt="img7">
+		                </div>
+		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+		                    <img src="https://source.unsplash.com/aob0ukAYfuI/400x300" class="img-fluid mx-auto d-block" alt="img8">
+		                </div>
+  					</div>
+  				</div>
+  					
+				<form action="#" th:action="${writePermission ? baseURL + '/update-main/' + mainDto.id : 'javascript:;'}"
+					th:id="${pageName + '-main-data-form'}"
+					th:object="${mainDto}" method="post" enctype="multipart/form-data">
+					
+					<div class="form-group mb-0">
+						<div class="input-group input-group-alternative">
+							<div class="input-group-prepend">
+								<span class="input-group-text" th:utext="#{slideshow.label.add.image}"></span>
+							</div>
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" 
+									id="upload-image-file-main" 
+									th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
+									th:accept="${supportImageTypes}" onChange="selectImage(this, 'main')" 
+									th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
+								<label class="custom-file-label" for="upload-image-file-main" id="image-file-label-main" 
+									th:data-browse="#{action.select.image}" 
+									th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
+							</div>
+							
+							<div class="input-group-prepend">
+								<span class="input-group-button">
+									<button type="submit" class="btn btn-primary" th:title="#{slideshow.label.add.image}">
+										<i class="fas fa-image"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div class="row">
+					<div class="col-12">&nbsp;</div>
+				</div>
+				
+				<th:block th:each="schedule : ${result.items}">
+					<div class="testimonial-group">
+	 					<div class="row">
+	 						<th:block th:if="${schedule.images != null}">
+	 							<div th:each="item : ${schedule.images}" 
+	 								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+	 								<span class="closes" title="Delete"
+	 									th:title="#{slideshow.action.delete.image.title}"
+	 									th:onclick="confirmDeleteScheduleImage([[${ item.id }]])">&times;</span>
+	                   				<img th:src="${baseMediaURL + '/image/view/' + item.image}" 
+	                   					class="img-fluid mx-auto d-block">
+	 							</div>
+	 						</th:block>
+	 						
+	 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+	               				<img th:id="${'image-preview-schedule-' + schedule.id}" 
+	               					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
+	               					class="img-fluid mx-auto d-block">
+							</div>
+	 					</div>
+	 				</div>
+	 				
+	 				<form action="#" th:action="${writePermission ? baseURL + '/update-schedule/' + schedule.id : 'javascript:;'}"
+						th:id="${pageName + '-schedule-data-form-' + schedule.id}"
+						th:object="${schedule}" method="post" enctype="multipart/form-data">
+						
+						<div class="form-group mb-0">
+							<div class="input-group input-group-alternative">
+								<div class="input-group-prepend">
+									<span class="input-group-text" th:utext="#{slideshow.label.add.image}"></span>
+								</div>
+								<div class="custom-file">
+									<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" 
+										th:id="${'upload-image-file-schedule' + schedule.id}" 
+										th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
+										th:accept="${supportImageTypes}" onChange="selectScheduleImage(this)" 
+										th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
+									<label class="custom-file-label" 
+										th:for="${'upload-image-file-schedule' + schedule.id}" 
+										th:id="${'image-file-label-schedule' + schedule.id}" 
+										th:data-browse="#{action.select.image}" 
+										th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
+								</div>
+								
+								<div class="input-group-prepend">
+									<span class="input-group-button">
+										<button type="submit" class="btn btn-primary" th:title="#{slideshow.label.add.image}">
+											<i class="fas fa-image"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
+										</button>
+									</span>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="row">
+						<div class="col-12">&nbsp;</div>
+					</div>
+	 			</th:block>
+	 			
+	 			<div class="row">
+					<div class="col-12 group-header">
+						<h3 class="mb-0 form-title-label" th:utext="#{slideshow.header.new.schedule}"></h3>
+					</div>
+				</div>	
+	 			<div class="testimonial-group">
+ 					<div class="row">
+						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+               				<img id="image-preview-new-schedule" 
+               					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
+               					class="img-fluid mx-auto d-block">
+						</div>
+ 					</div>
+ 				</div>
+ 				
+ 				<form action="#" th:action="${writePermission ? baseURL + '/new-schedule/' : 'javascript:;'}"
+					th:id="${pageName + '-new-schedule-data-form'}"
+					th:object="${newScheduleDto}" method="post" enctype="multipart/form-data">
+					
+					<div class="form-group row">
+						<label id="startDateLabel" for="startDate" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+							th:text="#{|${baseMessageKey}.detail.start.date|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<div class="input-group">
+								<input type="text" class="form-control datepicker" 
+									th:field="*{startDate}" id="startDate" 
+									th:placeholder="#{|${baseMessageKey}.detail.start.date.placeholder|}" 
+									th:data-date-format="${dateFormat.toLowerCase()}" 
+									required="required" autocomplete="off" />
+								<div class="input-group-prepend">
+									<span class="input-group-text"><i class="fas fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label for="upload-image-file-new-schedule" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+							th:text="#{|${baseMessageKey}.detail.image|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" 
+									id="upload-image-file-new-schedule"
+									th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
+									th:accept="${supportImageTypes}" onChange="selectImage(this, 'new-schedule')" 
+									th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
+								<label class="custom-file-label" for="upload-image-file-new-schedule" 
+									id="image-file-label-new-schedule" 
+									th:data-browse="#{action.select.image}" 
+									th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
+							</div>
+						</div>
+					</div>
+					<div th:if="${writePermission}" class="form-group row">
+						<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+							<div class="form-action-buttons-row">
+								<button type="submit" class="btn btn-primary" th:title="#{action.save.title}">
+									<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		
+		<th:block th:replace="fragments/data-list-modals :: modals"></th:block>
+		
+		<div class="modal fade" id="confirm-delete-main-image-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="deleteMainImageConfirmModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<form id="confirm-delete-main-image-form" action="javascript:;" method="POST">
+						<div class="modal-header modal-header-danger">
+							<h3 class="modal-title" id="confirm-delete-main-image-modal-title" th:utext="#{modal.confirm.delete.title}"></h3>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p th:utext="#{slideshow.confirm.delete.main.image.message}"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-danger" th:utext="#{modal.button.yes}">Yes</button>
+                            <button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal" th:utext="#{modal.button.no}">No</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="confirm-delete-schedule-image-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="deleteScheduleImageConfirmModal" aria-hidden="true" data-backdrop="false">
+			<div class="modal-dialog modal-dialog-centered modal-7" role="document">
+				<div class="modal-content">
+					<form id="confirm-delete-schedule-image-form" action="javascript:;" method="POST">
+						<div class="modal-header modal-header-danger">
+							<h3 class="modal-title" id="confirm-delete-schedule-image-modal-title" th:utext="#{modal.confirm.delete.title}"></h3>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p th:utext="#{slideshow.confirm.delete.schedule.image.message}"></p>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-danger" th:utext="#{modal.button.yes}">Yes</button>
+                            <button type="button" class="btn btn-secondary ml-auto" data-dismiss="modal" th:utext="#{modal.button.no}">No</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+	<th:block layout:fragment="scripts">
+		<script type="text/javascript">
+			function confirmDelete(id) {
+				const deleteUrl = '[[${baseURL}]]/delete/' + id;
+				
+				$('#confirm-delete-form').attr('action', deleteUrl);
+				showModal('confirm-delete-modal');
+			}
+			
+			function confirmDeleteMainImage(id) {
+				const deleteUrl = '[[${baseURL}]]/delete-image/main/' + id;
+				
+				$('#confirm-delete-main-image-form').attr('action', deleteUrl);
+				showModal('confirm-delete-main-image-modal');
+			}
+			
+			function confirmDeleteScheduleImage(id) {
+				const deleteUrl = '[[${baseURL}]]/delete-image/schedule/' + id;
+				
+				$('#confirm-delete-schedule-image-form').attr('action', deleteUrl);
+				showModal('confirm-delete-schedule-image-modal');
+			}
+			
+			function selectImage(inputElement, groupName) {
+				const supportImageTypes = '[[${supportImageTypes}]]';
+				const supportImageFileSize = [[${supportImageSize}]];
+				const defaultImageLabel = '[[#{|${baseMessageKey}.detail.image.placeholder|}]]';
+				const imagePreviewId = 'image-preview-' + groupName;
+				const imageFileLabelId = 'image-file-label-' + groupName;
+				
+				console.log(imageFileLabelId);
+				validateAndPreviewImage(inputElement, 
+						imagePreviewId, imageFileLabelId, defaultImageLabel,
+						supportImageTypes, supportImageFileSize, 
+						'image-file-type-modal', 'image-file-size-modal');
+			}
+			
+			function initializeCarousel(carouselId) {
+				$('#' + carouselId).on('slide.bs.carousel', function (e) {
+				    /*
+				        CC 2.0 License Iatek LLC 2018 - Attribution required
+				    */
+				    var $e = $(e.relatedTarget);
+				    var idx = $e.index();
+				    var itemsPerSlide = 5;
+				    var totalItems = $('#' + carouselId + ' .carousel-item').length;
+				 
+				    if (idx >= totalItems-(itemsPerSlide-1)) {
+				        var it = itemsPerSlide - (totalItems - idx);
+				        for (var i=0; i<it; i++) {
+				            // append slides to end
+				            if (e.direction=="left") {
+				                $('#' + carouselId + ' .carousel-item').eq(i).appendTo('.carousel-inner');
+				            }
+				            else {
+				                $('#' + carouselId + ' .carousel-item').eq(0).appendTo('.carousel-inner');
+				            }
+				        }
+				    }
+				});
+			}
+			
+			$(function() {
+				$('select').selectpicker();
+				
+				initializeCarousel('carousel-example');
+				
+				showOnLoadedModal();
+			});
+		</script>
+	</th:block>
+</body>
+</html>

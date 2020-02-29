@@ -3,10 +3,13 @@ package fr.be.your.self.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import fr.be.your.self.common.BusinessCodeDiscountType;
 import fr.be.your.self.common.BusinessCodeStatus;
@@ -28,8 +31,12 @@ public class BusinessCode extends PO<String> {
 	 **/
 	private int status;
 
+	@Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "startDate", nullable = true)
 	private Date startDate;
 
+	@Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "endDate", nullable = true)
 	private Date endDate;
 
 	/**
