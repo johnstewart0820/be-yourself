@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.dto.PageableResponse;
+import fr.be.your.self.model.Constants;
 import fr.be.your.self.model.Session;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
@@ -266,7 +267,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	public PageableResponse<User> pageableSearch(String text, String filterRole, Integer filterStatus,
 			List<Integer> filterSubscriptionTypesIds, PageRequest pageable, Sort sort) {
 		if (filterSubscriptionTypesIds == null || filterSubscriptionTypesIds.isEmpty()) {
-			if (filterStatus == UserStatus.FIND_ALL) {
+			if (filterStatus == Constants.FIND_ALL) {
 				if (StringUtils.isNullOrEmpty(filterRole)) {
 					return this.pageableSearch(text, pageable, sort);
 				}
@@ -287,12 +288,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		}
 		
 		Page<User> pageDomain;
-		//TODO TVA add filter subscriptiontypeids
-		if (!StringUtils.isNullOrEmpty(filterRole)) {
+
+		if (filterSubscriptionTypesIds != null || !filterSubscriptionTypesIds.isEmpty()) {
+			pageDomain = this.findAllBySubscriptionType(filterSubscriptionTypesIds, pageable);
+		} else 	if (!StringUtils.isNullOrEmpty(filterRole)) {
 			pageDomain = this.findAllByUserType(filterRole, pageable);
-		} else if (filterStatus != null && filterStatus != UserStatus.FIND_ALL) {
+		} else if (filterStatus != null && filterStatus != Constants.FIND_ALL) {
 			pageDomain = this.findAllByStatus(filterStatus, pageable);
-		} 	else {
+		} else {
 			pageDomain = this.getPaginatedObjects(pageable);
 		}
 		
@@ -314,7 +317,13 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		return result;
 		
 	}
+	
+	@Override
+	public Page<User> findAllBySubscriptionType(List<Integer> subscriptionTypesIds, Pageable pageable) {
+		return this.repository.findAllBySubscriptionType(subscriptionTypesIds, pageable);
+	}
 
+	
 	private List<User> search(String text, String filterRole, Integer filterStatus,
 			List<Integer> filterSubscriptionTypesIds, Sort sort) {
 		Iterable<User> domains;
@@ -323,7 +332,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		
 		if (!StringUtils.isNullOrEmpty(filterRole)) {
 			domains = this.findAllByUserType(filterRole);
-		} else if (filterStatus != null && filterStatus != UserStatus.FIND_ALL) {
+		} else if (filterStatus != null && filterStatus != Constants.FIND_ALL) {
 			domains = this.findAllByStatus(filterStatus);
 		} 	else {
 			domains = this.findAll();
@@ -349,4 +358,6 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	public Iterable<User> findAllByStatus(int status) {
 		return this.repository.findAllByStatus(status);
 	}
+
+	
 }

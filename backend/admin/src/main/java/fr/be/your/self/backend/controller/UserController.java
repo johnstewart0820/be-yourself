@@ -67,12 +67,14 @@ import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.Session;
+import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
+import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.NumberUtils;
 import fr.be.your.self.util.StringUtils;
@@ -98,6 +100,9 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	FunctionalityService functionalityService;
 	
 	@Autowired
+	SubscriptionTypeService subtypeService;
+	
+	@Autowired
 	private EmailSender emailSender;
 	
 	@Autowired
@@ -105,6 +110,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 
 	static {
@@ -554,12 +561,16 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		final String filterStatus = searchParams.get("filterStatus");
 		List<String> userTypes = UserType.getPossibleStrValues();
 		List<Integer> userStatuses = UserStatus.getPossibleIntValues();
+		Iterable<SubscriptionType> subtypes = this.subtypeService.findAll();
+		final String searchSubtypeIds = searchParams.get("filterSubscriptionTypesIds");
+		final List<Integer> filteredSubscriptionTypesIds = NumberUtils.parseIntegers(searchSubtypeIds, ",");
 		
 		model.addAttribute("filterRole", filterRole);
 		model.addAttribute("filterStatus", filterStatus);
 		model.addAttribute("userTypes", userTypes);
 		model.addAttribute("userStatuses", userStatuses);
-
+		model.addAttribute("subtypes", subtypes);
+		model.addAttribute("filteredSubscriptionTypesIds", filteredSubscriptionTypesIds);
 
 	}
 	
@@ -567,8 +578,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	protected PageableResponse<User> pageableSearch(Map<String, String> searchParams, PageRequest pageable, Sort sort) {
 		final String search = searchParams.get("q");
 		final String filterRole = searchParams.get("filterRole");
-		final Integer filterStatus = NumberUtils.parseInt(searchParams.get("filterStatus"), UserStatus.FIND_ALL);
-		final List<Integer> filterSubscriptionTypesIds = NumberUtils.parseIntegers(searchParams.get("filterSubtypeIds"), ",");
+		final Integer filterStatus = NumberUtils.parseInt(searchParams.get("filterStatus"), fr.be.your.self.model.Constants.FIND_ALL);
+		final List<Integer> filterSubscriptionTypesIds = NumberUtils.parseIntegers(searchParams.get("filterSubscriptionTypesIds"), ",");
 		
 		return this.userService.pageableSearch(search, filterRole, filterStatus, filterSubscriptionTypesIds, pageable, sort);
 	}

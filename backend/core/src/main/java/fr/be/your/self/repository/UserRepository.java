@@ -1,12 +1,16 @@
 package fr.be.your.self.repository;
 
+import java.util.Collection;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import fr.be.your.self.model.Session;
 import fr.be.your.self.model.User;
 
 @Repository
@@ -54,4 +58,10 @@ public interface UserRepository extends BaseRepository<User, Integer> {
     @Modifying
     @Query("UPDATE User SET status = ?2 WHERE id = ?1")
     int updateStatus(Integer id, Integer status);
+    
+    @Query(
+        	value = "SELECT u FROM User u, Subscription s, SubscriptionType st WHERE u.id = s.user AND s.subtype=st.id  AND st.id IN :subtypeIds"
+        )
+    Page<User> findAllBySubscriptionType(@Param("subtypeIds") Collection<Integer> subtypeIds, 
+    		Pageable pageable);
 }

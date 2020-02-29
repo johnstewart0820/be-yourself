@@ -198,17 +198,16 @@
 												</div>
 											</div>
 										</div>
-										<!-- div class="col-md-4" id="reset_pwd_email_div"
-											th:if="${writePermission}"> 
+										<div class="col-md-4" id="reset_pwd_email_div"	th:if="${writePermission && #strings.contains(action, 'update')}"> 
 											<div class="card shadow border-0">
 												<div class="card-body px-lg-5 py-lg-5">
-													<a th:href="@{/user/{id}/resetpassword(id=${user.id})}"
+													<a th:href="@{/user/{id}/resetpassword(id=${dto.id})}"
 														class="btn btn-primary mt-4">Reset Password</a> <a
-														th:href="@{/user/{id}/resendverifemail(id=${user.id})}"
+														th:href="@{/user/{id}/resendverifemail(id=${dto.id})}"
 														class="btn btn-primary mt-4">Resend Verification Email</a>
 												</div>
 											</div>
-										</div-->
+										</div>
 									</div>
 								</fieldset>
 							</form>

@@ -8,9 +8,7 @@ public enum UserStatus {
 	ACTIVE(1),
 	INACTIVE(2),
 	UNKNOWN(-1);
-	
-	public static final int FIND_ALL = -2;
-	
+		
 	private final int value;
 	
 	UserStatus(int value) {
