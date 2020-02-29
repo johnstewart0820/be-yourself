@@ -41,9 +41,13 @@ public interface UserRepository extends BaseRepository<User, Integer> {
     
     Page<User> findAllByUserType(String userType, Pageable pageable);
     Iterable<User> findAllByUserType(String userType, Sort sort);
+    Iterable<User> findAllByUserType(String userType);
+
     
     Page<User> findAllByStatus(int status, Pageable pageable);
     Iterable<User> findAllByStatus(int status, Sort sort);
+    Iterable<User> findAllByStatus(int status);
+
     
     Iterable<User> findAllByIdInAndUserTypeAndStatus(Iterable<Integer> ids, String userType, int status, Sort sort);
     

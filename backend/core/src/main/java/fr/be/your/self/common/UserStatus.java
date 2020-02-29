@@ -1,10 +1,15 @@
 package fr.be.your.self.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum UserStatus {
 	DRAFT(0),
 	ACTIVE(1),
 	INACTIVE(2),
 	UNKNOWN(-1);
+	
+	public static final int FIND_ALL = -2;
 	
 	private final int value;
 	
@@ -32,6 +37,16 @@ public enum UserStatus {
 		return UNKNOWN;
 	}
 	
+	public static List<Integer> getPossibleIntValues(){
+		List<Integer> res = new ArrayList<>();
+		for (UserStatus userStatus : UserStatus.values()) {
+			if (userStatus != UNKNOWN) {
+				res.add(userStatus.getValue());
+			}
+		}
+		return res;
+	}
+	
 	public static String getStatusDescription(int val) {
 		switch (val) {
 			case 0: return "DRAFT";
@@ -42,3 +57,4 @@ public enum UserStatus {
 	}
 	
 }
+

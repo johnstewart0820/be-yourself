@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.dto.PageableResponse;
+import fr.be.your.self.model.Session;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.repository.BaseRepository;
@@ -258,5 +260,93 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		return this.repository
 				.findAllByEmailContainsIgnoreCaseOrFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(email,
 						firstName, lastName, pageable);
+	}
+
+	@Override
+	public PageableResponse<User> pageableSearch(String text, String filterRole, Integer filterStatus,
+			List<Integer> filterSubscriptionTypesIds, PageRequest pageable, Sort sort) {
+		if (filterSubscriptionTypesIds == null || filterSubscriptionTypesIds.isEmpty()) {
+			if (filterStatus == UserStatus.FIND_ALL) {
+				if (StringUtils.isNullOrEmpty(filterRole)) {
+					return this.pageableSearch(text, pageable, sort);
+				}
+			}
+		}
+		
+		if (pageable == null) {
+			final List<User> items = this.search(text, filterRole, filterStatus, filterSubscriptionTypesIds, sort);
+			
+			final PageableResponse<User> result = new PageableResponse<>();
+			result.setItems(items);
+			result.setTotalItems(items.size());
+			result.setTotalPages(1);
+			result.setPageIndex(1);
+			result.setPageSize(-1);
+			
+			return result;
+		}
+		
+		Page<User> pageDomain;
+		//TODO TVA add filter subscriptiontypeids
+		if (!StringUtils.isNullOrEmpty(filterRole)) {
+			pageDomain = this.findAllByUserType(filterRole, pageable);
+		} else if (filterStatus != null && filterStatus != UserStatus.FIND_ALL) {
+			pageDomain = this.findAllByStatus(filterStatus, pageable);
+		} 	else {
+			pageDomain = this.getPaginatedObjects(pageable);
+		}
+		
+		
+		if (pageDomain == null) {
+			return null;
+		}
+		
+		final int pageIndex = pageable.getPageNumber() + 1;
+		final int pageSize = pageable.getPageSize();
+		
+		final PageableResponse<User> result = new PageableResponse<>();
+		result.setItems(pageDomain.getContent());
+		result.setTotalItems(pageDomain.getTotalElements());
+		result.setTotalPages(pageDomain.getTotalPages());
+		result.setPageIndex(pageIndex);
+		result.setPageSize(pageSize);
+		
+		return result;
+		
+	}
+
+	private List<User> search(String text, String filterRole, Integer filterStatus,
+			List<Integer> filterSubscriptionTypesIds, Sort sort) {
+		Iterable<User> domains;
+
+		final Sort domainSort = sort == null ? Sort.unsorted() : sort;
+		
+		if (!StringUtils.isNullOrEmpty(filterRole)) {
+			domains = this.findAllByUserType(filterRole);
+		} else if (filterStatus != null && filterStatus != UserStatus.FIND_ALL) {
+			domains = this.findAllByStatus(filterStatus);
+		} 	else {
+			domains = this.findAll();
+		}
+		
+		
+		if (domains == null) {
+			return Collections.emptyList();
+		}
+		
+		final List<User> result = new ArrayList<>();
+		domains.forEach(result::add);
+		
+		return result;
+	}
+
+	@Override
+	public Iterable<User> findAllByUserType(String userType) {
+		return this.repository.findAllByUserType(userType);
+	}
+	
+	@Override
+	public Iterable<User> findAllByStatus(int status) {
+		return this.repository.findAllByStatus(status);
 	}
 }
