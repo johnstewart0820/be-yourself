@@ -190,7 +190,7 @@
 											<th:block th:switch="${writePermission}">
 												<div th:case="true" class="col-md-10 col-sm-9 col-xs-12">
 													<select class="form-control voice-selectpicker show-tick" 
-														th:field="*{voiceId}" id="voiceId" required="required" 
+														th:field="*{voiceId}" id="voiceId"  
 														data-actions-box="false" data-live-search="true" 
 														th:title="#{|${baseMessageKey}.detail.voice.id.placeholder|}"
 														th:data-none-selected-text="#{|${baseMessageKey}.detail.voice.id.placeholder|}">

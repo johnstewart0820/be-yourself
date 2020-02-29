@@ -100,7 +100,7 @@ public abstract class BaseCodeController extends BaseResourceController<Business
 	@PostMapping("/create")
 	@Transactional
     public String createDomain(
-    		@ModelAttribute @Validated BusinessCodeDto dto, 
+    		@ModelAttribute("dto") @Validated BusinessCodeDto dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         if (result.hasErrors()) {
@@ -144,7 +144,7 @@ public abstract class BaseCodeController extends BaseResourceController<Business
 	@Transactional
     public String updateDomain(
     		@PathVariable("id") String id, 
-    		@ModelAttribute @Validated BusinessCodeDto dto, 
+    		@ModelAttribute("dto") @Validated BusinessCodeDto dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		

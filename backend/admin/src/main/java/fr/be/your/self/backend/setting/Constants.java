@@ -14,7 +14,10 @@ public final class Constants {
 			
 			public static final String SESSION_CATEGORY = "/session-category";
 			public static final String SESSION = "/session";
+			
 			public static final String BUSINESS_CODE = "/business-code";
+			public static final String GIFT = "/gift";
+			public static final String SLIDE_SHOW = "/slide-show";
 		}
 	}
 	
