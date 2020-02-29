@@ -25,7 +25,7 @@ public class SubscriptionType extends PO<Integer>  {
 	private boolean status;
 	private boolean autoRenew;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "subtype"/* , cascade = CascadeType.ALL, orphanRemoval = true */)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "subtype" , cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<Subscription> subscriptions;
 	
 	
