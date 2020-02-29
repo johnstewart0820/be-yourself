@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -32,8 +33,15 @@ public interface UserService extends BaseService<User, Integer> {
     Page<User> findAllByEmailOrFirstNameOrLastName(String email, String firstName, String lastName, Pageable pageable);
 
 	Iterable<User> findAllById(List<Integer> ids);
+	Iterable<User> findAllByUserType(String filterRole);
+	Iterable<User> findAllByStatus(int status);
+
 
 	public List<UserCSV> extractUserCsv(List<Integer> ids);
 
 	public boolean activateUser(Integer userId);
+
+	public PageableResponse<User> pageableSearch(String text, String filterRole, Integer filterStatus,
+			List<Integer> filterSubscriptionTypesIds, PageRequest pageable, Sort sort);
+
 }

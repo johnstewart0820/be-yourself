@@ -23,10 +23,7 @@ abcdef
 									</span>
 									</a>
 								</th:block>
-
-
 							</div>
-
 							<div class="col-6 text-right">
 								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
 							</div>
@@ -179,13 +176,6 @@ abcdef
 			});
 			
 			const sortableColumnMaps = { 'name': 0, 'duration': 1, 'price':2, 'canal':3, 'autoRenew': 4, 'status': 5 };
-			
-			function confirmDelete(id) {
-				const deleteUrl = '[[${baseURL}]]/delete/' + id;
-				
-				$('#confirm-delete-form').attr('action', deleteUrl);
-				showModal('confirm-delete-modal');
-			}
 			
 			$(function() {
 				const dataTableId = '[[${pageName}]]-data-table'; 

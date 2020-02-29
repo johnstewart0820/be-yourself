@@ -19,7 +19,7 @@
 						</a>
 					</th:block>
 				</div>
-				<div class="col-md-3">
+				<!-- <div class="col-md-3">
 					<div class="form-group">
 						<div class="input-group mb-4">
 							<div class="input-group-prepend">
@@ -29,7 +29,20 @@
 							<input class="form-control" placeholder="Search" id="search_box" name="search_box" 	type="text">
 						</div>
 					</div>
+				</div> -->
+				
+				<div class="col-md-3 col-sm-12 text-right">
+								<select id="display-page-option" class="selectpicker show-tick" 
+									th:data-none-selected-text="#{data.display.page.option.title}">
+									<option th:each="pageSize: ${supportPageSizes}" 
+										th:value="${pageSize}" 
+										th:text="#{data.display.page.option.item(${pageSize}, ${pageSizeName})}"
+										th:selected="${size != null && size == pageSize}"></option>
+									<option value="-1" th:text="#{data.display.page.option.all(${pageSizeName})}"
+										th:selected="${size == null || size <= 0}"></option>
+								</select>
 				</div>
+							
 			</div>
 			<div class="row">
 				<div class="col">
@@ -39,27 +52,12 @@
 								<td>
 									<div class="form-group">
 										<div class="input-group input-group-alternative mb-3">
-											<select id="nb_per_page" name="nb_per_page"
-												class="form-control" onchange="this.form.submit()">
-												<option value="2">SHOW 2 USERS</option>
-												<option value="10">SHOW 10 USERS</option>
-												<option value="20">SHOW 20 USERS</option>
-												<option value="50">SHOW 50 USERS</option>
-												<option value="100000">SHOW ALL USERS</option>
-											</select>
-										</div>
-									</div>
-								</td>
-								<td>
-									<div class="form-group">
-										<div class="input-group input-group-alternative mb-3">
 											<select id="filter_role" name="filter_role"
 												class="form-control">
 												<option value="">FILTER BY ROLE</option>
-												<option value="B2B">B2B</option>
-												<option value="B2C">B2C</option>
-												<option value="PRO">PRO</option>
-												<option value="ADM">ADMIN</option>
+												<option th:each="userType : ${userTypes}"
+														th:value="${userType}" th:text="#{'user.type.' + ${userType}}">>
+												</option>
 											</select>
 										</div>
 									</div>
@@ -70,10 +68,9 @@
 											<select id="filter_status" name="filter_status"
 												class="form-control">
 												<option value="-2">FILTER BY STATUS</option>
-												<option value="0">DRAFT</option>
-												<option value="1">ACTIVE</option>
-												<option value="2">INACTIVE</option>
-												<option value="-1">UNKNOWN</option>
+												<option th:each="userStatus : ${userStatuses}"
+														th:value="${userStatus}" th:text="#{'user.status.' + ${userStatus}}">>
+												</option>
 											</select>
 										</div>
 									</div>
@@ -91,8 +88,8 @@
 					<a href="#select_users" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
 					<a href="#" class="btn btn-sm btn-primary" onclick="document.getElementById('select_user_form').submit();">Export
 					CSV</a> 
-					<a href="/user/uploadform" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
-					<a href="/user/resetpwdbyemail" class="btn btn-sm btn-primary" th:if="${writePermission}">Reset password by email</a>
+					<a th:href="${baseURL + '/upload_csv_form'}" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
+					<a th:href="${baseURL + '/resetpwdbyemail'}" class="btn btn-sm btn-primary" th:if="${writePermission}">Reset password by email</a>
 			</div>
 		</div>
 	
@@ -103,7 +100,7 @@
 					<div class="card-header border-0">
 						<h3 class="mb-0">Users list</h3>
 					</div>
-					<form id="select_user_form"  th:action="@{/user/exportcsv}" method="post">
+					<form id="select_user_form"  th:action="${baseURL + '/exportcsv'}" method="post">
 					
 					<div class="table-responsive">
 						<table class="table align-items-center table-flush" id="user_table">
@@ -149,38 +146,14 @@
 						</table>
 					</div>
 					</form>
-					<!-- Begin paging 
-					<div class="card-footer py-4">
-						<nav aria-label="...">
-							<ul class="pagination justify-content-end mb-0">
-								<li class="page-item"><a class="page-link"
-									th:href="@{|/user/list/page/${userPage.number}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}" tabindex="-1"
-									th:if="${userPage.number > 0}"> <i
-										class="fas fa-angle-left"></i>
-								</a></li>
-
-								<li class="page-item" th:each="pageNumber : ${pageNumbers}"
-									th:classappend="${pageNumber==userPage.number + 1} ? active">
-									<a class="page-link"
-									th:href="@{|/user/list/page/${pageNumber}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}"
-									th:text=${pageNumber}>1</a>
-								</li>
-
-								<li class="page-item"><a class="page-link"
-									th:href="@{|/user/list/page/${userPage.number+2}?nb_per_page=${nb_per_page}&filter_role=${filter_role}&filter_status=${filter_status}|}"
-									tabindex="-1"
-									th:unless="${userPage.number == userPage.totalPages - 1}">
-										<i class="fas fa-angle-right"></i>
-								</a></li>
-
-							</ul>
-						</nav>
-					</div>
-					End paging -->
+					<!-- End table -->
+					
+					<div class="card-footer py-4"
+						th:insert="fragments/data-list-pagination :: pagination"></div>
+					
 				</div>
 			</div>
 		</div>
-		<!-- End table -->
 
 		<div class="modal fade" id="confirm-delete-modal" tabindex="-1"
 			role="dialog" aria-labelledby="deleteConfirmModal" aria-hidden="true"
@@ -217,23 +190,22 @@
 	
 	<section layout:fragment="scripts">
 	<script>
-		var nb_per_page = 10;
 		var filter_role = "";
 		var filter_status = -2;
 		var search_box = "";
 	</script>
 	
-	<script th:if="${filter_role != null}">
-		filter_role= "[[${filter_role}]]";
+	<script th:if="${filterRole != null}">
+		filter_role= "[[${filterRole}]]";
 	</script>
 	
-	<script th:if="${filter_status != null}">
-		filter_status= "[[${filter_status}]]";
+	<script th:if="${filterStatus != null}">
+		filter_status= "[[${filterStatus}]]";
 	</script>	
 	<script>
 	var select_all = false;
 	function confirmDelete(id) {
-		var url = '/user/' + id + '/delete';
+		var url = '[[${baseURL}]]/delete/' + id;
 		
 		$('#confirm-delete-form').attr('action', url);
 		showModal('confirm-delete-modal');
@@ -245,20 +217,25 @@
 		  });
 
 		
-		$('#nb_per_page').val([[${nb_per_page}]]);
 		$('#filter_role').val(filter_role);
 		$("#filter_status").val(filter_status);
 		$("#search_box").val("[[${search_box}]]");
 		
 		$("select#filter_status").change(function() {
 			$("#filter_role").val($("#filter_role option:first").val());
-			 $( "#select_form" ).submit();
+			const selectedStatus = $('#filter_status').val();
+			const selectedRole = $('#filter_role').val();
 
+			window.location = '[[${baseURL}]]/search?action=update-filter&filterRole=' + selectedRole + '&filterStatus='+selectedStatus;
 		});
 		
 		$("select#filter_role").change(function() {
 			$("#filter_status").val($("#filter_status option:first").val());
-		    $( "#select_form" ).submit();
+			
+			const selectedRole = $('#filter_role').val();
+			const selectedStatus = $('#filter_status').val()
+
+			window.location = '[[${baseURL}]]/search?action=update-filter&filterRole=' + selectedRole + '&filterStatus='+selectedStatus;
 
 		});
 		
@@ -273,12 +250,18 @@
 		});
 		
 		
-		$('#search_box').on("keypress", function(e) {
+		/* $('#search_box').on("keypress", function(e) {
 	        if (e.keyCode == 13) {
 	        	$("#filter_role").val($("#filter_role option:first").val());
 				$("#filter_status").val($("#filter_status option:first").val());
 			    $( "#select_form" ).submit();
 	        }
+		}); */
+		
+		$('#display-page-option').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+			const selectedPageSize = $('#display-page-option').val();
+			
+			window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size=' + selectedPageSize;
 		});
 	});
 </script>

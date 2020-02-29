@@ -1,11 +1,16 @@
 package fr.be.your.self.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum UserType {
 	ADMIN("ADM"),
 	B2B("B2B"),
 	B2C("B2C"),
 	PROFESSIONAL("PRO"),
 	USER("USR");
+	
+	public static String ALL = "ALL";
 	
 	private final String value;
 	
@@ -46,4 +51,15 @@ public enum UserType {
 			default: return "UNKNOWN";		
 		}
 	}
+	
+	public static List<String> getPossibleStrValues(){
+		List<String> res = new ArrayList<>();
+		for (UserType userType : UserType.values()) {
+			if (userType != USER) {
+				res.add(userType.getValue());
+			}
+		}
+		return res;
+	}
+	
 }
