@@ -1,10 +1,9 @@
 package fr.be.your.self.model;
 
-import java.sql.Date;
-import java.util.List;
-import java.util.Optional;
 
 import com.opencsv.bean.CsvBindByName;
+
+import fr.be.your.self.common.UserUtils;
 
 public class UserCSV {
 	@CsvBindByName(column = "Title")
@@ -44,29 +43,10 @@ public class UserCSV {
 		this.status = user.getStatus();
 		this.referralCode = user.getReferralCode();
 		this.userType = user.getUserType();
-		//Find the active subscription
-		Optional<Subscription> subscriptionOptional = user.getSubscriptions().stream().filter(x -> x.isStatus()).findAny();
-		
-		if (subscriptionOptional.isPresent()) {
-			this.subscriptionType = subscriptionOptional.get().getSubtype().getName();
-		} else { //Otherwise, find the last inactive subscription
-			List<Subscription> subscriptions = user.getSubscriptions();
-			if (subscriptions != null && subscriptions.size() > 0) {
-				Subscription subsription = subscriptions.get(0);
-				Date date = subsription.getSubscriptionEndDate();
-				for (Subscription sub : subscriptions) {
-					if (sub.getSubscriptionEndDate().after(date)) {
-						subsription = sub;
-						date = sub.getSubscriptionEndDate();
-					}
-					
-				}
-				this.subscriptionType = subsription.getSubtype().getName();
-			}
-		}
-		
-		
+		this.subscriptionType = UserUtils.findSubscriptionTypeOfUser(user);
 	}
+
+	
 	
 	public String getTitle() {
 		return title;

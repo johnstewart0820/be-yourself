@@ -27,9 +27,14 @@
 								</div>
 
 								<div class="col-lg-6 text-right d-md-none d-lg-block">
-									<h3  class="mb-0 form-title-label">Add/Update
-										User</h3>
-									
+									<div class="col-md-4" id="reset_pwd_email_div"
+										th:if="${writePermission && #strings.contains(action, 'update')}">
+										<h3 class="mb-0 form-title-label">Update User</h3>
+									</div>
+									<div class="col-md-4" id="reset_pwd_email_div"
+										th:unless="${writePermission && #strings.contains(action, 'update')}">
+										<h3 class="mb-0 form-title-label">Add User</h3>
+									</div>
 								</div>
 
 							</div>
@@ -201,9 +206,9 @@
 										<div class="col-md-4" id="reset_pwd_email_div"	th:if="${writePermission && #strings.contains(action, 'update')}"> 
 											<div class="card shadow border-0">
 												<div class="card-body px-lg-5 py-lg-5">
-													<a th:href="@{/user/{id}/resetpassword(id=${dto.id})}"
+													<a th:href="@{/users/{id}/resetpassword(id=${dto.id})}"
 														class="btn btn-primary mt-4">Reset Password</a> <a
-														th:href="@{/user/{id}/resendverifemail(id=${dto.id})}"
+														th:href="@{/users/{id}/resendverifemail(id=${dto.id})}"
 														class="btn btn-primary mt-4">Resend Verification Email</a>
 												</div>
 											</div>

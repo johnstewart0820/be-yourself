@@ -64,4 +64,9 @@ public interface UserRepository extends BaseRepository<User, Integer> {
         )
     Page<User> findAllBySubscriptionType(@Param("subtypeIds") Collection<Integer> subtypeIds, 
     		Pageable pageable);
+   
+    @Query(
+        	value = "SELECT u FROM User u, Subscription s, SubscriptionType st WHERE u.id = s.user AND s.subtype=st.id  AND st.id IN :subtypeIds"
+        )
+    Iterable<User> findAllBySubscriptionType(@Param("subtypeIds") Collection<Integer> subtypeIds);
 }

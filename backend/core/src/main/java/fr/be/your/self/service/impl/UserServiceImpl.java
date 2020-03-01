@@ -289,7 +289,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		
 		Page<User> pageDomain;
 
-		if (filterSubscriptionTypesIds != null || !filterSubscriptionTypesIds.isEmpty()) {
+		if (filterSubscriptionTypesIds != null && !filterSubscriptionTypesIds.isEmpty()) {
 			pageDomain = this.findAllBySubscriptionType(filterSubscriptionTypesIds, pageable);
 		} else 	if (!StringUtils.isNullOrEmpty(filterRole)) {
 			pageDomain = this.findAllByUserType(filterRole, pageable);
@@ -323,6 +323,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		return this.repository.findAllBySubscriptionType(subscriptionTypesIds, pageable);
 	}
 
+	@Override
+	public Iterable<User> findAllBySubscriptionType(List<Integer> subscriptionTypesIds) {
+		return this.repository.findAllBySubscriptionType(subscriptionTypesIds);
+	}
 	
 	private List<User> search(String text, String filterRole, Integer filterStatus,
 			List<Integer> filterSubscriptionTypesIds, Sort sort) {
@@ -330,7 +334,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 
 		final Sort domainSort = sort == null ? Sort.unsorted() : sort;
 		
-		if (!StringUtils.isNullOrEmpty(filterRole)) {
+		if (filterSubscriptionTypesIds != null && !filterSubscriptionTypesIds.isEmpty()) {
+			domains = this.findAllBySubscriptionType(filterSubscriptionTypesIds);
+		} else 	if (!StringUtils.isNullOrEmpty(filterRole)) {
 			domains = this.findAllByUserType(filterRole);
 		} else if (filterStatus != null && filterStatus != Constants.FIND_ALL) {
 			domains = this.findAllByStatus(filterStatus);

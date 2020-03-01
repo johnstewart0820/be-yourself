@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
+import fr.be.your.self.common.UserUtils;
 
 @Entity
 public class User extends PO<Integer> {
@@ -201,5 +202,9 @@ public class User extends PO<Integer> {
 	
 	public String getUserTypeDescription() {
 		return UserType.getStatusDescription(userType);
+	}
+	public String getSubscriptionType() {
+		String subtype = UserUtils.findSubscriptionTypeOfUser(this);
+		return subtype;
 	}
 }

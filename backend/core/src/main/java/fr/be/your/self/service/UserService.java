@@ -36,6 +36,7 @@ public interface UserService extends BaseService<User, Integer> {
 	Iterable<User> findAllById(List<Integer> ids);
 	Iterable<User> findAllByUserType(String filterRole);
 	Iterable<User> findAllByStatus(int status);
+	Iterable<User> findAllBySubscriptionType(List<Integer> subscriptionTypesIds);
 
 
 	public List<UserCSV> extractUserCsv(List<Integer> ids);
@@ -44,5 +45,6 @@ public interface UserService extends BaseService<User, Integer> {
 
 	public PageableResponse<User> pageableSearch(String text, String filterRole, Integer filterStatus,
 			List<Integer> filterSubscriptionTypesIds, PageRequest pageable, Sort sort);
+
 
 }

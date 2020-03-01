@@ -1,8 +1,11 @@
 package fr.be.your.self.common;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.util.StringUtils;
@@ -41,5 +44,32 @@ public final class UserUtils {
 	
 	public static String generateRandomPassword(int pwdLength) {
 		return StringUtils.randomAlphanumeric(pwdLength);
+	}
+	
+	public static String findSubscriptionTypeOfUser(User user) {
+		String subtype = "";
+		
+		//Find the active subscription
+		Optional<Subscription> subscriptionOptional = user.getSubscriptions().stream().filter(x -> x.isStatus()).findAny();
+		
+		if (subscriptionOptional.isPresent()) {
+			subtype =  subscriptionOptional.get().getSubtype().getName();
+		} else { //Otherwise, find the last inactive subscription
+			List<Subscription> subscriptions = user.getSubscriptions();
+			if (subscriptions != null && subscriptions.size() > 0) {
+				Subscription subsription = subscriptions.get(0);
+				Date date = subsription.getSubscriptionEndDate();
+				for (Subscription sub : subscriptions) {
+					if (sub.getSubscriptionEndDate().after(date)) {
+						subsription = sub;
+						date = sub.getSubscriptionEndDate();
+					}
+					
+				}
+				subtype = subsription.getSubtype().getName();
+			}
+		}
+		
+		return subtype;
 	}
 }

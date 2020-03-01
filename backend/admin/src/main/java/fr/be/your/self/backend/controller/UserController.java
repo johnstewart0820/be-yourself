@@ -543,6 +543,33 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		return this.getBaseURL() + "/upload_csv_form";
 	}
 	
+
+	// reset password user
+	@RequestMapping(value = "/{id}/resetpassword")
+	public String resetPasswordUser(@PathVariable("id") int id, Model model) {
+		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
+		String encodedPwd = passwordEncoder.encode(tempPwd);
+		User user = userService.getById(id);
+		user.setPassword(encodedPwd);
+		userService.saveOrUpdate(user);
+		this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
+		model.addAttribute("msg", "Password reset successfully");
+		return this.getBaseURL() +  "/userform_result";
+	}
+	
+	// resend verification email user
+	@RequestMapping(value = "/{id}/resendverifemail")
+	public String resendVerificationEmail(@PathVariable("id") int id, HttpServletRequest request, Model model) {
+		User user = userService.getById(id);
+		String activateAccountUrl = buildActivateAccountUrl(request);
+		setActivateCodeAndTimeout(user);
+		userService.saveOrUpdate(user);
+		sendVerificationEmailToUser(activateAccountUrl, user);
+		model.addAttribute("msg", "Resend verification email successfully");
+		return this.getBaseURL() +  "/userform_result";
+	}
+	
+
 	//generate a new activation code and timeout for a user
 	private void setActivateCodeAndTimeout(User user) {
 		String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
