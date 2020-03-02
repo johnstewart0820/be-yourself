@@ -361,7 +361,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		if (file.isEmpty()) {
 			result.setResStatus(ResultStatus.ERROR.getValue());
 			result.setMessage("File is empty");
-			return this.getBaseURL() + "/simple_status";
+			return this.getName() + "/simple_status";
 		}
 
 		List<UserCSV> usersCsv;
@@ -370,7 +370,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		} catch (Exception e) {
 			result.setResStatus(ResultStatus.ERROR.getValue());
 			result.setMessage("Exception occured while reading CSV file: " + e.getMessage());
-			return this.getBaseURL() + "/simple_status";
+			return this.getName() + "/simple_status";
 		}
 		List<User> users = UserUtils.convertUsersCsv(usersCsv);
 				
@@ -380,12 +380,12 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			if (StringUtils.isNullOrEmpty(user.getEmail()) || !EmailValidator.getInstance().isValid(user.getEmail())) {
 				result.setResStatus(ResultStatus.ERROR.getValue());
 				result.setMessage("ERROR: Email field of " + user.getFullName() + " is empty or not valid!");
-				return this.getBaseURL() + "/simple_status";
+				return this.getName() + "/simple_status";
 			} else {
 				if (userService.existsEmail(user.getEmail())) {
 					result.setResStatus(ResultStatus.ERROR.getValue());
 					result.setMessage("ERROR: Email of user " + user.getFullName() + " already exists!");
-					return this.getBaseURL() +  "/simple_status";
+					return this.getName() +  "/simple_status";
 				}
 			}
 		}
@@ -411,7 +411,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		
 		result.setResStatus(ResultStatus.SUCCESS.getValue());
 		result.setMessage("File imported successfully!");
-		return this.getBaseURL() + "/simple_status";
+		return this.getName() + "/simple_status";
 	}
 
 	
@@ -439,7 +439,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		if (user == null) {
 			result.setResStatus(ResultStatus.ERROR.getValue());
 			result.setMessage("Email address does not exist!");
-			return this.getBaseURL() +  "/simple_status";
+			return this.getName() +  "/simple_status";
 		}
 		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
 		String encodedPwd = getPasswordEncoder().encode(tempPwd);
@@ -449,7 +449,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		result.setResStatus(ResultStatus.SUCCESS.getValue());
 		result.setMessage("Password reset successfully for user: '" + user.getFullName() + "' with email: " + user.getEmail());
 		model.addAttribute("result", result);
-		return this.getBaseURL() + "/simple_status";
+		return this.getName() + "/simple_status";
 	}
 	
 	// save account settings
@@ -495,19 +495,19 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	public String showAccountSettings(Model model) {
 		User loggedUser = userService.getById((int) model.getAttribute("userId"));
 		model.addAttribute("user", loggedUser);
-		return this.getBaseURL() + "/account_settings";
+		return this.getName() + "/account_settings";
 	}
 		
 	// show reset password form
 	@RequestMapping(value = "/resetpwdbyemail")
 	public String showResetPassword(Model model) {
-		return this.getBaseURL() + "/reset_password_form";
+		return this.getName() + "/reset_password_form";
 	}
 	
 	// show upload csv form
 	@GetMapping(value = "/upload_csv_form")
 	public String showUploadUserForm(Model model) {
-		return this.getBaseURL() + "/upload_csv_form";
+		return this.getName() + "/upload_csv_form";
 	}
 	
 
@@ -521,7 +521,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		userService.saveOrUpdate(user);
 		this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
 		model.addAttribute("msg", "Password reset successfully");
-		return this.getBaseURL() +  "/userform_result";
+		return this.getName() +  "/userform_result";
 	}
 	
 	// resend verification email user
@@ -533,7 +533,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		userService.saveOrUpdate(user);
 		sendVerificationEmailToUser(activateAccountUrl, user);
 		model.addAttribute("msg", "Resend verification email successfully");
-		return this.getBaseURL() +  "/userform_result";
+		return this.getName() +  "/userform_result";
 	}
 	
 

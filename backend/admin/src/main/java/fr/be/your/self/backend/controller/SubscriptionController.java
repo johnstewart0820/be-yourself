@@ -305,7 +305,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		if (file.isEmpty()) {
 			result.setResStatus(ResultStatus.ERROR.getValue());
 			result.setMessage("File is empty");
-			return this.getBaseURL() + "/upload_csv_form";
+			return this.getName() + "/upload_csv_form";
 		}
 
 		List<SubscriptionCsv> subscriptionsCsv;
@@ -336,7 +336,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		}
 		
 		if (result.getResStatus() == ResultStatus.ERROR.getValue()) {
-			return this.getBaseURL() + "/simple_status";
+			return this.getName() + "/simple_status";
 			
 		}
 		
@@ -382,13 +382,13 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		
 		result.setResStatus(ResultStatus.SUCCESS.getValue());
 		result.setMessage("File imported successfully!");
-		return this.getBaseURL() + "/simple_status";
+		return this.getName() + "/simple_status";
 	}
 	
 	// show upload csv form
 	@GetMapping(value = "/upload_csv_form")
 	public String showUploadUserForm(Model model) {
-		return this.getBaseURL() + "/upload_csv_form";
+		return this.getName() + "/upload_csv_form";
 	}
 	
 }
