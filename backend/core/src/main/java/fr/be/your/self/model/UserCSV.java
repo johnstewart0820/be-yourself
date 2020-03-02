@@ -43,7 +43,7 @@ public class UserCSV {
 		this.status = user.getStatus();
 		this.referralCode = user.getReferralCode();
 		this.userType = user.getUserType();
-		this.subscriptionType = UserUtils.findSubscriptionTypeOfUser(user);
+		this.subscriptionType = UserUtils.findSubscriptionUser(user).getSubtype().getName();
 	}
 
 	

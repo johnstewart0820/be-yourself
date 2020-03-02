@@ -203,8 +203,8 @@ public class User extends PO<Integer> {
 	public String getUserTypeDescription() {
 		return UserType.getStatusDescription(userType);
 	}
-	public String getSubscriptionType() {
-		String subtype = UserUtils.findSubscriptionTypeOfUser(this);
-		return subtype;
+	public Subscription getSubscription() {
+		Subscription sub = UserUtils.findSubscriptionUser(this);
+		return sub;
 	}
 }

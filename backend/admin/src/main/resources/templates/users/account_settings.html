@@ -118,20 +118,24 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
 
 	<section layout:fragment="scripts">
+		
 		<script type="text/javascript">
-			$('#user_form').submit(function() {
-				if ($("#new_pwd").val() != null && $("#new_pwd").val() != '') {
-					if ($("#confirmed_new_pwd").val() != $("#new_pwd").val()) {
-						alert("New passwords do not match!");
-						return false;
-					}
-				} 
-				return true;
-			});
+		$(document).ready(function() { 
+			//TODO
+		});
+		
+		$('#user_form').submit(function() {
+			if ($("#new_pwd").val() != null && $("#new_pwd").val() != '') {
+				if ($("#confirmed_new_pwd").val() != $("#new_pwd").val()) {
+					alert("New passwords do not match!");
+					return false;
+				}
+			} 
+			return true;
+		});
 		</script>
 	</section>
 

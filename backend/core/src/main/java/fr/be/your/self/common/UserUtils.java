@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import fr.be.your.self.model.Subscription;
+import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.util.StringUtils;
@@ -46,14 +47,14 @@ public final class UserUtils {
 		return StringUtils.randomAlphanumeric(pwdLength);
 	}
 	
-	public static String findSubscriptionTypeOfUser(User user) {
-		String subtype = "";
+	public static Subscription findSubscriptionUser(User user) {
+		Subscription subscription = new Subscription();
 		
 		//Find the active subscription
 		Optional<Subscription> subscriptionOptional = user.getSubscriptions().stream().filter(x -> x.isStatus()).findAny();
 		
 		if (subscriptionOptional.isPresent()) {
-			subtype =  subscriptionOptional.get().getSubtype().getName();
+			subscription =  subscriptionOptional.get();
 		} else { //Otherwise, find the last inactive subscription
 			List<Subscription> subscriptions = user.getSubscriptions();
 			if (subscriptions != null && subscriptions.size() > 0) {
@@ -66,10 +67,10 @@ public final class UserUtils {
 					}
 					
 				}
-				subtype = subsription.getSubtype().getName();
+				subscription = subsription;
 			}
 		}
 		
-		return subtype;
+		return subscription;
 	}
 }

@@ -16,9 +16,9 @@
 						<!-- Card header -->
 						<div class="card-header border-0">
 							<div class="row">
-								<div class="col-6">
+								<div class="col-md-6">
 									<a class="btn btn-icon btn-2 btn-primary"
-										th:href="${baseURL+'/users'}"
+										th:href="${baseURL+ '/current-page'}"
 										th:title="#{action.go.to.list.title}"> <span
 										class="btn-inner--icon"> <i class="fas fa-arrow-left"></i>
 											<span th:text="#{action.go.to.list}"></span>
@@ -26,12 +26,12 @@
 									</a>
 								</div>
 
-								<div class="col-lg-6 text-right d-md-none d-lg-block">
-									<div class="col-md-4" id="reset_pwd_email_div"
+								<div class="col-md-6 text-right d-md-none d-lg-block">
+									<div  id="reset_pwd_email_div"
 										th:if="${writePermission && #strings.contains(action, 'update')}">
 										<h3 class="mb-0 form-title-label">Update User</h3>
 									</div>
-									<div class="col-md-4" id="reset_pwd_email_div"
+									<div  id="reset_pwd_email_div"
 										th:unless="${writePermission && #strings.contains(action, 'update')}">
 										<h3 class="mb-0 form-title-label">Add User</h3>
 									</div>
@@ -180,7 +180,17 @@
 
 											</div>
 
-
+											<!-- Subcription Type -->
+											<div class="form-group row">
+												<label for="subscription"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													>Subscription Type</label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="subscription"
+													th:if="${dto != null}" 
+															  disabled th:field="*{subtype}">
+												</div>
+											</div>
 											<div th:if="${writePermission}" class="form-group row">
 												<div
 													class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12">
@@ -192,7 +202,7 @@
 														</button>
 
 														<a class="btn btn-outline-warning"
-															th:href="${baseURL+'/management'}"
+															th:href="${baseURL + '/current-page'}"
 															th:title="#{action.go.to.list.title}"> <span
 															class="btn-inner--icon"> <i
 																class="fas fa-arrow-left"></i> <span
@@ -245,6 +255,8 @@
 		<script>
 
 
+	toastAction = '[[${toastAction}]]';
+	toastStatus = '[[${toastStatus}]]';
 	
 	function selectLoginType() {
 		var selectedLoginType = $("select#loginType").children("option:selected").val();
@@ -280,6 +292,11 @@
 
 	
 	$(document).ready(function() {
+		if (toastAction && toastStatus ) {
+			if (toastAction == "update" && toastStatus == "success") {
+				alert("User updated successfully!");
+			}		
+		}
 		selectLoginType();
 		selectUserType();
 		selectAccountType();

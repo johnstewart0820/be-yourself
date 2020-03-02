@@ -1,4 +1,3 @@
-abcdef
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -14,7 +13,7 @@ abcdef
 				<div class="card shadow">
 					<div class="card-header border-0">
 						<div class="row">
-							<div class="col-6">
+							<div class="col-md-6">
 								<th:block th:if="${writePermission}">
 									<a class="btn btn-icon btn-2 btn-primary"
 										th:href="${baseURL + '/create'}"> <span
@@ -23,15 +22,30 @@ abcdef
 									</span>
 									</a>
 								</th:block>
-
-
 							</div>
 
-							<div class="col-6 text-right">
-								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
+							<div class="col-md-6 text-right">
+								<form id="select_form" role="form"
+									th:action="${baseURL} + '/search'" method="get">
+									<div class="form-group mb-0">
+										<div class="input-group input-group-alternative">
+											<th:block th:if="${baseURL != null && baseURL != ''}">
+												<div class="input-group-prepend">
+													<span class="input-group-text"> <i
+														class="fas fa-search"></i>
+													</span>
+												</div>
+												<input class="form-control" type="text" name="q"
+													th:placeholder="#{search.placeholder}" th:value="${search}">
+											</th:block>
+										</div>
+									</div>
+									<input type="submit" style="display: none" />
+								</form>
 							</div>
+
 						</div>
-						
+
 						<div class="row form-search-container">
 							<div class="offset-md-9 col-md-3 col-sm-12 text-right">
 								<select id="display-page-option" class="selectpicker show-tick"
@@ -48,8 +62,9 @@ abcdef
 						</div>
 					</div>
 					<!-- End card header -->
-					<div class="table-responsive" >
-						<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush"
+							th:id="${pageName + '-data-table'}">
 							<thead class="thead-light">
 								<tr>
 									<th scope="col" width="40%"
@@ -151,30 +166,44 @@ abcdef
 			$(function() {
 				$('#on-load-toast').toast('show');
 			});
-			
-			const sortableColumnMaps = { 'name': 0, 'duration': 1, 'price':2, 'canal':3, 'autoRenew': 4, 'status': 5 };
-			
+
+			const sortableColumnMaps = {
+				'name' : 0,
+				'duration' : 1,
+				'price' : 2,
+				'canal' : 3,
+				'autoRenew' : 4,
+				'status' : 5
+			};
+
 			function confirmDelete(id) {
 				const deleteUrl = '[[${baseURL}]]/delete/' + id;
-				
+
 				$('#confirm-delete-form').attr('action', deleteUrl);
 				showModal('confirm-delete-modal');
 			}
-			
+
 			$(function() {
-				const dataTableId = '[[${pageName}]]-data-table'; 
+				const dataTableId = '[[${pageName}]]-data-table';
 				const defaultSort = '[[${sort}]]';
 				const sortUrl = '[[${baseURL}]]/current-page?sort=';
-				
-				buildDataTable(dataTableId, sortableColumnMaps, defaultSort, sortUrl);
-				
+
+				buildDataTable(dataTableId, sortableColumnMaps, defaultSort,
+						sortUrl);
+
 				$('select').selectpicker();
-				
-				$('#display-page-option').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-					const selectedPageSize = $('#display-page-option').val();
-					window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size=' + selectedPageSize;
-				});
-				
+
+				$('#display-page-option')
+						.on(
+								'changed.bs.select',
+								function(e, clickedIndex, isSelected,
+										previousValue) {
+									const selectedPageSize = $(
+											'#display-page-option').val();
+									window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size='
+											+ selectedPageSize;
+								});
+
 				showOnLoadedModal();
 			});
 		</script>

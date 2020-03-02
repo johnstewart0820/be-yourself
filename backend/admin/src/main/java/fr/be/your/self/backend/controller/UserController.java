@@ -115,8 +115,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 
 	static {
-		SORTABLE_COLUMNS.put("name", new String[] { "name" });
-		//TODO TVA add sortable columns
+		SORTABLE_COLUMNS.put("email", new String[] { "email" });
+		//TODO  add sortable columns
 	}
 	
 	@Override
@@ -313,15 +313,17 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
         dto.copyToDomain(domain);
         
         final User updatedDomain = this.userService.update(domain);
-        for (Permission permission : dto.getPermissions()) {
-			permission.setUser(domain);
-			permissionService.saveOrUpdate(permission);
-		}
+        if (dto.getPermissions() != null) {
+	        for (Permission permission : dto.getPermissions()) {
+				permission.setUser(domain);
+				permissionService.saveOrUpdate(permission);
+			}
+        }
 
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
         
-        return "redirect:" + this.getBaseURL() + "/current-page";
+        return "redirect:" + this.getBaseURL() + "/edit/" + id;
     }
 	
 	@PostMapping(value = { "/delete/{id}" })

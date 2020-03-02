@@ -153,7 +153,9 @@
 									<td><span th:if="${item != null}" th:utext="${item.fullName}"></span></td>
 									<td > <span th:if="${item != null}" th:utext="#{'user.status.' + ${item.status}}"></span> </td>
 
-									<td ><span th:if="${item != null}" th:utext="${item.subscriptionType}"></span></td>
+									<td ><span th:if="${item != null && item.subscription != null && 
+												item.subscription.subtype != null}" 
+												th:utext="${item.subscription.subtype.name}"></span></td>
 									<td> <span th:if="${item != null}" th:utext="#{'user.type.' + ${item.userType}}"></span> </td>
 																	
 									 <td class="text-right" th:if="${writePermission}">

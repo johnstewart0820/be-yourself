@@ -24,6 +24,7 @@ public class UserDto implements Serializable {
 	private List<Permission> permissions;
 	private String activateCode;
 	private long activateTimeout;
+	private String subtype;
 	
 	public UserDto() {
 	}
@@ -42,7 +43,10 @@ public class UserDto implements Serializable {
 			this.referralCode = domain.getReferralCode();
 			this.status = domain.getStatus();
 			this.title = domain.getTitle();
-			this.userType = domain.getUserType();		
+			this.userType = domain.getUserType();	
+			if (domain.getSubscription() != null && domain.getSubscription().getSubtype()!=null) {
+				this.setSubtype(domain.getSubscription().getSubtype().getName());
+			}
 		
 		}
 	}
@@ -138,6 +142,12 @@ public class UserDto implements Serializable {
 	
 	public String getFullname() {
 		return firstName + " " + lastName;
+	}
+	public String getSubtype() {
+		return subtype;
+	}
+	public void setSubtype(String subtype) {
+		this.subtype = subtype;
 	}
 	
 }
