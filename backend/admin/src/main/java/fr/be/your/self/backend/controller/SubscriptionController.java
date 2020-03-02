@@ -40,12 +40,14 @@ import fr.be.your.self.backend.dto.ResultStatus;
 import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.dto.SubscriptionDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.backend.utils.AdminUtils;
 import fr.be.your.self.common.CsvUtils;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.PaymentGateway;
 import fr.be.your.self.common.PaymentStatus;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
+import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionCsv;
@@ -356,8 +358,15 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 					user.setTitle(subCsv.getTitle());
 					user.setStatus(UserStatus.DRAFT.getValue());
 					user.setUserType(UserType.B2C.getValue());
+					String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
+					setActivateCodeAndTimeout(user);
 					user = this.userService.create(user);
-					//TODO TVA: send mail to user
+					addDefaultPermissions(user);
+					this.getPermissionService().saveAll(user.getPermissions());
+					this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
+					String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
+					sendVerificationEmailToUser(activateAccountUrl, user);
+					
 				}
 				SubscriptionType subtype = this.subtypeService.findAllByNameContainsIgnoreCase(subCsv.getSubtype()).iterator().next();
 				sub.setUser(user);

@@ -28,11 +28,13 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -48,17 +50,40 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.PermissionDto;
+import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.dto.PageableResponse;
+import fr.be.your.self.engine.EmailSender;
 import fr.be.your.self.exception.BusinessException;
+import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.PO;
+import fr.be.your.self.model.Permission;
+import fr.be.your.self.model.User;
 import fr.be.your.self.service.BaseService;
+import fr.be.your.self.service.FunctionalityService;
+import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.util.StringUtils;
 
 public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailDto, K extends Serializable>
 		extends BaseController {
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private EmailSender emailSender;
+	
+	@Autowired
+	private PermissionService permissionService;
+	
+	@Autowired
+	FunctionalityService functionalityService;
+	
+	@Autowired
+	DataSetting dataSetting;
 
 	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 
@@ -1071,5 +1096,69 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		}
 
 		return maxFileSize <= 0 || maxFileSize >= fileSize;
+	}
+
+	public PasswordEncoder getPasswordEncoder() {
+		return passwordEncoder;
+	}
+
+	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	public EmailSender getEmailSender() {
+		return emailSender;
+	}
+
+	public void setEmailSender(EmailSender emailSender) {
+		this.emailSender = emailSender;
+	}
+	
+	public PermissionService getPermissionService() {
+		return permissionService;
+	}
+
+	public void setPermissionService(PermissionService permissionService) {
+		this.permissionService = permissionService;
+	}
+	protected List<Permission> createDefaultPermissions(User user) {
+		Iterable<Functionality> functionalities = functionalityService.findAll();
+		List<Permission> permissions = new ArrayList<Permission>();
+
+		for (Functionality func : functionalities) {
+			Permission permission = new Permission();
+			permission.setUser(user);
+			permission.setFunctionality(func);
+			permission.setUserPermission(UserPermission.DENIED.getValue());
+			permissions.add(permission);
+		}
+		return permissions;
+	}
+	
+	protected void addDefaultPermissions(UserDto userdto) {
+		List<Permission> permissions = createDefaultPermissions(new User());
+		userdto.setPermissions(permissions);
+	}
+	
+	protected void addDefaultPermissions(User user) {
+		List<Permission> permissions = createDefaultPermissions(user);
+		user.setPermissions(permissions);
+	}
+	
+	protected boolean sendVerificationEmailToUser(String activateAccountUrl, User savedUser) {
+
+		boolean success = this.getEmailSender().sendActivateUser(savedUser.getEmail(), activateAccountUrl,
+				savedUser.getActivateCode());
+		return success;
+	}
+
+	//generate a new activation code and timeout for a user
+	void setActivateCodeAndTimeout(User user) {
+		String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
+		long activateCodeTimeout = (new Date().getTime() / (60 * 1000))
+				+ this.dataSetting.getActivateCodeTimeout();
+
+		user.setActivateCode(activateCode);
+		user.setActivateTimeout(activateCodeTimeout);
 	}
 }

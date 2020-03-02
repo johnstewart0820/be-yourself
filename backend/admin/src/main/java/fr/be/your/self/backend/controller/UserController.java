@@ -56,6 +56,7 @@ import fr.be.your.self.backend.dto.SubscriptionDto;
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
+import fr.be.your.self.backend.utils.AdminUtils;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserStatus;
@@ -86,30 +87,16 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 	public static String CSV_USERS_EXPORT_FILE = "users.csv";
 	
-	private static final String ACTIVATE_URL = Constants.PATH.WEB_ADMIN_PREFIX 
-			+ Constants.PATH.AUTHENTICATION_PREFIX 
-			+ Constants.PATH.AUTHENTICATION.ACTIVATE;
 	
 	@Autowired
 	private UserService userService;
 	
-	@Autowired
-	PermissionService permissionService;
-
-	@Autowired
-	FunctionalityService functionalityService;
 	
 	@Autowired
 	SubscriptionTypeService subtypeService;
-	
-	@Autowired
-	private EmailSender emailSender;
-	
-	@Autowired
-	private DataSetting dataSetting;
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+
+
+
 	
 	
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
@@ -191,29 +178,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 	}
 	
-	private void addDefaultPermissions(UserDto userdto) {
-		List<Permission> permissions = createDefaultPermissions(new User());
-		userdto.setPermissions(permissions);
-	}
-	
-	private void addDefaultPermissions(User user) {
-		List<Permission> permissions = createDefaultPermissions(user);
-		user.setPermissions(permissions);
-	}
-
-	private List<Permission> createDefaultPermissions(User user) {
-		Iterable<Functionality> functionalities = functionalityService.findAll();
-		List<Permission> permissions = new ArrayList<Permission>();
-
-		for (Functionality func : functionalities) {
-			Permission permission = new Permission();
-			permission.setUser(user);
-			permission.setFunctionality(func);
-			permission.setUserPermission(UserPermission.DENIED.getValue());
-			permissions.add(permission);
-		}
-		return permissions;
-	}
+		
 	
 	@PostMapping("/create")
 	@Transactional
@@ -238,7 +203,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		if (user.getLoginType() == LoginType.PASSWORD.getValue()) {
 			tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
 					
-			String encodedPwd = passwordEncoder.encode(tempPwd);
+			String encodedPwd = getPasswordEncoder().encode(tempPwd);
 			user.setPassword(encodedPwd);
 		}
 
@@ -265,18 +230,18 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		//For normal user, default value = "Denied"
 		for (Permission permission : dto.getPermissions()) {
 			permission.setUser(savedUser); // We need user id of saved user
-			permissionService.saveOrUpdate(permission);
+			this.getPermissionService().saveOrUpdate(permission);
 		}
 		
 		if (!isAutoActivateAccount) {
 			if (savedUser.getStatus() == UserStatus.DRAFT.getValue()) {
-				String activateAccountUrl = buildActivateAccountUrl(request);
+				String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
 				boolean success = sendVerificationEmailToUser(activateAccountUrl, savedUser);
 				// TODO: Use success variable?
 			}
 			
 			if (tempPwd != null) {
-				this.emailSender.sendTemporaryPassword(savedUser.getEmail(), tempPwd);
+				this.getEmailSender().sendTemporaryPassword(savedUser.getEmail(), tempPwd);
 			}
 		}
         
@@ -316,7 +281,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
         if (dto.getPermissions() != null) {
 	        for (Permission permission : dto.getPermissions()) {
 				permission.setUser(domain);
-				permissionService.saveOrUpdate(permission);
+				this.getPermissionService().saveOrUpdate(permission);
 			}
         }
 
@@ -427,9 +392,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		
 		
 		for (User user : users) {
-			String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
-			String encodedPwd = passwordEncoder.encode(tempPwd);
-			user.setPassword(encodedPwd);
+			String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
 
 			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
 				setActivateCodeAndTimeout(user);
@@ -437,11 +400,11 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 			User savedUser = userService.saveOrUpdate(user);
 			addDefaultPermissions(savedUser);
-			permissionService.saveAll(savedUser.getPermissions());
+			this.getPermissionService().saveAll(savedUser.getPermissions());
 
-			this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
+			this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
 			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
-				String activateAccountUrl = buildActivateAccountUrl(request);
+				String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
 				sendVerificationEmailToUser(activateAccountUrl, user);
 			}
 		}
@@ -450,6 +413,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		result.setMessage("File imported successfully!");
 		return this.getBaseURL() + "/simple_status";
 	}
+
+	
 
 	
 	private List<UserCSV> readCsvFile(MultipartFile file) throws Exception {
@@ -477,10 +442,10 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			return this.getBaseURL() +  "/simple_status";
 		}
 		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
-		String encodedPwd = passwordEncoder.encode(tempPwd);
+		String encodedPwd = getPasswordEncoder().encode(tempPwd);
 		user.setPassword(encodedPwd);
 		userService.saveOrUpdate(user);
-		this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
+		this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
 		result.setResStatus(ResultStatus.SUCCESS.getValue());
 		result.setMessage("Password reset successfully for user: '" + user.getFullName() + "' with email: " + user.getEmail());
 		model.addAttribute("result", result);
@@ -506,14 +471,14 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			
 			SimpleResult simpleResult = new SimpleResult();
 			if (!StringUtils.isNullOrEmpty(new_pwd)) {
-				if (!passwordEncoder.matches(current_pwd, currentUser.getPassword())) {
+				if (!getPasswordEncoder().matches(current_pwd, currentUser.getPassword())) {
 					String message = this.getMessage("settings.error.incorrectpwd");
 					simpleResult.setResStatus(ResultStatus.ERROR.getValue());
 					simpleResult.setMessage(message);
 					redirectAttributes.addFlashAttribute("result", simpleResult);
 					return "redirect:" + this.getBaseURL() + "/settings"; 
 				}
-				String encoded_new_pwd = this.passwordEncoder.encode(new_pwd);
+				String encoded_new_pwd = this.getPasswordEncoder().encode(new_pwd);
 				currentUser.setPassword(encoded_new_pwd);
 			}
 
@@ -550,11 +515,11 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	@RequestMapping(value = "/{id}/resetpassword")
 	public String resetPasswordUser(@PathVariable("id") int id, Model model) {
 		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
-		String encodedPwd = passwordEncoder.encode(tempPwd);
+		String encodedPwd = getPasswordEncoder().encode(tempPwd);
 		User user = userService.getById(id);
 		user.setPassword(encodedPwd);
 		userService.saveOrUpdate(user);
-		this.emailSender.sendTemporaryPassword(user.getEmail(), tempPwd);
+		this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
 		model.addAttribute("msg", "Password reset successfully");
 		return this.getBaseURL() +  "/userform_result";
 	}
@@ -563,7 +528,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	@RequestMapping(value = "/{id}/resendverifemail")
 	public String resendVerificationEmail(@PathVariable("id") int id, HttpServletRequest request, Model model) {
 		User user = userService.getById(id);
-		String activateAccountUrl = buildActivateAccountUrl(request);
+		String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
 		setActivateCodeAndTimeout(user);
 		userService.saveOrUpdate(user);
 		sendVerificationEmailToUser(activateAccountUrl, user);
@@ -572,15 +537,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	}
 	
 
-	//generate a new activation code and timeout for a user
-	private void setActivateCodeAndTimeout(User user) {
-		String activateCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
-		long activateCodeTimeout = (new Date().getTime() / (60 * 1000))
-				+ this.dataSetting.getActivateCodeTimeout();
-
-		user.setActivateCode(activateCode);
-		user.setActivateTimeout(activateCodeTimeout);
-	}
 	
 	@Override
 	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
@@ -611,27 +567,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		final List<Integer> filterSubscriptionTypesIds = NumberUtils.parseIntegers(searchParams.get("filterSubscriptionTypesIds"), ",");
 		
 		return this.userService.pageableSearch(search, filterRole, filterStatus, filterSubscriptionTypesIds, pageable, sort);
-	}
-	
-	private String buildActivateAccountUrl(HttpServletRequest request) {
-		String activateAccountUrl = request.getScheme() + "://" + request.getServerName() + ":"
-				+ request.getServerPort() + request.getContextPath();
-
-		if (activateAccountUrl.endsWith("/")) {
-			activateAccountUrl = activateAccountUrl.substring(0, activateAccountUrl.length() - 1);
-		}
-		activateAccountUrl += ACTIVATE_URL;
-
-		return activateAccountUrl;
-	}
-	
-	private boolean sendVerificationEmailToUser(String activateAccountUrl, User savedUser) {
-
-		boolean success = this.emailSender.sendActivateUser(savedUser.getEmail(), activateAccountUrl,
-				savedUser.getActivateCode());
-		return success;
-	}
-	
-	
+	}	
 
 }

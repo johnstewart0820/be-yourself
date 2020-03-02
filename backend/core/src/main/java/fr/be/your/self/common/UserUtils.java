@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
@@ -72,5 +75,12 @@ public final class UserUtils {
 		}
 		
 		return subscription;
+	}
+	
+	public static String assignPassword(User user, PasswordEncoder passwordEncoder, int pwdLength) {
+		String tempPwd = UserUtils.generateRandomPassword(pwdLength);
+		String encodedPwd = passwordEncoder.encode(tempPwd);
+		user.setPassword(encodedPwd);
+		return tempPwd;
 	}
 }
