@@ -1,7 +1,7 @@
 package fr.be.your.self.model;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,8 +39,9 @@ public class Subscription extends PO<Integer> {
 	private String code;
 	private int codeType;
 	private String canal;
+	private boolean autoRenew;
 
-	
+
 	public User getUser() {
 		return user;
 	}
@@ -184,6 +185,14 @@ public class Subscription extends PO<Integer> {
 
 	public void setCanal(String canal) {
 		this.canal = canal;
+	}
+
+	public boolean isAutoRenew() {
+		return autoRenew;
+	}
+
+	public void setAutoRenew(boolean autoRenew) {
+		this.autoRenew = autoRenew;
 	}
 
 }

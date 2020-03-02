@@ -84,8 +84,8 @@ abcdef
 									</td>
 									<td nowrap><span th:if="${item.user != null}" th:utext="${item.user.fullName}"></span></td>
 									<td nowrap><span th:if="${item.subtype != null}" th:utext="${item.subtype.name}"></span></td>
-									<td nowrap><span th:if="${item != null}" th:utext="${#dates.format(item.subscriptionStartDate, 'dd/MM/yyyy')}" ></span></td>
-									<td nowrap><span th:if="${item != null}" th:utext="${#dates.format(item.subscriptionEndDate, 'dd/MM/yyyy')}"></span></td>
+									<td nowrap><span th:if="${item != null}" th:utext="${#dates.format(item.subscriptionStartDate, dateFormat)}" ></span></td>
+									<td nowrap><span th:if="${item != null}" th:utext="${#dates.format(item.subscriptionEndDate, dateFormat)}"></span></td>
 									<td nowrap><span th:if="${item != null}" th:utext="#{'payment.status.' + ${item.paymentStatus}}"></span></td>
 									<td nowrap><span th:if="${item.status}"><i
 											class="fas fa-check"></i></span> <span th:unless="${item.status}"><i

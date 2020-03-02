@@ -2,11 +2,10 @@ package fr.be.your.self.backend.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 import fr.be.your.self.model.Subscription;
-import fr.be.your.self.model.SubscriptionType;
-import fr.be.your.self.model.User;
+
 
 public class SubscriptionDto  implements Serializable {
 
@@ -33,6 +32,7 @@ public class SubscriptionDto  implements Serializable {
 	private String code;
 	private int codeType;
 	private String canal;
+	private boolean autoRenew;
 
 	
 	public SubscriptionDto() {
@@ -62,6 +62,7 @@ public class SubscriptionDto  implements Serializable {
 			this.userId = domain.getUser().getId();
 			this.validEndDate = domain.getValidEndDate();
 			this.validStartDate = domain.getValidStartDate();
+			this.setAutoRenew(domain.isAutoRenew());
 		
 		}
 	}
@@ -81,6 +82,7 @@ public class SubscriptionDto  implements Serializable {
 		domain.setTerminationAsked(terminationAsked);
 		domain.setValidEndDate(validEndDate);
 		domain.setValidStartDate(validStartDate);
+		domain.setAutoRenew(autoRenew);
 	}
 	
 	public int getId() {
@@ -186,6 +188,12 @@ public class SubscriptionDto  implements Serializable {
 	}
 	public void setCanal(String canal) {
 		this.canal = canal;
+	}
+	public boolean isAutoRenew() {
+		return autoRenew;
+	}
+	public void setAutoRenew(boolean autoRenew) {
+		this.autoRenew = autoRenew;
 	}
 	
 	
