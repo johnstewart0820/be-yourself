@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/main-layout.html}">
+<head>
+<title th:text="#{|${baseMessageKey}.page.title|}"></title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+		<div class="container">
+
+			<div class="row">
+				<div class="col">
+					<div class="card  shadow">
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<div class="row">
+								<div class="col-md-6">
+									<a class="btn btn-icon btn-2 btn-primary"
+										th:href="${baseURL+ '/current-page'}"
+										th:title="#{action.go.to.list.title}"> <span
+										class="btn-inner--icon"> <i class="fas fa-arrow-left"></i>
+											<span th:text="#{action.go.to.list}"></span>
+									</span>
+									</a>
+								</div>
+
+								<div class="col-md-6 text-right d-md-none d-lg-block">
+									<div  id="reset_pwd_email_div"
+										th:if="${writePermission && #strings.contains(action, 'update')}">
+										<h3 class="mb-0 form-title-label">Update Professional</h3>
+									</div>
+									<div  id="reset_pwd_email_div"
+										th:unless="${writePermission && #strings.contains(action, 'update')}">
+										<h3 class="mb-0 form-title-label">Add Professional</h3>
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<!-- Card body -->
+						<div class="card-body px-lg-5 py-lg-5">
+							<form th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
+								th:object="${dto}" method="post">
+								<fieldset th:disabled="${!writePermission}">
+									<input type="hidden" th:field="*{id}" />
+									<div class="row">
+										<div class="col-md-8 col-sm-12">
+											<!-- Last Name -->
+											<div class="form-group row">
+												<label for="lastname"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.lastname|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" id="lastname" type="text"
+														th:field="*{lastName}">
+												</div>
+											</div>
+											<!-- First Name -->
+											<div class="form-group row">
+												<label for="firstname"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.firstname|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="firstname"
+														th:field="*{firstName}" required>
+												</div>
+											</div>
+											<!-- Email -->
+											<div class="form-group row">
+												<label for="email"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.email|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="email" id="email"
+														th:field="*{email}" required>
+												</div>
+											</div>
+											<!-- Phone Number -->
+											<div class="form-group row">
+												<label for="phoneNumber"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.phonenumber|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="tel" id="phoneNumber"
+														th:field="*{phoneNumber}" required>
+												</div>
+											</div>
+											<!-- Address -->
+											<div class="form-group row">
+												<label for="email"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.address|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="address"
+														th:field="*{address.address}" required>
+												</div>
+											</div>
+											<!-- Formation Type -->
+											<div class="form-group row" id="account_type_div">
+												<label for="formation"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.formation|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<select class="form-control" id="userId" th:field="*{formation}">
+													<option th:each="formation : ${formations}" th:value="${formation}"
+													 th:text="#{'formation.label.' + ${formation}}"></option>
+												</select>
+												</div>
+
+											</div>
+
+											<!-- Website -->
+											<div class="form-group row">
+												<label for="website"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.website|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="website"
+														th:field="*{website}" required>
+												</div>
+											</div>
+											<!-- Linkedin -->
+											<div class="form-group row">
+												<label for="linkedin"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.linkedin|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="linkedin"
+														th:field="*{linkedin}" required>
+												</div>
+											</div>
+											<!-- Facebook -->
+											<div class="form-group row">
+												<label for="facebook"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.facebook|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="facebook"
+														th:field="*{facebook}" required>
+												</div>
+											</div>
+											<div th:if="${writePermission}" class="form-group row">
+												<div
+													class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12">
+													<div class="form-action-buttons-row">
+														<button type="submit" class="btn btn-primary"
+															th:title="#{action.save.title}">
+															<i class="fas fa-save"></i> <span class="hidden-xs"
+																th:text="#{action.save}"></span>
+														</button>
+
+														<a class="btn btn-outline-warning"
+															th:href="${baseURL + '/current-page'}"
+															th:title="#{action.go.to.list.title}"> <span
+															class="btn-inner--icon"> <i
+																class="fas fa-arrow-left"></i> <span
+																th:text="#{action.go.to.list}"></span>
+														</span>
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</fieldset>
+							</form>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<section layout:fragment="scripts">
+		<script>
+		var editAccType = 2;
+		var editPermissions = 2;
+	</script>
+		<div th:if="${editAccType != null}">
+			<script>
+		   	editAccType = [[${editAccType}]];
+	   </script>
+		</div>
+		<div th:if="${editPermissions != null}">
+			<script>
+			editPermissions = [[${editPermissions}]];
+	   </script>
+		</div>
+		<script>
+
+
+	toastAction = '[[${toastAction}]]';
+	toastStatus = '[[${toastStatus}]]';
+	
+	function selectLoginType() {
+		var selectedLoginType = $("select#loginType").children("option:selected").val();
+		if (selectedLoginType == 0) {
+			$("#password_div").show();
+			$("#reset_pwd_email_div").show();
+		} else {
+			$("#password_div").hide();
+			$("#reset_pwd_email_div").hide();
+		}
+	}
+
+	function selectUserType() {
+		var selectedUserType = $("select#userType").children("option:selected").val();
+		if (selectedUserType == "ADM" || selectedUserType == "SAM") {
+			$("#admin_permissions_div").show();
+		} else {
+			$("#admin_permissions_div").hide();
+		}
+	}
+	
+	function selectAccountType() {
+		if (editAccType == 1 || editAccType == 0) {
+			$('#userType').css('pointer-events','none'); //Disable access to select account type
+		}
+	}
+	
+	function selectEditPermissions() {
+		if (editPermissions == 1 || editPermissions == 0) {
+			$('#admin_permissions_div').css('pointer-events','none'); //Disable access to edit permissions
+		}
+	}
+
+	
+	$(document).ready(function() {
+		if (toastAction && toastStatus ) {
+			if (toastAction == "update" && toastStatus == "success") {
+				alert("User updated successfully!");
+			}		
+		}
+		selectLoginType();
+		selectUserType();
+		selectAccountType();
+		selectEditPermissions();
+		
+		$("select#loginType").change(function() {
+			selectLoginType();
+		});
+		$("select#userType").change(function() {
+			selectUserType();
+		});
+	});
+</script>
+	</section>
+
+</body>
+</html>

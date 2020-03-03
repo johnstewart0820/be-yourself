@@ -46,5 +46,7 @@ public interface UserService extends BaseService<User, Integer> {
 	public PageableResponse<User> pageableSearch(String text, String filterRole, Integer filterStatus,
 			List<Integer> filterSubscriptionTypesIds, PageRequest pageable, Sort sort);
 
+	public  PageableResponse<User> pageableSearchPro(String search, PageRequest pageable, Sort sort);
+
 
 }
