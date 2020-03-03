@@ -26,11 +26,13 @@ import fr.be.your.self.common.UserType;
 import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.Slideshow;
+import fr.be.your.self.model.SplashScreen;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.repository.FunctionalityRepository;
 import fr.be.your.self.repository.PermissionRepository;
 import fr.be.your.self.repository.SlideshowRepository;
+import fr.be.your.self.repository.SplashScreenRepository;
 import fr.be.your.self.repository.UserRepository;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
@@ -56,6 +58,9 @@ public class AdminApplication implements CommandLineRunner {
 	
 	@Autowired
 	private SlideshowRepository slideshowRepository;
+	
+	@Autowired
+	private SplashScreenRepository splashScreenRepository;
 	
 	private Permission updatePermission(User adminUser, String path, String name, UserPermission userPermission) {
 		final Optional<Functionality> optionalFunctionality = this.functionalityRepository.findByPath(path);
@@ -131,8 +136,18 @@ public class AdminApplication implements CommandLineRunner {
 		try {
 			final Iterable<Slideshow> defaultSlideshows = slideshowRepository.findAllByStartDateIsNull();
 			if (defaultSlideshows == null || !defaultSlideshows.iterator().hasNext()) {
-				Slideshow defaultSlideshow = new Slideshow();
+				final Slideshow defaultSlideshow = new Slideshow();
+				defaultSlideshow.setId(1);
+				
 				slideshowRepository.save(defaultSlideshow);
+			}
+			
+			final Iterable<SplashScreen> defaultSplashScreens = splashScreenRepository.findAll();
+			if (defaultSplashScreens == null || !defaultSplashScreens.iterator().hasNext()) {
+				final SplashScreen defaultSplashScreen = new SplashScreen();
+				defaultSplashScreen.setId(1);
+				
+				splashScreenRepository.save(defaultSplashScreen);
 			}
 			
 			User adminUser = userRepository.findByEmail(adminEmail);
@@ -216,7 +231,7 @@ public class AdminApplication implements CommandLineRunner {
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.B2B_MULTIPLE.getValue();
-				final String name = "B2B multiple code management";
+				//final String name = "B2B multiple code management";
 				
 				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 				this.deleteFunctionality(adminUser, path);
@@ -224,7 +239,7 @@ public class AdminApplication implements CommandLineRunner {
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.B2B_UNIQUE.getValue();
-				final String name = "B2B unique code management";
+				//final String name = "B2B unique code management";
 				
 				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 				this.deleteFunctionality(adminUser, path);
@@ -232,7 +247,7 @@ public class AdminApplication implements CommandLineRunner {
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.B2C_DISCOUNT_100.getValue();
-				final String name = "B2C discount 100% code management";
+				//final String name = "B2C discount 100% code management";
 				
 				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 				this.deleteFunctionality(adminUser, path);
@@ -240,7 +255,7 @@ public class AdminApplication implements CommandLineRunner {
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.B2C_DISCOUNT.getValue();
-				final String name = "B2C discount code management";
+				//final String name = "B2C discount code management";
 				
 				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 				this.deleteFunctionality(adminUser, path);
@@ -248,7 +263,7 @@ public class AdminApplication implements CommandLineRunner {
 			
 			{
 				final String path = "/discount-code-" + BusinessCodeType.GIFT_CARD.getValue();
-				final String name = "Gift card management";
+				//final String name = "Gift card management";
 				
 				//this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 				this.deleteFunctionality(adminUser, path);
@@ -266,6 +281,14 @@ public class AdminApplication implements CommandLineRunner {
 			{
 				final String path = "/slideshow";
 				final String name = "Slideshow management";
+				
+				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
+			}
+			
+			// Splash screen management
+			{
+				final String path = "/splash-screen";
+				final String name = "Splash screen management";
 				
 				this.updatePermission(adminUser, path, name, UserPermission.WRITE);
 			}

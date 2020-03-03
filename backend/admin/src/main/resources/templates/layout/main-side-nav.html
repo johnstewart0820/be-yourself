@@ -167,6 +167,12 @@
 							</a>
 				  		</li>
 				  		
+				  		<li class="nav-item" th:if="${permission.hasPermission('/splash-screen')}">
+							<a class="nav-link" th:href="@{/splash-screen}">
+					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.splash.screen}"></span>
+							</a>
+				  		</li>
+				  		
 				  		<li class="nav-item" th:if="${permission.hasPermission('/admin-user')}">
 							<a class="nav-link " href="../examples/maps.html">
 					  			<i class="ni ni-pin-3 text-orange"></i> <span th:text="#{greeting}"></span>

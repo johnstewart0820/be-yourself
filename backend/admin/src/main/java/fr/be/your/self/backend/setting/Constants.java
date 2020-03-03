@@ -17,6 +17,7 @@ public final class Constants {
 			
 			public static final String BUSINESS_CODE = "/business-code";
 			public static final String GIFT = "/gift";
+			public static final String SPLASH_SCREEN = "/splash-screen";
 			public static final String SLIDE_SHOW = "/slide-show";
 		}
 	}
