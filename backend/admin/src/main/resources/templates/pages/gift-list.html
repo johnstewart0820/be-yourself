@@ -38,7 +38,7 @@
 							<div class="col-md-9 col-sm-12">
 								<form role="form" th:action="${baseURL} + '/search'" method="get">
 									<div class="form-group mb-0">
-										<div class="input-group input-group-alternative">
+										<div class="input-group">
 											<div class="input-group-prepend">
 												<span class="input-group-text">
 													<i class="fas fa-search"></i>
@@ -73,10 +73,10 @@
 									<th scope="col" width="75%" 
 										th:utext="#{|${baseMessageKey}.list.name|}"
 										th:title="#{|${baseMessageKey}.list.name.placeholder|}"></th>
-									<th scope="col" width="10%" 
+									<th scope="col" width="10%" class="text-center"
 										th:utext="#{|${baseMessageKey}.list.price|}"
 										th:title="#{|${baseMessageKey}.list.price.placeholder|}"></th>
-									<th scope="col" width="10%" 
+									<th scope="col" width="10%" class="text-center"
 										th:utext="#{|${baseMessageKey}.list.duration|}"
 										th:title="#{|${baseMessageKey}.list.duration.placeholder|}"></th>
 									<th scope="col" class="no-sort" th:if="${readPermission}"></th>
@@ -91,8 +91,9 @@
 										<span th:text="${item.price}"></span>
 										<span th:utext="${priceUnitSymbol}"></span>
 									</td>
-									<td class="text-center">
-										<span th:text="${item.duration}"></span>
+									<td class="text-center" th:data-sort="${item.duration}" th:switch="${item.duration}">
+										<span th:case="1" th:utext="#{gift.option.duration.month(${item.duration})}"></span>
+										<span th:case="*" th:utext="#{gift.option.duration.months(${item.duration})}"></span>
 									</td>
 									<td class="text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">

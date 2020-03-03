@@ -259,6 +259,21 @@ public class SessionController extends BaseResourceController<Session, SessionSi
         // ====> Session category
         final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
         
+        // ====> Session voice 
+        User voice = null;
+        
+        final Integer voiceId = dto.getVoiceId();
+        if (voiceId != null && voiceId > 0) {
+    		voice = this.userService.getById(voiceId);
+    		
+    		if (voice == null) {
+    			final ObjectError error = this.createFieldError(result, "voiceId", "not.found", new Object[] { voiceId }, "Cannot find voice #" + voiceId);
+            	result.addError(error);
+            	
+            	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+    		}
+        }
+        
         // ====> Validate image and content file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile == null || uploadImageFile.isEmpty()) {
@@ -297,6 +312,7 @@ public class SessionController extends BaseResourceController<Session, SessionSi
         final Session domain = this.newDomain();
         dto.copyToDomain(domain);
         
+        domain.setVoice(voice);
         domain.setCategories(categories);
         domain.setImage(uploadImageFileName);
         domain.setContentFile(uploadContentFileName);
@@ -352,6 +368,7 @@ public class SessionController extends BaseResourceController<Session, SessionSi
         final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
         domain.setCategories(categories);
         
+        // ====> Session voice 
         final Integer voiceId = dto.getVoiceId();
         if (voiceId == null) {
         	domain.setVoice(null);

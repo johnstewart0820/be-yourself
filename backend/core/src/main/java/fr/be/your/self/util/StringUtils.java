@@ -70,4 +70,40 @@ public class StringUtils {
 	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
 	      .toString();
 	}
+	
+	public static String formatDuration(int timeInSeconds) {
+		return formatDuration(timeInSeconds, false, true);
+	}
+	
+	public static String formatDuration(int timeInSeconds, boolean forceHour, boolean forceMinute) {
+	    int hours = timeInSeconds / 3600;
+	    int secondsLeft = timeInSeconds - hours * 3600;
+	    int minutes = secondsLeft / 60;
+	    int seconds = secondsLeft - minutes * 60;
+
+	    String formattedTime = "";
+	    if (hours > 0 || forceHour) {
+	    	forceMinute = true;
+	    	formattedTime += (String.format("%02d", hours) + ":");
+	    }
+	    
+	    if (minutes > 0 || forceHour) {
+	    	formattedTime += (String.format("%02d", minutes) + ":");
+	    }
+	    
+	    formattedTime += String.format("%02d", seconds);
+	    return formattedTime;
+	}
+	
+	public static int parseDuration(String duration) {
+		int timeInSeconds = 0;
+		
+		final String[] durationValues = duration.split(":");
+		for (int i = 0; i < durationValues.length; i++) {
+			timeInSeconds *= 60;
+			timeInSeconds += Integer.parseInt(durationValues[i]);
+		}
+		
+		return timeInSeconds;
+	}
 }

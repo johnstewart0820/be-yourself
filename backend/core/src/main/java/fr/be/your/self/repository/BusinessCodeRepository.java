@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import fr.be.your.self.model.BusinessCode;
 
 @Repository
-public interface BusinessCodeRepository extends BaseRepository<BusinessCode, String> {
+public interface BusinessCodeRepository extends BaseRepository<BusinessCode, Integer> {
 	
 	Boolean existsByNameIgnoreCase(String name);
 	

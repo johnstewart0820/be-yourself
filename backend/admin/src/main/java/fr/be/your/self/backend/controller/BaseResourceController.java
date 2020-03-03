@@ -763,11 +763,34 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 	}
 
 	/**************************************************************************************/
-	/*********************
-	 * MESSAGE METHODS
-	 ************************************************/
+	/********************** MESSAGE METHODS ***********************************************/
 	/**************************************************************************************/
-	protected String getIdNotFoundMessage(K idValue) {
+	protected final String getFieldErrorMessage(String fieldName, String errorMessageCode,
+			Object[] messageArguments, String defaultMessage) {
+		final String baseMessageKey = this.getName().replace('-', '.');
+
+		final List<String> fieldNameMessageCodes = Arrays.asList(fieldName.split("(?=\\p{Lu})"));
+		fieldNameMessageCodes.replaceAll(String::toLowerCase);
+
+		final String fieldNameMessageCode = String.join(".", fieldNameMessageCodes);
+		final String messageCode = baseMessageKey + ".error." + fieldNameMessageCode + "." + errorMessageCode;
+		
+		return this.getMessage(messageCode, messageArguments, defaultMessage);
+	}
+	
+	protected final String getRequiredFieldMessage(String fieldName, String defaultMessage) {
+		return this.getFieldErrorMessage(fieldName, "required", null, defaultMessage);
+	}
+	
+	protected final String getInvalidFieldMessage(String fieldName, String defaultMessage) {
+		return this.getFieldErrorMessage(fieldName, "invalid", null, defaultMessage);
+	}
+	
+	protected final String getProcessingError() {
+		return this.getMessage("error.processing", "Processing error");
+	}
+	
+	protected final String getIdNotFoundMessage(K idValue) {
 		final String baseMessageKey = this.getName().replace('-', '.');
 		final String dataName = this.getMessage(baseMessageKey + ".name");
 
@@ -781,7 +804,7 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		return message;
 	}
 
-	protected String getDeleteByIdErrorMessage(K idValue) {
+	protected final String getDeleteByIdErrorMessage(K idValue) {
 		final String baseMessageKey = this.getName().replace('-', '.');
 		final String dataName = this.getMessage(baseMessageKey + ".name");
 
@@ -795,7 +818,7 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		return message;
 	}
 
-	protected String getDeleteSuccessMessage(K idValue) {
+	protected final String getDeleteSuccessMessage(K idValue) {
 		final String baseMessageKey = this.getName().replace('-', '.');
 		final String dataName = this.getMessage(baseMessageKey + ".name");
 
@@ -810,17 +833,14 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 	}
 
 	/**************************************************************************************/
-	/*********************
-	 * PROCESS UPLOAD FILES
-	 *******************************************/
+	/********************** PROCESS UPLOAD FILES ******************************************/
 	/**************************************************************************************/
-	protected Path processUploadImageFile(final MultipartFile uploadImageFile, BindingResult result) {
+	protected final Path processUploadImageFile(final MultipartFile uploadImageFile, BindingResult result) {
 		final String uploadFileName = uploadImageFile.getOriginalFilename();
 		final long uploadFileSize = uploadImageFile.getSize();
 
 		if (!this.isValidImageFileSize(uploadFileSize)) {
-			final ObjectError error = this.createTooLargeImageError(result, uploadFileSize, "image",
-					"Image is too large");
+			final ObjectError error = this.createTooLargeImageError(result, uploadFileSize, "image", "Image is too large");
 			result.addError(error);
 
 			this.logger.error("Image file {0} with size {1} is too large!", uploadFileName, uploadFileSize);

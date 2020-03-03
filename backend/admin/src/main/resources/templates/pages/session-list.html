@@ -11,7 +11,7 @@
 		<div class="row">
 			<div class="col">
 				<div class="card shadow"> 
-					<div class="card-header border-0" style="padding-bottom: 6px;">
+					<div class="card-header border-0">
 						<div class="row">
 							<th:block th:switch="${writePermission}">
 								<th:block th:case="true">
@@ -38,34 +38,38 @@
 							<div class="col-md-9 col-sm-12">
 								<form role="form" th:action="${baseURL} + '/search'" method="get">
 									<div class="form-group mb-0">
-										<div class="input-group input-group-alternative">
-											<select id="category-filter" class="selectpicker show-tick" multiple 
-												data-actions-box="true" data-live-search="true" 
-												th:data-select-all-text="#{data.display.button.select.all}"
-												th:data-deselect-all-text="#{data.display.button.deselect.all}"
-												th:title="#{|${baseMessageKey}.option.filter.category.title|}"
-												th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}"
-												data-selected-text-format="count > 2" 
-												th:data-count-selected-text="#{|${baseMessageKey}.option.filter.category.many|}">
-												<option th:each="sessionCategory: ${sessionCategories}" 
-													th:value="${sessionCategory.id}" 
-													th:text="${sessionCategory.name}"
-													th:selected="${#arrays.contains(filteredCategoryIds, sessionCategory.id)}"></option>
-											</select>
+										<div class="input-group">
+											<span style="padding-right: 12px;">
+												<select id="category-filter" class="selectpicker show-tick" multiple 
+													data-actions-box="true" data-live-search="true" 
+													th:data-select-all-text="#{data.display.button.select.all}"
+													th:data-deselect-all-text="#{data.display.button.deselect.all}"
+													th:title="#{|${baseMessageKey}.option.filter.category.title|}"
+													th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}"
+													data-selected-text-format="count > 2" 
+													th:data-count-selected-text="#{|${baseMessageKey}.option.filter.category.many|}">
+													<option th:each="sessionCategory: ${sessionCategories}" 
+														th:value="${sessionCategory.id}" 
+														th:text="${sessionCategory.name}"
+														th:selected="${#arrays.contains(filteredCategoryIds, sessionCategory.id)}"></option>
+												</select>
+											</span>
 											
-											<select id="voice-filter" class="voice-selectpicker show-tick" multiple
-												data-actions-box="false" data-live-search="true" 
-												th:data-select-all-text="#{data.display.button.select.all}"
-												th:data-deselect-all-text="#{data.display.button.deselect.all}"
-												th:title="#{|${baseMessageKey}.option.filter.voice.title|}"
-												th:data-none-selected-text="#{|${baseMessageKey}.option.filter.voice.title|}"
-												data-selected-text-format="count > 2" 
-												th:data-count-selected-text="#{|${baseMessageKey}.option.filter.voice.many|}">
-												<option th:each="filteredVoice: ${filteredVoices}" 
-													th:value="${filteredVoice.id}" 
-													th:text="${filteredVoice.name}"
-													th:selected="${#arrays.contains(filteredVoiceIds, filteredVoice.id)}"></option>
-											</select>
+											<span style="padding-right: 12px;">
+												<select id="voice-filter" class="voice-selectpicker show-tick" multiple
+													data-actions-box="false" data-live-search="true" 
+													th:data-select-all-text="#{data.display.button.select.all}"
+													th:data-deselect-all-text="#{data.display.button.deselect.all}"
+													th:title="#{|${baseMessageKey}.option.filter.voice.title|}"
+													th:data-none-selected-text="#{|${baseMessageKey}.option.filter.voice.title|}"
+													data-selected-text-format="count > 2" 
+													th:data-count-selected-text="#{|${baseMessageKey}.option.filter.voice.many|}">
+													<option th:each="filteredVoice: ${filteredVoices}" 
+														th:value="${filteredVoice.id}" 
+														th:text="${filteredVoice.name}"
+														th:selected="${#arrays.contains(filteredVoiceIds, filteredVoice.id)}"></option>
+												</select>
+											</span>
 											
 											<th:block th:if="${baseURL != null && baseURL != ''}">
 												<div class="input-group-prepend">
@@ -255,7 +259,6 @@
 				
 				$('#voice-filter').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 					const selectedVoiceIds = $('#voice-filter').val();
-					//console.log(selectedVoiceIds);
 					
 					window.location = '[[${baseURL}]]/search?action=update-filter&filterVoiceIds=' + encodeURIComponent(selectedVoiceIds.join(','));
 				});

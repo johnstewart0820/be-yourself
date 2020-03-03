@@ -54,18 +54,13 @@
 										<div class="form-group row">
 											<label for="name" class="label form-control-label col-lg-2 col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
 												th:text="#{|${baseMessageKey}.detail.name|}"></label>
-											<th:block th:switch="${action}">
-												<div th:case="create" class="col-lg-4 col-md-4 col-sm-9 col-xs-12 sm-form-group">
-													<input type="text" class="form-control" 
-														th:field="*{name}" id="name"
-														th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
-														required="required" autofocus="autofocus" />
-													<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-												</div>
-												<div th:case="*" class="col-lg-4 col-md-4 col-sm-9 col-xs-12 sm-form-group">
-													<strong th:text="${dto.name}"></strong>
-												</div>
-											</th:block>
+											<div class="col-lg-4 col-md-4 col-sm-9 col-xs-12 sm-form-group">
+												<input type="text" class="form-control" 
+													th:field="*{name}" id="name"
+													th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
+													required="required" autofocus="autofocus" />
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+											</div>
 											
 											<label for="type" class="label form-control-label col-lg-2 col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
 												th:text="#{|${baseMessageKey}.detail.type|}"></label>

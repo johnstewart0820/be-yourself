@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import fr.be.your.self.model.Session;
 import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.model.User;
+import fr.be.your.self.util.StringUtils;
 
 public class SessionSimpleDto extends BaseDto {
 	/**
@@ -34,7 +35,7 @@ public class SessionSimpleDto extends BaseDto {
 	private String contentFileType;
 	private String contentMimeType;
 
-	private int duration;
+	private String duration;
 
 	private String description;
 
@@ -59,10 +60,10 @@ public class SessionSimpleDto extends BaseDto {
 			this.image = domain.getImage();
 			this.contentFile = domain.getContentFile();
 			this.contentMimeType = domain.getContentMimeType();
-			this.duration = domain.getDuration();
 			this.description = domain.getDescription();
 			this.free = domain.isFree();
 			this.categories = domain.getCategories();
+			this.duration = StringUtils.formatDuration(domain.getDuration());
 			
 			final User voice = domain.getVoice();
 			if (voice != null) {
@@ -80,9 +81,9 @@ public class SessionSimpleDto extends BaseDto {
 
 	public void copyToDomain(Session domain) {
 		domain.setTitle(this.title);
-		domain.setDuration(this.duration);
 		domain.setDescription(this.description);
 		domain.setFree(this.free);
+		domain.setDuration(StringUtils.parseDuration(this.duration));
 	}
 
 	public int getId() {
@@ -165,11 +166,11 @@ public class SessionSimpleDto extends BaseDto {
 		this.contentFileType = contentFileType;
 	}
 
-	public int getDuration() {
+	public String getDuration() {
 		return duration;
 	}
 
-	public void setDuration(int duration) {
+	public void setDuration(String duration) {
 		this.duration = duration;
 	}
 

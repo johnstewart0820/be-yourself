@@ -29,4 +29,6 @@ public interface SlideshowService extends BaseService<Slideshow, Integer> {
 	public boolean updateImageIndex(int imageId, int index);
 	
 	public int getMaxImageIndex(int id);
+	
+	public long countImage(int id);
 }

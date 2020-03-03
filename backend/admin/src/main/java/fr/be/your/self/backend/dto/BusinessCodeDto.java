@@ -14,6 +14,8 @@ public class BusinessCodeDto extends BaseDto {
 	 */
 	private static final long serialVersionUID = 8615171831998913884L;
 
+	private Integer id;
+	
 	private String name;
 
 	/**
@@ -85,6 +87,7 @@ public class BusinessCodeDto extends BaseDto {
 		this.editable = true;
 
 		if (domain != null) {
+			this.id = domain.getId();
 			this.name = domain.getName();
 			this.type = domain.getType();
 			this.status = domain.getStatus();
@@ -110,19 +113,19 @@ public class BusinessCodeDto extends BaseDto {
 		domain.setDiscountValue(discountValue);
 		domain.setStartDate(startDate);
 		domain.setEndDate(endDate);
+		domain.setName(name);
 		
 		if (createMode) {
-			domain.setName(name);
 			domain.setType(type);			
 		}
 	}
 
-	public String getId() {
-		return name;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setId(String id) {
-		this.name = id;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getName() {

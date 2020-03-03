@@ -2,6 +2,7 @@ package fr.be.your.self.backend.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,6 +111,13 @@ public class GiftController extends BaseResourceController<Gift, Gift, Gift, Int
 		
 		model.addAttribute("priceUnitSymbol", this.dataSetting.getPriceUnitSymbol());
 		model.addAttribute("priceUnitName", this.dataSetting.getPriceUnitName());
+		
+		final Set<Integer> availableDurations = this.dataSetting.getGiftDurations();
+		model.addAttribute("availableDurations", availableDurations);
+		
+		if (domain == null && dto.getDuration() <= 0 && !availableDurations.isEmpty()) {
+			dto.setDuration(availableDurations.iterator().next());
+		}
 	}
 	
 	@PostMapping("/create")

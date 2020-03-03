@@ -17,11 +17,17 @@
 				background-color: #ccc;
 			}
 			
+			.testimonial-group {
+				padding-bottom: 12px;
+				padding-left: 12px;
+			}
+			
 			.testimonial-group > .row {
 				display: inline-block;
 				overflow-x: auto;
 				white-space: nowrap;
 				width: 100%;
+				padding-bottom: 8px;
 			}
 			
 			.testimonial-group > .row > .col-image {
@@ -38,19 +44,27 @@
 				vertical-align: top;
 			}
 			
+			.col-image {
+				border: 2px solid #28a745;
+			}
+			
 			.col-image img {
-				max-height: 150px;
-				min-height: 100px;
-				min-width: 100px;
+				height: 120px;
+				width: 120px;
+				max-height: 120px;
+				min-height: 120px;
+				min-width: 120px;
+				max-width: 120px;
 			}
 			
 			.col-image .closes {
 				position: absolute;
 				top: 15px;
 				right: 12px;
-				z-index: 100;
+				z-index: 10;
 				background-color: #f00;
-				padding: 2px 3px 6px 2px;
+				/*padding: 2px 3px 6px 2px;*/
+				padding: 6px 6px;
 				
 				color: #000;
 				font-weight: bold;
@@ -66,11 +80,15 @@
 			.col-image:hover .closes {
 				opacity: 1;
 			}
+			
+			.col-preview-image {
+				border: 2px dotted #dc3545;
+			}
 		</style>
 	</th:block>
 	
 	<th:block layout:fragment="content">
-		<div class="card shadow"> 
+		<div class="card shadow">
 			<div class="card-header border-0">
 				<div class="row">
 					<div class="col-12">
@@ -93,40 +111,11 @@
  							</div>
  						</th:block>
  						
- 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+ 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image col-preview-image">
                				<img id="image-preview-main" 
                					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
                					class="img-fluid mx-auto d-block">
 						</div>
-						
- 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
- 							<span class="closes" title="Delete">&times;</span>
-                   			<img src="https://source.unsplash.com/300x300/?perth,australia" class="img-fluid mx-auto d-block" alt="img1">
-               			</div>
-               			<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-               				<span class="closes" title="Delete">&times;</span>
-               				<img src="https://source.unsplash.com/300x300/?fremantle,australia" class="img-fluid mx-auto d-block" alt="img2">
-               			</div>
-               			<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-               				<span class="closes" title="Delete">&times;</span>
-               				<img src="https://source.unsplash.com/300x300/?west-australia" class="img-fluid mx-auto d-block" alt="img3">
-               			</div>
-               			<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-               				<span class="closes" title="Delete">&times;</span>
-               				<img src="https://source.unsplash.com/300x300/?perth" class="img-fluid mx-auto d-block" alt="img4">
-               			</div>
-		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-		                    <img src="https://source.unsplash.com/300x300/?quokka,perth" class="img-fluid mx-auto d-block" alt="img5">
-		                </div>
-		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-		                    <img src="https://source.unsplash.com/300x300/?margaretriver,australia" class="img-fluid mx-auto d-block" alt="img6">
-		                </div>
-		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-		                    <img src="https://source.unsplash.com/pWkk7iiCoDM/400x300" class="img-fluid mx-auto d-block" alt="img7">
-		                </div>
-		                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-		                    <img src="https://source.unsplash.com/aob0ukAYfuI/400x300" class="img-fluid mx-auto d-block" alt="img8">
-		                </div>
   					</div>
   				</div>
   					
@@ -160,83 +149,92 @@
 						</div>
 					</div>
 				</form>
+			</div>
+		</div>
+		
+		<div class="card shadow" th:each="schedule : ${result.items}">
+			<div class="card-header border-0">
 				<div class="row">
-					<div class="col-12">&nbsp;</div>
+					<div class="col-12">
+						<h3 class="mb-0 form-title-label">
+							<span th:utext="#{slideshow.header.current.schedule}"></span>: 
+							<span th:utext="${#dates.format(schedule.startDate, dateFormat)}"></span>
+							<a href="javascript:;" th:name="${'schedule-link-' + schedule.id}"></a>
+						</h3>
+					</div>
 				</div>
-				
-				<th:block th:each="schedule : ${result.items}">
-					<div class="row">
-						<div class="col-12 group-header">
-							<h3 class="mb-0 form-title-label" th:utext="#{slideshow.header.current.schedule}"></h3>
+			</div>
+			
+			<div class="card-body border-0">
+				<div class="testimonial-group">
+ 					<div class="row">
+ 						<th:block th:if="${schedule.images != null}">
+ 							<div th:each="item : ${schedule.images}" 
+ 								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+ 								<span class="closes" title="Delete"
+ 									th:title="#{slideshow.action.delete.image.title}"
+ 									th:onclick="confirmDeleteScheduleImage([[${ item.id }]])">&times;</span>
+                   				<img th:src="${baseMediaURL + '/image/view/' + item.image}" 
+                   					class="img-fluid mx-auto d-block">
+ 							</div>
+ 						</th:block>
+ 						
+ 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image col-preview-image">
+               				<img th:id="${'image-preview-schedule-' + schedule.id}" 
+               					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
+               					class="img-fluid mx-auto d-block">
 						</div>
-					</div>
+ 					</div>
+ 				</div>
+ 				
+ 				<form action="#" th:action="${writePermission ? baseURL + '/update-schedule/' + schedule.id : 'javascript:;'}"
+					th:id="${pageName + '-schedule-data-form-' + schedule.id}"
+					th:object="${editScheduleDto}" method="post" enctype="multipart/form-data">
 					
-					<div class="testimonial-group">
-	 					<div class="row">
-	 						<th:block th:if="${schedule.images != null}">
-	 							<div th:each="item : ${schedule.images}" 
-	 								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-	 								<span class="closes" title="Delete"
-	 									th:title="#{slideshow.action.delete.image.title}"
-	 									th:onclick="confirmDeleteScheduleImage([[${ item.id }]])">&times;</span>
-	                   				<img th:src="${baseMediaURL + '/image/view/' + item.image}" 
-	                   					class="img-fluid mx-auto d-block">
-	 							</div>
-	 						</th:block>
-	 						
-	 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-	               				<img th:id="${'image-preview-schedule-' + schedule.id}" 
-	               					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
-	               					class="img-fluid mx-auto d-block">
+					<div class="form-group mb-0">
+						<div class="input-group input-group-alternative">
+							<div class="input-group-prepend">
+								<span class="input-group-text" th:utext="#{slideshow.label.add.image}"></span>
 							</div>
-	 					</div>
-	 				</div>
-	 				
-	 				<form action="#" th:action="${writePermission ? baseURL + '/update-schedule/' + schedule.id : 'javascript:;'}"
-						th:id="${pageName + '-schedule-data-form-' + schedule.id}"
-						method="post" enctype="multipart/form-data">
-						
-						<div class="form-group mb-0">
-							<div class="input-group input-group-alternative">
-								<div class="input-group-prepend">
-									<span class="input-group-text" th:utext="#{slideshow.label.add.image}"></span>
-								</div>
-								<div class="custom-file">
-									<input type="file" class="custom-file-input"  
-										th:id="${'upload-image-file-schedule' + schedule.id}" 
-										th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
-										th:accept="${supportImageTypes}" onChange="selectScheduleImage(this)" 
-										th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
-									<label class="custom-file-label" 
-										th:for="${'upload-image-file-schedule' + schedule.id}" 
-										th:id="${'image-file-label-schedule' + schedule.id}" 
-										th:data-browse="#{action.select.image}" 
-										th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
-								</div>
-								
-								<div class="input-group-prepend">
-									<span class="input-group-button">
-										<button type="submit" class="btn btn-primary" th:title="#{slideshow.label.add.image}">
-											<i class="fas fa-image"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
-										</button>
-									</span>
-								</div>
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" th:field="*{uploadImageFile}"
+									th:id="${'upload-image-file-schedule-' + schedule.id}" 
+									th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
+									th:accept="${supportImageTypes}" th:onChange="selectImage(this, 'schedule-[[${schedule.id}]]')" 
+									th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
+								<label class="custom-file-label" 
+									th:for="${'upload-image-file-schedule-' + schedule.id}" 
+									th:id="${'image-file-label-schedule-' + schedule.id}" 
+									th:data-browse="#{action.select.image}" 
+									th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
+							</div>
+							
+							<div class="input-group-prepend">
+								<span class="input-group-button">
+									<button type="submit" class="btn btn-primary" th:title="#{slideshow.label.add.image}">
+										<i class="fas fa-image"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
+									</button>
+								</span>
 							</div>
 						</div>
-					</form>
-					<div class="row">
-						<div class="col-12">&nbsp;</div>
 					</div>
-	 			</th:block>
-	 			
-	 			<div class="row">
-					<div class="col-12 group-header">
+				</form>
+	 		</div>
+	 	</div>
+	 	
+	 	<div class="card shadow">
+ 			<div class="card-header border-0">
+				<div class="row">
+					<div class="col-12">
 						<h3 class="mb-0 form-title-label" th:utext="#{slideshow.header.new.schedule}"></h3>
 					</div>
-				</div>	
+				</div>
+			</div>
+			
+			<div class="card-body border-0">
 	 			<div class="testimonial-group">
  					<div class="row">
-						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image col-preview-image">
                				<img id="image-preview-new-schedule" 
                					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
                					class="img-fluid mx-auto d-block">

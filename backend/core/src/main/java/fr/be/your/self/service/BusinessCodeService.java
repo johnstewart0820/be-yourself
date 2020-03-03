@@ -9,7 +9,7 @@ import org.springframework.data.domain.Sort;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.model.BusinessCode;
 
-public interface BusinessCodeService extends BaseService<BusinessCode, String> {
+public interface BusinessCodeService extends BaseService<BusinessCode, Integer> {
 
 	public boolean existsName(String name);
 

@@ -16,4 +16,7 @@ public interface SlideshowImageRepository extends BaseRepository<SlideshowImage,
 	
     @Query("SELECT MAX(e.index) + 1 FROM SlideshowImage e WHERE e.slideshow.id = :slideshowId")
     Integer getMaxIndex(@Param("slideshowId") int slideshowId);
+    
+    @Query("SELECT COUNT(e) FROM SlideshowImage e WHERE e.slideshow.id = :slideshowId")
+    long countBySlideshow(@Param("slideshowId") int slideshowId);
 }

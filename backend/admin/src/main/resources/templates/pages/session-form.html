@@ -137,7 +137,7 @@
 											<label for="duration" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
 												th:text="#{|${baseMessageKey}.detail.duration|}"></label>
 											<div class="col-md-7 col-sm-6 col-xs-12">
-												<input type="number" class="form-control" 
+												<input type="text" class="form-control" 
 													th:field="*{duration}" id="duration"
 													th:placeholder="#{|${baseMessageKey}.detail.duration.placeholder|}" 
 													required="required" />
@@ -375,7 +375,7 @@
 		    	    const duration = Math.round(instance.duration);
 		    	    
 		    	    if (duration > 0) {
-		    	    	$('#duration').val(duration);
+		    	    	$('#duration').val(formatDuration(duration));
 		    	    }
 		    	});
 		    	
@@ -384,7 +384,7 @@
 		    	    const duration = Math.round(instance.duration);
 		    	    
 		    	    if (duration > 0) {
-		    	    	$('#duration').val(duration);
+		    	    	$('#duration').val(formatDuration(duration));
 		    	    }
 		    	});
 		    	

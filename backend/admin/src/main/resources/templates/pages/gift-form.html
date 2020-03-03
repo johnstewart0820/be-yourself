@@ -75,23 +75,27 @@
 										</div>
 										
 										<div class="form-group row">
-											<label for="duration" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+											<label for="duration" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
 												th:text="#{|${baseMessageKey}.detail.duration|}"></label>
-											<div class="col-md-10 col-sm-9 col-xs-12">
+											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
 												<select class="form-control selectpicker show-tick"
 													th:field="*{duration}" id="duration" required="required" 
 													th:data-none-selected-text="#{|${baseMessageKey}.detail.duration.type.placeholder|}">
-													<option value="0" th:text="#{discount.code.discount.type.0}"></option>
-													<option value="1" th:text="#{discount.code.discount.type.1}"></option>
+													<th:block th:each="duration: ${availableDurations}">
+														<th:block th:switch="${duration}">
+															<option th:case="1" th:value="${duration}" 
+																th:text="#{gift.option.duration.month(${duration})}"></option>
+															<option th:case="*" th:value="${duration}" 
+																th:text="#{gift.option.duration.months(${duration})}"></option>
+														</th:block>
+													</th:block>
 												</select>
 												<div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
 											</div>
-										</div>
-										
-										<div class="form-group row">
-											<label for="price" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+											
+											<label for="price" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
 												th:text="#{|${baseMessageKey}.detail.price|}"></label>
-											<div class="col-md-10 col-sm-9 col-xs-12">
+											<div class="col-md-4 col-sm-9 col-xs-12">
 												<div class="input-group">
 													<input type="number" class="form-control" 
 														th:field="*{price}" id="price"

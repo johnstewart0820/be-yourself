@@ -18,13 +18,13 @@ import fr.be.your.self.service.BusinessCodeService;
 import fr.be.your.self.util.StringUtils;
 
 @Service
-public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, String> implements BusinessCodeService {
+public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, Integer> implements BusinessCodeService {
 	
 	@Autowired
 	private BusinessCodeRepository repository;
 
 	@Override
-	protected BaseRepository<BusinessCode, String> getRepository() {
+	protected BaseRepository<BusinessCode, Integer> getRepository() {
 		return this.repository;
 	}
 	

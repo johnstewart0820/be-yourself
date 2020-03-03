@@ -5,20 +5,29 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
 import fr.be.your.self.common.BusinessCodeDiscountType;
 import fr.be.your.self.common.BusinessCodeStatus;
 import fr.be.your.self.common.BusinessCodeType;
 
 @Entity
-public class BusinessCode extends PO<String> {
-
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "Name" }))
+public class BusinessCode extends PO<Integer> {
+	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	
+	@Column(name = "Name", length = 60)
 	private String name;
 
 	/**
@@ -77,13 +86,17 @@ public class BusinessCode extends PO<String> {
 	private BigDecimal discountValue;
 
 	@Override
-	public String getId() {
-		return this.name;
+	public Integer getId() {
+		return this.id;
 	}
 
 	@Override
 	public String getDisplay() {
 		return this.name;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {

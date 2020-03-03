@@ -251,6 +251,22 @@ function formatBytes(bytes, decimals) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+function formatDuration(timeInSeconds) {
+	const pad = function(num, size) { return ('000' + num).slice(size * -1); };
+	
+	const time = parseFloat(timeInSeconds).toFixed(3);
+	const hours = Math.floor(timeInSeconds / 60 / 60);
+	const minutes = Math.floor(timeInSeconds / 60) % 60;
+	const seconds = Math.floor(timeInSeconds - minutes * 60);
+	const milliseconds = time.slice(-3);
+	
+	if (hours > 0) {
+		return pad(hours, 2) + ':' + pad(minutes, 2) + ':' + pad(seconds, 2);
+	}
+    
+	return pad(minutes, 2) + ':' + pad(seconds, 2);
+}
+
 function getFileExtension(fileName) {
 	var lastDot = fileName.lastIndexOf('.');
 	if (lastDot < 0) 

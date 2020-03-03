@@ -11,7 +11,7 @@
 		<div class="row">
 			<div class="col">
 				<div class="card shadow"> 
-					<div class="card-header border-0" style="padding-bottom: 6px;">
+					<div class="card-header border-0">
 						<div class="row">
 							<th:block th:switch="${writePermission}">
 								<th:block th:case="true">
@@ -38,7 +38,7 @@
 							<div class="col-md-9 col-sm-12">
 								<form role="form" th:action="${baseURL} + '/search'" method="get">
 									<div class="form-group mb-0">
-										<div class="input-group input-group-alternative">
+										<div class="input-group">
 											<!-- 
 											<select id="type-filter" class="selectpicker show-tick" multiple 
 												data-actions-box="true" data-live-search="true" 
@@ -126,10 +126,12 @@
 									<td nowrap>
 										<span th:utext="#{|${baseMessageKey}.type.${item.type}|}"></span>
 									</td>
-									<td nowrap class="text-center">
+									<td nowrap class="text-center" 
+										th:data-sort="${item.startDate == null ? 0 : item.startDate.getTime()}">
 										<span th:if="${item.startDate != null}" th:text="${#dates.format(item.startDate, dateFormat)}"></span>
 									</td>
-									<td nowrap class="text-center">
+									<td nowrap class="text-center" 
+										th:data-sort="${item.endDate == null ? 0 : item.endDate.getTime()}">
 										<span th:if="${item.endDate != null}" th:text="${#dates.format(item.endDate, dateFormat)}"></span>
 									</td>
 									<td nowrap>

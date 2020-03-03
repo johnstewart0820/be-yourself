@@ -18,7 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,7 +50,8 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 	
 	static {
-		SORTABLE_COLUMNS.put("date", new String[] { "startDate", "endDate" });
+		SORTABLE_COLUMNS.put("startDate", new String[] { "startDate", });
+		SORTABLE_COLUMNS.put("endDate", new String[] { "endDate" });
 	}
 	
 	@Autowired
@@ -118,12 +119,7 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		return this.mainService.searchAvailaible(today, null, sort);
 	}
 
-	@Override
-	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
-			Model model, Map<String, String> searchParams, PageableResponse<SlideshowDto> pageableDto)
-			throws BusinessException {
-		super.loadListPageOptions(session, request, response, model, searchParams, pageableDto);
-		
+	private void loadPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response, Model model) throws BusinessException {
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
 		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
@@ -141,26 +137,25 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		final SlideshowDto newScheduleDto = new SlideshowDto();
 		newScheduleDto.setStartDate(new Date());
 		model.addAttribute("newScheduleDto", newScheduleDto);
+		
+		final SlideshowDto editScheduleDto = new SlideshowDto();
+		editScheduleDto.setStartDate(new Date());
+		model.addAttribute("editScheduleDto", editScheduleDto);
+	}
+	
+	@Override
+	protected void loadListPageOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Model model, Map<String, String> searchParams, PageableResponse<SlideshowDto> pageableDto)
+			throws BusinessException {
+		super.loadListPageOptions(session, request, response, model, searchParams, pageableDto);
+		this.loadPageOptions(session, request, response, model);
 	}
 
 	@Override
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, Slideshow domain, SlideshowDto dto) throws BusinessException {
 		super.loadDetailFormOptions(session, request, response, model, domain, dto);
-		
-		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
-		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
-		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
-		
-		model.addAttribute("supportImageTypes", supportImageTypes);
-		model.addAttribute("supportImageExtensions", supportImageExtensions);
-		model.addAttribute("supportImageSize", supportImageSize);
-		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
-		
-		final Slideshow mainSlideshow = this.mainService.getMainSlideshow();
-		final SlideshowDto mainDto = new SlideshowDto(mainSlideshow);
-		
-		model.addAttribute("mainDto", mainDto);
+		this.loadPageOptions(session, request, response, model);
 	}
 	
 	@PostMapping("/create-schedule")
@@ -170,23 +165,51 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
-		if (result.hasErrors()) {
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
-        }
-        
+		if (dto.getStartDate() == null) {
+			final String message = this.getRequiredFieldMessage("startDate", "Date required");
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
+		}
+		
+		if (dto.getStartDate().getTime() < new Date().getTime()) {
+			final String message = this.getInvalidFieldMessage("startDate", "Date is invalid");
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
+		}
+		
         // ====> Validate image file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image required");
-        	result.addError(error);
+        	final String message = this.getRequiredFieldMessage("image", "Image required");
         	
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         // ====> Process upload image file
         final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
         if (uploadImageFilePath == null) {
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        	final FieldError fieldError = result.getFieldError();
+        	final String message = fieldError == null 
+        			? this.getInvalidFieldMessage("image", "Image is invalid")
+        			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         // ====> Update domain
@@ -202,12 +225,16 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
             if (savedDomain == null || result.hasErrors()) {
             	this.deleteUploadFile(uploadImageFilePath);
             	
-            	if (!result.hasErrors()) {
-    	        	final ObjectError error = this.createProcessingError(result);
-    	        	result.addError(error);
-            	}
+            	final FieldError fieldError = result.getFieldError();
+            	final String message = fieldError == null 
+            			? this.getProcessingError()
+            			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
             	
-            	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+            	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create.schedule");
+    	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+    	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+    	        
+    	        return "redirect:" + this.getBaseURL() + "/current-page";
             }
 	        
             // ====> Create new image
@@ -222,19 +249,23 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        if (savedImage == null || result.hasErrors()) {
 	        	this.deleteUploadFile(uploadImageFilePath);
 	        	
-	        	if (!result.hasErrors()) {
-		        	final ObjectError error = this.createProcessingError(result);
-		        	result.addError(error);
-	        	}
-	        	
-	        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+	        	final FieldError fieldError = result.getFieldError();
+            	final String message = fieldError == null 
+            			? this.getProcessingError()
+            			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+            	
+            	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create.schedule");
+    	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+    	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+    	        
+    	        return "redirect:" + this.getBaseURL() + "/current-page";
 	        }
 	        
 	        // ====> Success
 	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
 	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
 	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
+	        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + savedDomain.getId();
         } catch (Exception ex) {
         	this.deleteUploadFile(uploadImageFilePath);
         	
@@ -250,18 +281,15 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
-        if (result.hasErrors()) {
-        	dto.setId(id);
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
-        }
-        
         Slideshow domain = this.mainService.getById(id);
         if (domain != null && (domain.getStartDate() != null || domain.getEndDate() != null)) {
-        	final ObjectError error = this.createIdNotFoundError(result, id);
-        	result.addError(error);
+        	final String message = this.getIdNotFoundMessage(id);
         	
-        	dto.setId(id);
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         if (domain == null) {
@@ -269,16 +297,16 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
         	
         	if (domain == null) {
         		Slideshow defaultSlideshow = new Slideshow();
-        		defaultSlideshow.setId(1);
         		domain = this.mainService.create(defaultSlideshow);
         		
-
                 if (domain == null) {
-                	final ObjectError error = this.createIdNotFoundError(result, id);
-                	result.addError(error);
+                	final String message = this.getIdNotFoundMessage(id);
                 	
-                	dto.setId(id);
-                	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+                	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+        	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+        	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+        	        
+        	        return "redirect:" + this.getBaseURL() + "/current-page";
                 }
         	}
         }
@@ -286,18 +314,28 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
         // ====> Validate image file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image required");
-        	result.addError(error);
+        	final String message = this.getRequiredFieldMessage("image", "Image required");
         	
-        	dto.setId(id);
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         // ====> Process upload image file
         final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
         if (uploadImageFilePath == null) {
-        	dto.setId(id);
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        	final FieldError fieldError = result.getFieldError();
+        	final String message = fieldError == null 
+        			? this.getInvalidFieldMessage("image", "Image is invalid")
+        			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         // ====> Create new image
@@ -315,13 +353,16 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        if (savedImage == null || result.hasErrors()) {
 	        	this.deleteUploadFile(uploadImageFilePath);
 	        	
-	        	if (!result.hasErrors()) {
-		        	final ObjectError error = this.createProcessingError(result);
-		        	result.addError(error);
-	        	}
-	        	
-	        	dto.setId(id);
-	        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+	        	final FieldError fieldError = result.getFieldError();
+            	final String message = fieldError == null 
+            			? this.getProcessingError()
+            			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+            	
+            	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+    	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+    	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+    	        
+    	        return "redirect:" + this.getBaseURL() + "/current-page";
 	        }
 	        
 	        // ====> Success
@@ -340,40 +381,63 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	@Transactional
     public String updateScheduleDomain(
     		@PathVariable("id") Integer id, 
-    		MultipartFile uploadImageFile, 
+    		@ModelAttribute("editScheduleDto") @Validated SlideshowDto dto,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
         if (result.hasErrors()) {
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        	final FieldError fieldError = result.getFieldError();
+        	final String message = this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         Slideshow domain = this.mainService.getById(id);
         if (domain == null || domain.getStartDate() == null || domain.getEndDate() == null) {
-        	final ObjectError error = this.createIdNotFoundError(result, id);
-        	result.addError(error);
+        	final String message = this.getIdNotFoundMessage(id);
         	
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         // ====> Validate image file
+        final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image required");
-        	result.addError(error);
+        	final String message = this.getRequiredFieldMessage("image", "Image required");
         	
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         // ====> Process upload image file
         final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
         if (uploadImageFilePath == null) {
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        	final FieldError fieldError = result.getFieldError();
+        	final String message = fieldError == null 
+        			? this.getInvalidFieldMessage("image", "Image is invalid")
+        			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
         // ====> Create new image
         try {
-	        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
-	        
+        	final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+        	
 	        final SlideshowImage newImage = new SlideshowImage();
 	        newImage.setSlideshow(domain);
 	        newImage.setImage(uploadImageFileName);
@@ -385,19 +449,23 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        if (savedImage == null || result.hasErrors()) {
 	        	this.deleteUploadFile(uploadImageFilePath);
 	        	
-	        	if (!result.hasErrors()) {
-		        	final ObjectError error = this.createProcessingError(result);
-		        	result.addError(error);
-	        	}
-	        	
-	        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+	        	final FieldError fieldError = result.getFieldError();
+            	final String message = fieldError == null 
+            			? this.getProcessingError()
+            			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+            	
+            	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+    	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+    	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+    	        
+    	        return "redirect:" + this.getBaseURL() + "/current-page";
 	        }
 	        
 	        // ====> Success
 	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
 	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
 	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
+	        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + id;
         } catch (Exception ex) {
         	this.deleteUploadFile(uploadImageFilePath);
         	
@@ -428,10 +496,25 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 			// ====> Success, delete old image file
 			this.deleteUploadFile(deleteImageFileName);
 			
+			try {
+				final Slideshow slideshow = domain.getSlideshow();
+				if (slideshow.getStartDate() != null 
+						&& this.mainService.countImage(slideshow.getId()) == 0) {
+					this.mainService.delete(slideshow.getId());
+					
+					redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete." + slideshowType + ".image");
+			        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+					
+			        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + slideshow.getId();
+				}
+			} catch (Exception ex) {
+				this.logger.error("Cannot delete slideshow", ex);
+			}
+			
 			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete." + slideshowType + ".image");
 	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
 			
-			return "redirect:" + this.getBaseURL();
+	        return "redirect:" + this.getBaseURL() + "/current-page";
 		}
 		
 		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete." + slideshowType + ".image");

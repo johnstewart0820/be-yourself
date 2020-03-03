@@ -36,7 +36,7 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 	
 	@Override
 	public String getDefaultSort() {
-		return "startDate|desc";
+		return "startDate|asc";
 	}
 	
 	@Override
@@ -137,5 +137,10 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 	public int getMaxImageIndex(int id) {
 		final Integer maxIndex = this.imageRepository.getMaxIndex(id);
 		return maxIndex == null ? 0 : maxIndex.intValue();
+	}
+
+	@Override
+	public long countImage(int id) {
+		return this.imageRepository.countBySlideshow(id);
 	}
 }
