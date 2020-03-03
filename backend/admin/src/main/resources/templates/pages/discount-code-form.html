@@ -191,21 +191,22 @@
 											</div>
 										</div>
 										
-										<div class="form-group row" id="b2b100ViewContainer" th:if="${action != 'create'}">
-											<label id="pricePerUserLabel" for="pricePerUser" 
+										<div class="form-group row" th:if="${action != 'create'}">
+											<label id="usedAmountLabel" for="usedAmount" 
 												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
+												th:text="#{|${baseMessageKey}.detail.used.amount|}"></label>
+											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group" 
+												th:title="#{|${baseMessageKey}.detail.used.amount.placeholder|}">
+												<span th:text="${dto.usedAmount}"></span>
+											</div>
+											
+											<label id="pricePerUserLabel" for="pricePerUser" 
+												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
 												th:text="#{|${baseMessageKey}.detail.price.per.user|}"></label>
-											<div id="pricePerUserContainer" class="col-md-4 col-sm-9 col-xs-12 sm-form-group" 
+											<div id="pricePerUserContainer" class="col-md-4 col-sm-9 col-xs-12" 
 												th:title="#{|${baseMessageKey}.detail.price.per.user.placeholder|}">
 												<span th:text="${dto.pricePerUser}"></span>
 												<span th:utext="${priceUnitSymbol}"></span>
-											</div>
-											
-											<label id="usedAmountLabel" for="usedAmount" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
-												th:text="#{|${baseMessageKey}.detail.used.amount|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12" th:title="#{|${baseMessageKey}.detail.used.amount.placeholder|}">
-												<span th:text="${dto.usedAmount}"></span>
 											</div>
 										</div>
 										
@@ -216,7 +217,9 @@
 												<select class="form-control selectpicker show-tick"
 													th:field="*{status}" id="status" 
 													th:data-none-selected-text="#{|${baseMessageKey}.detail.status.placeholder|}">
+													<!-- 
 													<option value="0" th:text="#{discount.code.status.0}"></option>
+													-->
 													<option value="1" th:text="#{discount.code.status.1}"></option>
 													<option value="2" th:text="#{discount.code.status.2}"></option>
 												</select>
@@ -267,13 +270,15 @@
 				// B2B Multiple 100%
 				if (codeType == 0) {
 					$('#b2b100EditableContainer').show();
-					$('#b2b100ViewContainer').show();
+					$('#pricePerUserLabel').show();
+					$('#pricePerUserContainer').show();
 					
 					$('#dealPrice').prop('required', true);
 					$('#maxUserAmount').prop('required', true);
 				} else {
 					$('#b2b100EditableContainer').hide();
-					$('#b2b100ViewContainer').hide();
+					$('#pricePerUserLabel').hide();
+					$('#pricePerUserContainer').hide();
 					
 					$('#dealPrice').prop('required', false);
 					$('#maxUserAmount').prop('required', false);

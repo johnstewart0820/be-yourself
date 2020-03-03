@@ -84,6 +84,12 @@ public abstract class BaseController {
 			displayName = this.getMessage("user.anonymous", "Anonymous");
 		}
 		
+		String servletPath = request.getServletPath();
+		final int partIndex = servletPath.indexOf("/", 1);
+		if (partIndex > 0) {
+			servletPath = servletPath.substring(0, partIndex);
+		}
+		
 		model.addAttribute("userId", userId);
 		model.addAttribute("userAvatar", userAvatar);
 		model.addAttribute("displayName", displayName);
@@ -91,6 +97,7 @@ public abstract class BaseController {
 		
 		model.addAttribute("allowRegister", this.dataSetting.isAllowRegisterOnAuthPage());
 		model.addAttribute("baseAvatarURL", BASE_AVATAR_URL);
+		model.addAttribute("currentFunction", servletPath);
 		
 		this.initAttributes(session, request, response, model, permission);
 	}

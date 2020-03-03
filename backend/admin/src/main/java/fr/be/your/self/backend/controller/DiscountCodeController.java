@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import fr.be.your.self.backend.dto.BusinessCodeDto;
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.BusinessCodeStatus;
 import fr.be.your.self.common.BusinessCodeType;
 import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.common.UserPermission;
@@ -107,6 +108,11 @@ public class DiscountCodeController extends BaseCodeController {
 		final PermissionDto permission = (PermissionDto) model.getAttribute("permission");
 		if (permission == null) {
 			throw new BusinessException(ErrorStatusCode.INVALID_PERMISSION);
+		}
+		
+		if (dto.getStatus() != BusinessCodeStatus.ACTIVE.getValue() 
+				&& dto.getStatus() != BusinessCodeStatus.INACTIVE.getValue()) {
+			dto.setStatus(BusinessCodeStatus.ACTIVE.getValue());
 		}
 		
 		final List<Integer> availableCodeTypes = new ArrayList<Integer>();

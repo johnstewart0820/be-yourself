@@ -55,6 +55,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final String LOGIN_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGIN;
 	private static final String LOGOUT_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGOUT;
 	private static final String ACTIVATE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACTIVATE;
+	private static final String REGISTER_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.REGISTER;
+	private static final String FORGOT_PASSWORD_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.FORGOT_PASSWORD;
 	
 	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 	
@@ -151,12 +153,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// @formatter:off
 		httpSecurity
 			.authorizeRequests()
-				.antMatchers(LOGIN_URL, ACTIVATE_URL, ACCESS_DENIED_URL, "/oauth/test").permitAll()
-				.antMatchers("/", "/home", "/about", "/error", "/test").permitAll()
+				.antMatchers(LOGIN_URL, ACTIVATE_URL, REGISTER_URL, FORGOT_PASSWORD_URL, ACCESS_DENIED_URL).permitAll()
+				.antMatchers("/", "/home", "/about", "/error").permitAll()
 			.and()
         		.authorizeRequests()
-        			//.antMatchers("/admin/**").hasAnyRole(UserType.SUPER_ADMIN.getValue(), UserType.ADMIN.getValue())
-        			//.antMatchers("/user/**").hasAnyRole(UserType.USER.getValue())
         			.anyRequest().hasRole(UserType.USER.getValue())
         	.and()
         		.exceptionHandling()
@@ -186,34 +186,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 			; 
-			/*
-			.csrf().disable()
-				.authorizeRequests()
-					.antMatchers("/api/**").authenticated()
-				.and()
-				.authorizeRequests()
-					.antMatchers("/", "/authenticate", "/home", "/about", "/greeting", "/test").permitAll()
-					.antMatchers("/admin/**").hasAnyRole("ADMIN")
-					.antMatchers("/user/**").hasAnyRole("USER")
-					
-					.anyRequest().authenticated()
-		        .and()
-			        .formLogin()
-						.loginPage(LOGIN_URL)
-						.defaultSuccessUrl("/")
-						.failureUrl(LOGIN_URL + "?authentication_error=true")
-						.permitAll()
-				.and()
-			        .logout()
-						.permitAll()
-				.and()
-		        	.exceptionHandling()
-		        		//.authenticationEntryPoint(this.jwtAuthenticationEntryPointBean())
-		        		.accessDeniedHandler(accessDeniedHandler())
-		        //.and()
-				//	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			;
-			*/
 		// @formatter:on
 		
 		// If no allowed origin, mean only allow from same domain

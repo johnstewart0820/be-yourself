@@ -62,6 +62,22 @@ label.disabled {
 	}
 }
 
+select.selectpicker[disabled] + button {
+	background-color: #e9ecef;
+	border: 1px solid #ced4da;
+	box-shadow: none;
+	color: #a0a0a0;
+    opacity: 1;
+}
+
+.form-control[disabled] {
+	color: #a0a0a0;
+}
+
+.form-control[disabled] + .input-group-prepend .input-group-text {
+	color: #a0a0a0;
+}
+
 /********* Modal *************/
 .modal-header.modal-header-warning {
 	background-color: #fb6340; 

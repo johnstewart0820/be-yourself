@@ -47,6 +47,7 @@ public final class Constants {
 			
 			public static final String REGISTER = "/register";
 			public static final String ACTIVATE = "/activate";
+			public static final String FORGOT_PASSWORD = "/forgot-password";
 			public static final String SEND_ACTIVATE_CODE = "/send-activate-code";
 			
 			public static final String VERIFY_TOKEN_GOOGLE = "/google/verify-token";

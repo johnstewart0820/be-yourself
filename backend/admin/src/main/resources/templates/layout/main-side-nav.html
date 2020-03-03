@@ -17,7 +17,7 @@
 		<a th:href="@{/}" class="navbar-brand pt-0">
 			<img th:src="@{/images/brand/blue.png}" class="navbar-brand-img" alt="...">
 		</a>
-		  
+		
 		<!-- User -->
 		<!-- 
 		<ul class="nav align-items-center d-md-none">
@@ -95,6 +95,7 @@
 			</div>
 
 			<!-- Search form -->
+			<!-- 
 			<form th:if="${baseURL != null && baseURL != ''}" 
 				role="form" th:action="${baseURL} + '/search'" method="get" class="mt-4 mb-3 d-md-none">
 		  		<div class="input-group input-group-rounded input-group-merge">
@@ -107,99 +108,103 @@
 					</div>
 		  		</div>
 			</form>
-
+			-->
+			
 			<!-- Navigation -->
 			<ul class="navbar-nav">
-		  		<li class="nav-item active ">
+		  		<li th:class="${'nav-item' + (currentFunction == '' || currentFunction == '/' ? ' active' : '')}">
 					<a class="nav-link" th:href="@{/}">
 			  			<i class="fas fa-home"></i> <span th:text="#{menu.home}">Home</span>
 					</a>
 		  		</li>
 		  		
-		  		<th:block sec:authorize="hasAnyRole('ROLE_SAM', 'ROLE_ADM')">
-			  		<li class="nav-item">
-						<a class="nav-link" th:href="@{/users}">
-				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.user.management}"></span>
-						</a>
-			  		</li>
-			  		
-			  		<li class="nav-item" th:if="${permission.hasPermission('/professional')}">
-						<a class="nav-link" th:href="@{/professional}">
-				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.professional}"></span>
-						</a>
-					</li>
-
-		  			<li class="nav-item" th:if="${permission.hasPermission('/subtype')}">
-						<a class="nav-link" th:href="@{/subtype}">
-				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.subscriptions.type}"></span>
-						</a>
-					</li>
-					
-					<li class="nav-item" th:if="${permission.hasPermission('/subscription')}">
-						<a class="nav-link" th:href="@{/subscription}">
-				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.subscriptions}"></span>
-						</a>
-					</li>
-							
-			  		
-			  		<th:block th:if="${permission != null}">
-			  			<li class="nav-item" th:if="${permission.hasPermission('/session-category')}">
+		  		<th:block sec:authorize="hasAnyRole('ROLE_ADM')">
+		  			<th:block th:if="${permission != null}">
+		  				<!-- 
+			  			<h6 th:if="${permission.hasPermission('/session-category', '/session')}" 
+			  				class="navbar-heading text-muted"
+			  				th:utext="#{menu.group.session}"></h6>
+			  			-->
+			  			<li th:if="${permission.hasPermission('/session-category')}"
+			  				th:class="${'nav-item' + (currentFunction == '/session-category' ? ' active' : '')}">
 							<a class="nav-link" th:href="@{/session-category}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.session.category}"></span>
+					  			<i class="fas fa-list"></i> <span th:text="#{menu.session.category}"></span>
 							</a>
 				  		</li>
 				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/session')}">
+				  		<li th:if="${permission.hasPermission('/session')}"
+				  			th:class="${'nav-item' + (currentFunction == '/session' ? ' active' : '')}">
 							<a class="nav-link" th:href="@{/session}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.session}"></span>
+					  			<i class="fas fa-compact-disc"></i> <span th:text="#{menu.session}"></span>
 							</a>
 				  		</li>
 				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/discount-code', '/discount-code-0', '/discount-code-1', '/discount-code-2', '/discount-code-3')}">
+				  		<li th:class="${'nav-item' + (currentFunction == '/users' ? ' active' : '')}">
+							<a class="nav-link" th:href="@{/users}">
+					  			<i class="fas fa-user"></i> <span th:text="#{menu.user.management}"></span>
+							</a>
+				  		</li>
+			  		
+				  		<li th:if="${permission.hasPermission('/professional')}" 
+				  			th:class="${'nav-item' + (currentFunction == '/professional' ? ' active' : '')}">
+							<a class="nav-link" th:href="@{/professional}">
+					  			<i class="fas fa-user-graduate"></i> <span th:text="#{menu.professional}"></span>
+							</a>
+						</li>
+	
+			  			<li th:if="${permission.hasPermission('/subtype')}"
+			  				th:class="${'nav-item' + (currentFunction == '/subtype' ? ' active' : '')}">
+							<a class="nav-link" th:href="@{/subtype}">
+					  			<i class="fas fa-book"></i> <span th:text="#{menu.subscriptions.type}"></span>
+							</a>
+						</li>
+						
+						<li th:if="${permission.hasPermission('/subscription')}"
+							th:class="${'nav-item' + (currentFunction == '/subscription' ? ' active' : '')}">
+							<a class="nav-link" th:href="@{/subscription}">
+					  			<i class="fas fa-handshake"></i> <span th:text="#{menu.subscriptions}"></span>
+							</a>
+						</li>
+							
+				  		<li th:if="${permission.hasPermission('/discount-code', '/discount-code-0', '/discount-code-1', '/discount-code-2', '/discount-code-3')}"
+				  			th:class="${'nav-item' + (currentFunction == '/discount-code' || currentFunction == '/discount-code-0' || currentFunction == '/discount-code-1' || currentFunction == '/discount-code-2' || currentFunction == '/discount-code-3' ? ' active' : '')}">
 							<a class="nav-link" th:href="@{/discount-code}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.discount.code}"></span>
+					  			<i class="fas fa-percent"></i> <span th:text="#{menu.discount.code}"></span>
 							</a>
 				  		</li>
 				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/gift')}">
+				  		<li th:if="${permission.hasPermission('/gift')}"
+				  			th:class="${'nav-item' + (currentFunction == '/gift' ? ' active' : '')}">
 							<a class="nav-link" th:href="@{/gift}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.gift}"></span>
+					  			<i class="fas fa-gift"></i> <span th:text="#{menu.gift}"></span>
 							</a>
 				  		</li>
 				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/slideshow')}">
+				  		<li th:if="${permission.hasPermission('/slideshow')}"
+				  			th:class="${'nav-item' + (currentFunction == '/slideshow' ? ' active' : '')}">
 							<a class="nav-link" th:href="@{/slideshow}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.slideshow}"></span>
+					  			<i class="fas fa-images"></i> <span th:text="#{menu.slideshow}"></span>
 							</a>
 				  		</li>
 				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/splash-screen')}">
+				  		<li th:if="${permission.hasPermission('/splash-screen')}"
+				  			th:class="${'nav-item' + (currentFunction == '/splash-screen' ? ' active' : '')}">
 							<a class="nav-link" th:href="@{/splash-screen}">
-					  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.splash.screen}"></span>
-							</a>
-				  		</li>
-				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/admin-user')}">
-							<a class="nav-link " href="../examples/maps.html">
-					  			<i class="ni ni-pin-3 text-orange"></i> <span th:text="#{greeting}"></span>
-							</a>
-				  		</li>
-				  		
-				  		<li class="nav-item" th:if="${permission.hasPermission('/temp')}">
-							<a class="nav-link " href="../examples/maps.html">
-					  			<i class="ni ni-pin-3 text-orange"></i> <span th:text="#{greeting}"></span>
+					  			<i class="fas fa-eye"></i> <span th:text="#{menu.splash.screen}"></span>
 							</a>
 				  		</li>
 				  	</th:block>
 			  	</th:block>
 			  	
+			  	<!--
 			  	<th:block sec:authorize="isAuthenticated()">
 			  		<li class="nav-item">
-						<a class="nav-link" th:href="@{/oauth/profile}">
+						<a class="nav-link" th:href="@{/users/settings}">
 				  			<i class="fas fa-user-circle text-yellow"></i> <span th:text="#{menu.profile}">My Profile</span>
 						</a>
 			  		</li>
 			  	</th:block>
+			  	-->
 			  	
 		  		<th:block sec:authorize="!isAuthenticated()">
 			  		<li class="nav-item">
@@ -215,13 +220,11 @@
 			  	</th:block>
 			</ul>
 			
-			<!-- Divider -->
+			<!-- 
 			<hr class="my-3">
 		
-			<!-- Heading -->
 			<h6 class="navbar-heading text-muted">Documentation</h6>
 			
-			<!-- Navigation -->
 			<ul class="navbar-nav mb-md-3">
 		  		<li class="nav-item">
 					<a class="nav-link" href="https://demos.creative-tim.com/argon-dashboard/docs/getting-started/overview.html">
@@ -239,7 +242,7 @@
 					</a>
 		  		</li>
 			</ul>
-
+			
 			<ul class="navbar-nav">
 		  		<li class="nav-item active active-pro">
 					<a class="nav-link" href="../examples/upgrade.html">
@@ -247,6 +250,7 @@
 					</a>
 		  		</li>
 			</ul>
+			-->
 	  	</div>
 	</div>
 </body>

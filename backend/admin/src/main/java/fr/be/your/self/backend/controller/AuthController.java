@@ -61,6 +61,11 @@ public class AuthController {
         return "login";
     }
 	
+	@GetMapping(Constants.PATH.AUTHENTICATION.REGISTER)
+    public String registerPage(Model model) {
+        return "register";
+    }
+	
 	@GetMapping(Constants.PATH.AUTHENTICATION.ACTIVATE)
     public String activatePage(
     		@RequestParam(name = "code", required = false) String activateCode,
