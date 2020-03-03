@@ -163,38 +163,84 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		model.addAttribute("mainDto", mainDto);
 	}
 	
-	/*
 	@PostMapping("/create-schedule")
 	@Transactional
     public String createDomain(
-    		@ModelAttribute("dto") @Validated Slideshow dto, 
+    		@ModelAttribute("newScheduleDto") @Validated SlideshowDto dto, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
-        if (result.hasErrors()) {
+		
+		if (result.hasErrors()) {
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
-        final Slideshow domain = this.newDomain();
-        dto.copy(domain);
-        
-        final Slideshow savedDomain = this.mainService.create(domain);
-        
-        // ====> Error, delete upload file
-        if (savedDomain == null || result.hasErrors()) {
-        	if (!result.hasErrors()) {
-	        	final ObjectError error = this.createProcessingError(result);
-	        	result.addError(error);
-        	}
+        // ====> Validate image file
+        final MultipartFile uploadImageFile = dto.getUploadImageFile();
+        if (uploadImageFile == null || uploadImageFile.isEmpty()) {
+        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image required");
+        	result.addError(error);
         	
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
-        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+        // ====> Process upload image file
+        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
+        if (uploadImageFilePath == null) {
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        }
         
-        return "redirect:" + this.getBaseURL();
+        // ====> Update domain
+        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+        
+        final Slideshow domain = this.newDomain();
+        dto.copyToDomain(domain);
+        
+        try {
+        	final Slideshow savedDomain = this.mainService.create(domain);
+        	
+        	// ====> Error, delete upload file
+            if (savedDomain == null || result.hasErrors()) {
+            	this.deleteUploadFile(uploadImageFilePath);
+            	
+            	if (!result.hasErrors()) {
+    	        	final ObjectError error = this.createProcessingError(result);
+    	        	result.addError(error);
+            	}
+            	
+            	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+            }
+	        
+            // ====> Create new image
+	        final SlideshowImage newImage = new SlideshowImage();
+	        newImage.setSlideshow(domain);
+	        newImage.setImage(uploadImageFileName);
+	        newImage.setIndex(1);
+	        
+	        final SlideshowImage savedImage = this.mainService.createImage(newImage);
+	        
+	        // ====> Error, delete upload file
+	        if (savedImage == null || result.hasErrors()) {
+	        	this.deleteUploadFile(uploadImageFilePath);
+	        	
+	        	if (!result.hasErrors()) {
+		        	final ObjectError error = this.createProcessingError(result);
+		        	result.addError(error);
+	        	}
+	        	
+	        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+	        }
+	        
+	        // ====> Success
+	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
+        } catch (Exception ex) {
+        	this.deleteUploadFile(uploadImageFilePath);
+        	
+        	throw ex;
+		}
     }
-	*/
 	
 	@PostMapping("/update-main/{id}")
 	@Transactional
@@ -290,45 +336,74 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		}
     }
 	
-	/*
-	@PostMapping(value = { "/delete/{id}" })
+	@PostMapping("/update-schedule/{id}")
 	@Transactional
-    public String deletePage(
-    		@PathVariable(name = "id", required = true) Integer id,
+    public String updateScheduleDomain(
+    		@PathVariable("id") Integer id, 
+    		MultipartFile uploadImageFile, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		RedirectAttributes redirectAttributes, Model model) {
+    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
-		final Slideshow domain = this.mainService.getById(id);
-		if (domain == null) {
-			final String message = this.getIdNotFoundMessage(id);
-			
-			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        
-			return "redirect:" + this.getBaseURL() + "/current-page";
-		}
-		
-		final boolean result = this.mainService.delete(id);
-		if (result) {
-			// ====> Success
-			final String message = this.getDeleteSuccessMessage(id);
-			
-			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-			
-			return "redirect:" + this.getBaseURL();
-		}
-		
-		final String message = this.getDeleteByIdErrorMessage(id);
-		
-		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+        if (result.hasErrors()) {
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        }
         
-		return "redirect:" + this.getBaseURL() + "/current-page";
-	}*/
+        Slideshow domain = this.mainService.getById(id);
+        if (domain == null || domain.getStartDate() == null || domain.getEndDate() == null) {
+        	final ObjectError error = this.createIdNotFoundError(result, id);
+        	result.addError(error);
+        	
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        }
+        
+        // ====> Validate image file
+        if (uploadImageFile == null || uploadImageFile.isEmpty()) {
+        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image required");
+        	result.addError(error);
+        	
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        }
+        
+        // ====> Process upload image file
+        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
+        if (uploadImageFilePath == null) {
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+        }
+        
+        // ====> Create new image
+        try {
+	        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+	        
+	        final SlideshowImage newImage = new SlideshowImage();
+	        newImage.setSlideshow(domain);
+	        newImage.setImage(uploadImageFileName);
+	        newImage.setIndex(this.mainService.getMaxImageIndex(id) + 1);
+	        
+	        final SlideshowImage savedImage = this.mainService.createImage(newImage);
+	        
+	        // ====> Error
+	        if (savedImage == null || result.hasErrors()) {
+	        	this.deleteUploadFile(uploadImageFilePath);
+	        	
+	        	if (!result.hasErrors()) {
+		        	final ObjectError error = this.createProcessingError(result);
+		        	result.addError(error);
+	        	}
+	        	
+	        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, null);
+	        }
+	        
+	        // ====> Success
+	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
+        } catch (Exception ex) {
+        	this.deleteUploadFile(uploadImageFilePath);
+        	
+        	throw ex;
+		}
+    }
 	
 	@PostMapping(value = { "/delete-image/{type}/{imageId}" })
 	@Transactional

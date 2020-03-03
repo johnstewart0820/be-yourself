@@ -107,21 +107,20 @@
 									<td nowrap class="text-right">
 										<th:block th:switch="${item.type}">
 											<th:block th:case="3">
+												<span th:text="${item.discountValue % 1 == 0 ? #numbers.formatDecimal(item.discountValue, 0, 0) : item.discountValue}"></span>
 												<th:block th:switch="${item.discountType}">
 													<th:block th:case="0">
-														<th:block th:case="item.discountValue">
-															<span th:case="100">100</span>
-															<span th:case="*" th:text="${item.discountValue}"></span>
-														</th:block>
 														<span>%</span>
 													</th:block>
 													<th:block th:case="*">
-														<span th:text="${item.discountValue}"></span>
 														<span th:text="${priceUnitSymbol}"></span>
 													</th:block>
 												</th:block>
 											</th:block>
-											<span th:case="*">100%</span>
+											<th:block th:case="*">
+												<span>100</span>
+												<span>%</span>
+											</th:block>
 										</th:block>
 									</td>
 									<td nowrap>

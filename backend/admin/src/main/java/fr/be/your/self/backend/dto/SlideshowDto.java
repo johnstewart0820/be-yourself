@@ -53,6 +53,11 @@ public class SlideshowDto extends BaseDto {
 		}
 	}
 
+	public void copyToDomain(Slideshow domain) {
+		domain.setStartDate(startDate);
+		domain.setEndDate(endDate);
+	}
+	
 	public int getId() {
 		return id;
 	}

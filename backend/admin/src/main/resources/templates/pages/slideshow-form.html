@@ -165,6 +165,12 @@
 				</div>
 				
 				<th:block th:each="schedule : ${result.items}">
+					<div class="row">
+						<div class="col-12 group-header">
+							<h3 class="mb-0 form-title-label" th:utext="#{slideshow.header.current.schedule}"></h3>
+						</div>
+					</div>
+					
 					<div class="testimonial-group">
 	 					<div class="row">
 	 						<th:block th:if="${schedule.images != null}">
@@ -188,7 +194,7 @@
 	 				
 	 				<form action="#" th:action="${writePermission ? baseURL + '/update-schedule/' + schedule.id : 'javascript:;'}"
 						th:id="${pageName + '-schedule-data-form-' + schedule.id}"
-						th:object="${schedule}" method="post" enctype="multipart/form-data">
+						method="post" enctype="multipart/form-data">
 						
 						<div class="form-group mb-0">
 							<div class="input-group input-group-alternative">
@@ -196,7 +202,7 @@
 									<span class="input-group-text" th:utext="#{slideshow.label.add.image}"></span>
 								</div>
 								<div class="custom-file">
-									<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" 
+									<input type="file" class="custom-file-input"  
 										th:id="${'upload-image-file-schedule' + schedule.id}" 
 										th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
 										th:accept="${supportImageTypes}" onChange="selectScheduleImage(this)" 
@@ -238,7 +244,7 @@
  					</div>
  				</div>
  				
- 				<form action="#" th:action="${writePermission ? baseURL + '/new-schedule/' : 'javascript:;'}"
+ 				<form action="#" th:action="${writePermission ? baseURL + '/create-schedule/' : 'javascript:;'}"
 					th:id="${pageName + '-new-schedule-data-form'}"
 					th:object="${newScheduleDto}" method="post" enctype="multipart/form-data">
 					
