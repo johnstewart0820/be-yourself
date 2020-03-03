@@ -354,6 +354,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		
 		return result;
 	}
+	
 
 	@Override
 	public Iterable<User> findAllByUserType(String userType) {
@@ -365,5 +366,47 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 		return this.repository.findAllByStatus(status);
 	}
 
+	@Override
+	public PageableResponse<User> pageableSearchPro(String search, PageRequest pageable, Sort sort) {
+		Page<User> page;
+		
+		if (pageable == null) {//Not paging
+			Iterable<User> users;
+
+			if (StringUtils.isNullOrSpace(search))	{
+				users  =  this.repository.findAllByUserType(UserType.PROFESSIONAL.getValue());
+			} else {
+				users =  this.repository.searchByUserTypeAndEmailOrFirstNameOrLastName(UserType.PROFESSIONAL.getValue(), search);
+			}
+			
+			List<User> usersList = new ArrayList<>();
+		
+			if (users != null) {
+				users.forEach(usersList::add);
+			}	
+			final PageableResponse<User> result = createPageableResponse(usersList);
+			
+			return result;
+		}
+		
+		if (StringUtils.isNullOrSpace(search))	{
+			page  =  this.repository.findAllByUserType(UserType.PROFESSIONAL.getValue(), pageable);
+		} else {
+			page =  this.repository.searchByUserTypeAndEmailOrFirstNameOrLastName(UserType.PROFESSIONAL.getValue(), search, pageable);
+
+		}
+		return new PageableResponse<>(page);
+
+	}
+
+	private PageableResponse<User> createPageableResponse(List<User> usersList) {
+		final PageableResponse<User> result = new PageableResponse<>();
+		result.setItems(usersList);
+		result.setTotalItems(usersList.size());
+		result.setTotalPages(1);
+		result.setPageIndex(1);
+		result.setPageSize(-1);
+		return result;
+	}
 	
 }

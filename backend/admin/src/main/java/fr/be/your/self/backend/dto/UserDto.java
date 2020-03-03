@@ -3,8 +3,20 @@ package fr.be.your.self.backend.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import fr.be.your.self.common.UserType;
+import fr.be.your.self.model.Address;
 import fr.be.your.self.model.Permission;
+import fr.be.your.self.model.ProfessionalEvent;
 import fr.be.your.self.model.User;
+import fr.be.your.self.model.UserFile;
 
 public class UserDto implements Serializable {
 
@@ -25,6 +37,19 @@ public class UserDto implements Serializable {
 	private String activateCode;
 	private long activateTimeout;
 	private String subtype;
+	
+	private String phoneNumber;
+	private String formation;
+	private String website;
+	private String facebook;
+	private String linkedin;
+	private boolean supervised;
+	private String profilePicture;
+	private String description;
+	
+	private Address address;
+	private List<UserFile> userFiles;
+	private ProfessionalEvent event;
 	
 	public UserDto() {
 	}
@@ -47,10 +72,20 @@ public class UserDto implements Serializable {
 			if (domain.getSubscription() != null && domain.getSubscription().getSubtype()!=null) {
 				this.setSubtype(domain.getSubscription().getSubtype().getName());
 			}
-		
+			
+			this.phoneNumber = domain.getPhoneNumber();
+			this.formation = domain.getFormation();
+			this.website = domain.getWebsite();
+			this.facebook = domain.getFacebook();
+			this.linkedin = domain.getLinkedin();
+			this.supervised = domain.isSupervised();
+			this.profilePicture = domain.getProfilePicture();
+			this.description = domain.getDescription();
+			this.address = domain.getAddress();
+			this.userFiles = domain.getUserFiles();
+			this.event = domain.getEvent();		
 		}
 	}
-	
 	
 	public void copyToDomain(User domain) {
 		domain.setEmail(this.email);
@@ -58,11 +93,27 @@ public class UserDto implements Serializable {
 		domain.setId(this.id);
 		domain.setLastName(this.lastName);
 		domain.setLoginType(this.loginType);
-		//TODO TVA check why we need to comment heredomain.setPermissions(this.permissions);
+		//TODO TVA check why we need to comment here domain.setPermissions(this.permissions);
 		domain.setReferralCode(this.referralCode);
 		domain.setStatus(this.status);
 		domain.setTitle(this.title);
 		domain.setUserType(this.userType);
+	}
+	
+	//Used in professional page
+	public void copyToDomainOfProfessional(User domain) {
+		domain.setEmail(this.email);
+		domain.setFirstName(this.firstName);
+		domain.setId(this.id);
+		domain.setLastName(this.lastName);
+		domain.setPhoneNumber(phoneNumber);
+		domain.setFormation(formation);
+		domain.setWebsite(website);
+		domain.setFacebook(facebook);
+		domain.setLinkedin(linkedin);
+		domain.setSupervised(supervised);
+		domain.setProfilePicture(profilePicture);
+		domain.setDescription(description);	
 	}
 
 
@@ -148,6 +199,73 @@ public class UserDto implements Serializable {
 	}
 	public void setSubtype(String subtype) {
 		this.subtype = subtype;
+	}
+	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+	public String getFormation() {
+		return formation;
+	}
+	public void setFormation(String formation) {
+		this.formation = formation;
+	}
+	public String getWebsite() {
+		return website;
+	}
+	public void setWebsite(String website) {
+		this.website = website;
+	}
+	public String getFacebook() {
+		return facebook;
+	}
+	public void setFacebook(String facebook) {
+		this.facebook = facebook;
+	}
+	public String getLinkedin() {
+		return linkedin;
+	}
+	public void setLinkedin(String linkedin) {
+		this.linkedin = linkedin;
+	}
+	public boolean isSupervised() {
+		return supervised;
+	}
+	public void setSupervised(boolean supervised) {
+		this.supervised = supervised;
+	}
+	public String getProfilePicture() {
+		return profilePicture;
+	}
+	public void setProfilePicture(String profilePicture) {
+		this.profilePicture = profilePicture;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public Address getAddress() {
+		return address;
+	}
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+	public List<UserFile> getUserFiles() {
+		return userFiles;
+	}
+	public void setUserFiles(List<UserFile> userFiles) {
+		this.userFiles = userFiles;
+	}
+	public ProfessionalEvent getEvent() {
+		return event;
+	}
+	public void setEvent(ProfessionalEvent event) {
+		this.event = event;
 	}
 	
 }

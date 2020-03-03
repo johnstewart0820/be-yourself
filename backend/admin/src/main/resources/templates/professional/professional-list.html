@@ -38,53 +38,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-md-3 text-right">
-						<div class="form-group">
-							<div class="input-group input-group-alternative mb-3">
-								<select id="filter_subtype" class="selectpicker show-tick"
-									multiple data-actions-box="true" data-live-search="true"
-									th:data-select-all-text="#{data.display.button.select.all}"
-									th:data-deselect-all-text="#{data.display.button.deselect.all}"
-									th:title="#{|${baseMessageKey}.option.filter.subtype.title|}"
-									th:data-none-selected-text="#{|${baseMessageKey}.option.filter.subtype.title|}"
-									data-selected-text-format="count > 2"
-									th:data-count-selected-text="#{|${baseMessageKey}.option.filter.subtype.many|}">
-									<option th:each="subtype: ${subtypes}" th:value="${subtype.id}"
-										th:text="${subtype.name}"
-										th:selected="${#arrays.contains(filteredSubscriptionTypesIds, subtype.id)}"></option>
-								</select>
-								</div>
-						</div>
-					</div>
-					<div class="col-md-3 text-right">
-
-						<div class="form-group">
-							<div class="input-group input-group-alternative mb-3">
-								<select id="filter_role" name="filter_role" class="form-control">
-									<option value="">FILTER BY ROLE</option>
-									<option th:each="userType : ${userTypes}"
-										th:value="${userType}" th:text="#{'user.type.' + ${userType}}">></option>
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3 text-right">
-
-
-						<div class="form-group">
-							<div class="input-group input-group-alternative mb-3">
-								<select id="filter_status" name="filter_status"
-									class="form-control">
-									<option value="-2">FILTER BY STATUS</option>
-									<option th:each="userStatus : ${userStatuses}"
-										th:value="${userStatus}"
-										th:text="#{'user.status.' + ${userStatus}}">></option>
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3 text-right">
-
+					<div class="offset-md-9 col-md-3 text-right">
 						<div class="form-group">
 							<div class="input-group input-group-alternative mb-3">
 								<select id="display-page-option" class="selectpicker show-tick"
@@ -106,21 +60,6 @@
 			</form>
 		</div>
 
-		<div class="row mb-3">
-			<div class="col">
-				<a href="#select_users" class="btn btn-sm btn-primary">Select /
-				Deselect all</a> 
-				<a href="#" class="btn btn-sm btn-primary"
-				onclick="document.getElementById('select_user_form').submit();">Export
-				CSV</a> 
-				<a th:href="${baseURL + '/upload_csv_form'}"
-				class="btn btn-sm btn-primary" th:if="${writePermission}">Import
-				CSV</a> 
-				<a th:href="${baseURL + '/resetpwdbyemail'}"
-				class="btn btn-sm btn-primary" th:if="${writePermission}">Reset
-				password by email</a>
-			</div>
-		</div>
 
 		<!-- Table -->
 		<div class="row">
@@ -135,29 +74,24 @@
 						<table class="table align-items-center table-flush" id="user_table">
 							<thead class="thead-light">
 								<tr>
-									<th scope="col"></th>
 									<th scope="col">Email</th>
 									<th scope="col">FullName</th>
-									<th scope="col">Status</th>
-									<th scope="col">Subscription Type</th>
-									<th scope="col">Role</th>
+									<th scope="col">Address</th>
+									<th scope="col">Supervised</th>
 									<th scope="col"  th:if="${writePermission}"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${result.items}">
-									<td>
-										<input type="checkbox"  name="selected_id"  id="selected_id" th:value="${item.id}"></input>
-									</td>
 									<td><span th:text="${item.email}"> Email </span> </td>
 									<td><span th:if="${item != null}" th:utext="${item.fullName}"></span></td>
-									<td > <span th:if="${item != null}" th:utext="#{'user.status.' + ${item.status}}"></span> </td>
+									<td > <span th:if="${item != null && item.address != null}" th:utext="${item.address.address}"></span> </td>
 
-									<td ><span th:if="${item != null && item.subscription != null && 
-												item.subscription.subtype != null}" 
-												th:utext="${item.subscription.subtype.name}"></span></td>
-									<td> <span th:if="${item != null}" th:utext="#{'user.type.' + ${item.userType}}"></span> </td>
-																	
+									<td nowrap>
+										<span th:if="${item.supervised}"><i	class="fas fa-check"></i></span> 
+										<span th:unless="${item.supervised}"><i class="fas fa-times"></i></span>
+									</td>
+																										
 									 <td class="text-right" th:if="${writePermission}">
 										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
 											<span class="btn-inner--icon">
@@ -311,6 +245,7 @@
 		
 		$('#display-page-option').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 			const selectedPageSize = $('#display-page-option').val();
+			
 			window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size=' + selectedPageSize;
 		});
 	});

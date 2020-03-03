@@ -122,6 +122,12 @@
 				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.user.management}"></span>
 						</a>
 			  		</li>
+			  		
+			  		<li class="nav-item" th:if="${permission.hasPermission('/professional')}">
+						<a class="nav-link" th:href="@{/professional}">
+				  			<i class="fas fa-user text-blue"></i> <span th:text="#{menu.professional}"></span>
+						</a>
+					</li>
 
 		  			<li class="nav-item" th:if="${permission.hasPermission('/subtype')}">
 						<a class="nav-link" th:href="@{/subtype}">

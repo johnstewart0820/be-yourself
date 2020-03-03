@@ -1,5 +1,6 @@
 package fr.be.your.self.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -9,7 +10,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -63,7 +68,30 @@ public class User extends PO<Integer> {
 	private String activateCode;
 
 	private long activateTimeout;
-
+	
+	/*************Fields for professional****************/
+	private String phoneNumber;
+	private String formation;
+	private String website;
+	private String facebook;
+	private String linkedin;
+	private boolean supervised;
+	private String profilePicture;
+	
+	@Lob
+	private String description;
+	
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "address_id")
+	private Address address;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	private List<UserFile> userFiles;
+	
+	@OneToOne(fetch = FetchType.LAZY,  mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	private ProfessionalEvent event;
+	
 	public User() {
 	}
 
@@ -207,4 +235,97 @@ public class User extends PO<Integer> {
 		Subscription sub = UserUtils.findSubscriptionUser(this);
 		return sub;
 	}
+	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	public String getFormation() {
+		return formation;
+	}
+
+	public void setFormation(String formation) {
+		this.formation = formation;
+	}
+
+
+	public boolean isSupervised() {
+		return supervised;
+	}
+
+	public void setSupervised(boolean supervised) {
+		this.supervised = supervised;
+	}
+
+	public String getProfilePicture() {
+		return profilePicture;
+	}
+
+	public void setProfilePicture(String profilePicture) {
+		this.profilePicture = profilePicture;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<UserFile> getUserFiles() {
+		return userFiles;
+	}
+
+	public void setUserFiles(List<UserFile> userFiles) {
+		this.userFiles = userFiles;
+	}
+
+	public ProfessionalEvent getEvent() {
+		return event;
+	}
+
+	public void setEvent(ProfessionalEvent event) {
+		this.event = event;
+	}
+
+	public String getWebsite() {
+		return website;
+	}
+
+	public void setWebsite(String website) {
+		this.website = website;
+	}
+
+	public String getFacebook() {
+		return facebook;
+	}
+
+	public void setFacebook(String facebook) {
+		this.facebook = facebook;
+	}
+
+	public String getLinkedin() {
+		return linkedin;
+	}
+
+	public void setLinkedin(String linkedin) {
+		this.linkedin = linkedin;
+	}
+
+	
+	
+	
 }

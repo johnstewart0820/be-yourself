@@ -91,11 +91,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	@Autowired
 	private UserService userService;
 	
-	
 	@Autowired
 	SubscriptionTypeService subtypeService;
-
-
 
 	
 	
@@ -414,7 +411,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		return this.getName() + "/simple_status";
 	}
 
-	
 
 	
 	private List<UserCSV> readCsvFile(MultipartFile file) throws Exception {

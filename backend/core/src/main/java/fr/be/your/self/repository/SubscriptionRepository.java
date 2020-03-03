@@ -12,5 +12,5 @@ public interface SubscriptionRepository extends BaseRepository<Subscription, Int
 	    	"SELECT s FROM Subscription s WHERE lower(s.user.firstName) = lower(:text) "
 	    	+ " or lower(s.user.lastName) = lower(:text) or lower(s.user.email) = lower(:text)"
 	    )
-	Page<Subscription> searchByFirstNameOrLastNameOrEmail(@Param("text") String lasttextName, Pageable pageable);
+	Page<Subscription> searchByFirstNameOrLastNameOrEmail(@Param("text") String text, Pageable pageable);
 }

@@ -19,6 +19,9 @@ public final class Constants {
 			public static final String GIFT = "/gift";
 			public static final String SPLASH_SCREEN = "/splash-screen";
 			public static final String SLIDE_SHOW = "/slide-show";
+			
+			public static final String PROFESSIONAL = "/professional";
+
 		}
 	}
 	

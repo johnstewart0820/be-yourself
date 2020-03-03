@@ -40,6 +40,7 @@ public interface UserRepository extends BaseRepository<User, Integer> {
     Iterable<User> findAllByUserTypeAndStatusAndFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String userType, int status, 
     		String firstName, String lastName, Sort sort);
     
+    
     Page<User> findAllByUserTypeAndStatus(String userType, int status, Pageable pageable);
     Iterable<User> findAllByUserTypeAndStatus(String userType, int status, Sort sort);
     
@@ -69,4 +70,14 @@ public interface UserRepository extends BaseRepository<User, Integer> {
         	value = "SELECT u FROM User u, Subscription s, SubscriptionType st WHERE u.id = s.user AND s.subtype=st.id  AND st.id IN :subtypeIds"
         )
     Iterable<User> findAllBySubscriptionType(@Param("subtypeIds") Collection<Integer> subtypeIds);
+    
+    @Query(
+        	value = "SELECT u FROM User u WHERE lower(u.userType) LIKE lower(concat('%', :userType,'%')) AND ( (lower(u.email) LIKE lower(concat('%', :text,'%'))) OR  (lower(u.firstName) LIKE lower(concat('%', :text,'%'))) OR  (lower(u.lastName) LIKE lower(concat('%', :text,'%'))) )"
+    )
+    Page<User> searchByUserTypeAndEmailOrFirstNameOrLastName(@Param("userType") String userType, @Param("text") String text, Pageable pageable);
+    
+    @Query(
+        	value = "SELECT u FROM User u WHERE lower(u.userType) LIKE lower(concat('%', :userType,'%')) AND ( (lower(u.email) LIKE lower(concat('%', :text,'%'))) OR  (lower(u.firstName) LIKE lower(concat('%', :text,'%'))) OR  (lower(u.lastName) LIKE lower(concat('%', :text,'%'))) )"
+    )
+    Iterable<User> searchByUserTypeAndEmailOrFirstNameOrLastName(@Param("userType") String userType, @Param("text") String text);
 }
