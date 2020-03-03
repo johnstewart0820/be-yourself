@@ -87,7 +87,6 @@ public class UserDto implements Serializable {
 		}
 	}
 	
-	
 	public void copyToDomain(User domain) {
 		domain.setEmail(this.email);
 		domain.setFirstName(this.firstName);
@@ -99,6 +98,14 @@ public class UserDto implements Serializable {
 		domain.setStatus(this.status);
 		domain.setTitle(this.title);
 		domain.setUserType(this.userType);
+	}
+	
+	//Used in professional page
+	public void copyToDomainOfProfessional(User domain) {
+		domain.setEmail(this.email);
+		domain.setFirstName(this.firstName);
+		domain.setId(this.id);
+		domain.setLastName(this.lastName);
 		domain.setPhoneNumber(phoneNumber);
 		domain.setFormation(formation);
 		domain.setWebsite(website);

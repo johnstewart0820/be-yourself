@@ -24,6 +24,11 @@ public class Address {
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "address")
 	private ProfessionalEvent event;
 
+	public Address() {}
+	
+	public Address(String addr) {
+		this.address = addr;
+	}
 	public int getId() {
 		return id;
 	}
@@ -61,6 +66,9 @@ public class Address {
 		this.event = event;
 	}
 	
-	
+	public static Address newAddress(String addr) {
+		Address address = new Address(addr);
+		return address;
+	}
 	
 }

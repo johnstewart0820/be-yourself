@@ -141,8 +141,14 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		dto.copyToDomain(user);
 		user.setUserType(UserType.PROFESSIONAL.getValue());
 
+		//Create Address
+		Address addr = Address.newAddress(dto.getAddress().getAddress());
+		Address savedAddr = addressService.create(addr);
+				
+		//Create user
+		user.setAddress(savedAddr);
 		User savedUser = userService.create(user);
-		//Address
+		
 		
 
 		//Add default permission value = "Denied" to professionals
@@ -160,7 +166,6 @@ public class ProfessionalController extends BaseResourceController<User, User, U
     public String updateDomain(
     		@PathVariable("id") Integer id, 
     		@ModelAttribute @Validated UserDto dto, 
-    		@RequestParam(value = "addressId" , required = false) Integer addressId,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -183,8 +188,8 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         
         final User updatedDomain = this.userService.update(domain);
         
-        if (addressId != null) {
-        	Address add = addressService.getById(addressId);
+        if (dto.getAddress() != null) {
+        	Address add = addressService.getById(dto.getAddress().getId());
         	add.setAddress(dto.getAddress().getAddress());
         	addressService.update(add);
         }

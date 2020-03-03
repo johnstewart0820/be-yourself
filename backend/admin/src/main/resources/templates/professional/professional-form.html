@@ -89,6 +89,8 @@
 											</div>
 											<!-- Address -->
 											<div class="form-group row">
+												<input type="hidden" th:field="*{address.id}">
+											
 												<label for="email"
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.address|}"></label>
