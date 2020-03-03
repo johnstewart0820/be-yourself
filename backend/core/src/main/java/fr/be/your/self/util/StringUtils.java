@@ -87,7 +87,7 @@ public class StringUtils {
 	    	formattedTime += (String.format("%02d", hours) + ":");
 	    }
 	    
-	    if (minutes > 0 || forceHour) {
+	    if (minutes > 0 || forceMinute) {
 	    	formattedTime += (String.format("%02d", minutes) + ":");
 	    }
 	    
