@@ -18,11 +18,11 @@ public class Subscription extends PO<Integer> {
 	private int id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "userID")
+	@JoinColumn(name = "user_id")
     private User user;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subtypeId")
+	@JoinColumn(name = "subtype_id")
 	private SubscriptionType subtype;
 	
 	private boolean status;

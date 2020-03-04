@@ -3,17 +3,11 @@ package fr.be.your.self.backend.dto;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import org.springframework.web.multipart.MultipartFile;
 
-import fr.be.your.self.common.UserType;
 import fr.be.your.self.model.Address;
 import fr.be.your.self.model.Permission;
+import fr.be.your.self.model.Price;
 import fr.be.your.self.model.ProfessionalEvent;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserFile;
@@ -38,6 +32,7 @@ public class UserDto implements Serializable {
 	private long activateTimeout;
 	private String subtype;
 	
+	//Additional fields for professionals
 	private String phoneNumber;
 	private String formation;
 	private String website;
@@ -46,10 +41,13 @@ public class UserDto implements Serializable {
 	private boolean supervised;
 	private String profilePicture;
 	private String description;
-	
 	private Address address;
 	private List<UserFile> userFiles;
+	private List<Price> prices;
 	private ProfessionalEvent event;
+	
+	private MultipartFile uploadImageFile;
+
 	
 	public UserDto() {
 	}
@@ -84,6 +82,7 @@ public class UserDto implements Serializable {
 			this.address = domain.getAddress();
 			this.userFiles = domain.getUserFiles();
 			this.event = domain.getEvent();		
+			this.prices = domain.getPrices();
 		}
 	}
 	
@@ -266,6 +265,18 @@ public class UserDto implements Serializable {
 	}
 	public void setEvent(ProfessionalEvent event) {
 		this.event = event;
+	}
+	public MultipartFile getUploadImageFile() {
+		return uploadImageFile;
+	}
+	public void setUploadImageFile(MultipartFile uploadImageFile) {
+		this.uploadImageFile = uploadImageFile;
+	}
+	public List<Price> getPrices() {
+		return prices;
+	}
+	public void setPrices(List<Price> prices) {
+		this.prices = prices;
 	}
 	
 }

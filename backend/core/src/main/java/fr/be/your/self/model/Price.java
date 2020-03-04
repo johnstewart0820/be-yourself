@@ -1,5 +1,7 @@
 package fr.be.your.self.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -9,40 +11,49 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class UserFile {
+public class Price {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-    private User user;
+	private String label;
 	
-	private String filePath;
-	private int fileType;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "UserID")	
+	private User user;
+	
+	private BigDecimal price;
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
 	public User getUser() {
 		return user;
 	}
+
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public String getFilePath() {
-		return filePath;
+
+	public BigDecimal getPrice() {
+		return price;
 	}
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
-	public int getFileType() {
-		return fileType;
-	}
-	public void setFileType(int fileType) {
-		this.fileType = fileType;
-	}
-	
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}	
+
 }

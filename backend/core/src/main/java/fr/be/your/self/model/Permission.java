@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "UserID", "FunctionalityID" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "functionality_id" }))
 public class Permission {
 	
 	@Id
@@ -20,14 +20,14 @@ public class Permission {
     private int id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "UserID")
+	@JoinColumn(name = "user_id")
     private User user;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "FunctionalityID")
+	@JoinColumn(name = "functionality_id")
     private Functionality functionality;
 
-	@Column(name = "UserPermission")
+	@Column(name = "user_permission")
     private int userPermission;
 	
 	

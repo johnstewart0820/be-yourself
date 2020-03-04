@@ -15,5 +15,4 @@ public interface AddressRepository extends BaseRepository<Address, Integer> {
 	public Page<Address> findAllByAddressContainsIgnoreCase(String text, Pageable pageable);
 	public Iterable<Address> findAllByAddressContainsIgnoreCase(String text, Sort sort);
 
-
 }

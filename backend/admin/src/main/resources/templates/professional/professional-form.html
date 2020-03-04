@@ -42,7 +42,7 @@
 						<!-- Card body -->
 						<div class="card-body px-lg-5 py-lg-5">
 							<form th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
-								th:object="${dto}" method="post">
+								th:object="${dto}" method="post" enctype="multipart/form-data">
 								<fieldset th:disabled="${!writePermission}">
 									<input type="hidden" th:field="*{id}" />
 									<div class="row">
@@ -107,7 +107,7 @@
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<select class="form-control" id="userId" th:field="*{formation}">
 													<option th:each="formation : ${formations}" th:value="${formation}"
-													 th:text="#{'formation.label.' + ${formation}}"></option>
+													 th:text="#{'formation.level.' + ${formation}}"></option>
 												</select>
 												</div>
 
@@ -143,27 +143,155 @@
 														th:field="*{facebook}" required>
 												</div>
 											</div>
-											<div th:if="${writePermission}" class="form-group row">
-												<div
-													class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12">
-													<div class="form-action-buttons-row">
-														<button type="submit" class="btn btn-primary"
-															th:title="#{action.save.title}">
-															<i class="fas fa-save"></i> <span class="hidden-xs"
-																th:text="#{action.save}"></span>
-														</button>
-
-														<a class="btn btn-outline-warning"
-															th:href="${baseURL + '/current-page'}"
-															th:title="#{action.go.to.list.title}"> <span
-															class="btn-inner--icon"> <i
-																class="fas fa-arrow-left"></i> <span
-																th:text="#{action.go.to.list}"></span>
-														</span>
-														</a>
-													</div>
+											<!-- Is supervised? -->
+											<div class="form-group row">
+												<label for="supervised"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.supervised|}"></label>
+												<div class="col-sm-5 col-xs-10">
+													<input id="supervised" th:field="*{supervised}"
+														type="checkbox">
 												</div>
 											</div>
+											<!-- Profile picture -->
+											<div class="form-group row">
+												<div class="offset-md-3 col-md-4 col-sm-12 text-center" th:if="${action != 'create'}">													
+													<a th:href="${baseMediaURL + '/image/download/' + dto.profilePicture}" 
+														th:title="#{session.category.detail.image.link.title}" target="_blank">
+														<img id="imagePreview" class="image-fit image-preview" 
+														 th:src="${baseMediaURL + '/image/view/' + dto.profilePicture}">
+													</a>
+												</div>
+											</div>
+											
+										 	<th:block th:switch="${action}">
+												<div th:case="create" class="form-group row">
+													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field" 
+														th:text="#{|${baseMessageKey}.detail.image|}"></label>
+													<div class="col-sm-5 col-xs-12">
+														<div class="custom-file">
+															<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
+																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
+																th:accept="${supportImageTypes}" onChange="selectImage(this)" 
+																th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
+															<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
+																th:data-browse="#{action.select.image}"></label>
+														</div>
+													</div>
+												</div>
+	
+												<div th:case="*" class="form-group row">
+													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
+														th:text="#{|${baseMessageKey}.detail.image|}"></label>
+													<div class="col-md-8 col-sm-9 col-xs-12">
+														<div class="custom-file">
+															<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
+																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
+																th:accept="${supportImageTypes}" onChange="selectImage(this)" 
+																th:default-src="${baseMediaURL + '/image/view/' + dto.profilePicture}" />
+															<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
+																th:data-browse="#{action.select.image}" ></label>
+														</div>
+													</div>
+												</div>
+												
+										</th:block>
+										<!-- Description -->
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.description|}"></label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+												<textarea class="form-control" rows="4" id="description"
+													th:field="*{description}"> </textarea>
+												<div class="invalid-feedback"></div>
+											</div>
+										</div>
+										<!-- Prices -->
+										<div  id="price_div">
+											<div class="form-group row" th:each="price, itemStats : ${dto.prices}">
+													<input	type="hidden"
+														th:field="*{prices[__${itemStats.index}__].user}" />
+													<input type="hidden"
+														th:field="*{prices[__${itemStats.index}__].id}" />
+													<input
+														th:field="*{prices[__${itemStats.index}__].label}" />
+													<input 
+														th:field="*{prices[__${itemStats.index}__].price}" />
+												</div>
+										</div>
+										<div class="form-group row">
+											<div class="col-md-4 col-sm-5 col-xs-12">
+													<input class="form-control" type="text" id="price_label">
+											</div>
+											<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
+													<input class="form-control" type="text" id="price_value">
+											</div>
+											<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
+													<button class="form-control" type="button" id="add_price">Add</button>
+											</div>
+										</div>
+										
+										
+										<script>
+										
+											function removeElemById(id) {
+												elem = document.getElementById(id)
+												while( elem.hasChildNodes() ){
+													elem.removeChild(elem.lastChild);
+												}
+												elem.remove();
+											}
+											
+											$(document).ready(function() {
+												var index = /*${#lists.size(dto.prices)}"*/ "0";
+												$("#add_price").click(function() {
+													var current_label=$("#price_label").val();
+													var current_price=$("#price_value").val();
+													
+													var id_new_div="div_"+ index;
+
+													var id_new_label="prices"+ index + ".label";
+													var name_new_label="prices["+ index + "].label";
+
+													var id_new_price="prices"+ index + ".price";
+													var name_new_price="prices["+ index + "].price";
+
+													
+													var new_label = "<input type='text' id='" + id_new_label + "' name='" + name_new_label + "' value='"+current_label+"' required>";
+													var new_price = "<input type='number' step='0.01' id='" + id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
+													var remove_btn = "<input type='button' onclick=removeElemById('" + id_new_div + "')>";
+													
+													var new_inner_div = "<div id='"+ id_new_div + "'>" + new_label + new_price + remove_btn + "</div>";
+													$("#price_div").append(new_inner_div);
+													
+													index++;
+												})
+											})
+										</script>
+										
+										<!-- Save or go back -->
+										<div th:if="${writePermission}" class="form-group row">
+											<div
+												class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12">
+												<div class="form-action-buttons-row">
+													<button type="submit" class="btn btn-primary"
+														th:title="#{action.save.title}">
+														<i class="fas fa-save"></i> <span class="hidden-xs"
+															th:text="#{action.save}"></span>
+													</button>
+
+													<a class="btn btn-outline-warning"
+														th:href="${baseURL + '/current-page'}"
+														th:title="#{action.go.to.list.title}"> <span
+														class="btn-inner--icon"> <i
+															class="fas fa-arrow-left"></i> <span
+															th:text="#{action.go.to.list}"></span>
+													</span>
+													</a>
+												</div>
+											</div>
+										</div>
 										</div>
 									</div>
 								</fieldset>

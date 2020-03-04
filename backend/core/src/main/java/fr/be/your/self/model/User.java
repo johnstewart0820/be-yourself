@@ -1,10 +1,8 @@
 package fr.be.your.self.model;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,7 +13,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -56,6 +53,7 @@ public class User extends PO<Integer> {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<Subscription> subscriptions;
+
 	
 	public List<Subscription> getSubscriptions() {
 		return subscriptions;
@@ -77,7 +75,6 @@ public class User extends PO<Integer> {
 	private String linkedin;
 	private boolean supervised;
 	private String profilePicture;
-	
 	@Lob
 	private String description;
 	
@@ -86,6 +83,12 @@ public class User extends PO<Integer> {
 	@JoinColumn(name = "address_id")
 	private Address address;
 	
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	private List<Price> prices;
+	
+
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<UserFile> userFiles;
 	
@@ -104,7 +107,7 @@ public class User extends PO<Integer> {
 	}
 
 	public String getFullName() {
-		return firstName + " " + lastName;
+		return (firstName != null ? firstName : "")  + " " + (lastName != null ? lastName : "");
 	}
 
 	public List<Permission> getPermissions() {
@@ -325,7 +328,13 @@ public class User extends PO<Integer> {
 		this.linkedin = linkedin;
 	}
 
-	
+	public List<Price> getPrices() {
+		return prices;
+	}
+
+	public void setPrices(List<Price> prices) {
+		this.prices = prices;
+	}
 	
 	
 }

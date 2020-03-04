@@ -141,7 +141,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	@Override
 	protected UserDto createDetailDto(User domain) {
 		UserDto userDto =  new UserDto(domain);
-		if (domain == null) {
+		if (domain == null) { //This is the case when we create new User, if we update user then domain != null
 			addDefaultPermissions(userDto);
 		}
 		
@@ -198,10 +198,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		String tempPwd = null;
 		User savedUser;
 		if (user.getLoginType() == LoginType.PASSWORD.getValue()) {
-			tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
-					
-			String encodedPwd = getPasswordEncoder().encode(tempPwd);
-			user.setPassword(encodedPwd);
+			tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
 		}
 
 		if (userService.existsEmail(user.getEmail())) {
@@ -233,8 +230,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		if (!isAutoActivateAccount) {
 			if (savedUser.getStatus() == UserStatus.DRAFT.getValue()) {
 				String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
-				boolean success = sendVerificationEmailToUser(activateAccountUrl, savedUser);
-				// TODO: Use success variable?
+				sendVerificationEmailToUser(activateAccountUrl, savedUser);
 			}
 			
 			if (tempPwd != null) {
