@@ -50,15 +50,40 @@ label.disabled {
 	cursor: not-allowed;
 }
 
-@media (min-width: 768px) {
-	.md-text-right {
-		text-align: right;
+@media (max-width: 575px) {
+	.sm-btn-block {
+		display: block;
+    	width: 100%;
+	}
+	
+	.sm-btn-block.btn-above {
+		margin-bottom: 1rem;
 	}
 }
 
 @media (min-width: 576px) {
+	.sm-text-right {
+		text-align: right;
+	}
+}
+
+@media (max-width: 767px) {
 	.sm-form-group {
     	margin-bottom: 1rem;
+	}
+	
+	.pb-7, .py-7 {
+    	padding-bottom: 3rem !important;
+	}
+}
+
+@media (min-width: 768px) {
+	.md-text-right {
+		text-align: right;
+	}
+	
+	.sm-form-group {
+    	margin-bottom: 0rem;
 	}
 }
 

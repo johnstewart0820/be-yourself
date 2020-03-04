@@ -15,240 +15,207 @@
 	</th:block>
 	
 	<th:block layout:fragment="content">
-		<!-- Form -->
-		<div class="row">
-			<div class="col">
-				<div class="card shadow">
-					<div class="card-header border-0">
-						<div class="row">
-							<div class="col-lg-6 col-md-12">
-								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/current-page'}"
-									th:title="#{action.go.to.list.title}">
-									<span class="btn-inner--icon">
-										<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
-									</span>
-								</a>
-							</div>
-							
-							<div class="col-lg-6 text-right d-md-none d-lg-block">
-								<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
-							</div>
+		<div class="card shadow">
+			<div class="card-header border-0">
+				<th:block th:replace="fragments/data-page-options :: form-header"></th:block>
+			</div>
+			
+			<div class="card-body border-0">
+				<form action="#" th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
+					th:id="${pageName + '-data-form'}"
+					th:object="${dto}" method="post" enctype="multipart/form-data">
+					<fieldset th:disabled="${!writePermission}">
+						<div th:if="${param.error}">
+							<div class="alert alert-danger">Invalid username and password.</div>
 						</div>
-					</div>
-					
-					<div class="card-body border-0">
-						<form action="#" th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
-							th:id="${pageName + '-data-form'}"
-							th:object="${dto}" method="post" enctype="multipart/form-data">
-							<fieldset th:disabled="${!writePermission}">
-								<div th:if="${param.error}">
-									<div class="alert alert-danger">Invalid username and password.</div>
-								</div>
-				
-								<div th:if="${param.logout}">
-									<div class="alert alert-info">You have been logged out.</div>
+		
+						<div th:if="${param.logout}">
+							<div class="alert alert-info">You have been logged out.</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-md-12 col-sm-12">
+								<div class="form-group row">
+									<label for="name" class="label form-control-label col-lg-2 col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
+										th:text="#{|${baseMessageKey}.detail.name|}"></label>
+									<div class="col-lg-4 col-md-4 col-sm-9 col-xs-12 sm-form-group">
+										<input type="text" class="form-control" 
+											th:field="*{name}" id="name"
+											th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
+											required="required" autofocus="autofocus" />
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+									</div>
+									
+									<label for="type" class="label form-control-label col-lg-2 col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+										th:text="#{|${baseMessageKey}.detail.type|}"></label>
+									<th:block th:switch="${action}">
+										<div th:case="create" class="col-lg-4 col-md-4 col-sm-9 col-xs-12">
+											<select class="form-control selectpicker show-tick" 
+												th:field="*{type}" id="type" required="required" 
+												data-actions-box="false" data-live-search="false" 
+												th:title="#{|${baseMessageKey}.detail.type.placeholder|}"
+												th:data-none-selected-text="#{|${baseMessageKey}.detail.type.placeholder|}">
+												<option th:each="codeType: ${availableCodeTypes}" 
+													th:value="${codeType}" 
+													th:text="#{|discount.code.type.${codeType}|}"></option>
+											</select>
+											<div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+										</div>
+										<div th:case="*" class="col-lg-4 col-md-4 col-sm-9 col-xs-12">
+											<span th:utext="#{|${baseMessageKey}.type.${dto.type}|}"></span>
+										</div>
+									</th:block>
 								</div>
 								
-								<div class="row">
-									<div class="col-md-12 col-sm-12">
-										<div class="form-group row">
-											<label for="name" class="label form-control-label col-lg-2 col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
-												th:text="#{|${baseMessageKey}.detail.name|}"></label>
-											<div class="col-lg-4 col-md-4 col-sm-9 col-xs-12 sm-form-group">
-												<input type="text" class="form-control" 
-													th:field="*{name}" id="name"
-													th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
-													required="required" autofocus="autofocus" />
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-											</div>
-											
-											<label for="type" class="label form-control-label col-lg-2 col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
-												th:text="#{|${baseMessageKey}.detail.type|}"></label>
-											<th:block th:switch="${action}">
-												<div th:case="create" class="col-lg-4 col-md-4 col-sm-9 col-xs-12">
-													<select class="form-control selectpicker show-tick" 
-														th:field="*{type}" id="type" required="required" 
-														data-actions-box="false" data-live-search="false" 
-														th:title="#{|${baseMessageKey}.detail.type.placeholder|}"
-														th:data-none-selected-text="#{|${baseMessageKey}.detail.type.placeholder|}">
-														<option th:each="codeType: ${availableCodeTypes}" 
-															th:value="${codeType}" 
-															th:text="#{|discount.code.type.${codeType}|}"></option>
-													</select>
-													<div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
-												</div>
-												<div th:case="*" class="col-lg-4 col-md-4 col-sm-9 col-xs-12">
-													<span th:utext="#{|${baseMessageKey}.type.${dto.type}|}"></span>
-												</div>
-											</th:block>
-										</div>
-										
-										<div class="form-group row" id="beneficiaryGroup">
-											<label id="beneficiaryLabel" for="beneficiary" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-												th:text="#{|${baseMessageKey}.detail.beneficiary|}"></label>
-											<div class="col-md-10 col-sm-9 col-xs-12">
-												<input type="text" class="form-control" 
-													th:field="*{beneficiary}" id="beneficiary"
-													th:placeholder="#{|${baseMessageKey}.detail.beneficiary.placeholder|}" />
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('beneficiary')}" th:errors="*{beneficiary}"></div>
-											</div>
-										</div>
-										
-										<div class="form-group row">
-											<label id="startDateLabel" for="startDate" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs sm-form-group" 
-												th:text="#{|${baseMessageKey}.detail.start.date|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
-												<div class="input-group">
-													<input type="text" class="form-control datepicker" 
-														th:field="*{startDate}" id="startDate" 
-														th:placeholder="#{|${baseMessageKey}.detail.start.date.placeholder|}" 
-														th:data-date-format="${dateFormat.toLowerCase()}" 
-														autocomplete="off" />
-													<div class="input-group-prepend">
-														<span class="input-group-text"><i class="fas fa-calendar"></i></span>
-													</div>
-												</div>
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
-											</div>
-											
-											<label id="endDateLabel" for="endDate" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
-												th:text="#{|${baseMessageKey}.detail.end.date|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12">
-												<div class="input-group">
-													<input type="text" class="form-control datepicker" 
-														th:field="*{endDate}" id="endDate"
-														th:placeholder="#{|${baseMessageKey}.detail.end.date.placeholder|}" 
-														th:data-date-format="${dateFormat.toLowerCase()}" 
-														required="required" autocomplete="off" />
-													<div class="input-group-prepend">
-														<span class="input-group-text"><i class="fas fa-calendar"></i></span>
-													</div>
-												</div>
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></div>
-											</div>
-										</div>
-										
-										<div class="form-group row" id="discountGroup">
-											<label id="discountTypeLabel" for="discountType" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
-												th:text="#{|${baseMessageKey}.detail.discount.type|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
-												<select class="form-control selectpicker show-tick"
-													th:field="*{discountType}" id="discountType" required="required" 
-													th:data-none-selected-text="#{|${baseMessageKey}.detail.discount.type.placeholder|}">
-													<option value="0" th:text="#{discount.code.discount.type.0}"></option>
-													<option value="1" th:text="#{discount.code.discount.type.1}"></option>
-												</select>
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('discountType')}" th:errors="*{discountType}"></div>
-											</div>
-										
-											<label id="discountValueLabel" for="discountValue" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
-												th:text="#{|${baseMessageKey}.detail.discount.value|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12">
-												<div class="input-group">
-													<input type="number" class="form-control" 
-														th:field="*{discountValue}" id="discountValue"
-														th:placeholder="#{|${baseMessageKey}.detail.discount.value.placeholder|}" 
-														required="required" />
-													<div class="input-group-prepend" id="discountPercentageUnit">
-														<span class="input-group-text">%</span>
-													</div>
-													<div class="input-group-prepend" id="discountAmountUnit">
-														<span class="input-group-text" th:utext="${priceUnitSymbol}"></span>
-													</div>
-												</div>
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('discountValue')}" th:errors="*{discountValue}"></div>
-											</div>
-										</div>
-										
-										<div class="form-group row" id="b2b100EditableContainer">
-											<label id="dealPriceLabel" for="dealPrice" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
-												th:text="#{|${baseMessageKey}.detail.deal.price|}"></label>
-											<div id="dealPriceContainer" class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
-												<div class="input-group">
-													<input type="number" class="form-control" 
-														th:field="*{dealPrice}" id="dealPrice"
-														th:placeholder="#{|${baseMessageKey}.detail.deal.price.placeholder|}" />
-													<div class="input-group-prepend">
-														<span class="input-group-text" th:utext="${priceUnitSymbol}"></span>
-													</div>
-												</div>
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('dealPrice')}" th:errors="*{dealPrice}"></div>
-											</div>
-											
-											<label id="maxUserAmountLabel" for="maxUserAmount" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
-												th:text="#{|${baseMessageKey}.detail.max.user.amount|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12">
-												<input type="number" class="form-control" 
-													th:field="*{maxUserAmount}" id="maxUserAmount"
-													th:placeholder="#{|${baseMessageKey}.detail.max.user.amount.placeholder|}" />
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('maxUserAmount')}" th:errors="*{maxUserAmount}"></div>
-											</div>
-										</div>
-										
-										<div class="form-group row" th:if="${action != 'create'}">
-											<label id="usedAmountLabel" for="usedAmount" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
-												th:text="#{|${baseMessageKey}.detail.used.amount|}"></label>
-											<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group" 
-												th:title="#{|${baseMessageKey}.detail.used.amount.placeholder|}">
-												<span th:text="${dto.usedAmount}"></span>
-											</div>
-											
-											<label id="pricePerUserLabel" for="pricePerUser" 
-												class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
-												th:text="#{|${baseMessageKey}.detail.price.per.user|}"></label>
-											<div id="pricePerUserContainer" class="col-md-4 col-sm-9 col-xs-12" 
-												th:title="#{|${baseMessageKey}.detail.price.per.user.placeholder|}">
-												<span th:text="${dto.pricePerUser}"></span>
-												<span th:utext="${priceUnitSymbol}"></span>
-											</div>
-										</div>
-										
-										<div class="form-group row">
-											<label for="status" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
-												th:text="#{|${baseMessageKey}.detail.status|}"></label>
-											<div class="col-md-10 col-sm-9 col-xs-12">
-												<select class="form-control selectpicker show-tick"
-													th:field="*{status}" id="status" 
-													th:data-none-selected-text="#{|${baseMessageKey}.detail.status.placeholder|}">
-													<!-- 
-													<option value="0" th:text="#{discount.code.status.0}"></option>
-													-->
-													<option value="1" th:text="#{discount.code.status.1}"></option>
-													<option value="2" th:text="#{discount.code.status.2}"></option>
-												</select>
-												<div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
-											</div>
-										</div>
-										
-										<div th:if="${writePermission}" class="form-group row">
-											<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
-												<div class="form-action-buttons-row">
-													<button type="submit" class="btn btn-primary" th:title="#{action.save.title}">
-														<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
-													</button>
-													
-													<a class="btn btn-outline-warning" th:href="${baseURL + '/current-page'}"
-														th:title="#{action.go.to.list.title}">
-														<span class="btn-inner--icon">
-															<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
-														</span>
-													</a>
-												</div>
-											</div>
-										</div>
+								<div class="form-group row" id="beneficiaryGroup">
+									<label id="beneficiaryLabel" for="beneficiary" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+										th:text="#{|${baseMessageKey}.detail.beneficiary|}"></label>
+									<div class="col-md-10 col-sm-9 col-xs-12">
+										<input type="text" class="form-control" 
+											th:field="*{beneficiary}" id="beneficiary"
+											th:placeholder="#{|${baseMessageKey}.detail.beneficiary.placeholder|}" />
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('beneficiary')}" th:errors="*{beneficiary}"></div>
 									</div>
 								</div>
-							</fieldset>
-						</form>
-					</div>
-				</div>
+								
+								<div class="form-group row">
+									<label id="startDateLabel" for="startDate" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs sm-form-group" 
+										th:text="#{|${baseMessageKey}.detail.start.date|}"></label>
+									<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
+										<div class="input-group">
+											<input type="text" class="form-control datepicker" 
+												th:field="*{startDate}" id="startDate" 
+												th:placeholder="#{|${baseMessageKey}.detail.start.date.placeholder|}" 
+												th:data-date-format="${dateFormat.toLowerCase()}" 
+												autocomplete="off" />
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fas fa-calendar"></i></span>
+											</div>
+										</div>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
+									</div>
+									
+									<label id="endDateLabel" for="endDate" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+										th:text="#{|${baseMessageKey}.detail.end.date|}"></label>
+									<div class="col-md-4 col-sm-9 col-xs-12">
+										<div class="input-group">
+											<input type="text" class="form-control datepicker" 
+												th:field="*{endDate}" id="endDate"
+												th:placeholder="#{|${baseMessageKey}.detail.end.date.placeholder|}" 
+												th:data-date-format="${dateFormat.toLowerCase()}" 
+												required="required" autocomplete="off" />
+											<div class="input-group-prepend">
+												<span class="input-group-text"><i class="fas fa-calendar"></i></span>
+											</div>
+										</div>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></div>
+									</div>
+								</div>
+								
+								<div class="form-group row" id="discountGroup">
+									<label id="discountTypeLabel" for="discountType" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
+										th:text="#{|${baseMessageKey}.detail.discount.type|}"></label>
+									<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
+										<select class="form-control selectpicker show-tick"
+											th:field="*{discountType}" id="discountType" required="required" 
+											th:data-none-selected-text="#{|${baseMessageKey}.detail.discount.type.placeholder|}">
+											<option value="0" th:text="#{discount.code.discount.type.0}"></option>
+											<option value="1" th:text="#{discount.code.discount.type.1}"></option>
+										</select>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('discountType')}" th:errors="*{discountType}"></div>
+									</div>
+								
+									<label id="discountValueLabel" for="discountValue" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+										th:text="#{|${baseMessageKey}.detail.discount.value|}"></label>
+									<div class="col-md-4 col-sm-9 col-xs-12">
+										<div class="input-group">
+											<input type="number" class="form-control" 
+												th:field="*{discountValue}" id="discountValue"
+												th:placeholder="#{|${baseMessageKey}.detail.discount.value.placeholder|}" 
+												required="required" />
+											<div class="input-group-prepend" id="discountPercentageUnit">
+												<span class="input-group-text">%</span>
+											</div>
+											<div class="input-group-prepend" id="discountAmountUnit">
+												<span class="input-group-text" th:utext="${priceUnitSymbol}"></span>
+											</div>
+										</div>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('discountValue')}" th:errors="*{discountValue}"></div>
+									</div>
+								</div>
+								
+								<div class="form-group row" id="b2b100EditableContainer">
+									<label id="dealPriceLabel" for="dealPrice" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
+										th:text="#{|${baseMessageKey}.detail.deal.price|}"></label>
+									<div id="dealPriceContainer" class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
+										<div class="input-group">
+											<input type="number" class="form-control" 
+												th:field="*{dealPrice}" id="dealPrice"
+												th:placeholder="#{|${baseMessageKey}.detail.deal.price.placeholder|}" />
+											<div class="input-group-prepend">
+												<span class="input-group-text" th:utext="${priceUnitSymbol}"></span>
+											</div>
+										</div>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('dealPrice')}" th:errors="*{dealPrice}"></div>
+									</div>
+									
+									<label id="maxUserAmountLabel" for="maxUserAmount" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+										th:text="#{|${baseMessageKey}.detail.max.user.amount|}"></label>
+									<div class="col-md-4 col-sm-9 col-xs-12">
+										<input type="number" class="form-control" 
+											th:field="*{maxUserAmount}" id="maxUserAmount"
+											th:placeholder="#{|${baseMessageKey}.detail.max.user.amount.placeholder|}" />
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('maxUserAmount')}" th:errors="*{maxUserAmount}"></div>
+									</div>
+								</div>
+								
+								<div class="form-group row" th:if="${action != 'create'}">
+									<label id="usedAmountLabel" for="usedAmount" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
+										th:text="#{|${baseMessageKey}.detail.used.amount|}"></label>
+									<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group" 
+										th:title="#{|${baseMessageKey}.detail.used.amount.placeholder|}">
+										<span th:text="${dto.usedAmount}"></span>
+									</div>
+									
+									<label id="pricePerUserLabel" for="pricePerUser" 
+										class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
+										th:text="#{|${baseMessageKey}.detail.price.per.user|}"></label>
+									<div id="pricePerUserContainer" class="col-md-4 col-sm-9 col-xs-12" 
+										th:title="#{|${baseMessageKey}.detail.price.per.user.placeholder|}">
+										<span th:text="${dto.pricePerUser}"></span>
+										<span th:utext="${priceUnitSymbol}"></span>
+									</div>
+								</div>
+								
+								<div class="form-group row">
+									<label for="status" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+										th:text="#{|${baseMessageKey}.detail.status|}"></label>
+									<div class="col-md-10 col-sm-9 col-xs-12">
+										<select class="form-control selectpicker show-tick"
+											th:field="*{status}" id="status" 
+											th:data-none-selected-text="#{|${baseMessageKey}.detail.status.placeholder|}">
+											<!-- 
+											<option value="0" th:text="#{discount.code.status.0}"></option>
+											-->
+											<option value="1" th:text="#{discount.code.status.1}"></option>
+											<option value="2" th:text="#{discount.code.status.2}"></option>
+										</select>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+									</div>
+								</div>
+								
+								<th:block th:replace="fragments/data-page-options :: form-action"></th:block>
+							</div>
+						</div>
+					</fieldset>
+				</form>
 			</div>
 		</div>
 		
