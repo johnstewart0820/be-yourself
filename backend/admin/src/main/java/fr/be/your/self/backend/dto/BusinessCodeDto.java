@@ -93,7 +93,7 @@ public class BusinessCodeDto extends BaseDto {
 			this.status = domain.getStatus();
 			this.beneficiary = domain.getBeneficiary();
 			this.maxUserAmount = domain.getMaxUserAmount();
-			this.usedAmount = domain.getUsedAmount();
+			//this.usedAmount = domain.getUsedAmount();
 			this.dealPrice = domain.getDealPrice();
 			this.pricePerUser = domain.getPricePerUser();
 			this.discountType = domain.getDiscountType();
@@ -107,7 +107,7 @@ public class BusinessCodeDto extends BaseDto {
 		domain.setStatus(status);
 		domain.setBeneficiary(beneficiary);
 		domain.setMaxUserAmount(maxUserAmount);
-		domain.setUsedAmount(usedAmount);
+		//domain.setUsedAmount(usedAmount);
 		domain.setDealPrice(dealPrice);
 		domain.setDiscountType(discountType);
 		domain.setDiscountValue(discountValue);

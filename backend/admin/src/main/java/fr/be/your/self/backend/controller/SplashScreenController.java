@@ -26,7 +26,6 @@ import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.SplashScreen;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.SplashScreenService;
-import fr.be.your.self.util.StringUtils;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + SplashScreenController.NAME)
@@ -132,61 +131,6 @@ public class SplashScreenController extends BaseResourceController<SplashScreen,
 		this.loadPageOptions(session, request, response, model);
 	}
 	
-	/*
-	@PostMapping("/create")
-	@Transactional
-    public String createDomain(
-    		@ModelAttribute("dto") @Validated SplashScreen dto, 
-    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
-        if (result.hasErrors()) {
-        	final FieldError fieldError = result.getFieldError();
-        	final String message = this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
-        	
-        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-        }
-        
-        final String text = dto.getText();
-        if (StringUtils.isNullOrSpace(text)) {
-        	final String message = this.getRequiredFieldMessage("text", "Text required");
-        	
-        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
-        }
-        
-        final SplashScreen domain = this.newDomain();
-        domain.setText(text);
-        
-        try {
-	        final SplashScreen savedDomain = this.mainService.create(domain);
-	        
-	        // ====> Error, delete upload file
-	        if (savedDomain == null || result.hasErrors()) {
-	        	final FieldError fieldError = result.getFieldError();
-	        	final String message = fieldError == null 
-	        			? this.getProcessingError()
-	        			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
-	        	
-	        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
-		        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-		        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        }
-	        
-	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
-        } catch (Exception ex) {
-        	throw ex;
-		}
-    }
-	*/
-	
 	@PostMapping("/update/{id}")
 	@Transactional
     public String updateDomain(
@@ -205,6 +149,7 @@ public class SplashScreenController extends BaseResourceController<SplashScreen,
         }
         
         final String text = dto.getText();
+        /*
         if (StringUtils.isNullOrSpace(text)) {
         	final String message = this.getRequiredFieldMessage("text", "Text required");
         	
@@ -214,6 +159,7 @@ public class SplashScreenController extends BaseResourceController<SplashScreen,
 	        
 	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
+        */
         
         SplashScreen domain = this.mainService.getById(id);
         if (domain == null) {
@@ -249,45 +195,4 @@ public class SplashScreenController extends BaseResourceController<SplashScreen,
         
         return "redirect:" + this.getBaseURL() + "/current-page";
     }
-	
-	/*
-	@PostMapping(value = { "/delete/{id}" })
-	@Transactional
-    public String deletePage(
-    		@PathVariable(name = "id", required = true) Integer id,
-    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		RedirectAttributes redirectAttributes, Model model) {
-		
-		final SplashScreen domain = this.mainService.getById(id);
-		if (domain == null) {
-			final String message = this.getIdNotFoundMessage(id);
-			
-			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        
-			return "redirect:" + this.getBaseURL() + "/current-page";
-		}
-		
-		final boolean result = this.mainService.delete(id);
-		if (result) {
-			// ====> Success
-			final String message = this.getDeleteSuccessMessage(id);
-			
-			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-			
-			return "redirect:" + this.getBaseURL();
-		}
-		
-		final String message = this.getDeleteByIdErrorMessage(id);
-		
-		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-        
-		return "redirect:" + this.getBaseURL() + "/current-page";
-	}
-	*/
 }

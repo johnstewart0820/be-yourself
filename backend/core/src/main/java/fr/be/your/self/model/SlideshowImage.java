@@ -18,6 +18,12 @@ public class SlideshowImage {
 	@Column(name = "Image", length = 255)
 	private String image;
 
+	@Column(name = "WebLink", length = 255)
+	private String webLink;
+	
+	@Column(name = "MobileLink", length = 255)
+	private String mobileLink;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "SlideshowId")
 	private Slideshow slideshow;
@@ -39,6 +45,22 @@ public class SlideshowImage {
 
 	public void setImage(String image) {
 		this.image = image;
+	}
+
+	public String getWebLink() {
+		return webLink;
+	}
+
+	public void setWebLink(String webLink) {
+		this.webLink = webLink;
+	}
+
+	public String getMobileLink() {
+		return mobileLink;
+	}
+
+	public void setMobileLink(String mobileLink) {
+		this.mobileLink = mobileLink;
 	}
 
 	public Slideshow getSlideshow() {

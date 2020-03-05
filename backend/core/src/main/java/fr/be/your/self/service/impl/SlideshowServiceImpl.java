@@ -1,7 +1,6 @@
 package fr.be.your.self.service.impl;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,16 +57,11 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 	}
 
 	@Override
-	public Slideshow getMainSlideshow() {
-		final Iterable<Slideshow> domains = this.repository.findAllByStartDateIsNull();
+	public Slideshow getCurrentSlideshow() {
+		final Optional<Slideshow> domain = this.repository.findFirstByStartDateLessThanEqualOrderByStartDateDesc(new Date());
 		
-		if (domains == null) {
-			return null;
-		}
-		
-		final Iterator<Slideshow> iterator = domains.iterator();
-		if (iterator.hasNext()) {
-			return iterator.next();
+		if (domain.isPresent()) {
+			return domain.get();
 		}
 		
 		return null;
@@ -76,10 +70,10 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 	@Override
 	public long countAvailaible(Date startDate) {
 		if (startDate == null) {
-			return this.repository.countByStartDateIsNotNull();
+			return this.repository.count();
 		}
 		
-		return this.repository.countByStartDateGreaterThanEqual(startDate);
+		return this.repository.countByStartDateGreaterThan(startDate);
 	}
 
 	@Override
@@ -90,11 +84,11 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 		}
 		
 		if (startDate == null) {
-			final Page<Slideshow> page = this.repository.findAllByStartDateIsNotNull(pageable);
+			final Page<Slideshow> page = this.repository.findAll(pageable);
 			return new PageableResponse<>(page);
 		}
 		
-		final Page<Slideshow> page = this.repository.findAllByStartDateGreaterThanEqual(startDate, pageable);
+		final Page<Slideshow> page = this.repository.findAllByStartDateGreaterThan(startDate, pageable);
 		return new PageableResponse<>(page);
 	}
 
@@ -103,11 +97,11 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 		final Sort domainSort = sort == null ? Sort.unsorted() : sort;
 		
 		if (startDate == null) {
-			final Iterable<Slideshow> domains = this.repository.findAllByStartDateIsNotNull(domainSort);
+			final Iterable<Slideshow> domains = this.repository.findAll(domainSort);
 			return this.toList(domains);
 		}
 		
-		final Iterable<Slideshow> domains = this.repository.findAllByStartDateGreaterThanEqual(startDate, domainSort);
+		final Iterable<Slideshow> domains = this.repository.findAllByStartDateGreaterThan(startDate, domainSort);
 		return this.toList(domains);
 	}
 

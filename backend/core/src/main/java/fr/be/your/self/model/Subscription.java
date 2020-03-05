@@ -41,7 +41,10 @@ public class Subscription extends PO<Integer> {
 	private String canal;
 	private boolean autoRenew;
 
-
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "CodeId")
+	private BusinessCode businessCode;
+	
 	public User getUser() {
 		return user;
 	}
@@ -193,6 +196,14 @@ public class Subscription extends PO<Integer> {
 
 	public void setAutoRenew(boolean autoRenew) {
 		this.autoRenew = autoRenew;
+	}
+
+	public BusinessCode getBusinessCode() {
+		return businessCode;
+	}
+
+	public void setBusinessCode(BusinessCode businessCode) {
+		this.businessCode = businessCode;
 	}
 
 }

@@ -47,6 +47,7 @@ import com.opencsv.bean.MappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
+import fr.be.your.self.backend.cache.CacheManager;
 import fr.be.your.self.backend.dto.IdNameDto;
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.ResultStatus;
@@ -94,7 +95,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	@Autowired
 	SubscriptionTypeService subtypeService;
 
-	
+	@Autowired
+	private CacheManager cacheManager;
 	
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 
@@ -278,6 +280,9 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			}
         }
 
+        final String permissionCacheKey = Constants.CACHE.getPermission(id);
+        this.cacheManager.updateItem(permissionCacheKey, null);
+        
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
         
@@ -305,7 +310,9 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		
 		final boolean result = this.userService.delete(id);
 		if (result) {
-	        
+			final String permissionCacheKey = Constants.CACHE.getPermission(id);
+			this.cacheManager.updateItem(permissionCacheKey, null);
+			
 			final String message = this.getDeleteSuccessMessage(id);
 			
 			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete");

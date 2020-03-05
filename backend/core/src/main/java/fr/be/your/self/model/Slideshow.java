@@ -24,9 +24,9 @@ public class Slideshow extends PO<Integer> {
     @Column(name = "startDate", nullable = true)
 	private Date startDate;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "endDate", nullable = true)
-	private Date endDate;
+	//@Temporal(TemporalType.TIMESTAMP)
+    //@Column(name = "endDate", nullable = true)
+	//private Date endDate;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "slideshow")
     private List<SlideshowImage> images;
@@ -52,7 +52,8 @@ public class Slideshow extends PO<Integer> {
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
-
+	
+	/*
 	public Date getEndDate() {
 		return endDate;
 	}
@@ -60,6 +61,7 @@ public class Slideshow extends PO<Integer> {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
+	*/
 	
 	public List<SlideshowImage> getImages() {
 		return images;

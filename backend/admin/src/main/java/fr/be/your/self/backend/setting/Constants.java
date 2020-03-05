@@ -57,4 +57,11 @@ public final class Constants {
 			public static final String MEDIA = "/media";
 		}
 	}
+	
+	public static interface CACHE {
+		
+		public static String getPermission(Integer userId) {
+			return "PERMISSION_" + userId;
+		}
+	}
 }
