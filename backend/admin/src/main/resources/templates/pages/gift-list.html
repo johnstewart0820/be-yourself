@@ -7,123 +7,102 @@
 </head>
 <body>
 	<th:block layout:fragment="content">
-		<!-- Table -->
-		<div class="row">
-			<div class="col">
-				<div class="card shadow"> 
-					<div class="card-header border-0">
-						<div class="row">
-							<th:block th:switch="${writePermission}">
-								<th:block th:case="true">
-									<div class="col-lg-6 col-md-12">
-										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/create'}">
-											<span class="btn-inner--icon">
-												<i class="fas fa-edit"></i> <span th:text="#{action.create}"></span>
-											</span>
-										</a>
+		<div class="card shadow"> 
+			<div class="card-header border-0">
+				<div class="row">
+					<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
+				</div>
+				
+				<div class="row form-search-container">
+					<!--
+					<div class="col-md-9 col-sm-12">
+						<form role="form" th:action="${baseURL} + '/search'" method="get">
+							<div class="form-group mb-0">
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text">
+											<i class="fas fa-search"></i>
+										</span>
 									</div>
-									
-									<div class="col-lg-6 text-right d-md-none d-lg-block">
-										<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
-									</div>
-								</th:block>
-								
-								<div th:case="*" class="col-12 text-right">
-									<h3 class="mb-0 form-title-label" th:utext="${formTitle}"></h3>
+									<input class="form-control" type="text" name="q" 
+										th:placeholder="#{search.placeholder}" th:value="${search}">
 								</div>
-							</th:block>
-						</div>
-						
-						<div class="row form-search-container">
-							<div class="col-md-9 col-sm-12">
-								<form role="form" th:action="${baseURL} + '/search'" method="get">
-									<div class="form-group mb-0">
-										<div class="input-group">
-											<div class="input-group-prepend">
-												<span class="input-group-text">
-													<i class="fas fa-search"></i>
-												</span>
-											</div>
-											<input class="form-control" type="text" name="q" 
-												th:placeholder="#{search.placeholder}" th:value="${search}">
-										</div>
-									</div>
-									<input type="hidden" name="action" value="update-filter">
-									<input type="submit" style="display: none" />
-								</form>
 							</div>
-							<div class="col-md-3 col-sm-12 text-right">
-								<select id="display-page-option" class="selectpicker show-tick" 
-									th:data-none-selected-text="#{data.display.page.option.title}">
-									<option th:each="pageSize: ${supportPageSizes}" 
-										th:value="${pageSize}" 
-										th:text="#{data.display.page.option.item(${pageSize}, ${pageSizeName})}"
-										th:selected="${size != null && size == pageSize}"></option>
-									<option value="-1" th:text="#{data.display.page.option.all(${pageSizeName})}"
-										th:selected="${size == null || size <= 0}"></option>
-								</select>
-							</div>
-						</div>
+							<input type="hidden" name="action" value="update-filter">
+							<input type="submit" style="display: none" />
+						</form>
 					</div>
-					
-					<div class="table-responsive">
-						<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
-							<thead class="thead-light">
-								<tr>
-									<th scope="col" width="75%" 
-										th:utext="#{|${baseMessageKey}.list.name|}"
-										th:title="#{|${baseMessageKey}.list.name.placeholder|}"></th>
-									<th scope="col" width="10%" class="text-center"
-										th:utext="#{|${baseMessageKey}.list.price|}"
-										th:title="#{|${baseMessageKey}.list.price.placeholder|}"></th>
-									<th scope="col" width="10%" class="text-center"
-										th:utext="#{|${baseMessageKey}.list.duration|}"
-										th:title="#{|${baseMessageKey}.list.duration.placeholder|}"></th>
-									<th scope="col" class="no-sort" th:if="${readPermission}"></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:each="item : ${result.items}">
-									<th scope="row" nowrap>
-										<span class="mb-0 text-sm" th:text="${item.name}"></span>
-									</th>
-									<td class="text-center">
-										<span th:text="${item.price}"></span>
-										<span th:utext="${priceUnitSymbol}"></span>
-									</td>
-									<td class="text-center" th:data-sort="${item.duration}" th:switch="${item.duration}">
-										<span th:case="1" th:utext="#{gift.option.duration.month(${item.duration})}"></span>
-										<span th:case="*" th:utext="#{gift.option.duration.months(${item.duration})}"></span>
-									</td>
-									<td class="text-right" th:if="${writePermission}">
-										<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
-											<span class="btn-inner--icon">
-												<i class="fas fa-edit"></i>
-											</span>
-										</a>
-										
-										<button class="btn btn-icon btn-2 btn-danger" type="button" 
-											th:title="#{action.delete.title}" th:onclick="confirmDelete([[${item.id}]])">
-											<span class="btn-inner--icon">
-												<i class="fas fa-times"></i>
-											</span>
-										</button>
-									</td>
-									<td class="text-right" th:if="${!writePermission && readPermission}">
-										<a class="btn btn-icon btn-2 btn-info" th:href="${baseURL + '/view/' + item.id}" th:title="#{action.view.title}">
-											<span class="btn-inner--icon">
-												<i class="fas fa-eye"></i>
-											</span>
-										</a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
+					-->
+					<div class="col-md-12 col-sm-12 text-right">
+						<select id="display-page-option" class="selectpicker show-tick" 
+							th:data-none-selected-text="#{data.display.page.option.title}">
+							<option th:each="pageSize: ${supportPageSizes}" 
+								th:value="${pageSize}" 
+								th:text="#{data.display.page.option.item(${pageSize}, ${pageSizeName})}"
+								th:selected="${size != null && size == pageSize}"></option>
+							<option value="-1" th:text="#{data.display.page.option.all(${pageSizeName})}"
+								th:selected="${size == null || size <= 0}"></option>
+						</select>
 					</div>
-					
-					<div class="card-footer py-4" th:insert="fragments/data-list-pagination :: pagination"></div>
 				</div>
 			</div>
+			
+			<div class="table-responsive">
+				<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
+					<thead class="thead-light">
+						<tr>
+							<th scope="col" width="75%" 
+								th:utext="#{|${baseMessageKey}.list.name|}"
+								th:title="#{|${baseMessageKey}.list.name.placeholder|}"></th>
+							<th scope="col" width="10%" class="text-center"
+								th:utext="#{|${baseMessageKey}.list.price|}"
+								th:title="#{|${baseMessageKey}.list.price.placeholder|}"></th>
+							<th scope="col" width="10%" class="text-center"
+								th:utext="#{|${baseMessageKey}.list.duration|}"
+								th:title="#{|${baseMessageKey}.list.duration.placeholder|}"></th>
+							<th scope="col" class="no-sort" th:if="${readPermission}"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${result.items}">
+							<th scope="row" nowrap>
+								<span class="mb-0 text-sm" th:text="${item.name}"></span>
+							</th>
+							<td class="text-center">
+								<span th:text="${item.price}"></span>
+								<span th:utext="${priceUnitSymbol}"></span>
+							</td>
+							<td class="text-center" th:data-sort="${item.duration}" th:switch="${item.duration}">
+								<span th:case="1" th:utext="#{gift.option.duration.month(${item.duration})}"></span>
+								<span th:case="*" th:utext="#{gift.option.duration.months(${item.duration})}"></span>
+							</td>
+							<td class="text-right" th:if="${writePermission}">
+								<a class="btn btn-icon btn-2 btn-primary" th:href="${baseURL + '/edit/' + item.id}" th:title="#{action.edit.title}">
+									<span class="btn-inner--icon">
+										<i class="fas fa-edit"></i>
+									</span>
+								</a>
+								
+								<button class="btn btn-icon btn-2 btn-danger" type="button" 
+									th:title="#{action.delete.title}" th:onclick="confirmDelete([[${item.id}]])">
+									<span class="btn-inner--icon">
+										<i class="fas fa-times"></i>
+									</span>
+								</button>
+							</td>
+							<td class="text-right" th:if="${!writePermission && readPermission}">
+								<a class="btn btn-icon btn-2 btn-info" th:href="${baseURL + '/view/' + item.id}" th:title="#{action.view.title}">
+									<span class="btn-inner--icon">
+										<i class="fas fa-eye"></i>
+									</span>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div class="card-footer py-4" th:insert="fragments/data-list-pagination :: pagination"></div>
 		</div>
 		
 		<th:block th:replace="fragments/data-list-modals :: modals"></th:block>
