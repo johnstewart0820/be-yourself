@@ -1,6 +1,7 @@
 package fr.be.your.self.backend.controller;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.utils.AdminUtils;
+import fr.be.your.self.common.FileType;
 import fr.be.your.self.common.FormationType;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserPermission;
@@ -44,11 +46,13 @@ import fr.be.your.self.model.Price;
 import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserConstants;
+import fr.be.your.self.model.DegreeFile;
 import fr.be.your.self.service.AddressService;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.PriceService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.NumberUtils;
+import fr.be.your.self.util.StringUtils;
 
 @Controller
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + ProfessionalController.NAME)
@@ -166,10 +170,12 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 
 		//Create Address
 		Address addr = Address.newAddress(dto.getAddress().getAddress());
-		Address savedAddr = addressService.create(addr);
-				
+		
 		//Create user
-		user.setAddress(savedAddr);
+		user.setAddress(addr);
+
+		//Add prices
+		user.setPrices(dto.getPrices());
 		
 		 //Validate image file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
@@ -191,6 +197,16 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         user.setProfilePicture(uploadImageFileName);
         
         
+        //Degrees
+        List<MultipartFile> degrees = dto.getDegrees();
+        List<DegreeFile> degreesList = new ArrayList<>();
+        for (MultipartFile file : degrees) {
+        	Path uploadFilePath = uploadFile(file);
+        	DegreeFile userFile = new DegreeFile(uploadFilePath.getFileName().toString());
+        	userFile.setUser(user);
+        	degreesList.add(userFile);
+        }
+        user.setDegreeFiles(degreesList);
 		User savedUser = userService.create(user);
 		
 
@@ -201,13 +217,6 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 			this.getPermissionService().saveOrUpdate(permission);
 		}
 		
-		//Add prices
-		for (Price price : dto.getPrices()) {
-			if (price.getLabel() != null && price.getPrice() != null) {
-				price.setUser(savedUser);
-				priceService.create(price);
-			}
-		}
 		
 		String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
 		sendVerificationEmailToUser(activateAccountUrl, savedUser);
@@ -222,6 +231,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
     public String updateDomain(
     		@PathVariable("id") Integer id, 
     		@ModelAttribute @Validated UserDto dto, 
+    		@RequestParam(value="priceIdsToRemove", required=false) String priceIdsToRemove, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -242,16 +252,8 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         
         dto.copyToDomainOfProfessional(domain);
         
-        if (dto.getAddress() != null) {
-        	Address add = addressService.getById(dto.getAddress().getId());
-        	if (add == null) {
-        		add = new Address();
-        	}
-        	add.setAddress(dto.getAddress().getAddress());
-        	addressService.update(add);
-            domain.setAddress(add);
-
-        }
+        domain.setAddress(dto.getAddress());
+       
         
         // Process upload image and content file
         String deleteImageFileName = null;
@@ -272,8 +274,24 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         	domain.setProfilePicture(uploadImageFileName);
         }
         
+
+  		
         final User updatedDomain = this.userService.update(domain);
         
+        //Update prices
+		for (Price price : dto.getPrices()) {
+			if (price.getLabel() != null && price.getPrice() != null) {
+				price.setUser(updatedDomain);
+				priceService.update(price);
+			}
+		}
+        
+        if (!StringUtils.isNullOrEmpty(priceIdsToRemove)) {
+        	String[] removedIDs = priceIdsToRemove.split(",");
+        	for (int i = 0; i<removedIDs.length; i++) {
+        		priceService.delete(Integer.valueOf(removedIDs[i]));
+        	}
+        }
         //Error, delete upload file
         if (updatedDomain == null || result.hasErrors()) {
         	this.deleteUploadFile(uploadImageFilePath);
@@ -287,13 +305,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
-        //Update prices
-  		for (Price price : dto.getPrices()) {
-  			if (price.getLabel() != null && price.getPrice() != null) {
-  				price.setUser(updatedDomain);
-  				priceService.update(price);
-  			}
-  		}
+       
       		
         //Success, delete old image file
         this.deleteUploadFile(deleteImageFileName);

@@ -112,7 +112,6 @@
 												</div>
 
 											</div>
-
 											<!-- Website -->
 											<div class="form-group row">
 												<label for="website"
@@ -209,15 +208,19 @@
 										</div>
 										<!-- Prices -->
 										<div  id="price_div">
-											<div class="form-group row" th:each="price, itemStats : ${dto.prices}">
+											<input type="hidden" id="priceIdsToRemove" name="priceIdsToRemove" value="">
+										
+											<div class="form-group row" th:each="price, itemStats : ${dto.prices}" th:id="'div_old_price_' + ${price.id}">
 													<input	type="hidden"
 														th:field="*{prices[__${itemStats.index}__].user}" />
 													<input type="hidden"
 														th:field="*{prices[__${itemStats.index}__].id}" />
-													<input
+													<input class="form-control col-md-4 col-sm-6 col-xs-12"
 														th:field="*{prices[__${itemStats.index}__].label}" />
-													<input 
+													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12"
 														th:field="*{prices[__${itemStats.index}__].price}" />
+													<button type="button" class="form-control col-md-2 col-sm-2" th:onclick="'javascript:confirmDelete(' + ${price.id} + ');'">Modify</button>	
+													<button type="button"  class="form-control col-md-2 col-sm-2" th:onclick="'javascript:removeOldPrice(' + ${price.id} + ');'">Remove </button>
 												</div>
 										</div>
 										<div class="form-group row">
@@ -234,7 +237,20 @@
 										
 										
 										<script>
-										
+											function removeOldPrice(priceId){
+												var idsToRemoveTxt = document.getElementById('priceIdsToRemove').value;
+												if (idsToRemoveTxt == "") {
+													idsToRemoveTxt += priceId; 
+												} else {
+													idsToRemoveTxt = idsToRemoveTxt + "," + priceId;
+												}
+												
+												document.getElementById('priceIdsToRemove').value = idsToRemoveTxt;
+												var divToRemove = 'div_old_price_' + priceId;
+												alert(document.getElementById('priceIdsToRemove').value);
+												document.getElementById(divToRemove).remove();
+											}
+											
 											function removeElemById(id) {
 												elem = document.getElementById(id)
 												while( elem.hasChildNodes() ){
@@ -244,12 +260,12 @@
 											}
 											
 											$(document).ready(function() {
-												var index = /*${#lists.size(dto.prices)}"*/ "0";
+												var index = /*${#lists.size(dto.prices)}"*/ "0"; // Get the current number of price elements
 												$("#add_price").click(function() {
 													var current_label=$("#price_label").val();
 													var current_price=$("#price_value").val();
 													
-													var id_new_div="div_"+ index;
+													var id_new_div="div_price_"+ index;
 
 													var id_new_label="prices"+ index + ".label";
 													var name_new_label="prices["+ index + "].label";
@@ -258,11 +274,11 @@
 													var name_new_price="prices["+ index + "].price";
 
 													
-													var new_label = "<input type='text' id='" + id_new_label + "' name='" + name_new_label + "' value='"+current_label+"' required>";
-													var new_price = "<input type='number' step='0.01' id='" + id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
-													var remove_btn = "<input type='button' onclick=removeElemById('" + id_new_div + "')>";
+													var new_label = "<input class='form-control col-md-5 col-sm-6 col-xs-12' type='text' id='" + id_new_label + "' name='" + name_new_label + "' value='"+current_label+"' required>";
+													var new_price = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='number' step='0.01' id='" + id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
+													var remove_btn = "<input class='form-control offset-md-1 col-md-2 offset-sm-1 col-sm-2 col-xs-12' type='button' onclick=removeElemById('" + id_new_div + "') value='Remove'></button>";
 													
-													var new_inner_div = "<div id='"+ id_new_div + "'>" + new_label + new_price + remove_btn + "</div>";
+													var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_label + new_price + remove_btn + "</div>";
 													$("#price_div").append(new_inner_div);
 													
 													index++;
@@ -270,6 +286,10 @@
 											})
 										</script>
 										
+										<!-- Degrees -->
+										<div class="form-group row">
+											<input type="file" name="degrees" multiple="multiple"/>
+										</div>
 										<!-- Save or go back -->
 										<div th:if="${writePermission}" class="form-group row">
 											<div

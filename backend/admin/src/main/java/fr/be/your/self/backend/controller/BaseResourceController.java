@@ -943,6 +943,9 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 	}
 
 	protected Path uploadFile(final MultipartFile mediaFile) {
+		return uploadFile(mediaFile, false);
+	}
+	protected Path uploadFile(final MultipartFile mediaFile, boolean partlyUseOriginal) {
 		final String uploadDirectoryName = this.getUploadDirectoryName();
 		final String fileName = mediaFile.getOriginalFilename();
 		final int dotIndex = fileName.lastIndexOf(".");
@@ -959,7 +962,13 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 			return null;
 		}
 
-		final String uploadFileName = UUID.randomUUID().toString() + fileExtension;
+		final String uploadFileName;
+		
+		if (!partlyUseOriginal) {
+			uploadFileName = UUID.randomUUID().toString() + fileExtension;
+		} else {
+			uploadFileName = fileName + "_" + UUID.randomUUID().toString();
+		}
 		final Path uploadFilePath = Paths.get(uploadDirectoryName + "/" + uploadFileName);
 
 		try {

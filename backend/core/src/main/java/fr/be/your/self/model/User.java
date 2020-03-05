@@ -75,23 +75,24 @@ public class User extends PO<Integer> {
 	private String linkedin;
 	private boolean supervised;
 	private String profilePicture;
+	
+
 	@Lob
 	private String description;
 	
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "address_id")
 	private Address address;
 	
-	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<Price> prices;
-	
-
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
-	private List<UserFile> userFiles;
+	private List<DegreeFile> degreeFiles;
 	
+	
+
 	@OneToOne(fetch = FetchType.LAZY,  mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
 	private ProfessionalEvent event;
 	
@@ -116,6 +117,14 @@ public class User extends PO<Integer> {
 
 	public void setPermissions(List<Permission> permissions) {
 		this.permissions = permissions;
+	}
+	
+	public List<DegreeFile> getDegreeFiles() {
+		return degreeFiles;
+	}
+
+	public void setDegreeFiles(List<DegreeFile> degreeFiles) {
+		this.degreeFiles = degreeFiles;
 	}
 
 	public Integer getId() {
@@ -288,13 +297,6 @@ public class User extends PO<Integer> {
 		this.description = description;
 	}
 
-	public List<UserFile> getUserFiles() {
-		return userFiles;
-	}
-
-	public void setUserFiles(List<UserFile> userFiles) {
-		this.userFiles = userFiles;
-	}
 
 	public ProfessionalEvent getEvent() {
 		return event;
@@ -335,6 +337,8 @@ public class User extends PO<Integer> {
 	public void setPrices(List<Price> prices) {
 		this.prices = prices;
 	}
+
+	
 	
 	
 }

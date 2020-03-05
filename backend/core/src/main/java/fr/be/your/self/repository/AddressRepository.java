@@ -6,7 +6,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import fr.be.your.self.model.Address;
-import fr.be.your.self.model.Functionality;
 
 @Repository
 public interface AddressRepository extends BaseRepository<Address, Integer> {

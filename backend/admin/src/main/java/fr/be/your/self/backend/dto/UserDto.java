@@ -10,7 +10,7 @@ import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.Price;
 import fr.be.your.self.model.ProfessionalEvent;
 import fr.be.your.self.model.User;
-import fr.be.your.self.model.UserFile;
+import fr.be.your.self.model.DegreeFile;
 
 public class UserDto implements Serializable {
 
@@ -42,12 +42,12 @@ public class UserDto implements Serializable {
 	private String profilePicture;
 	private String description;
 	private Address address;
-	private List<UserFile> userFiles;
+	private List<DegreeFile> degreeFiles;
 	private List<Price> prices;
 	private ProfessionalEvent event;
 	
 	private MultipartFile uploadImageFile;
-
+	private List<MultipartFile> degrees;
 	
 	public UserDto() {
 	}
@@ -80,7 +80,7 @@ public class UserDto implements Serializable {
 			this.profilePicture = domain.getProfilePicture();
 			this.description = domain.getDescription();
 			this.address = domain.getAddress();
-			this.userFiles = domain.getUserFiles();
+			this.degreeFiles = domain.getDegreeFiles();
 			this.event = domain.getEvent();		
 			this.prices = domain.getPrices();
 		}
@@ -254,11 +254,11 @@ public class UserDto implements Serializable {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
-	public List<UserFile> getUserFiles() {
-		return userFiles;
+	public List<DegreeFile> getUserFiles() {
+		return degreeFiles;
 	}
-	public void setUserFiles(List<UserFile> userFiles) {
-		this.userFiles = userFiles;
+	public void setUserFiles(List<DegreeFile> userFiles) {
+		this.degreeFiles = userFiles;
 	}
 	public ProfessionalEvent getEvent() {
 		return event;
@@ -277,6 +277,12 @@ public class UserDto implements Serializable {
 	}
 	public void setPrices(List<Price> prices) {
 		this.prices = prices;
+	}
+	public List<MultipartFile> getDegrees() {
+		return degrees;
+	}
+	public void setDegrees(List<MultipartFile> degrees) {
+		this.degrees = degrees;
 	}
 	
 }

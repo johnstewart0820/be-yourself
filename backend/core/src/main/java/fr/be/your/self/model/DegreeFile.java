@@ -9,7 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class UserFile {
+public class DegreeFile {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -17,9 +17,14 @@ public class UserFile {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
     private User user;
-	
+
 	private String filePath;
-	private int fileType;
+	
+	public DegreeFile() {} 
+	public DegreeFile(String filePath) {
+		this.filePath = filePath;
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -37,12 +42,6 @@ public class UserFile {
 	}
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
-	}
-	public int getFileType() {
-		return fileType;
-	}
-	public void setFileType(int fileType) {
-		this.fileType = fileType;
 	}
 	
 }
