@@ -7,9 +7,7 @@
 </head>
 <body>
 	<div layout:fragment="content">
-
 		<div class="container">
-
 			<div class="row">
 				<div class="col">
 					<div class="card  shadow">
@@ -162,7 +160,7 @@
 											<div class="form-group row">
 												<div class="offset-md-3 col-md-4 col-sm-12 text-center" th:if="${action != 'create'}">													
 													<a th:href="${baseMediaURL + '/image/download/' + dto.profilePicture}" 
-														th:title="#{session.category.detail.image.link.title}" target="_blank">
+														target="_blank">
 														<img id="imagePreview" class="image-fit image-preview" 
 														 th:src="${baseMediaURL + '/image/view/' + dto.profilePicture}">
 													</a>
@@ -171,14 +169,14 @@
 											
 										 	<th:block th:switch="${action}">
 												<div th:case="create" class="form-group row">
-													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs " 
+													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field" 
 														th:text="#{|${baseMessageKey}.detail.image|}"></label>
 													<div class="col-sm-5 col-xs-12">
 														<div class="custom-file">
 															<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
 																th:accept="${supportImageTypes}" onChange="selectImage(this)" 
-																th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
+																th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" required/>
 															<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 																th:data-browse="#{action.select.image}"></label>
 														</div>
@@ -254,9 +252,9 @@
 											</div>
 											<div class="offset-md-1">
 													<a class="btn btn-icon btn-2 btn-primary" title="#{action.add.title}" id="add_price"> 
-													<span class="btn-inner--icon"> 
-													<i class="fas fa-edit"></i> <span th:text="#{action.add}"></span>
-													</span>
+														<span class="btn-inner--icon"> 
+														<i class="fas fa-edit"></i> <span th:text="#{action.add}"></span>
+														</span>
 													</a>
 											</div>
 										</div>
@@ -321,7 +319,7 @@
 										<div  id="degree_div">
 											<input type="hidden" id="degreeIdsToRemove" name="degreeIdsToRemove" value="">
 											<div class="form-group row" >
-											<div th:each="degree, itemStats : ${dto.degreeFiles}" th:id="'div_old_degree_' + ${degree.id}">
+												<div th:each="degree, itemStats : ${dto.degreeFiles}" th:id="'div_old_degree_' + ${degree.id}">
 													<input	type="hidden"
 														th:field="*{degreeFiles[__${itemStats.index}__].user}" />
 													<input type="hidden"
@@ -337,10 +335,30 @@
 										<div class="form-group row">											
 											<div class="col" id="fileList"></div>
 										</div>
-										<div class="form-group row">										
-											<input class="col" type="file" name="degrees" id="degrees" multiple="multiple"
-											 onchange="javascript:updateDegreeList()" />
+										
+										<div  class="form-group row">
+													<label for="degrees" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
+														th:text="#{|${baseMessageKey}.detail.degree|}"></label>
+													<div class="col-sm-5 col-xs-12">
+														<div class="custom-file">
+															<input type="file" multiple="multiple" name="degrees" id="degrees" class="custom-file-input"  
+																onChange="javascript:updateDegreeList()" 	 />
+															<label class="custom-file-label" for="degrees" id="degreeFileLabel" 
+																th:data-browse="#{action.select.image}"></label>
+														</div>
+													</div>
+												</div>
+												
+										
+								<!-- 		<div class="form-group row">	
+											<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field" 
+														th:text="#{|${baseMessageKey}.detail.image|}"></label>
+																							
+											
 										</div>
+										
+										<input class="col" type="file" name="degrees" id="degrees" multiple="multiple"
+											 onchange="javascript:updateDegreeList()" /> -->
 										<script>
 											function removeOldDegree(degreeId){
 												var idsToRemoveTxt = document.getElementById('degreeIdsToRemove').value;
@@ -377,12 +395,12 @@
 												</div>
 										</div>
 										
-										<!-- MEDAS SECTION -->
+										<!-- MEDIAS SECTION -->
 										<h3>Medias</h3>	<BR>
 																			
 										<div  id="media_div">
 											<input type="hidden" id="mediaIdsToRemove" name="mediaIdsToRemove" value="">
-										
+											<div class="form-group row">
 											<div class="form-group row" th:each="media, itemStats : ${dto.mediaFiles}" 
 																	th:id="'div_old_media_' + ${media.id}">
 													<input	type="hidden"
@@ -395,14 +413,30 @@
 													  	<figcaption th:text="${media.filePath}" style="display: table-caption; caption-side: bottom ;">File name </figcaption>	
 													 </figure>
 												</div>
+												</div>
 										</div>
 										<div class="form-group row">											
 											<div class="col" id="mediaFileList"></div>
 										</div>
-										<div class="form-group row">										
+										
+										<div  class="form-group row">
+													<label for="medias" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
+														th:text="#{|${baseMessageKey}.detail.media|}"></label>
+													<div class="col-sm-5 col-xs-12">
+														<div class="custom-file">
+															<input type="file" multiple="multiple" name="medias" id="medias" class="custom-file-input"  
+																onChange="javascript:updateMediaList()" 	 />
+															<label class="custom-file-label" for="medias" id="degreeFileLabel" 
+																th:data-browse="#{action.select.image}"></label>
+														</div>
+													</div>
+												</div>
+												
+												
+										<!-- <div class="form-group row">										
 											<input class="col" type="file" name="medias" id="medias" multiple="multiple" 
-											onchange="javascript:updateMediaList()" />
-										</div>
+											onchange="javascript:updateMediaList()" /> 
+										</div>-->
 										<script>
 										function removeOldMedia(mediaId){
 											var idsToRemoveTxt = document.getElementById('mediaIdsToRemove').value;
@@ -448,13 +482,14 @@
 														th:field="*{events[__${itemStats.index}__].id}" />
 													
 													<div class="col-md-2 col-sm-2 col-xs-12 input-group">
+
 														<input type="text" class="form-control datepicker"
 															th:field="*{events[__${itemStats.index}__].date}" 
 															th:data-date-format="${dateFormat.toLowerCase()}" 
 															autocomplete="off"/>
 															<div class="input-group-prepend">
-																<span class="input-group-text"><i class="fas fa-calendar"></i></span>
-															</div>
+															<span class="input-group-text"><i class="fas fa-calendar"></i></span>
+															</div>															
 													</div>
 													<textarea rows="1" class="form-control col-md-3 col-sm-4 col-xs-12" 
 															th:field="*{events[__${itemStats.index}__].address.address}" required></textarea>
@@ -476,7 +511,7 @@
 												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.event.date|}"></label>
 
-												<div class="col-md-3 col-sm-8 input-group">
+												<div class="col-md-3 col-sm-8 input-group">						
 													<input type="text" class="form-control datepicker" 
 													   id="eventDate" 													
 														th:data-date-format="${dateFormat.toLowerCase()}" 
@@ -510,7 +545,7 @@
 										<div class="form-group row">
 											<label for="eventPrice"
 												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
-												th:text="#{|${baseMessageKey}.detail.eevnt.price|}"></label>
+												th:text="#{|${baseMessageKey}.detail.event.price|}"></label>
 											<div class="col-md-8 col-sm-9 col-xs-12s">
 												<input type="number" step="0.01" class="form-control"
 													id="eventPrice" />
@@ -626,7 +661,7 @@
 
 	<section layout:fragment="scripts">
 		  
-		<script>
+	<script>
 		 
 		var editAccType = 2;
 		var editPermissions = 2;
@@ -646,57 +681,14 @@
 
 	toastAction = '[[${toastAction}]]';
 	toastStatus = '[[${toastStatus}]]';
-	
-	function selectLoginType() {
-		var selectedLoginType = $("select#loginType").children("option:selected").val();
-		if (selectedLoginType == 0) {
-			$("#password_div").show();
-			$("#reset_pwd_email_div").show();
-		} else {
-			$("#password_div").hide();
-			$("#reset_pwd_email_div").hide();
-		}
-	}
-
-	function selectUserType() {
-		var selectedUserType = $("select#userType").children("option:selected").val();
-		if (selectedUserType == "ADM" || selectedUserType == "SAM") {
-			$("#admin_permissions_div").show();
-		} else {
-			$("#admin_permissions_div").hide();
-		}
-	}
-	
-	function selectAccountType() {
-		if (editAccType == 1 || editAccType == 0) {
-			$('#userType').css('pointer-events','none'); //Disable access to select account type
-		}
-	}
-	
-	function selectEditPermissions() {
-		if (editPermissions == 1 || editPermissions == 0) {
-			$('#admin_permissions_div').css('pointer-events','none'); //Disable access to edit permissions
-		}
-	}
-
-	
+		
 	$(document).ready(function() {
 		if (toastAction && toastStatus ) {
 			if (toastAction == "update" && toastStatus == "success") {
 				alert("User updated successfully!");
 			}		
 		}
-		selectLoginType();
-		selectUserType();
-		selectAccountType();
-		selectEditPermissions();
 		
-		$("select#loginType").change(function() {
-			selectLoginType();
-		});
-		$("select#userType").change(function() {
-			selectUserType();
-		});
 	});
 </script>
 	</section>

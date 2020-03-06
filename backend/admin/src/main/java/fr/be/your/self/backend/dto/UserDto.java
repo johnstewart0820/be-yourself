@@ -123,7 +123,7 @@ public class UserDto implements Serializable {
 		domain.setFacebook(facebook);
 		domain.setLinkedin(linkedin);
 		domain.setSupervised(supervised);
-		domain.setProfilePicture(profilePicture);
+		//domain.setProfilePicture(profilePicture);
 		domain.setDescription(description);	
 		domain.setSchool(school);
 		domain.setAddress(address);
