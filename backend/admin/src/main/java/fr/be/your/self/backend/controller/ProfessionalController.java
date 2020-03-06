@@ -55,6 +55,7 @@ import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.DegreeFileService;
 import fr.be.your.self.service.MediaFileService;
 import fr.be.your.self.service.PriceService;
+import fr.be.your.self.service.ProfessionalEventService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.NumberUtils;
 import fr.be.your.self.util.StringUtils;
@@ -79,6 +80,9 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 	
 	@Autowired
 	private MediaFileService mediaFileService;
+	
+	@Autowired
+	private ProfessionalEventService professionalEventService;
 
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 	
@@ -272,7 +276,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
     		@RequestParam(value="priceIdsToRemove", required=false) String priceIdsToRemove,
     		@RequestParam(value="degreeIdsToRemove", required=false) String degreeIdsToRemove, 
     		@RequestParam(value="mediaIdsToRemove", required=false) String mediaIdsToRemove, 
-
+    		@RequestParam(value="eventIdsToRemove", required=false) String eventIdsToRemove, 
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -355,7 +359,20 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		deleteOldMediaFile(mediaIdList);
         removeIds(mediaFileService, mediaIdList);
         
-      		
+        // Update events
+        if (dto.getEvents() !=  null) {
+			for (ProfessionalEvent event : dto.getEvents()) {
+				if (event.getDate() != null && event.getAddress() != null &&
+						event.getDescription() != null	&& event.getPrice() != null) {
+					event.setUser(domain);
+					professionalEventService.update(event);
+				}
+			}
+        }
+        
+        List<Integer> eventIdList = parseFromString(eventIdsToRemove);
+        removeIds(professionalEventService, eventIdList); 
+        
         //Success, delete old profile picture
         this.deleteUploadFile(oldPictureToDelete);
 

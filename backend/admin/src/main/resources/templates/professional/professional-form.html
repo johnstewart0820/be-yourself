@@ -47,6 +47,8 @@
 									<input type="hidden" th:field="*{id}" />
 									<div class="row">
 										<div class="col-md-12 col-sm-12">
+											<!-- INFORMATION SECTION -->
+											<h2>Information</h2><br>
 											<!-- Last Name -->
 											<div class="form-group row">
 												<label for="lastname"
@@ -152,6 +154,10 @@
 														type="checkbox">
 												</div>
 											</div>
+											
+											<!-- PROFILE SECTION -->
+											<h2>Profile</h2><br>
+											
 											<!-- Profile picture -->
 											<div class="form-group row">
 												<div class="offset-md-3 col-md-4 col-sm-12 text-center" th:if="${action != 'create'}">													
@@ -206,22 +212,38 @@
 												<div class="invalid-feedback"></div>
 											</div>
 										</div>
-										<!-- Prices -->
-										<div  id="price_div">
-											<input type="hidden" id="priceIdsToRemove" name="priceIdsToRemove" value="">
 										
+										<!-- PRICE SECTION -->
+										<h2>Price</h2><br>
+											
+										
+										<!-- Prices -->
+										<div  id="price_div" >
+											<input type="hidden" id="priceIdsToRemove" name="priceIdsToRemove" value="">
+											<div class="form-group row">
+												<div class="col-md-4 col-sm-5 col-xs-12">
+														<span>Label</span>
+												</div>
+												<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
+														<span>Price (&euro;)</span>
+												</div>
+												
+											</div>
 											<div class="form-group row" th:each="price, itemStats : ${dto.prices}" th:id="'div_old_price_' + ${price.id}">
-													<input	type="hidden"
-														th:field="*{prices[__${itemStats.index}__].user}" />
+													<!-- <input	type="hidden"
+														th:field="*{prices[__${itemStats.index}__].user}" /> -->
 													<input type="hidden"
 														th:field="*{prices[__${itemStats.index}__].id}" />
-													<input class="form-control col-md-4 col-sm-6 col-xs-12"
+														
+													<input class="form-control col-md-4 col-sm-5 col-xs-12"
 														th:field="*{prices[__${itemStats.index}__].label}" />
-													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12"
+													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12"
 														th:field="*{prices[__${itemStats.index}__].price}" />
-													<button type="button" class="form-control col-md-2 col-sm-2">Modify</button>	
-													<button type="button"  class="form-control col-md-2 col-sm-2" th:onclick="'javascript:removeOldPrice(' + ${price.id} + ');'">Remove </button>
-												</div>
+													<button type="button"  class="btn btn-icon btn-2 btn-danger offset-md-1" th:title="#{action.delete.title}" 
+													th:onclick="'javascript:removeOldPrice(' + ${price.id} + ');'"><span class="btn-inner--icon">
+													<i class="fas fa-times"></i></span> </button>
+											
+											</div>
 										</div>
 										<div class="form-group row">
 											<div class="col-md-4 col-sm-5 col-xs-12">
@@ -230,8 +252,12 @@
 											<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
 													<input class="form-control" type="text" id="price_value">
 											</div>
-											<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
-													<button class="form-control" type="button" id="add_price">Add</button>
+											<div class="offset-md-1">
+													<a class="btn btn-icon btn-2 btn-primary" title="#{action.add.title}" id="add_price"> 
+													<span class="btn-inner--icon"> 
+													<i class="fas fa-edit"></i> <span th:text="#{action.add}"></span>
+													</span>
+													</a>
 											</div>
 										</div>
 										
@@ -274,9 +300,12 @@
 													var name_new_price="prices["+ index + "].price";
 
 													
-													var new_label = "<input class='form-control col-md-5 col-sm-6 col-xs-12' type='text' id='" + id_new_label + "' name='" + name_new_label + "' value='"+current_label+"' required>";
-													var new_price = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='number' step='0.01' id='" + id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
-													var remove_btn = "<input class='form-control offset-md-1 col-md-2 offset-sm-1 col-sm-2 col-xs-12' type='button' onclick=removeElemById('" + id_new_div + "') value='Remove'></button>";
+													var new_label = "<input class='form-control col-md-4 col-sm-5 col-xs-12' type='text' id='" + id_new_label 
+																+ "' name='" + name_new_label + "' value='"+current_label+"' required>";
+													var new_price = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12' type='number' step='0.01' id='" 
+																+ id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
+													var remove_btn = "<input class='form-control offset-md-1 col-md-2 offset-sm-1 col-sm-3 col-xs-12' type='button' onclick=removeElemById('" 
+																+ id_new_div + "') value='Remove'></button>";
 													
 													var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_label + new_price + remove_btn + "</div>";
 													$("#price_div").append(new_inner_div);
@@ -286,23 +315,24 @@
 											})
 										</script>
 										
-										<!-- Degrees -->
-										<div class="form-group row">	
-											<h3>Degrees</h3>										
-										</div>
+										<!-- DEGREE SECTION -->
+										<h2>Degrees</h2><br>
+										
 										<div  id="degree_div">
 											<input type="hidden" id="degreeIdsToRemove" name="degreeIdsToRemove" value="">
-										
-											<div class="form-group row" th:each="degree, itemStats : ${dto.degreeFiles}" th:id="'div_old_degree_' + ${degree.id}">
+											<div class="form-group row" >
+											<div th:each="degree, itemStats : ${dto.degreeFiles}" th:id="'div_old_degree_' + ${degree.id}">
 													<input	type="hidden"
 														th:field="*{degreeFiles[__${itemStats.index}__].user}" />
 													<input type="hidden"
 														th:field="*{degreeFiles[__${itemStats.index}__].id}" />
-													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12"
-														th:field="*{degreeFiles[__${itemStats.index}__].filePath}" />
-													<button type="button"  class="form-control col-md-2 col-sm-2" 
-													th:onclick="'javascript:removeOldDegree(' + ${degree.id} + ');'">Remove </button>
+													<figure class="mr-2" style="display: table;">													
+													  <img th:src="@{/images/delete-doc-symbol.png}" width=100 
+													  		th:onclick="'javascript:removeOldDegree(' + ${degree.id} + ');'">
+													  <figcaption th:text="${degree.filePath}" style="display: table-caption; caption-side: bottom ;">File name </figcaption>												
+													</figure>
 												</div>
+											</div>
 										</div>
 										<div class="form-group row">											
 											<div class="col" id="fileList"></div>
@@ -346,10 +376,10 @@
 														th:field="*{school}" required>
 												</div>
 										</div>
-										<!-- Media -->
-										<div class="form-group row">	
-											<h3>Medias</h3>										
-										</div>
+										
+										<!-- MEDAS SECTION -->
+										<h3>Medias</h3>	<BR>
+																			
 										<div  id="media_div">
 											<input type="hidden" id="mediaIdsToRemove" name="mediaIdsToRemove" value="">
 										
@@ -359,10 +389,11 @@
 														th:field="*{mediaFiles[__${itemStats.index}__].user}" />
 													<input type="hidden"
 														th:field="*{mediaFiles[__${itemStats.index}__].id}" />
-													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12"
-														th:field="*{mediaFiles[__${itemStats.index}__].filePath}" />
-													<button type="button"  class="form-control col-md-2 col-sm-2" 
-													th:onclick="'javascript:removeOldMedia(' + ${media.id} + ');'">Remove </button>
+													<figure>
+														<img th:src="@{/images/delete-button.png}" width=100 
+													  		th:onclick="'javascript:removeOldMedia(' + ${media.id} + ');'">
+													  	<figcaption th:text="${media.filePath}" style="display: table-caption; caption-side: bottom ;">File name </figcaption>	
+													 </figure>
 												</div>
 										</div>
 										<div class="form-group row">											
@@ -374,14 +405,13 @@
 										</div>
 										<script>
 										function removeOldMedia(mediaId){
-											alert(mediaId);
 											var idsToRemoveTxt = document.getElementById('mediaIdsToRemove').value;
 											if (idsToRemoveTxt == "") {
 												idsToRemoveTxt += mediaId; 
 											} else {
 												idsToRemoveTxt = idsToRemoveTxt + "," + mediaId;
 											}
-											alert("ids media to remove = " + idsToRemoveTxt);
+											//alert("ids media to remove = " + idsToRemoveTxt);
 											
 											document.getElementById('mediaIdsToRemove').value = idsToRemoveTxt;
 											var divToRemove = 'div_old_media_' + mediaId;
@@ -397,10 +427,19 @@
 											    output.innerHTML = '<ul>'+children+'</ul>';
 											}
 										</script>
-										<!-- PROFESSIONAL EVENTS -->
+										
+										<!-- PROFESSIONAL EVENTS SECTION-->
+										<h3>Events</h3>	<BR>
+										
 										<div  id="event_div">
 											<input type="hidden" id="eventIdsToRemove" name="eventIdsToRemove" value="">
-										
+											<div class="form-group row">
+												<div class="col-md-2 col-sm-2 col-xs-12"><span>Date</span></div>
+												<div class="col-md-3 col-sm-4 col-xs-12"><span>Address</span></div>
+												<div class="col-md-3 col-sm-4 col-xs-12"><span>Description</span></div>
+												<div class="col-md-1 col-sm-4 col-xs-12"><span>Price</span></div>
+												
+											</div> 
 											<div class="form-group row" th:each="event, itemStats : ${dto.events}" 
 																		th:id="'div_old_event_' + ${event.id}">
 													<input	type="hidden"
@@ -424,8 +463,10 @@
 													<input type="number" step="0.01" class="form-control col-md-1 col-sm-4 col-xs-12"
 													th:field="*{events[__${itemStats.index}__].price}"
 														id="eventPrice" />
-													<button type="button" class="form-control col-md-1 col-sm-2">Modify</button>	
-													<button type="button"  class="form-control col-md-1 col-sm-2" th:onclick="'javascript:removeOldEven(' + ${event.id} + ');'">Remove </button>
+													
+													<button type="button"  class="btn btn-icon btn-2 btn-danger offset-md-1" th:title="#{action.delete.title}" 
+													th:onclick="'javascript:removeOldEvent(' + ${event.id} + ');'"><span class="btn-inner--icon">
+													<i class="fas fa-times"></i></span> </button>
 											</div>
 										</div>
 									
@@ -451,7 +492,7 @@
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.event.address|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
-													<input class="form-control" type="text" id="eventAddress"	 required>
+													<input class="form-control" type="text" id="eventAddress">
 												</div>
 											</div>
 										<!-- Description -->
@@ -478,10 +519,29 @@
 										</div>
 										<div class="form-group row">
 											<div class="col-md-3  col-sm-3 col-xs-12">
-													<button class="form-control" type="button" id="add_event">Add</button>
+													<!-- <button class="form-control" type="button" id="add_event">Add</button> -->
+													
+													<a class="btn btn-icon btn-2 btn-primary" title="#{action.add.title}" id="add_event"> 
+													<span class="btn-inner--icon"> 		<i class="fas fa-edit"></i> <span th:text="#{action.add}"></span>
+													</span>
+													</a>
+											
 											</div>
 										</div>
 										<script>
+										function removeOldEvent(eventId){
+											var idsToRemoveTxt = document.getElementById('eventIdsToRemove').value;
+											if (idsToRemoveTxt == "") {
+												idsToRemoveTxt += eventId; 
+											} else {
+												idsToRemoveTxt = idsToRemoveTxt + "," + eventId;
+											}
+											
+											document.getElementById('eventIdsToRemove').value = idsToRemoveTxt;
+											var divToRemove = 'div_old_event_' + eventId;
+											document.getElementById(divToRemove).remove();
+										}
+										
 										var indexEvent = [[${#lists.size(dto.events)}]]; // Get the current number of price elements
 										$("#add_event").click(function() {
 											var current_date=$("#eventDate").val();
@@ -503,15 +563,24 @@
 											var id_new_price="events"+ indexEvent + ".price";
 											var name_new_price="events["+ indexEvent + "].price";
 											
-											var new_date = "<input class='form-control col-md-5 col-sm-6 col-xs-12' type='text' id='" + id_new_date + "' name='" + name_new_date + "' value='"+current_date+"' required>";
-											var new_address = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='text' step='0.01' id='" + id_new_address + "' name='" + name_new_address + "' value='"+current_address+"' required>";
-											var new_description = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='text' step='0.01' id='" + id_new_description + "' name='" + name_new_description + "' value='"+current_description+"' required>";
-											var new_price = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='number' step='0.01' id='" + id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
-
-											var remove_btn = "<input class='form-control offset-md-1 col-md-2 offset-sm-1 col-sm-2 col-xs-12' type='button' onclick=removeElemById('" + id_new_div + "') value='Remove'></button>";
+											var new_date = "<div class='input-group col-md-2 col-sm-6 col-xs-12'>" 
+															+" <input class='form-control datepicker' data-date-format='dd-mm-yyyy' type='text' autocomplete='off' id='" 
+															+ id_new_date + "' name='" + name_new_date + "' value='"+current_date
+															+"' required><div class='input-group-prepend'> <span class='input-group-text'><i class='fas fa-calendar'></i></span></div></div>";
+											var new_address = "<input class='form-control  col-md-3  col-sm-4 col-xs-12' type='text' id='" + id_new_address 
+															+ "' name='" + name_new_address + "' value='"+current_address+"' required>";
+											var new_description = "<input class='form-control  col-md-3 col-sm-4 col-xs-12' type='text'  id='" + id_new_description 
+															+ "' name='" + name_new_description + "' value='"+current_description+"' required>";
+											var new_price = "<input class='form-control col-md-1 col-sm-4 col-xs-12' type='number' step='0.01' id='" + id_new_price 
+															+ "' name='" + name_new_price + "' value='"+current_price+"' required>";
+															
+															
+																
+											var remove_btn = "<button class='btn btn-icon btn-2 btn-danger offset-md-1' type='button' onclick=removeElemById('" 
+																+ id_new_div + "')><span class='btn-inner--icon'><i class='fas fa-times'></i></span></button>";
 											
-											var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_date + new_address + new_description + new_price +"</div>";
-											alert(new_inner_div);
+											var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_date + new_address + new_description + new_price +  remove_btn +"</div>";
+											//alert(new_inner_div);
 											$("#event_div").append(new_inner_div);
 											
 											indexEvent++;

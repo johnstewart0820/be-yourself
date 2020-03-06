@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.ProfessionalEvent;
 import fr.be.your.self.repository.BaseRepository;
@@ -11,6 +12,7 @@ import fr.be.your.self.repository.ProfessionalEventRepository;
 import fr.be.your.self.service.ProfessionalEventService;
 import fr.be.your.self.util.StringUtils;
 
+@Service
 public class ProfessionalEventServiceImpl extends BaseServiceImpl<ProfessionalEvent, Integer> implements ProfessionalEventService {
 
 	@Autowired
