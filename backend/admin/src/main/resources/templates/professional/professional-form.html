@@ -46,7 +46,7 @@
 								<fieldset th:disabled="${!writePermission}">
 									<input type="hidden" th:field="*{id}" />
 									<div class="row">
-										<div class="col-md-8 col-sm-12">
+										<div class="col-md-12 col-sm-12">
 											<!-- Last Name -->
 											<div class="form-group row">
 												<label for="lastname"
@@ -91,7 +91,7 @@
 											<div class="form-group row">
 												<input type="hidden" th:field="*{address.id}">
 											
-												<label for="email"
+												<label for="address"
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.address|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
@@ -165,12 +165,12 @@
 											
 										 	<th:block th:switch="${action}">
 												<div th:case="create" class="form-group row">
-													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field" 
+													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs " 
 														th:text="#{|${baseMessageKey}.detail.image|}"></label>
 													<div class="col-sm-5 col-xs-12">
 														<div class="custom-file">
 															<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
-																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
+																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
 																th:accept="${supportImageTypes}" onChange="selectImage(this)" 
 																th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
 															<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
@@ -197,7 +197,7 @@
 										</th:block>
 										<!-- Description -->
 										<div class="form-group row">
-											<label for="title"
+											<label for="description"
 												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.description|}"></label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
@@ -219,7 +219,7 @@
 														th:field="*{prices[__${itemStats.index}__].label}" />
 													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12"
 														th:field="*{prices[__${itemStats.index}__].price}" />
-													<button type="button" class="form-control col-md-2 col-sm-2" th:onclick="'javascript:confirmDelete(' + ${price.id} + ');'">Modify</button>	
+													<button type="button" class="form-control col-md-2 col-sm-2">Modify</button>	
 													<button type="button"  class="form-control col-md-2 col-sm-2" th:onclick="'javascript:removeOldPrice(' + ${price.id} + ');'">Remove </button>
 												</div>
 										</div>
@@ -247,7 +247,6 @@
 												
 												document.getElementById('priceIdsToRemove').value = idsToRemoveTxt;
 												var divToRemove = 'div_old_price_' + priceId;
-												alert(document.getElementById('priceIdsToRemove').value);
 												document.getElementById(divToRemove).remove();
 											}
 											
@@ -260,7 +259,8 @@
 											}
 											
 											$(document).ready(function() {
-												var index = /*${#lists.size(dto.prices)}"*/ "0"; // Get the current number of price elements
+											    
+												var index = [[${#lists.size(dto.prices)}]]; // Get the current number of price elements
 												$("#add_price").click(function() {
 													var current_label=$("#price_label").val();
 													var current_price=$("#price_value").val();
@@ -287,10 +287,238 @@
 										</script>
 										
 										<!-- Degrees -->
-										<div class="form-group row">
-											<input type="file" name="degrees" multiple="multiple"/>
+										<div class="form-group row">	
+											<h3>Degrees</h3>										
 										</div>
-										<!-- Save or go back -->
+										<div  id="degree_div">
+											<input type="hidden" id="degreeIdsToRemove" name="degreeIdsToRemove" value="">
+										
+											<div class="form-group row" th:each="degree, itemStats : ${dto.degreeFiles}" th:id="'div_old_degree_' + ${degree.id}">
+													<input	type="hidden"
+														th:field="*{degreeFiles[__${itemStats.index}__].user}" />
+													<input type="hidden"
+														th:field="*{degreeFiles[__${itemStats.index}__].id}" />
+													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12"
+														th:field="*{degreeFiles[__${itemStats.index}__].filePath}" />
+													<button type="button"  class="form-control col-md-2 col-sm-2" 
+													th:onclick="'javascript:removeOldDegree(' + ${degree.id} + ');'">Remove </button>
+												</div>
+										</div>
+										<div class="form-group row">											
+											<div class="col" id="fileList"></div>
+										</div>
+										<div class="form-group row">										
+											<input class="col" type="file" name="degrees" id="degrees" multiple="multiple"
+											 onchange="javascript:updateDegreeList()" />
+										</div>
+										<script>
+											function removeOldDegree(degreeId){
+												var idsToRemoveTxt = document.getElementById('degreeIdsToRemove').value;
+												if (idsToRemoveTxt == "") {
+													idsToRemoveTxt += degreeId; 
+												} else {
+													idsToRemoveTxt = idsToRemoveTxt + "," + degreeId;
+												}
+												
+												document.getElementById('degreeIdsToRemove').value = idsToRemoveTxt;
+												var divToRemove = 'div_old_degree_' + degreeId;
+												document.getElementById(divToRemove).remove();
+											}
+											
+											updateDegreeList = function() {
+											    var input = document.getElementById('degrees');
+											    var output = document.getElementById('fileList');
+											    var children = "";
+											    for (var i = 0; i < input.files.length; ++i) {
+											        children += '<li>' + input.files.item(i).name + '</li>';
+											    }
+											    output.innerHTML = '<ul>'+children+'</ul>';
+											}
+										</script>
+										<!-- School -->
+										
+										<div class="form-group row">
+												<label for="school"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.school|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="school"
+														th:field="*{school}" required>
+												</div>
+										</div>
+										<!-- Media -->
+										<div class="form-group row">	
+											<h3>Medias</h3>										
+										</div>
+										<div  id="media_div">
+											<input type="hidden" id="mediaIdsToRemove" name="mediaIdsToRemove" value="">
+										
+											<div class="form-group row" th:each="media, itemStats : ${dto.mediaFiles}" 
+																	th:id="'div_old_media_' + ${media.id}">
+													<input	type="hidden"
+														th:field="*{mediaFiles[__${itemStats.index}__].user}" />
+													<input type="hidden"
+														th:field="*{mediaFiles[__${itemStats.index}__].id}" />
+													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12"
+														th:field="*{mediaFiles[__${itemStats.index}__].filePath}" />
+													<button type="button"  class="form-control col-md-2 col-sm-2" 
+													th:onclick="'javascript:removeOldMedia(' + ${media.id} + ');'">Remove </button>
+												</div>
+										</div>
+										<div class="form-group row">											
+											<div class="col" id="mediaFileList"></div>
+										</div>
+										<div class="form-group row">										
+											<input class="col" type="file" name="medias" id="medias" multiple="multiple" 
+											onchange="javascript:updateMediaList()" />
+										</div>
+										<script>
+										function removeOldMedia(mediaId){
+											alert(mediaId);
+											var idsToRemoveTxt = document.getElementById('mediaIdsToRemove').value;
+											if (idsToRemoveTxt == "") {
+												idsToRemoveTxt += mediaId; 
+											} else {
+												idsToRemoveTxt = idsToRemoveTxt + "," + mediaId;
+											}
+											alert("ids media to remove = " + idsToRemoveTxt);
+											
+											document.getElementById('mediaIdsToRemove').value = idsToRemoveTxt;
+											var divToRemove = 'div_old_media_' + mediaId;
+											document.getElementById(divToRemove).remove();
+										}
+											updateMediaList = function() {
+											    var input = document.getElementById('medias');
+											    var output = document.getElementById('mediaFileList');
+											    var children = "";
+											    for (var i = 0; i < input.files.length; ++i) {
+											        children += '<li>' + input.files.item(i).name + '</li>';
+											    }
+											    output.innerHTML = '<ul>'+children+'</ul>';
+											}
+										</script>
+										<!-- PROFESSIONAL EVENTS -->
+										<div  id="event_div">
+											<input type="hidden" id="eventIdsToRemove" name="eventIdsToRemove" value="">
+										
+											<div class="form-group row" th:each="event, itemStats : ${dto.events}" 
+																		th:id="'div_old_event_' + ${event.id}">
+													<input	type="hidden"
+														th:field="*{events[__${itemStats.index}__].user}" />
+													<input type="hidden"
+														th:field="*{events[__${itemStats.index}__].id}" />
+													
+													<div class="col-md-2 col-sm-2 col-xs-12 input-group">
+														<input type="text" class="form-control datepicker"
+															th:field="*{events[__${itemStats.index}__].date}" 
+															th:data-date-format="${dateFormat.toLowerCase()}" 
+															autocomplete="off"/>
+															<div class="input-group-prepend">
+																<span class="input-group-text"><i class="fas fa-calendar"></i></span>
+															</div>
+													</div>
+													<textarea rows="1" class="form-control col-md-3 col-sm-4 col-xs-12" 
+															th:field="*{events[__${itemStats.index}__].address.address}" required></textarea>
+													<textarea rows="1" class="form-control col-md-3 col-sm-4 col-xs-12"
+														th:field="*{events[__${itemStats.index}__].description}"> </textarea>
+													<input type="number" step="0.01" class="form-control col-md-1 col-sm-4 col-xs-12"
+													th:field="*{events[__${itemStats.index}__].price}"
+														id="eventPrice" />
+													<button type="button" class="form-control col-md-1 col-sm-2">Modify</button>	
+													<button type="button"  class="form-control col-md-1 col-sm-2" th:onclick="'javascript:removeOldEven(' + ${event.id} + ');'">Remove </button>
+											</div>
+										</div>
+									
+										<!-- Date -->
+										<div class="form-group row">
+											 <label for="eventDate"
+												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.event.date|}"></label>
+
+												<div class="col-md-3 col-sm-8 input-group">
+													<input type="text" class="form-control datepicker" 
+													   id="eventDate" 													
+														th:data-date-format="${dateFormat.toLowerCase()}" 
+														autocomplete="off" />
+													<div class="input-group-prepend">
+														<span class="input-group-text"><i class="fas fa-calendar"></i></span>
+													</div>
+												</div>											
+										</div>
+										<!-- Address -->
+										<div class="form-group row">										
+												<label for="eventAddress"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													th:text="#{|${baseMessageKey}.detail.event.address|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<input class="form-control" type="text" id="eventAddress"	 required>
+												</div>
+											</div>
+										<!-- Description -->
+										<div class="form-group row">
+											<label for="eventDescription"
+												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.event.description|}"></label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+												<textarea class="form-control" rows="4" id="eventDescription"></textarea>
+													
+												<div class="invalid-feedback"></div>
+											</div>
+										</div>
+										<!-- Price -->
+										<div class="form-group row">
+											<label for="eventPrice"
+												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.eevnt.price|}"></label>
+											<div class="col-md-8 col-sm-9 col-xs-12s">
+												<input type="number" step="0.01" class="form-control"
+													id="eventPrice" />
+												<div class="invalid-feedback"></div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<div class="col-md-3  col-sm-3 col-xs-12">
+													<button class="form-control" type="button" id="add_event">Add</button>
+											</div>
+										</div>
+										<script>
+										var indexEvent = [[${#lists.size(dto.events)}]]; // Get the current number of price elements
+										$("#add_event").click(function() {
+											var current_date=$("#eventDate").val();
+											var current_address=$("#eventAddress").val();
+											var current_description=$("#eventDescription").val();
+											var current_price=$("#eventPrice").val();
+
+											var id_new_div="div_event_"+ indexEvent;
+
+											var id_new_date="events"+ indexEvent + ".date";
+											var name_new_date="events["+ indexEvent + "].date";
+
+											var id_new_address="events"+ indexEvent + ".address.address";
+											var name_new_address="events["+ indexEvent + "].address.address";
+
+											var id_new_description="events"+ indexEvent + ".description";
+											var name_new_description="events["+ indexEvent + "].description";
+											
+											var id_new_price="events"+ indexEvent + ".price";
+											var name_new_price="events["+ indexEvent + "].price";
+											
+											var new_date = "<input class='form-control col-md-5 col-sm-6 col-xs-12' type='text' id='" + id_new_date + "' name='" + name_new_date + "' value='"+current_date+"' required>";
+											var new_address = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='text' step='0.01' id='" + id_new_address + "' name='" + name_new_address + "' value='"+current_address+"' required>";
+											var new_description = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='text' step='0.01' id='" + id_new_description + "' name='" + name_new_description + "' value='"+current_description+"' required>";
+											var new_price = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-4 col-xs-12' type='number' step='0.01' id='" + id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
+
+											var remove_btn = "<input class='form-control offset-md-1 col-md-2 offset-sm-1 col-sm-2 col-xs-12' type='button' onclick=removeElemById('" + id_new_div + "') value='Remove'></button>";
+											
+											var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_date + new_address + new_description + new_price +"</div>";
+											alert(new_inner_div);
+											$("#event_div").append(new_inner_div);
+											
+											indexEvent++;
+										})
+										</script>
+											
+											<!-- Save or go back -->
 										<div th:if="${writePermission}" class="form-group row">
 											<div
 												class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12">
@@ -328,7 +556,9 @@
 	</div>
 
 	<section layout:fragment="scripts">
+		  
 		<script>
+		 
 		var editAccType = 2;
 		var editPermissions = 2;
 	</script>

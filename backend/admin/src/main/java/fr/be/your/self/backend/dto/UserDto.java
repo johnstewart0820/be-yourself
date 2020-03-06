@@ -1,6 +1,7 @@
 package fr.be.your.self.backend.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import fr.be.your.self.model.Price;
 import fr.be.your.self.model.ProfessionalEvent;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.DegreeFile;
+import fr.be.your.self.model.MediaFile;
 
 public class UserDto implements Serializable {
 
@@ -43,11 +45,19 @@ public class UserDto implements Serializable {
 	private String description;
 	private Address address;
 	private List<DegreeFile> degreeFiles;
-	private List<Price> prices;
-	private ProfessionalEvent event;
+	
+	private List<MediaFile> mediaFiles;
+
+	private List<Price> prices = new ArrayList<>();
+	private List<ProfessionalEvent> events = new ArrayList<>();
+	
 	
 	private MultipartFile uploadImageFile;
+	
 	private List<MultipartFile> degrees;
+	private List<MultipartFile> medias;
+
+	private String school;
 	
 	public UserDto() {
 	}
@@ -81,8 +91,10 @@ public class UserDto implements Serializable {
 			this.description = domain.getDescription();
 			this.address = domain.getAddress();
 			this.degreeFiles = domain.getDegreeFiles();
-			this.event = domain.getEvent();		
+			this.mediaFiles = domain.getMediaFiles();
+			this.events = domain.getEvents();		
 			this.prices = domain.getPrices();
+			this.school = domain.getSchool();
 		}
 	}
 	
@@ -113,6 +125,8 @@ public class UserDto implements Serializable {
 		domain.setSupervised(supervised);
 		domain.setProfilePicture(profilePicture);
 		domain.setDescription(description);	
+		domain.setSchool(school);
+		domain.setAddress(address);
 	}
 
 
@@ -260,12 +274,8 @@ public class UserDto implements Serializable {
 	public void setUserFiles(List<DegreeFile> userFiles) {
 		this.degreeFiles = userFiles;
 	}
-	public ProfessionalEvent getEvent() {
-		return event;
-	}
-	public void setEvent(ProfessionalEvent event) {
-		this.event = event;
-	}
+	
+	
 	public MultipartFile getUploadImageFile() {
 		return uploadImageFile;
 	}
@@ -284,5 +294,34 @@ public class UserDto implements Serializable {
 	public void setDegrees(List<MultipartFile> degrees) {
 		this.degrees = degrees;
 	}
-	
+	public String getSchool() {
+		return school;
+	}
+	public void setSchool(String school) {
+		this.school = school;
+	}
+	public List<MultipartFile> getMedias() {
+		return medias;
+	}
+	public void setMedias(List<MultipartFile> medias) {
+		this.medias = medias;
+	}
+	public List<MediaFile> getMediaFiles() {
+		return mediaFiles;
+	}
+	public void setMediaFiles(List<MediaFile> mediaFiles) {
+		this.mediaFiles = mediaFiles;
+	}
+	public List<DegreeFile> getDegreeFiles() {
+		return degreeFiles;
+	}
+	public void setDegreeFiles(List<DegreeFile> degreeFiles) {
+		this.degreeFiles = degreeFiles;
+	}
+	public List<ProfessionalEvent> getEvents() {
+		return events;
+	}
+	public void setEvents(List<ProfessionalEvent> events) {
+		this.events = events;
+	}
 }

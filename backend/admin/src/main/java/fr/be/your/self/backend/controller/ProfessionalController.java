@@ -43,12 +43,17 @@ import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Address;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.Price;
+import fr.be.your.self.model.ProfessionalEvent;
 import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserConstants;
+import fr.be.your.self.model.UserFile;
 import fr.be.your.self.model.DegreeFile;
+import fr.be.your.self.model.MediaFile;
 import fr.be.your.self.service.AddressService;
 import fr.be.your.self.service.BaseService;
+import fr.be.your.self.service.DegreeFileService;
+import fr.be.your.self.service.MediaFileService;
 import fr.be.your.self.service.PriceService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.NumberUtils;
@@ -67,10 +72,13 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 	private UserService userService;
 	
 	@Autowired
-	private AddressService addressService; 
+	private PriceService priceService; 
 	
 	@Autowired
-	private PriceService priceService; 
+	private DegreeFileService degreeFileService; 
+	
+	@Autowired
+	private MediaFileService mediaFileService;
 
 	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
 	
@@ -169,13 +177,24 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		user.setStatus(UserStatus.DRAFT.getValue());
 
 		//Create Address
-		Address addr = Address.newAddress(dto.getAddress().getAddress());
-		
-		//Create user
-		user.setAddress(addr);
+		user.setAddress(dto.getAddress());
 
 		//Add prices
+		if (dto.getPrices() != null) {
+			for (Price price : dto.getPrices()) {
+				price.setUser(user);
+			}
+		}
 		user.setPrices(dto.getPrices());
+		
+		
+		//Add events
+		if (dto.getEvents() != null) {
+			for (ProfessionalEvent event : dto.getEvents()) {
+				event.setUser(user);
+			}
+			user.setEvents(dto.getEvents());
+		}
 		
 		 //Validate image file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
@@ -201,12 +220,31 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         List<MultipartFile> degrees = dto.getDegrees();
         List<DegreeFile> degreesList = new ArrayList<>();
         for (MultipartFile file : degrees) {
-        	Path uploadFilePath = uploadFile(file);
+        	if (StringUtils.isNullOrEmpty(file.getOriginalFilename())){
+        		continue;
+        	}
+        	Path uploadFilePath = uploadFile(file, true);
         	DegreeFile userFile = new DegreeFile(uploadFilePath.getFileName().toString());
         	userFile.setUser(user);
         	degreesList.add(userFile);
         }
         user.setDegreeFiles(degreesList);
+        
+        //Medias
+        List<MultipartFile> medias = dto.getMedias();
+        List<MediaFile> mediasList = new ArrayList<>();
+        for (MultipartFile file : medias) {
+        	if (StringUtils.isNullOrEmpty(file.getOriginalFilename())){
+        		continue;
+        	}
+        	Path uploadFilePath = uploadFile(file, true);
+        	MediaFile userFile = new MediaFile(uploadFilePath.getFileName().toString());
+        	userFile.setUser(user);
+        	mediasList.add(userFile);
+        }
+        user.setMediaFiles(mediasList);
+        
+        
 		User savedUser = userService.create(user);
 		
 
@@ -231,7 +269,10 @@ public class ProfessionalController extends BaseResourceController<User, User, U
     public String updateDomain(
     		@PathVariable("id") Integer id, 
     		@ModelAttribute @Validated UserDto dto, 
-    		@RequestParam(value="priceIdsToRemove", required=false) String priceIdsToRemove, 
+    		@RequestParam(value="priceIdsToRemove", required=false) String priceIdsToRemove,
+    		@RequestParam(value="degreeIdsToRemove", required=false) String degreeIdsToRemove, 
+    		@RequestParam(value="mediaIdsToRemove", required=false) String mediaIdsToRemove, 
+
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -251,17 +292,15 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         }
         
         dto.copyToDomainOfProfessional(domain);
-        
-        domain.setAddress(dto.getAddress());
-       
+             
         
         // Process upload image and content file
-        String deleteImageFileName = null;
+        String oldPictureToDelete = null;
         Path uploadImageFilePath = null;
         
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
         if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
-        	deleteImageFileName = domain.getProfilePicture();
+        	oldPictureToDelete = domain.getProfilePicture();
         	
         	//Process upload image file
         	uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
@@ -273,26 +312,10 @@ public class ProfessionalController extends BaseResourceController<User, User, U
             final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
         	domain.setProfilePicture(uploadImageFileName);
         }
-        
 
   		
         final User updatedDomain = this.userService.update(domain);
-        
-        //Update prices
-		for (Price price : dto.getPrices()) {
-			if (price.getLabel() != null && price.getPrice() != null) {
-				price.setUser(updatedDomain);
-				priceService.update(price);
-			}
-		}
-        
-        if (!StringUtils.isNullOrEmpty(priceIdsToRemove)) {
-        	String[] removedIDs = priceIdsToRemove.split(",");
-        	for (int i = 0; i<removedIDs.length; i++) {
-        		priceService.delete(Integer.valueOf(removedIDs[i]));
-        	}
-        }
-        //Error, delete upload file
+       //Error, delete upload file
         if (updatedDomain == null || result.hasErrors()) {
         	this.deleteUploadFile(uploadImageFilePath);
         	
@@ -306,14 +329,102 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         }
         
        
+		// Update prices
+        if (dto.getPrices() !=  null) {
+			for (Price price : dto.getPrices()) {
+				if (price.getLabel() != null && price.getPrice() != null) {
+					price.setUser(domain);
+					priceService.update(price);
+				}
+			}
+        }
+        List<Integer> priceIdList = parseFromString(priceIdsToRemove);
+        removeIds(priceService, priceIdList);  
+        
+		// Update degrees
+        List<DegreeFile> uploadDegreeFileList = getUploadDegreeList(dto, domain);
+		degreeFileService.saveAll(uploadDegreeFileList);
+        List<Integer> degreeIdList = parseFromString(degreeIdsToRemove);
+		deleteOldDegreeFile(degreeIdList);
+        removeIds(degreeFileService, degreeIdList);
+        
+        // Update media files
+        List<MediaFile> uploadMediaFileList = getUploadMediaList(dto, domain);
+		mediaFileService.saveAll(uploadMediaFileList);
+        List<Integer> mediaIdList = parseFromString(mediaIdsToRemove);
+		deleteOldMediaFile(mediaIdList);
+        removeIds(mediaFileService, mediaIdList);
+        
       		
-        //Success, delete old image file
-        this.deleteUploadFile(deleteImageFileName);
+        //Success, delete old profile picture
+        this.deleteUploadFile(oldPictureToDelete);
 
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
         
         return "redirect:" + this.getBaseURL() + "/edit/" + id;
     }
+
+	private List<DegreeFile> getUploadDegreeList(UserDto dto, User domain) {
+		List<MultipartFile> degrees = dto.getDegrees();
+		List<DegreeFile> uploadDegreeFileList = new ArrayList<>();
+		for (MultipartFile file : degrees) {
+			if (StringUtils.isNullOrEmpty(file.getOriginalFilename())){
+        		continue;
+        	}
+			Path uploadFilePath = uploadFile(file, true);
+			DegreeFile degreeFile = new DegreeFile(uploadFilePath.getFileName().toString());
+			degreeFile.setUser(domain);
+			uploadDegreeFileList.add(degreeFile);
+		}
+		return uploadDegreeFileList;
+	}
+
+	private List<MediaFile> getUploadMediaList(UserDto dto, User domain) {
+		List<MultipartFile> medias = dto.getMedias();
+		List<MediaFile> uploadMediaFileList = new ArrayList<>();
+		for (MultipartFile file : medias) {
+			if (StringUtils.isNullOrEmpty(file.getOriginalFilename())){
+        		continue;
+        	}
+			Path uploadFilePath = uploadFile(file, true);
+			MediaFile mediaFile = new MediaFile(uploadFilePath.getFileName().toString());
+			mediaFile.setUser(domain);
+			uploadMediaFileList.add(mediaFile);
+		}
+		return uploadMediaFileList;
+	}
+	
+	private List<Integer> parseFromString(String idStr) {
+		List<Integer> res = new ArrayList<>();
+		if (!StringUtils.isNullOrEmpty(idStr)) {
+			String[] removedIDs = idStr.split(",");
+			for (int i = 0; i<removedIDs.length; i++) {
+				res.add(Integer.valueOf(removedIDs[i]));
+			}
+		}
+		return res;
+	}
+
+	private void deleteOldDegreeFile(List<Integer> degreeIdList) {
+		for (Integer id : degreeIdList) {
+			DegreeFile degreeFile = degreeFileService.getById(id);
+			this.deleteUploadFile(degreeFile.getFilePath());
+		}
+	}
+	
+	private void deleteOldMediaFile(List<Integer> degreeIdList) {
+		for (Integer id : degreeIdList) {
+			MediaFile degreeFile = mediaFileService.getById(id);
+			this.deleteUploadFile(degreeFile.getFilePath());
+		}
+	}
+
+	private void removeIds(BaseService baseService, List<Integer> idList) {
+		for (Integer id : idList) {
+			baseService.delete(Integer.valueOf(id));
+		}
+
+	}
 
 }

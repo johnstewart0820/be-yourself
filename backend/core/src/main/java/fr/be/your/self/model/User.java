@@ -75,12 +75,12 @@ public class User extends PO<Integer> {
 	private String linkedin;
 	private boolean supervised;
 	private String profilePicture;
-	
+	private String school;
+
 
 	@Lob
 	private String description;
-	
-	
+
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "address_id")
 	private Address address;
@@ -91,10 +91,11 @@ public class User extends PO<Integer> {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<DegreeFile> degreeFiles;
 	
-	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	private List<MediaFile> mediaFiles;
 
-	@OneToOne(fetch = FetchType.LAZY,  mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
-	private ProfessionalEvent event;
+	@OneToMany(fetch = FetchType.LAZY,  mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	private List<ProfessionalEvent> events;
 	
 	public User() {
 	}
@@ -298,12 +299,14 @@ public class User extends PO<Integer> {
 	}
 
 
-	public ProfessionalEvent getEvent() {
-		return event;
+
+
+	public List<ProfessionalEvent> getEvents() {
+		return events;
 	}
 
-	public void setEvent(ProfessionalEvent event) {
-		this.event = event;
+	public void setEvents(List<ProfessionalEvent> events) {
+		this.events = events;
 	}
 
 	public String getWebsite() {
@@ -338,7 +341,21 @@ public class User extends PO<Integer> {
 		this.prices = prices;
 	}
 
+
+	public String getSchool() {
+		return school;
+	}
+
+	public void setSchool(String school) {
+		this.school = school;
+	}
 	
-	
+	public List<MediaFile> getMediaFiles() {
+		return mediaFiles;
+	}
+
+	public void setMediaFiles(List<MediaFile> mediaFiles) {
+		this.mediaFiles = mediaFiles;
+	}
 	
 }

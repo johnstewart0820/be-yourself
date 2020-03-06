@@ -9,7 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class DegreeFile extends UserFile {
+public class MediaFile extends UserFile {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -20,8 +20,8 @@ public class DegreeFile extends UserFile {
 
 	private String filePath;
 	
-	public DegreeFile() {} 
-	public DegreeFile(String filePath) {
+	public MediaFile() {} 
+	public MediaFile(String filePath) {
 		this.filePath = filePath;
 	}
 	
