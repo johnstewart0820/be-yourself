@@ -1,6 +1,7 @@
 package fr.be.your.self.repository;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,13 +13,19 @@ import fr.be.your.self.model.Slideshow;
 @Repository
 public interface SlideshowRepository extends BaseRepository<Slideshow, Integer> {
 	
-	long countByStartDateGreaterThanEqual(Date date);
-    Iterable<Slideshow> findAllByStartDateGreaterThanEqual(Date date, Sort sort);
-    Page<Slideshow> findAllByStartDateGreaterThanEqual(Date date, Pageable pageable);
+	Optional<Slideshow> findFirstByStartDateLessThanEqualOrderByStartDateDesc(Date date);
+	
+	long countByStartDateGreaterThan(Date date);
+	
+    Iterable<Slideshow> findAllByStartDateGreaterThan(Date date, Sort sort);
     
-    long countByStartDateIsNotNull();
-    Iterable<Slideshow> findAllByStartDateIsNotNull(Sort sort);
-    Page<Slideshow> findAllByStartDateIsNotNull(Pageable pageable);
+    Page<Slideshow> findAllByStartDateGreaterThan(Date date, Pageable pageable);
     
-    Iterable<Slideshow> findAllByStartDateIsNull();
+    //long countByStartDateIsNotNull();
+    
+    //Iterable<Slideshow> findAllByStartDateIsNotNull(Sort sort);
+    
+    //Page<Slideshow> findAllByStartDateIsNotNull(Pageable pageable);
+    
+    //Iterable<Slideshow> findAllByStartDateIsNull();
 }

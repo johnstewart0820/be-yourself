@@ -50,7 +50,7 @@ public class DiscountCodeController extends BaseCodeController {
 		SORTABLE_COLUMNS.put("startDate", new String[] { "startDate" });
 		SORTABLE_COLUMNS.put("endDate", new String[] { "endDate" });
 		SORTABLE_COLUMNS.put("maxUserAmount", new String[] { "maxUserAmount" });
-		SORTABLE_COLUMNS.put("usedAmount", new String[] { "usedAmount" });
+		//SORTABLE_COLUMNS.put("usedAmount", new String[] { "usedAmount" });
 		SORTABLE_COLUMNS.put("dealPrice", new String[] { "dealPrice" });
 		SORTABLE_COLUMNS.put("pricePerUser", new String[] { "pricePerUser" });
 		SORTABLE_COLUMNS.put("discountType", new String[] { "discountType" });

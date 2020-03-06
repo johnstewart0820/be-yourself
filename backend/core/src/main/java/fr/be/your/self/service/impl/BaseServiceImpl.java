@@ -28,6 +28,18 @@ public abstract class BaseServiceImpl<T, K extends Serializable> implements Base
 	
 	protected abstract Page<T> getListByPage(String text, Pageable pageable);
 	
+	protected void handleBeforeCreate(T domain) throws RuntimeException {}
+	
+	protected void handleAfterCreate(T domain) throws RuntimeException {}
+	
+	protected void handleBeforeUpdate(T domain) throws RuntimeException {}
+	
+	protected void handleAfterUpdate(T domain) throws RuntimeException {}
+	
+	protected void handleBeforeDelete(K id) throws RuntimeException {}
+	
+	protected void handleAfterDelete(K id) throws RuntimeException {}
+	
 	@Override
 	@Transactional(readOnly = true)
 	public T getById(K id) {
@@ -86,19 +98,36 @@ public abstract class BaseServiceImpl<T, K extends Serializable> implements Base
 	@Override
 	@Transactional
 	public T create(T domain) {
-		return this.getRepository().save(domain);
+		this.handleBeforeCreate(domain);
+		
+		final T savedDomain = this.getRepository().save(domain);
+		
+		this.handleAfterCreate(savedDomain);
+		
+		return savedDomain;
 	}
 	
 	@Override
 	@Transactional
 	public T update(T domain) {
-		return this.getRepository().save(domain);
+		this.handleBeforeUpdate(domain);
+		
+		final T savedDomain = this.getRepository().save(domain);
+		
+		this.handleAfterUpdate(savedDomain);
+		
+		return savedDomain;
 	}
 	
 	@Override
 	@Transactional
 	public boolean delete(K id) {
+		this.handleBeforeDelete(id);
+		
 		this.getRepository().deleteById(id);
+		
+		this.handleAfterDelete(id);
+		
 		return true;
 	}
 

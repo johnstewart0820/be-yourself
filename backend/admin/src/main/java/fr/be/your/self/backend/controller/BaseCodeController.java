@@ -1,5 +1,8 @@
 package fr.be.your.self.backend.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -86,6 +89,23 @@ public abstract class BaseCodeController extends BaseResourceController<Business
 		
 		model.addAttribute("priceUnitSymbol", this.dataSetting.getPriceUnitSymbol());
 		model.addAttribute("priceUnitName", this.dataSetting.getPriceUnitName());
+		
+		if (pageableDto != null) {
+			final List<BusinessCodeDto> dtos = pageableDto.getItems();
+			
+			if (dtos != null && !dtos.isEmpty()) {
+				final List<Integer> codeIds = new ArrayList<Integer>(dtos.size());
+				for (BusinessCodeDto dto : dtos) {
+					codeIds.add(dto.getId());
+				}
+				
+				final Map<Integer, Integer> usedAmounts = this.mainService.getUsedAmountByIds(codeIds);
+				for (BusinessCodeDto dto : dtos) {
+					final Integer usedAmount = usedAmounts.get(dto.getId());
+					dto.setUsedAmount(usedAmount == null ? 0 : usedAmount.intValue());
+				}
+			}
+		}
 	}
 
 	@Override
@@ -123,6 +143,16 @@ public abstract class BaseCodeController extends BaseResourceController<Business
 			}
 			
 			dto.setName(name);
+		}
+		
+		if (domain != null) {
+			final List<Integer> codeIds = Collections.singletonList(domain.getId());
+			final Map<Integer, Integer> usedAmounts = this.mainService.getUsedAmountByIds(codeIds);
+			
+			if (usedAmounts != null) {
+				final Integer usedAmount = usedAmounts.get(domain.getId());
+				dto.setUsedAmount(usedAmount == null ? 0 : usedAmount.intValue());
+			}
 		}
 	}
 

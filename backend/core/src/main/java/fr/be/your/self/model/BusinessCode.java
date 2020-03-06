@@ -61,7 +61,7 @@ public class BusinessCode extends PO<Integer> {
 	/**
 	 * Number of times the code has been used for B2B
 	 **/
-	private int usedAmount;
+	//private int usedAmount;
 
 	/**
 	 * Price of the deal (euro) for B2B
@@ -154,7 +154,8 @@ public class BusinessCode extends PO<Integer> {
 	public void setMaxUserAmount(int maxUserAmount) {
 		this.maxUserAmount = maxUserAmount;
 	}
-
+	
+	/*
 	public int getUsedAmount() {
 		return usedAmount;
 	}
@@ -162,7 +163,8 @@ public class BusinessCode extends PO<Integer> {
 	public void setUsedAmount(int usedAmount) {
 		this.usedAmount = usedAmount;
 	}
-
+	*/
+	
 	public BigDecimal getDealPrice() {
 		return dealPrice;
 	}

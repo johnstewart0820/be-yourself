@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import fr.be.your.self.backend.cache.CacheManager;
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
@@ -36,6 +37,9 @@ public abstract class BaseController {
 	@Autowired
 	private PermissionService permissionService;
 	
+	@Autowired
+	private CacheManager cacheManager;
+	
 	protected void initAttributes(HttpSession session, HttpServletRequest request, 
 			HttpServletResponse response, Model model, PermissionDto permission) {
 	}
@@ -44,8 +48,7 @@ public abstract class BaseController {
 	protected void initModelAttribute(HttpSession session, HttpServletRequest request, 
 			HttpServletResponse response, Model model) {
 		
-		PermissionDto permission = new PermissionDto();
-		
+		PermissionDto permission = null;
 		Integer userId = null;
 		String displayName = null;
 		String userAvatar = null;
@@ -70,14 +73,27 @@ public abstract class BaseController {
 				
 				userId = userDetails.getUserId();
 				
-				final Iterable<Permission> userPermissions = this.permissionService.getPermissionByUserId(userId);
-				if (userPermissions != null) {
-					for (Permission userPermission : userPermissions) {
-						final Functionality functionality = userPermission.getFunctionality();
-						permission.addPermission(functionality.getPath(), userPermission.getUserPermission());
+				final String permissionCacheKey = Constants.CACHE.getPermission(userId);
+				permission = this.cacheManager.getItemValue(permissionCacheKey, PermissionDto.class);
+				
+				if (permission == null) {
+					permission = new PermissionDto();
+					
+					final Iterable<Permission> userPermissions = this.permissionService.getPermissionByUserId(userId);
+					if (userPermissions != null) {
+						for (Permission userPermission : userPermissions) {
+							final Functionality functionality = userPermission.getFunctionality();
+							permission.addPermission(functionality.getPath(), userPermission.getUserPermission());
+						}
 					}
+					
+					this.cacheManager.updateItem(permissionCacheKey, permission);
 				}
 			}
+		}
+		
+		if (permission == null) {
+			permission = new PermissionDto();
 		}
 		
 		if (StringUtils.isNullOrSpace(displayName)) {

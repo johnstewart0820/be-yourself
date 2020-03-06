@@ -1,12 +1,17 @@
 package fr.be.your.self.backend.dto;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import fr.be.your.self.common.UserPermission;
 
-public class PermissionDto {
-
+public class PermissionDto implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5317213474474452007L;
+	
 	private Map<String, Integer> userPermissions = new HashMap<>();
 
 	public boolean hasPermission(String... paths) {

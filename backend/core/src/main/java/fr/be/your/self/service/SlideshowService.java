@@ -12,7 +12,7 @@ import fr.be.your.self.model.SlideshowImage;
 
 public interface SlideshowService extends BaseService<Slideshow, Integer> {
 
-	public Slideshow getMainSlideshow();
+	public Slideshow getCurrentSlideshow();
 	
 	public long countAvailaible(Date startDate);
 

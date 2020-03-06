@@ -19,10 +19,11 @@ public class SlideshowDto extends BaseDto {
 	private int id;
 	
 	private Date startDate;
-	private Date endDate;
 
 	private List<SlideshowImage> images;
 	
+	private String webLink;
+	private String mobileLink;
 	private MultipartFile uploadImageFile;
 
 	public SlideshowDto() {
@@ -37,7 +38,6 @@ public class SlideshowDto extends BaseDto {
 		if (domain != null) {
 			this.id = domain.getId().intValue();
 			this.startDate = domain.getStartDate();
-			this.endDate = domain.getEndDate();
 			this.images = domain.getImages();
 		}
 		
@@ -55,7 +55,6 @@ public class SlideshowDto extends BaseDto {
 
 	public void copyToDomain(Slideshow domain) {
 		domain.setStartDate(startDate);
-		domain.setEndDate(endDate == null ? startDate : endDate);
 	}
 	
 	public int getId() {
@@ -74,20 +73,28 @@ public class SlideshowDto extends BaseDto {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
 	public List<SlideshowImage> getImages() {
 		return images;
 	}
 
 	public void setImages(List<SlideshowImage> images) {
 		this.images = images;
+	}
+
+	public String getWebLink() {
+		return webLink;
+	}
+
+	public void setWebLink(String webLink) {
+		this.webLink = webLink;
+	}
+
+	public String getMobileLink() {
+		return mobileLink;
+	}
+
+	public void setMobileLink(String mobileLink) {
+		this.mobileLink = mobileLink;
 	}
 
 	public MultipartFile getUploadImageFile() {

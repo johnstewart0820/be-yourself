@@ -8,15 +8,6 @@
 <body>
 	<th:block layout:fragment="stylesheets">
 		<style type="text/css">
-			.carousel-inner > .carousel-item > img,
-			.carousel-inner > .carousel-item > a > img {
-  				max-height: 120px !important;
-			}
-			
-			.group-header {
-				background-color: #ccc;
-			}
-			
 			.testimonial-group {
 				padding-bottom: 12px;
 				padding-left: 12px;
@@ -119,15 +110,15 @@
   					</div>
   				</div>
   					
-				<form action="#" th:action="${writePermission ? baseURL + '/update-main/' + mainDto.id : 'javascript:;'}"
+				<form th:if="${writePermission}" action="#" th:action="${baseURL + '/update/' + mainDto.id}"
 					th:id="${pageName + '-main-data-form'}"
-					th:object="${mainDto}" method="post" enctype="multipart/form-data">
+					th:object="${editScheduleDto}" method="post" enctype="multipart/form-data">
 					
-					<div class="form-group mb-0">
-						<div class="input-group input-group-alternative">
-							<div class="input-group-prepend">
-								<span class="input-group-text" th:utext="#{slideshow.label.add.image}"></span>
-							</div>
+					<div class="form-group row">
+						<label for="upload-image-file-main" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+							th:text="#{|${baseMessageKey}.detail.image|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
 							<div class="custom-file">
 								<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" 
 									id="upload-image-file-main" 
@@ -138,13 +129,37 @@
 									th:data-browse="#{action.select.image}" 
 									th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 							</div>
-							
-							<div class="input-group-prepend">
-								<span class="input-group-button">
-									<button type="submit" class="btn btn-primary" th:title="#{slideshow.label.add.image}">
-										<i class="fas fa-image"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
-									</button>
-								</span>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label for="web-link-main" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							th:text="#{|${baseMessageKey}.detail.web.link|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<input type="text" class="form-control" 
+								th:field="*{webLink}" id="web-link-main" 
+								th:placeholder="#{|${baseMessageKey}.detail.web.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('webLink')}" th:errors="*{webLink}"></div>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label for="mobile-link-main" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							th:text="#{|${baseMessageKey}.detail.mobile.link|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<input type="text" class="form-control" 
+								th:field="*{mobileLink}" id="mobile-link-main" 
+								th:placeholder="#{|${baseMessageKey}.detail.mobile.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('mobileLink')}" th:errors="*{mobileLink}"></div>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+							<div class="form-action-buttons-row">
+								<button type="submit" class="btn btn-primary sm-btn-block" th:title="#{slideshow.button.add.image}">
+									<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -187,15 +202,15 @@
  					</div>
  				</div>
  				
- 				<form action="#" th:action="${writePermission ? baseURL + '/update-schedule/' + schedule.id : 'javascript:;'}"
+ 				<form th:if="${writePermission}" action="#" th:action="${baseURL + '/update/' + schedule.id}"
 					th:id="${pageName + '-schedule-data-form-' + schedule.id}"
 					th:object="${editScheduleDto}" method="post" enctype="multipart/form-data">
 					
-					<div class="form-group mb-0">
-						<div class="input-group input-group-alternative">
-							<div class="input-group-prepend">
-								<span class="input-group-text" th:utext="#{slideshow.label.add.image}"></span>
-							</div>
+					<div class="form-group row">
+						<label th:for="${'upload-image-file-schedule-' + schedule.id}" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+							th:text="#{|${baseMessageKey}.detail.image|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
 							<div class="custom-file">
 								<input type="file" class="custom-file-input" th:field="*{uploadImageFile}"
 									th:id="${'upload-image-file-schedule-' + schedule.id}" 
@@ -208,13 +223,39 @@
 									th:data-browse="#{action.select.image}" 
 									th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 							</div>
-							
-							<div class="input-group-prepend">
-								<span class="input-group-button">
-									<button type="submit" class="btn btn-primary" th:title="#{slideshow.label.add.image}">
-										<i class="fas fa-image"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
-									</button>
-								</span>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label th:for="${'web-link-schedule-' + schedule.id}" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							th:text="#{|${baseMessageKey}.detail.web.link|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<input type="text" class="form-control" 
+								th:field="*{webLink}" th:id="${'web-link-schedule-' + schedule.id}" 
+								th:placeholder="#{|${baseMessageKey}.detail.web.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('webLink')}" th:errors="*{webLink}"></div>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label th:for="${'mobile-link-schedule-' + schedule.id}" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							th:text="#{|${baseMessageKey}.detail.mobile.link|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<input type="text" class="form-control" 
+								th:field="*{mobileLink}" th:id="${'mobile-link-schedule-' + schedule.id}" 
+								th:placeholder="#{|${baseMessageKey}.detail.mobile.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('mobileLink')}" th:errors="*{mobileLink}"></div>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+							<div class="form-action-buttons-row">
+								<button type="submit" class="btn btn-primary sm-btn-block" th:title="#{slideshow.button.add.image}">
+									<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{slideshow.button.add.image}"></span>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -222,7 +263,7 @@
 	 		</div>
 	 	</div>
 	 	
-	 	<div class="card shadow">
+	 	<div th:if="${writePermission}" class="card shadow">
  			<div class="card-header border-0">
 				<div class="row">
 					<div class="col-12">
@@ -242,18 +283,18 @@
  					</div>
  				</div>
  				
- 				<form action="#" th:action="${writePermission ? baseURL + '/create-schedule/' : 'javascript:;'}"
+ 				<form action="#" th:action="${baseURL + '/create'}"
 					th:id="${pageName + '-new-schedule-data-form'}"
 					th:object="${newScheduleDto}" method="post" enctype="multipart/form-data">
 					
 					<div class="form-group row">
-						<label id="startDateLabel" for="startDate" 
+						<label for="start-date-new-schedule" 
 							class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
 							th:text="#{|${baseMessageKey}.detail.start.date|}"></label>
 						<div class="col-md-10 col-sm-9 col-xs-12">
 							<div class="input-group">
 								<input type="text" class="form-control datepicker" 
-									th:field="*{startDate}" id="startDate" 
+									th:field="*{startDate}" id="start-date-new-schedule" 
 									th:placeholder="#{|${baseMessageKey}.detail.start.date.placeholder|}" 
 									th:data-date-format="${dateFormat.toLowerCase()}" 
 									required="required" autocomplete="off" />
@@ -283,7 +324,32 @@
 							</div>
 						</div>
 					</div>
-					<div th:if="${writePermission}" class="form-group row">
+					
+					<div class="form-group row">
+						<label for="web-link-new-schedule" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							th:text="#{|${baseMessageKey}.detail.web.link|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<input type="text" class="form-control" 
+								th:field="*{webLink}" id="web-link-new-schedule" 
+								th:placeholder="#{|${baseMessageKey}.detail.web.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('webLink')}" th:errors="*{webLink}"></div>
+						</div>
+					</div>
+					
+					<div class="form-group row">
+						<label for="mobile-link-new-schedule" 
+							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							th:text="#{|${baseMessageKey}.detail.mobile.link|}"></label>
+						<div class="col-md-10 col-sm-9 col-xs-12">
+							<input type="text" class="form-control" 
+								th:field="*{mobileLink}" id="mobile-link-new-schedule" 
+								th:placeholder="#{|${baseMessageKey}.detail.mobile.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('mobileLink')}" th:errors="*{mobileLink}"></div>
+						</div>
+					</div>
+					
+					<div class="form-group row">
 						<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
 							<div class="form-action-buttons-row">
 								<button type="submit" class="btn btn-primary sm-btn-block" th:title="#{action.save.title}">
@@ -382,35 +448,8 @@
 						'image-file-type-modal', 'image-file-size-modal');
 			}
 			
-			function initializeCarousel(carouselId) {
-				$('#' + carouselId).on('slide.bs.carousel', function (e) {
-				    /*
-				        CC 2.0 License Iatek LLC 2018 - Attribution required
-				    */
-				    var $e = $(e.relatedTarget);
-				    var idx = $e.index();
-				    var itemsPerSlide = 5;
-				    var totalItems = $('#' + carouselId + ' .carousel-item').length;
-				 
-				    if (idx >= totalItems-(itemsPerSlide-1)) {
-				        var it = itemsPerSlide - (totalItems - idx);
-				        for (var i=0; i<it; i++) {
-				            // append slides to end
-				            if (e.direction=="left") {
-				                $('#' + carouselId + ' .carousel-item').eq(i).appendTo('.carousel-inner');
-				            }
-				            else {
-				                $('#' + carouselId + ' .carousel-item').eq(0).appendTo('.carousel-inner');
-				            }
-				        }
-				    }
-				});
-			}
-			
 			$(function() {
 				$('select').selectpicker();
-				
-				initializeCarousel('carousel-example');
 				
 				showOnLoadedModal();
 			});

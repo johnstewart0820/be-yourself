@@ -1,7 +1,12 @@
 package fr.be.your.self.backend;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
+import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -41,6 +46,8 @@ import fr.be.your.self.repository.UserRepository;
 @EnableJpaRepositories(basePackages = { "fr.be.your.self.repository" })
 public class AdminApplication implements CommandLineRunner {
 	
+	private static final Logger logger = LoggerFactory.getLogger(AdminApplication.class);
+	
 	private static final String WEB_URL_PATTERN = "/";
 	private static final String API_URL_PATTERN = Constants.PATH.API_PREFIX + "/*";
 	
@@ -62,71 +69,44 @@ public class AdminApplication implements CommandLineRunner {
 	@Autowired
 	private SplashScreenRepository splashScreenRepository;
 	
-	private Permission updatePermission(User adminUser, String path, String name, UserPermission userPermission) {
-		final Optional<Functionality> optionalFunctionality = this.functionalityRepository.findByPath(path);
-		Functionality functionality = optionalFunctionality.isPresent() ? optionalFunctionality.get() : null;
-		if (functionality == null) {
-			functionality = new Functionality();
-			functionality.setPath(path);
-			functionality.setName(name);
-			
-			functionality = this.functionalityRepository.save(functionality);
-		}
-		
-		final Optional<Permission> optionalPermission = this.permissionRepository.findByUserIdAndFunctionalityId(adminUser.getId(), functionality.getId());
-		Permission permission = optionalPermission.isPresent() ? optionalPermission.get() : null;
-		if (permission == null) {
-			permission = new Permission();
-			permission.setUser(adminUser);
-			permission.setFunctionality(functionality);
-			permission.setUserPermission(userPermission.getValue());
-			
-			permission = this.permissionRepository.save(permission);
-		} else if (permission.getUserPermission() != userPermission.getValue()) {
-			permission.setUserPermission(userPermission.getValue());
-			
-			permission = this.permissionRepository.save(permission);
-		}
-		
-		return permission;
+	public static void main(String[] args) {
+		SpringApplication.run(AdminApplication.class, args);
 	}
 	
-	private void deleteFunctionality(User adminUser, String path) {
-		final Optional<Functionality> optionalFunctionality = this.functionalityRepository.findByPath(path);
-		if (!optionalFunctionality.isPresent()) {
-			return;
-		}
-		
-		Functionality functionality = optionalFunctionality.get();
-		if (functionality == null) {
-			return;
-		}
-		
-		final Optional<Permission> optionalPermission = this.permissionRepository.findByUserIdAndFunctionalityId(adminUser.getId(), functionality.getId());
-		if (optionalPermission.isPresent()) {
-			final Permission permission = optionalPermission.get();
-			
-			if (permission != null) {
-				this.permissionRepository.delete(permission);
-			}
-		}
-		
-		this.functionalityRepository.delete(functionality);
+	@Bean
+	public ServletRegistrationBean<DispatcherServlet> apiServletRegistration() {
+		AnnotationConfigWebApplicationContext apiServletContext = new AnnotationConfigWebApplicationContext();
+        apiServletContext.register(RestConfig.class);
+        apiServletContext.scan("fr.be.your.self.backend.config.rest");
+        
+        DispatcherServlet apiDispatcherServlet = new DispatcherServlet(apiServletContext);
+        
+		ServletRegistrationBean<DispatcherServlet> apiServletRegistration = new ServletRegistrationBean<>();
+		apiServletRegistration.setName("apiDispatcherServlet");
+		apiServletRegistration.setServlet(apiDispatcherServlet);
+		apiServletRegistration.addUrlMappings(API_URL_PATTERN);
+        apiServletRegistration.setLoadOnStartup(1);
+        apiServletRegistration.setAsyncSupported(true);
+
+        return apiServletRegistration;
 	}
 	
-	private User createProfessional(String name, String email) {
-		User user = userRepository.findByEmail(email);
-		
-		if (user != null) {
-			return user;
-		}
-		
-		final String password = this.passwordEncoder.encode("123456");
-		
-		user = new User(email, password, UserType.PROFESSIONAL.getValue(), name, "");
-		user.setStatus(UserStatus.ACTIVE.getValue());
-		
-		return userRepository.save(user);
+	@Bean
+	public ServletRegistrationBean<DispatcherServlet> webServletRegistration() {
+		AnnotationConfigWebApplicationContext webServletContext = new AnnotationConfigWebApplicationContext();
+		webServletContext.register(WebMvcConfig.class);
+		webServletContext.scan("fr.be.your.self.backend.config.web");
+        
+        DispatcherServlet webDispatcherServlet = new DispatcherServlet(webServletContext);
+        
+		ServletRegistrationBean<DispatcherServlet> webServletRegistration = new ServletRegistrationBean<>();
+		webServletRegistration.setName("webDispatcherServlet");
+		webServletRegistration.setServlet(webDispatcherServlet);
+		webServletRegistration.addUrlMappings(WEB_URL_PATTERN);
+        webServletRegistration.setLoadOnStartup(2);
+        webServletRegistration.setAsyncSupported(true);
+        
+        return webServletRegistration;
 	}
 	
 	@Override
@@ -134,10 +114,11 @@ public class AdminApplication implements CommandLineRunner {
 		final String adminEmail = "admin@gmail.com";
 		
 		try {
-			final Iterable<Slideshow> defaultSlideshows = slideshowRepository.findAllByStartDateIsNull();
-			if (defaultSlideshows == null || !defaultSlideshows.iterator().hasNext()) {
+			final Date today = DateUtils.truncate(new Date(), Calendar.DATE);
+			final Optional<Slideshow> currentSlideshow = slideshowRepository.findFirstByStartDateLessThanEqualOrderByStartDateDesc(today);
+			if (!currentSlideshow.isPresent()) {
 				final Slideshow defaultSlideshow = new Slideshow();
-				defaultSlideshow.setId(1);
+				defaultSlideshow.setStartDate(today);
 				
 				slideshowRepository.save(defaultSlideshow);
 			}
@@ -315,48 +296,85 @@ public class AdminApplication implements CommandLineRunner {
 				this.createProfessional(name, email);
 				
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			logger.error("Initialize database is error!", ex);
+		}
+		
+		try {
+			this.initializeCache();
+		} catch (Exception ex) {
+			logger.error("Initialize cache is error!", ex);
 		}
 	}
 	
-	public static void main(String[] args) {
-		SpringApplication.run(AdminApplication.class, args);
+	private Permission updatePermission(User adminUser, String path, String name, UserPermission userPermission) {
+		final Optional<Functionality> optionalFunctionality = this.functionalityRepository.findByPath(path);
+		Functionality functionality = optionalFunctionality.isPresent() ? optionalFunctionality.get() : null;
+		if (functionality == null) {
+			functionality = new Functionality();
+			functionality.setPath(path);
+			functionality.setName(name);
+			
+			functionality = this.functionalityRepository.save(functionality);
+		}
+		
+		final Optional<Permission> optionalPermission = this.permissionRepository.findByUserIdAndFunctionalityId(adminUser.getId(), functionality.getId());
+		Permission permission = optionalPermission.isPresent() ? optionalPermission.get() : null;
+		if (permission == null) {
+			permission = new Permission();
+			permission.setUser(adminUser);
+			permission.setFunctionality(functionality);
+			permission.setUserPermission(userPermission.getValue());
+			
+			permission = this.permissionRepository.save(permission);
+		} else if (permission.getUserPermission() != userPermission.getValue()) {
+			permission.setUserPermission(userPermission.getValue());
+			
+			permission = this.permissionRepository.save(permission);
+		}
+		
+		return permission;
 	}
 	
-	@Bean
-	public ServletRegistrationBean<DispatcherServlet> apiServletRegistration() {
-		AnnotationConfigWebApplicationContext apiServletContext = new AnnotationConfigWebApplicationContext();
-        apiServletContext.register(RestConfig.class);
-        apiServletContext.scan("fr.be.your.self.backend.config.rest");
-        
-        DispatcherServlet apiDispatcherServlet = new DispatcherServlet(apiServletContext);
-        
-		ServletRegistrationBean<DispatcherServlet> apiServletRegistration = new ServletRegistrationBean<>();
-		apiServletRegistration.setName("apiDispatcherServlet");
-		apiServletRegistration.setServlet(apiDispatcherServlet);
-		apiServletRegistration.addUrlMappings(API_URL_PATTERN);
-        apiServletRegistration.setLoadOnStartup(1);
-        apiServletRegistration.setAsyncSupported(true);
-
-        return apiServletRegistration;
+	private void deleteFunctionality(User adminUser, String path) {
+		final Optional<Functionality> optionalFunctionality = this.functionalityRepository.findByPath(path);
+		if (!optionalFunctionality.isPresent()) {
+			return;
+		}
+		
+		Functionality functionality = optionalFunctionality.get();
+		if (functionality == null) {
+			return;
+		}
+		
+		final Optional<Permission> optionalPermission = this.permissionRepository.findByUserIdAndFunctionalityId(adminUser.getId(), functionality.getId());
+		if (optionalPermission.isPresent()) {
+			final Permission permission = optionalPermission.get();
+			
+			if (permission != null) {
+				this.permissionRepository.delete(permission);
+			}
+		}
+		
+		this.functionalityRepository.delete(functionality);
 	}
 	
-	@Bean
-	public ServletRegistrationBean<DispatcherServlet> webServletRegistration() {
-		AnnotationConfigWebApplicationContext webServletContext = new AnnotationConfigWebApplicationContext();
-		webServletContext.register(WebMvcConfig.class);
-		webServletContext.scan("fr.be.your.self.backend.config.web");
-        
-        DispatcherServlet webDispatcherServlet = new DispatcherServlet(webServletContext);
-        
-		ServletRegistrationBean<DispatcherServlet> webServletRegistration = new ServletRegistrationBean<>();
-		webServletRegistration.setName("webDispatcherServlet");
-		webServletRegistration.setServlet(webDispatcherServlet);
-		webServletRegistration.addUrlMappings(WEB_URL_PATTERN);
-        webServletRegistration.setLoadOnStartup(2);
-        webServletRegistration.setAsyncSupported(true);
-        
-        return webServletRegistration;
+	private User createProfessional(String name, String email) {
+		User user = userRepository.findByEmail(email);
+		
+		if (user != null) {
+			return user;
+		}
+		
+		final String password = this.passwordEncoder.encode("123456");
+		
+		user = new User(email, password, UserType.PROFESSIONAL.getValue(), name, "");
+		user.setStatus(UserStatus.ACTIVE.getValue());
+		
+		return userRepository.save(user);
+	}
+	
+	private void initializeCache() {
+		
 	}
 }

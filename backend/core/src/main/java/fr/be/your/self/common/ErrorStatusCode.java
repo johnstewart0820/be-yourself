@@ -11,7 +11,9 @@ public enum ErrorStatusCode {
 	INVALID_ID("invalid.id"),
 	INVALID_PARAMETER("invalid.parameter"),
 	
-	USERNAME_EXISTED("username.existed");
+	USERNAME_EXISTED("username.existed"),
+	
+	SUBSCRIPTION_EXISTED("subscription.existed");
 	
 	private final String value;
 

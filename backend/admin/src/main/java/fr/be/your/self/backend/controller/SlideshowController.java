@@ -129,17 +129,19 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		model.addAttribute("supportImageSize", supportImageSize);
 		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
 		
-		final Slideshow mainSlideshow = this.mainService.getMainSlideshow();
-		final SlideshowDto mainDto = new SlideshowDto(mainSlideshow);
+		final Slideshow currentSlideshow = this.mainService.getCurrentSlideshow();
+		final SlideshowDto mainDto = new SlideshowDto(currentSlideshow);
 		
 		model.addAttribute("mainDto", mainDto);
 		
+		final Date today = DateUtils.truncate(new Date(), Calendar.DATE);
+		
 		final SlideshowDto newScheduleDto = new SlideshowDto();
-		newScheduleDto.setStartDate(new Date());
+		newScheduleDto.setStartDate(today);
 		model.addAttribute("newScheduleDto", newScheduleDto);
 		
 		final SlideshowDto editScheduleDto = new SlideshowDto();
-		editScheduleDto.setStartDate(new Date());
+		editScheduleDto.setStartDate(today);
 		model.addAttribute("editScheduleDto", editScheduleDto);
 	}
 	
@@ -158,7 +160,7 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		this.loadPageOptions(session, request, response, model);
 	}
 	
-	@PostMapping("/create-schedule")
+	@PostMapping("/create")
 	@Transactional
     public String createDomain(
     		@ModelAttribute("newScheduleDto") @Validated SlideshowDto dto, 
@@ -241,6 +243,8 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        final SlideshowImage newImage = new SlideshowImage();
 	        newImage.setSlideshow(domain);
 	        newImage.setImage(uploadImageFileName);
+	        newImage.setWebLink(dto.getWebLink());
+	        newImage.setMobileLink(dto.getMobileLink());
 	        newImage.setIndex(1);
 	        
 	        final SlideshowImage savedImage = this.mainService.createImage(newImage);
@@ -273,6 +277,7 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		}
     }
 	
+	/*
 	@PostMapping("/update-main/{id}")
 	@Transactional
     public String updateDomain(
@@ -282,7 +287,7 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
         Slideshow domain = this.mainService.getById(id);
-        if (domain != null && (domain.getStartDate() != null || domain.getEndDate() != null)) {
+        if (domain == null) {
         	final String message = this.getIdNotFoundMessage(id);
         	
         	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
@@ -290,25 +295,6 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
 	        
 	        return "redirect:" + this.getBaseURL() + "/current-page";
-        }
-        
-        if (domain == null) {
-        	domain = this.mainService.getMainSlideshow();
-        	
-        	if (domain == null) {
-        		Slideshow defaultSlideshow = new Slideshow();
-        		domain = this.mainService.create(defaultSlideshow);
-        		
-                if (domain == null) {
-                	final String message = this.getIdNotFoundMessage(id);
-                	
-                	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
-        	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-        	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-        	        
-        	        return "redirect:" + this.getBaseURL() + "/current-page";
-                }
-        	}
         }
         
         // ====> Validate image file
@@ -376,8 +362,8 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
         	throw ex;
 		}
     }
-	
-	@PostMapping("/update-schedule/{id}")
+	*/
+	@PostMapping("/update/{id}")
 	@Transactional
     public String updateScheduleDomain(
     		@PathVariable("id") Integer id, 
@@ -397,7 +383,7 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
         }
         
         Slideshow domain = this.mainService.getById(id);
-        if (domain == null || domain.getStartDate() == null || domain.getEndDate() == null) {
+        if (domain == null) {
         	final String message = this.getIdNotFoundMessage(id);
         	
         	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
@@ -441,6 +427,8 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        final SlideshowImage newImage = new SlideshowImage();
 	        newImage.setSlideshow(domain);
 	        newImage.setImage(uploadImageFileName);
+	        newImage.setWebLink(dto.getWebLink());
+	        newImage.setMobileLink(dto.getMobileLink());
 	        newImage.setIndex(this.mainService.getMaxImageIndex(id) + 1);
 	        
 	        final SlideshowImage savedImage = this.mainService.createImage(newImage);
