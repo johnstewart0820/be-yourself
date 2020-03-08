@@ -133,24 +133,13 @@
 					</div>
 					
 					<div class="form-group row">
-						<label for="web-link-main" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-							th:text="#{|${baseMessageKey}.detail.web.link|}"></label>
+						<label for="link-main" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							th:text="#{|${baseMessageKey}.detail.link|}"></label>
 						<div class="col-md-10 col-sm-9 col-xs-12">
 							<input type="text" class="form-control" 
-								th:field="*{webLink}" id="web-link-main" 
-								th:placeholder="#{|${baseMessageKey}.detail.web.link.placeholder|}" />
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('webLink')}" th:errors="*{webLink}"></div>
-						</div>
-					</div>
-					
-					<div class="form-group row">
-						<label for="mobile-link-main" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-							th:text="#{|${baseMessageKey}.detail.mobile.link|}"></label>
-						<div class="col-md-10 col-sm-9 col-xs-12">
-							<input type="text" class="form-control" 
-								th:field="*{mobileLink}" id="mobile-link-main" 
-								th:placeholder="#{|${baseMessageKey}.detail.mobile.link.placeholder|}" />
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('mobileLink')}" th:errors="*{mobileLink}"></div>
+								th:field="*{link}" id="link-main" 
+								th:placeholder="#{|${baseMessageKey}.detail.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('link')}" th:errors="*{link}"></div>
 						</div>
 					</div>
 					
@@ -227,26 +216,14 @@
 					</div>
 					
 					<div class="form-group row">
-						<label th:for="${'web-link-schedule-' + schedule.id}" 
+						<label th:for="${'link-schedule-' + schedule.id}" 
 							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-							th:text="#{|${baseMessageKey}.detail.web.link|}"></label>
+							th:text="#{|${baseMessageKey}.detail.link|}"></label>
 						<div class="col-md-10 col-sm-9 col-xs-12">
 							<input type="text" class="form-control" 
-								th:field="*{webLink}" th:id="${'web-link-schedule-' + schedule.id}" 
-								th:placeholder="#{|${baseMessageKey}.detail.web.link.placeholder|}" />
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('webLink')}" th:errors="*{webLink}"></div>
-						</div>
-					</div>
-					
-					<div class="form-group row">
-						<label th:for="${'mobile-link-schedule-' + schedule.id}" 
-							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-							th:text="#{|${baseMessageKey}.detail.mobile.link|}"></label>
-						<div class="col-md-10 col-sm-9 col-xs-12">
-							<input type="text" class="form-control" 
-								th:field="*{mobileLink}" th:id="${'mobile-link-schedule-' + schedule.id}" 
-								th:placeholder="#{|${baseMessageKey}.detail.mobile.link.placeholder|}" />
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('mobileLink')}" th:errors="*{mobileLink}"></div>
+								th:field="*{link}" th:id="${'link-schedule-' + schedule.id}" 
+								th:placeholder="#{|${baseMessageKey}.detail.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('link')}" th:errors="*{link}"></div>
 						</div>
 					</div>
 					
@@ -326,26 +303,14 @@
 					</div>
 					
 					<div class="form-group row">
-						<label for="web-link-new-schedule" 
+						<label for="link-new-schedule" 
 							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-							th:text="#{|${baseMessageKey}.detail.web.link|}"></label>
+							th:text="#{|${baseMessageKey}.detail.link|}"></label>
 						<div class="col-md-10 col-sm-9 col-xs-12">
 							<input type="text" class="form-control" 
-								th:field="*{webLink}" id="web-link-new-schedule" 
-								th:placeholder="#{|${baseMessageKey}.detail.web.link.placeholder|}" />
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('webLink')}" th:errors="*{webLink}"></div>
-						</div>
-					</div>
-					
-					<div class="form-group row">
-						<label for="mobile-link-new-schedule" 
-							class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-							th:text="#{|${baseMessageKey}.detail.mobile.link|}"></label>
-						<div class="col-md-10 col-sm-9 col-xs-12">
-							<input type="text" class="form-control" 
-								th:field="*{mobileLink}" id="mobile-link-new-schedule" 
-								th:placeholder="#{|${baseMessageKey}.detail.mobile.link.placeholder|}" />
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('mobileLink')}" th:errors="*{mobileLink}"></div>
+								th:field="*{link}" id="link-new-schedule" 
+								th:placeholder="#{|${baseMessageKey}.detail.link.placeholder|}" />
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('link')}" th:errors="*{link}"></div>
 						</div>
 					</div>
 					
