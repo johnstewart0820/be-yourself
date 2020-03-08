@@ -44,10 +44,21 @@ abcdef
 						
 						<div class="row form-search-container">
 							<a href="#select_subscriptions" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
-							<a href="#" class="btn btn-sm btn-primary" onclick="document.getElementById('select_subscription_form').submit();">Export
+							<a href="#" class="btn btn-sm btn-primary" onclick="submitSubscriptionForm();">Export
 							CSV</a> 
 							<a th:href="${writePermission ? baseURL + '/upload_csv_form' : 'javascript:;'}" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
-								</div>
+						</div>
+						<script th:inline="javascript">
+							function submitSubscriptionForm(){
+								var nb_selected_id = $("#select_subscription_form").find('input[name="selected_id"]:checked').length;
+								if (nb_selected_id == 0) {
+									alert([[#{csv.info.exp.select.element}]]);
+									return false;
+								} else {
+									document.getElementById('select_subscription_form').submit();
+								}
+							}
+						</script>
 									
 					</div>
 					<!-- End card header -->

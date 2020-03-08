@@ -64,6 +64,7 @@ import fr.be.your.self.model.PO;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.User;
 import fr.be.your.self.service.BaseService;
+import fr.be.your.self.service.BusinessCodeService;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.util.StringUtils;
@@ -85,6 +86,9 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 	
 	@Autowired
 	DataSetting dataSetting;
+	
+	@Autowired
+	BusinessCodeService codeService;
 
 	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 
@@ -402,7 +406,10 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 	}
 
 	protected PageableResponse<T> pageableSearch(Map<String, String> searchParams, PageRequest pageable, Sort sort) {
-		final String search = searchParams.get("q");
+		String search = "";
+		if (searchParams != null ) {
+			search = searchParams.get("q");
+		}
 		return this.getService().pageableSearch(search, pageable, sort);
 	}
 

@@ -166,4 +166,9 @@ public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, Integ
 		
 		return result;
 	}
+
+	@Override
+	public Iterable<BusinessCode> findAllByNameContainsIgnoreCase(String name) {
+		return this.repository.findAllByNameContainsIgnoreCase(name);
+	}
 }

@@ -10,6 +10,7 @@ import fr.be.your.self.model.Address;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.Price;
 import fr.be.your.self.model.ProfessionalEvent;
+import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.DegreeFile;
 import fr.be.your.self.model.MediaFile;
@@ -58,7 +59,9 @@ public class UserDto implements Serializable {
 	private List<MultipartFile> medias;
 
 	private String school;
+	private Subscription subscription;
 	
+
 	public UserDto() {
 	}
 	public UserDto(User domain) {
@@ -95,6 +98,7 @@ public class UserDto implements Serializable {
 			this.events = domain.getEvents();		
 			this.prices = domain.getPrices();
 			this.school = domain.getSchool();
+			this.subscription  = domain.getSubscription();
 		}
 	}
 	
@@ -323,5 +327,11 @@ public class UserDto implements Serializable {
 	}
 	public void setEvents(List<ProfessionalEvent> events) {
 		this.events = events;
+	}
+	public Subscription getSubscription() {
+		return subscription;
+	}
+	public void setSubscription(Subscription subscription) {
+		this.subscription = subscription;
 	}
 }

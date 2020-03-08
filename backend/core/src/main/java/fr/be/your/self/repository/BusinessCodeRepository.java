@@ -29,4 +29,6 @@ public interface BusinessCodeRepository extends BaseRepository<BusinessCode, Int
     @Modifying
     @Query("UPDATE BusinessCode SET status = ?2 WHERE name = ?1")
     int updateStatus(String name, Integer status);
+
+    Iterable<BusinessCode> findAllByNameContainsIgnoreCase(String name);
 }

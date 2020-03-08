@@ -22,4 +22,6 @@ public interface BusinessCodeService extends BaseService<BusinessCode, Integer> 
 	public List<BusinessCode> search(String text, Collection<Integer> types, Sort sort);
 	
 	public Map<Integer, Integer> getUsedAmountByIds(Collection<Integer> ids);
+
+	public Iterable<BusinessCode> findAllByNameContainsIgnoreCase(String code);
 }

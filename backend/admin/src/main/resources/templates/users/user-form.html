@@ -180,17 +180,38 @@
 
 											</div>
 
-											<!-- Subcription Type -->
-											<div class="form-group row">
+											<!-- Subcription -->
+											
+											<div class="form-group row" th:if="${#strings.contains(action, 'update')}">
 												<label for="subscription"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
-													>Subscription Type</label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
-													<input class="form-control" type="text" id="subscription"
-													th:if="${dto != null}" 
-															  disabled th:field="*{subtype}">
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.subscription|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">											
+													<a th:if="${dto.subscription != null && dto.subscription.id != 0}" th:href="@{/subscription/edit/{id}(id=${dto.subscription.id})}">
+														<label class="form-control" id="subscription"
+														th:text="${dto.subtype}" style="cursor: pointer;"></label>
+													</a>
+													<label th:if="${dto.subscription == null || dto.subscription.id == 0}" class="form-control" 
+															id="subscription">
+													</label>
 												</div>
 											</div>
+											<!-- Code -->
+											<div th:if="${dto.subscription != null && dto.subscription.businessCode != null}">
+												<div class="form-group row" id="account_type_div">
+													<label for="subscription"
+														class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+														th:text="#{'discount.code.type.' + ${dto.subscription.businessCode.type}}">
+													</label>
+													<div class="col-md-8 col-sm-9 col-xs-12">
+														<label for="subscription"
+															class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+															th:text="${dto.subscription.businessCode.name}">
+													</label>
+													</div>
+												</div>
+											</div>
+											<!-- Save or Back actions -->
 											<div th:if="${writePermission}" class="form-group row">
 												<div
 													class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12">

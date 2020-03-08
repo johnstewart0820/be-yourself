@@ -62,7 +62,7 @@
 								class="selectpicker show-tick">
 								<option value="">FILTER BY ROLE</option>
 								<option th:each="userType : ${userTypes}" th:value="${userType}"
-									th:text="#{'user.type.' + ${userType}}">></option>
+									th:text="#{'user.type.' + ${userType}}"></option>
 							</select>
 
 						</div>
@@ -96,7 +96,7 @@
 					<div class="col">
 						<a href="#select_users" class="btn btn-sm btn-primary">Select
 							/ Deselect all</a> <a href="#" class="btn btn-sm btn-primary"
-							onclick="document.getElementById('select_user_form').submit();">Export
+							onclick="submitUserForm();">Export
 							CSV</a> <a th:href="${baseURL + '/upload_csv_form'}"
 							class="btn btn-sm btn-primary" th:if="${writePermission}">Import
 							CSV</a> <a th:href="${baseURL + '/resetpwdbyemail'}"
@@ -105,6 +105,17 @@
 					</div>
 				</div>
 			</div>
+			<script th:inline="javascript">
+					function submitUserForm(){
+						var nb_selected_id = $("#select_user_form").find('input[name="selected_id"]:checked').length;
+						if (nb_selected_id == 0) {
+							alert([[#{csv.info.exp.select.element}]]);
+							return false;
+						} else {
+							document.getElementById('select_user_form').submit();
+						}
+					}
+			</script>
 			<!-- Table -->
 			<div class="table-responsive">
 				<form id="select_user_form" th:action="${baseURL + '/exportcsv'}"
@@ -282,9 +293,7 @@
 															.selectpicker(
 																	'val', '');
 
-													const selectedStatus = $(
-															'#filter_status')
-															.val();
+													const selectedStatus = $('#filter_status').val();
 													const selectedRole = $(
 															'#filter_role')
 															.val();
@@ -302,21 +311,12 @@
 															+ encodedSelectedSubtypeIds;
 												});
 
-								$("select#filter_role")
-										.change(
+								$("select#filter_role").change(
 												function() {
-													$("#filter_status")
-															.val(
-																	$(
-																			"#filter_status option:first")
-																			.val());
-													$('#filter_subtype')
-															.selectpicker(
-																	'val', '');
+													$("#filter_status").val($("#filter_status option:first").val());
+													$('#filter_subtype').selectpicker('val', '');
 
-													const selectedRole = $(
-															'#filter_role')
-															.val();
+													const selectedRole = $('#filter_role').val();
 													const selectedStatus = $(
 															'#filter_status')
 															.val()

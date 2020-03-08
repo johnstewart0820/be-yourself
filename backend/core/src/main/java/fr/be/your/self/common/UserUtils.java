@@ -64,6 +64,9 @@ public final class UserUtils {
 				Subscription subsription = subscriptions.get(0);
 				Date date = subsription.getSubscriptionEndDate();
 				for (Subscription sub : subscriptions) {
+					if (sub.getSubscriptionEndDate() == null) {
+						continue;
+					}
 					if (sub.getSubscriptionEndDate().after(date)) {
 						subsription = sub;
 						date = sub.getSubscriptionEndDate();
