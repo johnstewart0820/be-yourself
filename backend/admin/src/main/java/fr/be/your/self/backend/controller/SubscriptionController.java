@@ -2,10 +2,12 @@ package fr.be.your.self.backend.controller;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.api.client.util.Key;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -41,6 +44,8 @@ import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.dto.SubscriptionDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.utils.AdminUtils;
+import fr.be.your.self.common.BusinessCodeStatus;
+import fr.be.your.self.common.BusinessCodeType;
 import fr.be.your.self.common.CsvUtils;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.PaymentGateway;
@@ -49,6 +54,7 @@ import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.exception.BusinessException;
+import fr.be.your.self.model.BusinessCode;
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionCsv;
 import fr.be.your.self.model.SubscriptionType;
@@ -152,6 +158,9 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		final Sort subtypeSort = this.getSortRequest(subtypeDefaultSort);
 		final List<SubscriptionType> subtypes = subtypeService.getAll(subtypeSort);
 		
+		Iterable<BusinessCode> codes =  codeService.findAll();
+		Map<Integer, List<BusinessCode>> codeMap = getActiveCodeMap(codes);
+		Set<Integer> codeTypes = codeMap.keySet();
 		
 		model.addAttribute("canals", canals); //TODO TVA check if we keep this
 		model.addAttribute("users", users);
@@ -159,13 +168,35 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		model.addAttribute("durations", durations);
 		model.addAttribute("paymentStatuses", paymentStatuses);
 		model.addAttribute("paymentGateways", paymentGateways);
+		model.addAttribute("codeMap", codeMap);
+		model.addAttribute("codeTypes", codeTypes);
+		if (domain != null && domain.getBusinessCode() != null) {
+			model.addAttribute("currentCodeId", domain.getBusinessCode().getId());
+		} else {
+			model.addAttribute("currentCodeId", SubscriptionDto.UNDEFINED_CODE);
+		}
 
+	}
+
+	private Map<Integer, List<BusinessCode>>  getActiveCodeMap(Iterable<BusinessCode> codes) {
+		Map<Integer, List<BusinessCode>> codeMap = new HashMap<Integer, List<BusinessCode>>();
+		for (BusinessCode code : codes) {
+			if (code.getStatus() != BusinessCodeStatus.ACTIVE.getValue()) {
+				continue;
+			}
+			if (!codeMap.containsKey(code.getType())) {
+				codeMap.put(code.getType(), new ArrayList<BusinessCode>());
+			}
+			codeMap.get(code.getType()).add(code);
+		}
+		return codeMap;
 	}
 	
 	@PostMapping("/create")
 	@Transactional
     public String createDomain(
-    		@Validated @ModelAttribute("dto") SubscriptionDto dto, 
+    		@Validated @ModelAttribute("dto") SubscriptionDto dto,
+    		@RequestParam(name = "codeId", required=false) Integer codeId,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -175,11 +206,18 @@ public class SubscriptionController extends BaseResourceController<Subscription,
                 
         final Subscription domain = this.newDomain();
         dto.copyToDomain(domain);
-
+        if (codeId != null && codeId != SubscriptionDto.UNDEFINED_CODE) {
+        	BusinessCode code = codeService.getById(dto.getCodeId());
+        	if (code == null) {
+        		//TODO TVA if code not found.
+        	}
+        	domain.setBusinessCode(code);
+        }
         User user = userService.getById(dto.getUserId());
         SubscriptionType subtype = subtypeService.getById(dto.getSubtypeId());
         domain.setUser(user);
         domain.setSubtype(subtype);;
+        domain.setIpAddress(request.getRemoteAddr());
         
         final Subscription savedDomain = this.subscriptionService.create(domain);
         
@@ -201,6 +239,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
     public String updateDomain(
     		@PathVariable("id") Integer id, 
     		@ModelAttribute @Validated SubscriptionDto dto, 
+    		@RequestParam(name = "codeId", required=false) Integer codeId,
     		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
@@ -219,9 +258,20 @@ public class SubscriptionController extends BaseResourceController<Subscription,
         	return this.getFormView();
         }
         
+        
         dto.copyToDomain(domain);
         SubscriptionType subtype = this.subtypeService.getById(dto.getSubtypeId());
         User user = this.userService.getById(dto.getUserId());
+        if (codeId != null && codeId != SubscriptionDto.UNDEFINED_CODE) {
+        	BusinessCode code = codeService.getById(dto.getCodeId());
+        	if (code == null) {
+        		//TODO TVA if code not found.
+        	}
+        	domain.setBusinessCode(code);
+        }
+        if (codeId == SubscriptionDto.UNDEFINED_CODE) {
+        	domain.setBusinessCode(null);
+        }
         domain.setSubtype(subtype);
         domain.setUser(user);
         final Subscription savedDomain = this.subscriptionService.update(domain);
@@ -297,7 +347,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 	@PostMapping(value = "/importcsv")
 	@Transactional
 	public String fileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, Model model)
-			throws IOException {
+			throws IOException, ParseException {
 
 		SimpleResult result = new SimpleResult(ResultStatus.UNKNOWN.getValue(), "Unknown status");
 		result.setFunctionalityName("Upload users CSV file!");
@@ -342,41 +392,40 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		
 		for (SubscriptionCsv subCsv : subscriptionsCsv) {
 			User user;
-			try {
-				Subscription sub = CsvUtils.SINGLETON.createSubscriptionFromCsv(subCsv);
+			Subscription sub = CsvUtils.SINGLETON.createSubscriptionFromCsv(subCsv);
 
-				String email = subCsv.getEmail();
-				if (this.userService.existsEmail(email)) {
-					user = this.userService.getByEmail(email);
-				} else {
-					// Create a new user with login type pwd;
-					user = new User();
-					user.setFirstName(subCsv.getFirstName());
-					user.setLastName(subCsv.getLastName());
-					user.setEmail(email);
-					user.setLoginType(LoginType.PASSWORD.getValue());
-					user.setTitle(subCsv.getTitle());
-					user.setStatus(UserStatus.DRAFT.getValue());
-					user.setUserType(UserType.B2C.getValue());
-					String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
-					setActivateCodeAndTimeout(user);
-					user = this.userService.create(user);
-					addDefaultPermissions(user);
-					this.getPermissionService().saveAll(user.getPermissions());
-					this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
-					String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
-					sendVerificationEmailToUser(activateAccountUrl, user);
-					
-				}
-				SubscriptionType subtype = this.subtypeService.findAllByNameContainsIgnoreCase(subCsv.getSubtype()).iterator().next();
-				sub.setUser(user);
-				sub.setSubtype(subtype);
-				this.subscriptionService.create(sub);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			String email = subCsv.getEmail();
+			if (this.userService.existsEmail(email)) {
+				user = this.userService.getByEmail(email);
+			} else {
+				// Create a new user with login type pwd;
+				user = new User();
+				user.setFirstName(subCsv.getFirstName());
+				user.setLastName(subCsv.getLastName());
+				user.setEmail(email);
+				user.setLoginType(LoginType.PASSWORD.getValue());
+				user.setTitle(subCsv.getTitle());
+				user.setStatus(UserStatus.DRAFT.getValue());
+				user.setUserType(UserType.B2C.getValue());
+				String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
+				setActivateCodeAndTimeout(user);
+				user = this.userService.create(user);
+				addDefaultPermissions(user);
+				this.getPermissionService().saveAll(user.getPermissions());
+				this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
+				String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
+				sendVerificationEmailToUser(activateAccountUrl, user);
+				
 			}
-			
+			SubscriptionType subtype = this.subtypeService.findAllByNameContainsIgnoreCase(subCsv.getSubtype()).iterator().next();
+			sub.setUser(user);
+			if (!StringUtils.isNullOrEmpty(subCsv.getCode())) {
+				BusinessCode code = this.codeService.findAllByNameContainsIgnoreCase(subCsv.getCode()).iterator().next();
+				//TODO TVA if code not found?
+				sub.setBusinessCode(code);
+			}
+			sub.setSubtype(subtype);
+			this.subscriptionService.create(sub);
 		}
 		
 		

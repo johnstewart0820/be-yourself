@@ -36,10 +36,10 @@ public class Subscription extends PO<Integer> {
 	private BigDecimal price;
 	private int paymentStatus;
 	private String paymentGateway;
-	private String code;
 	private int codeType;
 	private String canal;
 	private boolean autoRenew;
+	private String buyerEmail;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "CodeId")
@@ -166,13 +166,6 @@ public class Subscription extends PO<Integer> {
 		this.paymentGateway = paymentGateway;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
 
 	public int getCodeType() {
 		return codeType;
@@ -204,6 +197,14 @@ public class Subscription extends PO<Integer> {
 
 	public void setBusinessCode(BusinessCode businessCode) {
 		this.businessCode = businessCode;
+	}
+
+	public String getBuyerEmail() {
+		return buyerEmail;
+	}
+
+	public void setBuyerEmail(String buyerEmail) {
+		this.buyerEmail = buyerEmail;
 	}
 
 }

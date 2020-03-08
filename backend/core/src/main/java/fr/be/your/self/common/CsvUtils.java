@@ -39,21 +39,19 @@ public enum CsvUtils {
 	public Subscription createSubscriptionFromCsv(SubscriptionCsv subCsv) throws ParseException {
 		Subscription sub = new Subscription();
 		sub.setCanal(subCsv.getCanal());
-		sub.setCode(subCsv.getCode());
 		sub.setDuration(subCsv.getDuration());
-		
-		sub.setSubscriptionEndDate(getSqlDate(subCsv.getEndDate()));
+		sub.setSubscriptionEndDate(getDateFromStr(subCsv.getEndDate()));
 		sub.setPaymentGateway(subCsv.getPaymenGateway());
 		sub.setPrice(subCsv.getPrice());
-		sub.setSubscriptionStartDate(getSqlDate(subCsv.getStartDate()));
+		sub.setSubscriptionStartDate(getDateFromStr(subCsv.getStartDate()));
 		sub.setTerminationAsked(subCsv.isTerminationAsked());
 		return sub;
 	}
 
-	private java.sql.Date getSqlDate(String dateStr) throws ParseException {
+	private java.util.Date getDateFromStr(String dateStr) throws ParseException {
 		String pattern = SubscriptionCsv.DATE_FORMAT;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-		java.sql.Date date = new java.sql.Date(simpleDateFormat.parse(dateStr).getTime());
+		java.util.Date date = new java.util.Date(simpleDateFormat.parse(dateStr).getTime());
 		return date;
 	}
 }

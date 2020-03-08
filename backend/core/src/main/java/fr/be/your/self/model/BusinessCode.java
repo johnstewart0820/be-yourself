@@ -2,12 +2,16 @@ package fr.be.your.self.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -47,6 +51,9 @@ public class BusinessCode extends PO<Integer> {
 	@Temporal(TemporalType.TIMESTAMP)
     @Column(name = "endDate", nullable = true)
 	private Date endDate;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "businessCode" , cascade = CascadeType.ALL, orphanRemoval = true )
+	private List<Subscription> subscriptions;
 
 	/**
 	 * Beneficiary (company) for B2B

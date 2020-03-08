@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 
 import com.opencsv.bean.CsvBindByName;
 
+import fr.be.your.self.common.BusinessCodeType;
+
 public class SubscriptionCsv {
 	public static String DATE_FORMAT = "dd-MM-yyyy";
 
@@ -62,13 +64,19 @@ public class SubscriptionCsv {
 		this.email = subscription.getUser().getEmail();
 		this.subtype = subscription.getSubtype().getName();
 		this.canal = subscription.getCanal();
-		this.code = subscription.getCode();
-		this.codeType = "XXX"; //TODO TVA add this
+		if (subscription.getBusinessCode() != null) {
+			this.code = subscription.getBusinessCode().getName();
+			this.codeType = BusinessCodeType.toStrValue(subscription.getBusinessCode().getType());
+		}
 		this.duration = subscription.getDuration();
 		
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-		this.startDate = sdf.format(subscription.getSubscriptionStartDate());
-		this.endDate = sdf.format(subscription.getSubscriptionEndDate());
+		if (subscription.getSubscriptionStartDate() != null) {
+			this.startDate = sdf.format(subscription.getSubscriptionStartDate());
+		}
+		if (subscription.getSubscriptionEndDate()  != null) {
+			this.endDate = sdf.format(subscription.getSubscriptionEndDate());
+		}
 		
 		this.terminationAsked = subscription.isTerminationAsked();
 		this.price = subscription.getPrice();

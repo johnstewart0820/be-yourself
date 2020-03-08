@@ -14,6 +14,7 @@ public class SubscriptionDto  implements Serializable {
 	 */
 	private static final long serialVersionUID = 4446631053119483358L;
 
+	public static final int UNDEFINED_CODE = -1; 
 	private int id;
 	
 	private int userId;
@@ -29,11 +30,11 @@ public class SubscriptionDto  implements Serializable {
 	private BigDecimal price;
 	private int paymentStatus;
 	private String paymentGateway;
-	private String code;
 	private int codeType;
 	private String canal;
 	private boolean autoRenew;
-
+	private String buyerEmail;
+	private int codeId;
 	
 	public SubscriptionDto() {
 		
@@ -47,7 +48,6 @@ public class SubscriptionDto  implements Serializable {
 		if (domain != null) {
 			this.id = domain.getId().intValue();
 			this.canal = domain.getCanal();
-			this.code = domain.getCode();
 			this.codeType = domain.getCodeType();
 			this.duration = domain.getDuration();
 			this.ipAddress = domain.getIpAddress();
@@ -62,14 +62,14 @@ public class SubscriptionDto  implements Serializable {
 			this.userId = domain.getUser().getId();
 			this.validEndDate = domain.getValidEndDate();
 			this.validStartDate = domain.getValidStartDate();
-			this.setAutoRenew(domain.isAutoRenew());
+			this.autoRenew = domain.isAutoRenew();
+			this.buyerEmail = domain.getBuyerEmail();
 		
 		}
 	}
 
 	public void copyToDomain(Subscription domain) {
 		domain.setCanal(canal);
-		domain.setCode(code);
 		domain.setCodeType(codeType);
 		domain.setDuration(duration);
 		domain.setIpAddress(ipAddress);
@@ -83,6 +83,7 @@ public class SubscriptionDto  implements Serializable {
 		domain.setValidEndDate(validEndDate);
 		domain.setValidStartDate(validStartDate);
 		domain.setAutoRenew(autoRenew);
+		domain.setBuyerEmail(buyerEmail);
 	}
 	
 	public int getId() {
@@ -171,12 +172,7 @@ public class SubscriptionDto  implements Serializable {
 	public void setPaymentGateway(String paymentGateway) {
 		this.paymentGateway = paymentGateway;
 	}
-	public String getCode() {
-		return code;
-	}
-	public void setCode(String code) {
-		this.code = code;
-	}
+
 	public int getCodeType() {
 		return codeType;
 	}
@@ -196,6 +192,18 @@ public class SubscriptionDto  implements Serializable {
 		this.autoRenew = autoRenew;
 	}
 	
+	public String getBuyerEmail() {
+		return buyerEmail;
+	}
+	public void setBuyerEmail(String buyerEmail) {
+		this.buyerEmail = buyerEmail;
+	}
+	public int getCodeId() {
+		return codeId;
+	}
+	public void setCodeId(int codeId) {
+		this.codeId = codeId;
+	}
 	
 	
 }

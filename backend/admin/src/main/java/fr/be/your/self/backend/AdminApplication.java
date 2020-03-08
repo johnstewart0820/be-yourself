@@ -70,6 +70,7 @@ public class AdminApplication implements CommandLineRunner {
 	private SplashScreenRepository splashScreenRepository;
 	
 	public static void main(String[] args) {
+		System.getProperties().setProperty("java.net.preferIPv4Stack", "true");
 		SpringApplication.run(AdminApplication.class, args);
 	}
 	

@@ -243,8 +243,7 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        final SlideshowImage newImage = new SlideshowImage();
 	        newImage.setSlideshow(domain);
 	        newImage.setImage(uploadImageFileName);
-	        newImage.setWebLink(dto.getWebLink());
-	        newImage.setMobileLink(dto.getMobileLink());
+	        newImage.setLink(dto.getLink());
 	        newImage.setIndex(1);
 	        
 	        final SlideshowImage savedImage = this.mainService.createImage(newImage);
@@ -427,8 +426,7 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        final SlideshowImage newImage = new SlideshowImage();
 	        newImage.setSlideshow(domain);
 	        newImage.setImage(uploadImageFileName);
-	        newImage.setWebLink(dto.getWebLink());
-	        newImage.setMobileLink(dto.getMobileLink());
+	        newImage.setLink(dto.getLink());
 	        newImage.setIndex(this.mainService.getMaxImageIndex(id) + 1);
 	        
 	        final SlideshowImage savedImage = this.mainService.createImage(newImage);
