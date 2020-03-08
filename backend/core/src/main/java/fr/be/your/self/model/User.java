@@ -12,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,7 +33,7 @@ public class User extends PO<Integer> {
 	private String lastName;
 
 	private String title;
-	
+
 	private String email;
 
 	@JsonIgnore
@@ -48,13 +47,12 @@ public class User extends PO<Integer> {
 
 	private String userType;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Permission> permissions;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Subscription> subscriptions;
 
-	
 	public List<Subscription> getSubscriptions() {
 		return subscriptions;
 	}
@@ -64,10 +62,12 @@ public class User extends PO<Integer> {
 	}
 
 	private String activateCode;
-
 	private long activateTimeout;
-	
-	/*************Fields for professional****************/
+
+	private String resetPasswordCode;
+	private long resetPasswordTimeout;
+
+	/************* Fields for professional ****************/
 	private String phoneNumber;
 	private String formation;
 	private String website;
@@ -77,26 +77,25 @@ public class User extends PO<Integer> {
 	private String profilePicture;
 	private String school;
 
-
 	@Lob
 	private String description;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "address_id")
 	private Address address;
-	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Price> prices;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DegreeFile> degreeFiles;
-	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MediaFile> mediaFiles;
 
-	@OneToMany(fetch = FetchType.LAZY,  mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ProfessionalEvent> events;
-	
+
 	public User() {
 	}
 
@@ -108,8 +107,22 @@ public class User extends PO<Integer> {
 		this.lastName = lastName;
 	}
 
+	@Override
+	public Integer getId() {
+		return id;
+	}
+
+	@Override
+	public String getDisplay() {
+		return this.getFullName();
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	public String getFullName() {
-		return (firstName != null ? firstName : "")  + " " + (lastName != null ? lastName : "");
+		return (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
 	}
 
 	public List<Permission> getPermissions() {
@@ -119,21 +132,13 @@ public class User extends PO<Integer> {
 	public void setPermissions(List<Permission> permissions) {
 		this.permissions = permissions;
 	}
-	
+
 	public List<DegreeFile> getDegreeFiles() {
 		return degreeFiles;
 	}
 
 	public void setDegreeFiles(List<DegreeFile> degreeFiles) {
 		this.degreeFiles = degreeFiles;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public int getStatus() {
@@ -232,23 +237,35 @@ public class User extends PO<Integer> {
 		this.activateTimeout = activateTimeout;
 	}
 
-	@Override
-	public String getDisplay() {
-		return this.getFullName();
+	public String getResetPasswordCode() {
+		return resetPasswordCode;
 	}
-	
+
+	public void setResetPasswordCode(String resetPasswordCode) {
+		this.resetPasswordCode = resetPasswordCode;
+	}
+
+	public long getResetPasswordTimeout() {
+		return resetPasswordTimeout;
+	}
+
+	public void setResetPasswordTimeout(long resetPasswordTimeout) {
+		this.resetPasswordTimeout = resetPasswordTimeout;
+	}
+
 	public String getStatusDescription() {
 		return UserStatus.getStatusDescription(status);
 	}
-	
+
 	public String getUserTypeDescription() {
 		return UserType.getStatusDescription(userType);
 	}
+
 	public Subscription getSubscription() {
 		Subscription sub = UserUtils.findSubscriptionUser(this);
 		return sub;
 	}
-	
+
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -273,7 +290,6 @@ public class User extends PO<Integer> {
 		this.formation = formation;
 	}
 
-
 	public boolean isSupervised() {
 		return supervised;
 	}
@@ -297,9 +313,6 @@ public class User extends PO<Integer> {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-
-
 
 	public List<ProfessionalEvent> getEvents() {
 		return events;
@@ -341,7 +354,6 @@ public class User extends PO<Integer> {
 		this.prices = prices;
 	}
 
-
 	public String getSchool() {
 		return school;
 	}
@@ -349,7 +361,7 @@ public class User extends PO<Integer> {
 	public void setSchool(String school) {
 		this.school = school;
 	}
-	
+
 	public List<MediaFile> getMediaFiles() {
 		return mediaFiles;
 	}
@@ -357,5 +369,5 @@ public class User extends PO<Integer> {
 	public void setMediaFiles(List<MediaFile> mediaFiles) {
 		this.mediaFiles = mediaFiles;
 	}
-	
+
 }

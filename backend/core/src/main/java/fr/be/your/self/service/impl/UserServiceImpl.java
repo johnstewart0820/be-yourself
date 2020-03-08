@@ -17,7 +17,6 @@ import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.model.Constants;
-import fr.be.your.self.model.Session;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.repository.BaseRepository;
@@ -217,9 +216,20 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	}
 
 	@Override
+	public User getByResetPasswordCode(String resetPasswordCode) {
+		return this.repository.findByResetPasswordCode(resetPasswordCode);
+	}
+
+	@Override
 	@Transactional
 	public boolean activateUser(Integer userId) {
 		return this.repository.updateStatus(userId, UserStatus.ACTIVE.getValue()) > 0;
+	}
+
+	@Override
+	@Transactional
+	public boolean updatePassword(Integer userId, String password) {
+		return this.repository.updatePassword(userId, password) > 0;
 	}
 
 	@Override

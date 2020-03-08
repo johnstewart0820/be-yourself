@@ -108,7 +108,7 @@ public class DefaultEmailSender implements EmailSender {
 	}
 
 	@Override
-	public boolean sendForgotPassword(String forgotPasswordUrl, String email, String forgotPasswordCode) {
+	public boolean sendForgotPassword(String email, String forgotPasswordUrl, String forgotPasswordCode) {
 		final String realUrl = forgotPasswordUrl + (forgotPasswordUrl.indexOf("?") > 0 ? "&" : "?") + "code="
 				+ forgotPasswordCode;
 

@@ -54,9 +54,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private static final String LOGIN_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGIN;
 	private static final String LOGOUT_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.LOGOUT;
-	private static final String ACTIVATE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACTIVATE;
+	
 	private static final String REGISTER_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.REGISTER;
+	private static final String ACTIVATE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACTIVATE;
+	private static final String SEND_ACTIVATE_CODE_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.SEND_ACTIVATE_CODE;
+	
 	private static final String FORGOT_PASSWORD_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.FORGOT_PASSWORD;
+	private static final String ACTIVATE_RESET_PASSWORD_URL = Constants.PATH.AUTHENTICATION_PREFIX + Constants.PATH.AUTHENTICATION.ACTIVATE_RESET_PASSWORD;
 	
 	private static final String ACCESS_DENIED_URL = Constants.PATH.ACCESS_DENIED;
 	
@@ -153,7 +157,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// @formatter:off
 		httpSecurity
 			.authorizeRequests()
-				.antMatchers(LOGIN_URL, ACTIVATE_URL, REGISTER_URL, FORGOT_PASSWORD_URL, ACCESS_DENIED_URL).permitAll()
+				.antMatchers(LOGIN_URL, ACTIVATE_URL, REGISTER_URL, SEND_ACTIVATE_CODE_URL, 
+						FORGOT_PASSWORD_URL, ACTIVATE_RESET_PASSWORD_URL, ACCESS_DENIED_URL).permitAll()
 				.antMatchers("/", "/home", "/about", "/error").permitAll()
 			.and()
         		.authorizeRequests()
