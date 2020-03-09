@@ -57,8 +57,11 @@ import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.BusinessCode;
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionCsv;
+import fr.be.your.self.model.SubscriptionCsvMappingStrategy;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
+import fr.be.your.self.model.UserCSV;
+import fr.be.your.self.model.UserCsvMappingStrategy;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.SubscriptionService;
 import fr.be.your.self.service.SubscriptionTypeService;
@@ -329,9 +332,12 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
 				"attachment; filename=\"" + CSV_SUBSCRIPTION_EXPORT_FILE + "\"");
-
+		final SubscriptionCsvMappingStrategy<SubscriptionCsv> mappingStrategy = new SubscriptionCsvMappingStrategy<>();
+		mappingStrategy.setType(SubscriptionCsv.class);
+		
 		// create a csv writer
 		StatefulBeanToCsv<SubscriptionCsv> writer = new StatefulBeanToCsvBuilder<SubscriptionCsv>(response.getWriter())
+				.withMappingStrategy(mappingStrategy)
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 				.withOrderedResults(false).build();
 

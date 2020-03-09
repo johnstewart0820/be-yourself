@@ -73,6 +73,7 @@ import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
+import fr.be.your.self.model.UserCsvMappingStrategy;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.FunctionalityService;
 import fr.be.your.self.service.PermissionService;
@@ -339,16 +340,21 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + CSV_USERS_EXPORT_FILE + "\"");
-
+		final UserCsvMappingStrategy<UserCSV> mappingStrategy = new UserCsvMappingStrategy<>();
+		mappingStrategy.setType(UserCSV.class);
+		
 		// create a csv writer
 		StatefulBeanToCsv<UserCSV> writer = new StatefulBeanToCsvBuilder<UserCSV>(response.getWriter())
-				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-				.withOrderedResults(false).build();
+				.withMappingStrategy(mappingStrategy)
+				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+				.withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+				.withOrderedResults(false)
+				.build();
 
 		// write all users to csv file
 		List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv(userIds).spliterator(), false)
 				.collect(Collectors.toList());
-		
+	
 		writer.write(usersList);
 	}
 	@PostMapping(value = "/importcsv")

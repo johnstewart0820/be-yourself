@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvBindByPosition;
 
 import fr.be.your.self.common.BusinessCodeType;
 
@@ -11,48 +12,64 @@ public class SubscriptionCsv {
 	public static String DATE_FORMAT = "dd-MM-yyyy";
 
 	@CsvBindByName(column = "Title")
+    @CsvBindByPosition(position = 0)
+
 	private String title;
 
 	@CsvBindByName(column = "Last name")
+    @CsvBindByPosition(position = 1)
 	private String lastName;
 	
 	@CsvBindByName(column = "First name")
+	@CsvBindByPosition(position = 2)
 	private String firstName;
 	
 	@CsvBindByName(column = "Email")
+	@CsvBindByPosition(position = 3)
 	private String email;
 	
 	@CsvBindByName(column = "Subscription type")
+	@CsvBindByPosition(position = 4)
 	private String subtype;
 	
 	@CsvBindByName(column = "canal")
+	@CsvBindByPosition(position = 5)
 	private String canal;
 	
 	@CsvBindByName(column = "code")
+	@CsvBindByPosition(position = 6)
 	private String code;
 	
 	@CsvBindByName(column = "code type")	
+	@CsvBindByPosition(position = 7)
 	private String codeType;
 	
 	@CsvBindByName(column = "duration")
+	@CsvBindByPosition(position = 8)
 	private int duration;
 	
 	@CsvBindByName(column = "start date")
+	@CsvBindByPosition(position = 9)
 	private String startDate;
 	
 	@CsvBindByName(column = "end date")	
+	@CsvBindByPosition(position = 10)
 	private String endDate;
 	
-	@CsvBindByName(column = "termination asked")	
+	@CsvBindByName(column = "termination asked")
+	@CsvBindByPosition(position = 11)
 	private boolean terminationAsked;
 	
 	@CsvBindByName(column = "price")
+	@CsvBindByPosition(position = 12)
 	private BigDecimal price;
 	
 	@CsvBindByName(column = "gift card")
+	@CsvBindByPosition(position = 13)
 	private boolean giftCard;
 	
 	@CsvBindByName(column = "payment gateway")
+	@CsvBindByPosition(position = 14)
 	private String paymenGateway;
 	
 	public SubscriptionCsv() {}
@@ -81,14 +98,7 @@ public class SubscriptionCsv {
 		this.terminationAsked = subscription.isTerminationAsked();
 		this.price = subscription.getPrice();
 		this.paymenGateway = subscription.getPaymentGateway();
-	}
-
-	public static String getDATE_FORMAT() {
-		return DATE_FORMAT;
-	}
-
-	public static void setDATE_FORMAT(String dATE_FORMAT) {
-		DATE_FORMAT = dATE_FORMAT;
+		this.giftCard = subscription.isGiftCard();
 	}
 
 	public String getTitle() {

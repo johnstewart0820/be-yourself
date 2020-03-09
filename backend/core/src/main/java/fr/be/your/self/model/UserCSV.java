@@ -2,33 +2,47 @@ package fr.be.your.self.model;
 
 
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvBindByPosition;
 
+import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserUtils;
 
 public class UserCSV {
 	@CsvBindByName(column = "Title")
+    @CsvBindByPosition(position = 0)
 	private String title;
 	
 	@CsvBindByName(column = "Last Name")
+    @CsvBindByPosition(position = 1)
 	private String lastName;
 	
 	@CsvBindByName(column = "First Name")
+    @CsvBindByPosition(position = 2)
 	private String firstName;
 	
-	@CsvBindByName(column = "Email")	
+	@CsvBindByName(column = "Email")
+    @CsvBindByPosition(position = 3)
 	private String email;
-
-	@CsvBindByName(column = "Status")	
+	
+	@CsvBindByName(column = "Login Type")	
+    @CsvBindByPosition(position = 4)
+	private String loginType;
+	
+	@CsvBindByName(column = "Status")
+    @CsvBindByPosition(position = 5)
 	private int status;
 	
 	@CsvBindByName(column = "Referral Code")	
+    @CsvBindByPosition(position = 6)
 	private String referralCode;
 	
-	@CsvBindByName(column = "User Type")	
+	@CsvBindByName(column = "Account Type")	
+    @CsvBindByPosition(position = 7)
 	private String userType;
 
 	@CsvBindByName(column = "Subscription Type")	
-	private String subscriptionType; //TODO TVA get this
+    @CsvBindByPosition(position = 8)
+	private String subscriptionType;
 
 
 	public UserCSV() {
@@ -40,6 +54,7 @@ public class UserCSV {
 		this.lastName = user.getLastName();
 		this.firstName = user.getFirstName();
 		this.email = user.getEmail();
+		this.loginType = LoginType.toStrValue(user.getLoginType());
 		this.status = user.getStatus();
 		this.referralCode = user.getReferralCode();
 		this.userType = user.getUserType();
@@ -116,5 +131,12 @@ public class UserCSV {
 		this.subscriptionType = subscriptionType;
 	}
 	
-	
+	public String getLoginType() {
+		return loginType;
+	}
+
+	public void setLoginType(String loginType) {
+		this.loginType = loginType;
+	}
+
 }

@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import fr.be.your.self.common.BusinessCodeType;
+
 @Entity
 public class Subscription extends PO<Integer> {
 	@Id
@@ -205,6 +207,16 @@ public class Subscription extends PO<Integer> {
 
 	public void setBuyerEmail(String buyerEmail) {
 		this.buyerEmail = buyerEmail;
+	}
+	
+	public boolean isGiftCard() {
+		if (this.getBusinessCode() != null ) {
+			BusinessCode code = getBusinessCode();
+			if (code.getType() == BusinessCodeType.GIFT_CARD.getValue()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

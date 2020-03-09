@@ -31,4 +31,13 @@ public enum LoginType {
 		
 		return UNKNOWN;
 	}
+	
+	public static String toStrValue(int value) {
+		switch (value) {
+			case 0: return "PASSWORD";
+			case 1: return "GOOGLE";
+			case 2: return "FACEBOOK";
+		}
+		return "UNKNOWN";
+	}
 }
