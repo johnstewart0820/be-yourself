@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import fr.be.your.self.model.Session;
 import fr.be.your.self.model.User;
 
 @Repository
@@ -23,6 +22,8 @@ public interface UserRepository extends BaseRepository<User, Integer> {
     User findBySocialLogin(String socialLogin);
     
     User findByActivateCode(String activateCode);
+    
+    User findByResetPasswordCode(String resetPasswordCode);
     
     long countByEmailContainsIgnoreCaseOrFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String email, String firstName, String lastName);
     
@@ -57,8 +58,12 @@ public interface UserRepository extends BaseRepository<User, Integer> {
     Iterable<User> findAllByIdInAndUserTypeAndStatus(Iterable<Integer> ids, String userType, int status, Sort sort);
     
     @Modifying
-    @Query("UPDATE User SET status = ?2 WHERE id = ?1")
+    @Query("UPDATE User SET status = ?2, activateCode = NULL, activateTimeout = 0 WHERE id = ?1")
     int updateStatus(Integer id, Integer status);
+    
+    @Modifying
+    @Query("UPDATE User SET password = ?2, resetPasswordCode = NULL, resetPasswordTimeout = 0 WHERE id = ?1")
+    int updatePassword(Integer id, String password);
     
     @Query(
         	value = "SELECT u FROM User u, Subscription s, SubscriptionType st WHERE u.id = s.user AND s.subtype=st.id  AND st.id IN :subtypeIds"

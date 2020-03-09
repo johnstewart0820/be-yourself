@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.UserStatus;
+import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.engine.EmailSender;
 import fr.be.your.self.model.User;
 import fr.be.your.self.service.UserService;
@@ -38,6 +40,10 @@ public class AuthController {
 			+ Constants.PATH.AUTHENTICATION_PREFIX 
 			+ Constants.PATH.AUTHENTICATION.ACTIVATE;
 	
+	private static final String ACTIVATE_RESET_PASSWORD_URL = Constants.PATH.WEB_ADMIN_PREFIX 
+			+ Constants.PATH.AUTHENTICATION_PREFIX 
+			+ Constants.PATH.AUTHENTICATION.ACTIVATE_RESET_PASSWORD;
+	
 	@Autowired
 	private DataSetting dataSetting;
 	
@@ -46,6 +52,9 @@ public class AuthController {
 	
 	@Autowired
 	private EmailSender emailSender;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@ModelAttribute
 	protected void initModelAttribute(HttpSession session, HttpServletRequest request, 
@@ -66,6 +75,70 @@ public class AuthController {
         return "register";
     }
 	
+	@GetMapping(Constants.PATH.AUTHENTICATION.FORGOT_PASSWORD)
+    public String forgotPasswordPage(Model model) {
+        return "pages/auth-forgot-password";
+    }
+	
+	@PostMapping(Constants.PATH.AUTHENTICATION.FORGOT_PASSWORD)
+    public String requestForgotPasswordPage(@RequestParam(name = "email", required = false) String email,
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		RedirectAttributes redirectAttributes, Model model) {
+		
+		if (StringUtils.isNullOrSpace(email)) {
+			model.addAttribute("errorFormKey", "invalid.email");
+			model.addAttribute("errorFormValue", "");
+			
+			return "pages/auth-forgot-password";
+		}
+		
+		final User user = this.userService.getByEmail(email);
+		if (user == null || user.getStatus() != UserStatus.ACTIVE.getValue()) {
+			model.addAttribute("errorFormKey", "invalid.email");
+			model.addAttribute("errorFormValue", email);
+			
+			return "pages/auth-forgot-password";
+		}
+		
+		final String resetPasswordCode = StringUtils.randomAlphanumeric(this.dataSetting.getActivateCodeLength());
+		final long resetPasswordTimeout = (new Date().getTime() / (60 * 1000)) + this.dataSetting.getActivateCodeTimeout();
+		
+		user.setResetPasswordCode(resetPasswordCode);
+		user.setResetPasswordTimeout(resetPasswordTimeout);
+		
+		User savedUser;
+		try {
+			savedUser = this.userService.saveOrUpdate(user);
+			if (savedUser == null) {
+				model.addAttribute("errorFormKey", "unknown");
+				
+				return "pages/auth-forgot-password";
+			}
+		} catch (Exception ex) {
+			logger.error("Send reset password code error", ex);
+			
+			model.addAttribute("errorFormKey", "unknown");
+			return "pages/auth-forgot-password";
+		}
+		
+		String resetPasswordUrl = request.getScheme() + "://" 
+				+ request.getServerName() + ":"
+				+ request.getServerPort() 
+				+ request.getContextPath();
+		
+		if (resetPasswordUrl.endsWith("/")) {
+			resetPasswordUrl = resetPasswordUrl.substring(0, resetPasswordUrl.length() - 1);
+		}
+		
+		resetPasswordUrl += ACTIVATE_RESET_PASSWORD_URL;
+		
+		this.emailSender.sendForgotPassword(savedUser.getEmail(), 
+				resetPasswordUrl, savedUser.getResetPasswordCode());
+		
+		return "pages/auth-send-reset-password-success";
+    }
+	
+	// Activate user after register
 	@GetMapping(Constants.PATH.AUTHENTICATION.ACTIVATE)
     public String activatePage(
     		@RequestParam(name = "code", required = false) String activateCode,
@@ -166,6 +239,55 @@ public class AuthController {
 				activateAccountUrl, savedUser.getActivateCode());
 		
 		return "pages/auth-send-activate-success";
+    }
+	
+	// Reset password after reset password
+	@GetMapping(Constants.PATH.AUTHENTICATION.ACTIVATE_RESET_PASSWORD)
+    public String activateResetPassword(
+    		@RequestParam(name = "code", required = false) String resetPasswordCode,
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		RedirectAttributes redirectAttributes, Model model) {
+		
+		model.addAttribute("resetPasswordCode", resetPasswordCode);
+		
+		if (StringUtils.isNullOrSpace(resetPasswordCode)) {
+			model.addAttribute("errorMessageKey", "invalid.reset.password.code");
+			
+			return "pages/auth-reset-password-error";
+		}
+		
+		final User user = this.userService.getByResetPasswordCode(resetPasswordCode);
+		if (user == null) {
+			model.addAttribute("errorMessageKey", "invalid.reset.password.code");
+			
+			return "pages/auth-reset-password-error";
+		}
+		
+		if (user.getResetPasswordTimeout() < new Date().getTime() / (60 * 1000)) {
+			model.addAttribute("errorMessageKey", "expired.reset.password.code");
+			
+			return "pages/auth-reset-password-error";
+		}
+		
+		try {
+			final String rawPassword = StringUtils.randomAlphanumeric(this.dataSetting.getTempPwdLength());
+			final String password = this.passwordEncoder.encode(rawPassword);
+			
+			if (!this.userService.updatePassword(user.getId(), password)) {
+				model.addAttribute("errorMessageKey", "unknown");
+				
+				return "pages/auth-reset-password-error";
+			}
+			
+			this.emailSender.sendTemporaryPassword(user.getEmail(), rawPassword);
+		} catch (Exception ex) {
+			logger.error("Reset password user error", ex);
+			
+			model.addAttribute("errorMessageKey", "unknown");
+			return "pages/auth-reset-password-error";
+		}
+		
+		return "pages/auth-reset-password-success";
     }
 	
 	@GetMapping(Constants.PATH.ACCESS_DENIED)

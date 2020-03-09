@@ -22,6 +22,8 @@ public interface UserService extends BaseService<User, Integer> {
 	
 	public User getByActivateCode(String activateCode);
 	
+	public User getByResetPasswordCode(String resetPasswordCode);
+	
 	public PageableResponse<User> searchByName(String firstNameOrLastName, Pageable pageable, Sort sort);
 	
 	public PageableResponse<User> searchProfessionalByName(String firstNameOrLastName, Pageable pageable, Sort sort);
@@ -43,6 +45,8 @@ public interface UserService extends BaseService<User, Integer> {
 
 	public boolean activateUser(Integer userId);
 
+	public boolean updatePassword(Integer userId, String password);
+	
 	public PageableResponse<User> pageableSearch(String text, String filterRole, Integer filterStatus,
 			List<Integer> filterSubscriptionTypesIds, PageRequest pageable, Sort sort);
 

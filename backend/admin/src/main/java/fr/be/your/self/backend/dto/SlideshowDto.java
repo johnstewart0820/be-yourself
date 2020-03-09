@@ -22,8 +22,7 @@ public class SlideshowDto extends BaseDto {
 
 	private List<SlideshowImage> images;
 	
-	private String webLink;
-	private String mobileLink;
+	private String link;
 	private MultipartFile uploadImageFile;
 
 	public SlideshowDto() {
@@ -81,20 +80,12 @@ public class SlideshowDto extends BaseDto {
 		this.images = images;
 	}
 
-	public String getWebLink() {
-		return webLink;
+	public String getLink() {
+		return link;
 	}
 
-	public void setWebLink(String webLink) {
-		this.webLink = webLink;
-	}
-
-	public String getMobileLink() {
-		return mobileLink;
-	}
-
-	public void setMobileLink(String mobileLink) {
-		this.mobileLink = mobileLink;
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 	public MultipartFile getUploadImageFile() {
