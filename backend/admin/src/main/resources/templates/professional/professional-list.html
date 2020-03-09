@@ -7,7 +7,7 @@
 
 </head>
 <body>
-	<div layout:fragment="content">
+	<th:block layout:fragment="content">
 		<div class="card shadow">
 			<div class="card-header border-0">
 				<form id="select_form" role="form"
@@ -143,8 +143,8 @@
 				</div>
 			</div>
 		</div>
-
-	</div>
+		<th:block th:replace="fragments/data-list-modals :: modals"></th:block>
+	</th:block>
 
 
 	<section layout:fragment="scripts">
@@ -175,10 +175,12 @@
 				showModal('confirm-delete-modal');
 			}
 
-			$(document)
-					.ready(
-							function() {
-								$('#user_table').DataTable({
+			$(document).ready(function() {
+				
+			showOnLoadedModal();
+
+			
+			$('#user_table').DataTable({
 									"sDom" : 't'
 								});
 

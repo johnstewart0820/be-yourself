@@ -7,7 +7,7 @@
 
 </head>
 <body>
-	<div layout:fragment="content">
+	<th:block layout:fragment="content">
 
 		<div class="container">
 			<div class="row justify-content-center">
@@ -106,25 +106,22 @@
 										</div>
 									</div>
 								</div>
-								<!-- Action result -->
-								<div class="row">
-									<div class="col-md-10 col-sm-12">
-										<h4 th:if="${result != null}" th:text="${result.message}"></h4>
-									</div>
-								</div>
 							</form>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+		
+		<th:block th:replace="fragments/data-form-modals :: modals"></th:block>
+		
+	</th:block>
 
 	<section layout:fragment="scripts">
 		
 		<script type="text/javascript">
-		$(document).ready(function() { 
-			//TODO
+		$(document).ready(function() {
+			showOnLoadedModal();
 		});
 		
 		$('#user_form').submit(function() {

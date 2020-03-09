@@ -286,7 +286,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
         
-        return "redirect:" + this.getBaseURL() + "/edit/" + id;
+        return "redirect:" + this.getBaseURL() + "/current-page";
     }
 	
 	@PostMapping(value = { "/delete/{id}" })
@@ -430,25 +430,29 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	}
 
 	// reset password user by email
-	@RequestMapping(value = "/password/resetbyemail")
-	public String resetPasswordByEmail(@RequestParam("user_email") String userEmail, Model model) {
-		SimpleResult result = new SimpleResult(ResultStatus.UNKNOWN.getValue(), "Unknown status");
-		result.setFunctionalityName("Reset password by email");
+	@PostMapping(value = "/password/resetbyemail")
+	public String resetPasswordByEmail(@RequestParam("user_email") String userEmail, 
+			Model model, final RedirectAttributes redirectAttributes) {
 		User user = userService.getByEmail(userEmail);
+		String message;
 		if (user == null) {
-			result.setResStatus(ResultStatus.ERROR.getValue());
-			result.setMessage("Email address does not exist!");
-			return this.getName() +  "/simple_status";
+			message = this.getMessage("users.reset.password.error.email.message",  new Object[] {userEmail});			
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        return "redirect:" + this.getBaseURL() + "/resetpwdbyemail";
 		}
 		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
 		String encodedPwd = getPasswordEncoder().encode(tempPwd);
 		user.setPassword(encodedPwd);
 		userService.saveOrUpdate(user);
 		this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
-		result.setResStatus(ResultStatus.SUCCESS.getValue());
-		result.setMessage("Password reset successfully for user: '" + user.getFullName() + "' with email: " + user.getEmail());
-		model.addAttribute("result", result);
-		return this.getName() + "/simple_status";
+		
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+	    redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+		message = this.getMessage("users.reset.password.with.email.success.message", new Object[] {userEmail});			
+        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+		return "redirect:" + this.getBaseURL() + "/resetpwdbyemail";
 	}
 	
 	// save account settings
@@ -468,13 +472,13 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			currentUser.setEmail(user.getEmail());
 			currentUser.setTitle(user.getTitle());
 			
-			SimpleResult simpleResult = new SimpleResult();
 			if (!StringUtils.isNullOrEmpty(new_pwd)) {
 				if (!getPasswordEncoder().matches(current_pwd, currentUser.getPassword())) {
-					String message = this.getMessage("settings.error.incorrectpwd");
-					simpleResult.setResStatus(ResultStatus.ERROR.getValue());
-					simpleResult.setMessage(message);
-					redirectAttributes.addFlashAttribute("result", simpleResult);
+					String message = this.getMessage("settings.error.incorrectpwd");					
+					redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+			        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+			        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+			        
 					return "redirect:" + this.getBaseURL() + "/settings"; 
 				}
 				String encoded_new_pwd = this.getPasswordEncoder().encode(new_pwd);
@@ -482,23 +486,22 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			}
 
 			userService.saveOrUpdate(currentUser);
-			String message = this.getMessage("settings.update.success");
-			simpleResult.setResStatus(ResultStatus.SUCCESS.getValue());
-			simpleResult.setMessage(message);
-			redirectAttributes.addFlashAttribute("result", simpleResult);
+			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+		    redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+		        
 			return "redirect:" + this.getBaseURL() + "/settings"; 
 	}
 
 	// show account settings
 	@GetMapping(value = "/settings")
-	public String showAccountSettings(Model model) {
+	public String showAccountSettings(Model model, final RedirectAttributes redirectAttributes) {
 		User loggedUser = userService.getById((int) model.getAttribute("userId"));
 		model.addAttribute("user", loggedUser);
 		return this.getName() + "/account_settings";
 	}
 		
 	// show reset password form
-	@RequestMapping(value = "/resetpwdbyemail")
+	@GetMapping(value = "/resetpwdbyemail")
 	public String showResetPassword(Model model) {
 		return this.getName() + "/reset_password_form";
 	}
@@ -512,27 +515,36 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 	// reset password user
 	@RequestMapping(value = "/{id}/resetpassword")
-	public String resetPasswordUser(@PathVariable("id") int id, Model model) {
+	public String resetPasswordUser(@PathVariable("id") int id, Model model, final RedirectAttributes redirectAttributes) {
 		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
 		String encodedPwd = getPasswordEncoder().encode(tempPwd);
 		User user = userService.getById(id);
 		user.setPassword(encodedPwd);
 		userService.saveOrUpdate(user);
 		this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
-		model.addAttribute("msg", "Password reset successfully");
-		return this.getName() +  "/userform_result";
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+	    redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	    String message = this.getMessage("users.reset.password.success.message");					
+        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+        return "redirect:" + this.getBaseURL() + "/edit/" + id;
 	}
 	
 	// resend verification email user
 	@RequestMapping(value = "/{id}/resendverifemail")
-	public String resendVerificationEmail(@PathVariable("id") int id, HttpServletRequest request, Model model) {
+	public String resendVerificationEmail(@PathVariable("id") int id, HttpServletRequest request, Model model
+			, final RedirectAttributes redirectAttributes) {
 		User user = userService.getById(id);
 		String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
 		setActivateCodeAndTimeout(user);
 		userService.saveOrUpdate(user);
 		sendVerificationEmailToUser(activateAccountUrl, user);
-		model.addAttribute("msg", "Resend verification email successfully");
-		return this.getName() +  "/userform_result";
+		//model.addAttribute("msg", "Resend verification email successfully");
+		//return this.getName() +  "/userform_result";
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+	    redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	    String message = this.getMessage("users.resend.verification.email.success.message");					
+        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+        return "redirect:" + this.getBaseURL() + "/edit/" + id;
 	}
 	
 
@@ -555,7 +567,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		model.addAttribute("userStatuses", userStatuses);
 		model.addAttribute("subtypes", subtypes);
 		model.addAttribute("filteredSubscriptionTypesIds", filteredSubscriptionTypesIds);
-
 	}
 	
 	@Override

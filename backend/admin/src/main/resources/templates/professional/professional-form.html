@@ -6,7 +6,7 @@
 <title th:text="#{|${baseMessageKey}.page.title|}"></title>
 </head>
 <body>
-	<div layout:fragment="content">
+	<th:block layout:fragment="content">
 		<div class="container">
 			<div class="row">
 				<div class="col">
@@ -273,6 +273,12 @@
 												</div>
 												
 										</th:block>
+										<script type="text/javascript">
+										function selectImage(inputElement, groupName) {
+											var fileName = inputElement.files[0].name;
+											$("#imageFileLabel").text(fileName);
+										}
+										</script>
 										<!-- Description -->
 										<div class="form-group row">
 											<label for="description"
@@ -759,10 +765,10 @@
 					</div>
 				</div>
 			</div>
-
 		</div>
+		<th:block th:replace="fragments/data-list-modals :: modals"></th:block>
 
-	</div>
+	</th:block>
 
 	<section layout:fragment="scripts">
 		  
@@ -782,20 +788,10 @@
 	   </script>
 		</div>
 		<script>
-
-
-	toastAction = '[[${toastAction}]]';
-	toastStatus = '[[${toastStatus}]]';
-		
-	$(document).ready(function() {
-		if (toastAction && toastStatus ) {
-			if (toastAction == "update" && toastStatus == "success") {
-				alert("User updated successfully!");
-			}		
-		}
-		
-	});
-</script>
+			$(document).ready(function() {
+				showOnLoadedModal();
+			});
+		</script>
 	</section>
 
 </body>

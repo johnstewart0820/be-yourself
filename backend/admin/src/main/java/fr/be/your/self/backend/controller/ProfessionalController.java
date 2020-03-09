@@ -267,7 +267,8 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		sendVerificationEmailToUser(activateAccountUrl, savedUser);
 		this.getEmailSender().sendTemporaryPassword(savedUser.getEmail(), tempPwd);
 		
-
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
+        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
 		return "redirect:" + this.getBaseURL();
 	}
 	
