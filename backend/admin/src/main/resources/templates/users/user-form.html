@@ -67,7 +67,7 @@
 													th:text="#{|${baseMessageKey}.detail.lastname|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<input class="form-control" id="lastname" type="text"
-														th:field="*{lastName}">
+														th:field="*{lastName}" required>
 												</div>
 											</div>
 											<!-- First Name -->
@@ -108,7 +108,7 @@
 											<div class="form-group row" id="password_div">
 												<input type="hidden"/> <label
 													for="pwd"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.password|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<input class="form-control" id="pwd" type="password"
@@ -132,7 +132,7 @@
 											<!-- Referral Code -->
 											<div class="form-group row">
 												<label for="refcode"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.refcode|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<input class="form-control" type="text" id="refcode"
@@ -180,8 +180,7 @@
 
 											</div>
 
-											<!-- Subcription -->
-											
+											<!-- Subscription -->											
 											<div class="form-group row" th:if="${#strings.contains(action, 'update')}">
 												<label for="subscription"
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs"

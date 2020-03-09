@@ -182,7 +182,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 
 		//Create Address
 		user.setAddress(dto.getAddress());
-
+		user.setSpecialty(dto.getSpecialty());
 		//Add prices
 		if (dto.getPrices() != null) {
 			for (Price price : dto.getPrices()) {
@@ -202,22 +202,25 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		
 		 //Validate image file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
-        if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final ObjectError error = this.createRequiredFieldError(result, "image", "Image required");
-        	result.addError(error);
-        	
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
-        }
+		/*
+		 * if (uploadImageFile == null || uploadImageFile.isEmpty()) { final ObjectError
+		 * error = this.createRequiredFieldError(result, "image", "Image required");
+		 * result.addError(error);
+		 * 
+		 * return this.redirectAddNewPage(session, request, response,
+		 * redirectAttributes, model, dto); }
+		 */
         
         //Process upload image file
-        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
-        if (uploadImageFilePath == null) {
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
+	        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
+	        if (uploadImageFilePath == null) {
+	        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+	        }
+	      //Set profile picture
+	        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+	        user.setProfilePicture(uploadImageFileName);
         }
-        
-        //Set profile picture
-        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
-        user.setProfilePicture(uploadImageFileName);
         
         
         //Degrees

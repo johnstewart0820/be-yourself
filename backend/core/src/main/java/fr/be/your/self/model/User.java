@@ -10,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -77,14 +76,18 @@ public class User extends PO<Integer> {
 	private String profilePicture;
 	private String school;
 
-
 	@Lob
 	private String description;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "address_id")
 	private Address address;
 	
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "specialty_id")
+	private Specialty specialty;
+	
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<Price> prices;
 
@@ -356,6 +359,15 @@ public class User extends PO<Integer> {
 
 	public void setMediaFiles(List<MediaFile> mediaFiles) {
 		this.mediaFiles = mediaFiles;
+	}
+	
+	
+	public Specialty getSpecialty() {
+		return specialty;
+	}
+
+	public void setSpecialty(Specialty specialty) {
+		this.specialty = specialty;
 	}
 	
 }

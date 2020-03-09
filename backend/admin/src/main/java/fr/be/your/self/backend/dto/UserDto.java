@@ -10,6 +10,7 @@ import fr.be.your.self.model.Address;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.Price;
 import fr.be.your.self.model.ProfessionalEvent;
+import fr.be.your.self.model.Specialty;
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.DegreeFile;
@@ -60,6 +61,7 @@ public class UserDto implements Serializable {
 
 	private String school;
 	private Subscription subscription;
+	private Specialty specialty;
 	
 
 	public UserDto() {
@@ -99,6 +101,7 @@ public class UserDto implements Serializable {
 			this.prices = domain.getPrices();
 			this.school = domain.getSchool();
 			this.subscription  = domain.getSubscription();
+			this.specialty = domain.getSpecialty();
 		}
 	}
 	
@@ -131,6 +134,7 @@ public class UserDto implements Serializable {
 		domain.setDescription(description);	
 		domain.setSchool(school);
 		domain.setAddress(address);
+		domain.setSpecialty(specialty);
 	}
 
 
@@ -333,5 +337,11 @@ public class UserDto implements Serializable {
 	}
 	public void setSubscription(Subscription subscription) {
 		this.subscription = subscription;
+	}
+	public Specialty getSpecialty() {
+		return specialty;
+	}
+	public void setSpecialty(Specialty specialty) {
+		this.specialty = specialty;
 	}
 }

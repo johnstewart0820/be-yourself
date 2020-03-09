@@ -90,7 +90,9 @@
 											<!-- Address -->
 											<div class="form-group row">
 												<input type="hidden" th:field="*{address.id}">
-											
+												<input type="hidden" th:field="*{address.latitude}" id="latitude">
+												<input type="hidden" th:field="*{address.longitude}" id="longitude">
+												
 												<label for="address"
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.address|}"></label>
@@ -99,10 +101,32 @@
 														th:field="*{address.address}" required>
 												</div>
 											</div>
+											<div class="form-group row" th:if="${#strings.contains(action, 'update')}">											
+												<label for="address"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.coordinates|}"></label>
+												<div class="col-md-8 col-sm-9 col-xs-12">
+													<label class="form-control"
+														th:text="${dto.address.latitude} + ', ' +${dto.address.longitude}" ></label>
+												</div>
+											</div>
+											<script >
+											 	 var input = document.getElementById('address');
+										     	 // var autocomplete = new google.maps.places.Autocomplete(input,{types: ['(cities)']});
+											 	 var autocomplete = new google.maps.places.Autocomplete(input);
+										     	 google.maps.event.addListener(autocomplete, 'place_changed', function(){
+											         var place = autocomplete.getPlace();
+													 var lat = place.geometry.location.lat();
+													 var lng = place.geometry.location.lng();
+													 document.getElementById('latitude').value=lat;
+													 document.getElementById('longitude').value=lng;
+
+										     	 })
+											</script>
 											<!-- Formation Type -->
 											<div class="form-group row" id="account_type_div">
 												<label for="formation"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.formation|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<select class="form-control" id="userId" th:field="*{formation}">
@@ -115,42 +139,80 @@
 											<!-- Website -->
 											<div class="form-group row">
 												<label for="website"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.website|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<input class="form-control" type="text" id="website"
-														th:field="*{website}" required>
+														th:field="*{website}">
 												</div>
 											</div>
 											<!-- Linkedin -->
 											<div class="form-group row">
 												<label for="linkedin"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.linkedin|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<input class="form-control" type="text" id="linkedin"
-														th:field="*{linkedin}" required>
+														th:field="*{linkedin}">
 												</div>
 											</div>
 											<!-- Facebook -->
 											<div class="form-group row">
 												<label for="facebook"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.facebook|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<input class="form-control" type="text" id="facebook"
-														th:field="*{facebook}" required>
+														th:field="*{facebook}">
 												</div>
 											</div>
 											<!-- Is supervised? -->
 											<div class="form-group row">
 												<label for="supervised"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.supervised|}"></label>
 												<div class="col-sm-5 col-xs-10">
 													<input id="supervised" th:field="*{supervised}"
 														type="checkbox">
 												</div>
+											</div>
+											<input type="hidden" th:field="*{specialty.id}">
+											
+											<div class="form-group row">
+												<label for="sp_domicile"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.domicile|}"></label>												
+													<input id="sp_domicile" th:field="*{specialty.domicile}" type="checkbox">
+												<label for="sp_individual"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.individual|}"></label>												
+													<input id="sp_individual" th:field="*{specialty.individual}" type="checkbox">
+												<label for="sp_group"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.group|}"></label>												
+													<input id="sp_group" th:field="*{specialty.grp}" type="checkbox">
+												<label for="sp_children"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.children|}"></label>												
+													<input id="sp_children" th:field="*{specialty.children}" type="checkbox">
+											</div>
+											<div class="form-group row">
+												<label for="sp_adult"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.adult|}"></label>												
+													<input id="sp_adult" th:field="*{specialty.adult}" type="checkbox">
+												<label for="sp_pregnancy"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.pregnancy|}"></label>												
+													<input id="sp_pregnancy" th:field="*{specialty.pregnancy}" type="checkbox">
+												<label for="sp_sport"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.sport|}"></label>												
+													<input id="sp_sport" th:field="*{specialty.sport}" type="checkbox">
+												<label for="sp_enterprise"
+													class="label form-control-label col-md-2 col-sm-3 hidden-xs"
+													th:text="#{|${baseMessageKey}.detail.specialty.enterprise|}"></label>												
+													<input id="sp_enterprise" th:field="*{specialty.enterprise}" type="checkbox">
 											</div>
 											
 											<!-- PROFILE SECTION -->
@@ -169,14 +231,14 @@
 											
 										 	<th:block th:switch="${action}">
 												<div th:case="create" class="form-group row">
-													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field" 
+													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
 														th:text="#{|${baseMessageKey}.detail.image|}"></label>
 													<div class="col-sm-5 col-xs-12">
 														<div class="custom-file">
 															<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
 																th:accept="${supportImageTypes}" onChange="selectImage(this)" 
-																th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" required/>
+																th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}"/>
 															<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 																th:data-browse="#{action.select.image}"></label>
 														</div>
@@ -202,7 +264,7 @@
 										<!-- Description -->
 										<div class="form-group row">
 											<label for="description"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 												th:text="#{|${baseMessageKey}.detail.description|}"></label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<textarea class="form-control" rows="4" id="description"
@@ -349,16 +411,6 @@
 													</div>
 												</div>
 												
-										
-								<!-- 		<div class="form-group row">	
-											<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field" 
-														th:text="#{|${baseMessageKey}.detail.image|}"></label>
-																							
-											
-										</div>
-										
-										<input class="col" type="file" name="degrees" id="degrees" multiple="multiple"
-											 onchange="javascript:updateDegreeList()" /> -->
 										<script>
 											function removeOldDegree(degreeId){
 												var idsToRemoveTxt = document.getElementById('degreeIdsToRemove').value;
@@ -387,11 +439,11 @@
 										
 										<div class="form-group row">
 												<label for="school"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.school|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
 													<input class="form-control" type="text" id="school"
-														th:field="*{school}" required>
+														th:field="*{school}">
 												</div>
 										</div>
 										
@@ -622,7 +674,7 @@
 										})
 										</script>
 											
-											<!-- Save or go back -->
+										<!-- Save or go back -->
 										<div th:if="${writePermission}" class="form-group row">
 											<div
 												class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12">
