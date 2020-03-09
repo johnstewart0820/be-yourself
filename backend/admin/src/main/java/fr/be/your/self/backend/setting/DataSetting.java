@@ -51,6 +51,10 @@ public class DataSetting {
 	private int discountCodeFormatType;
 	private int discountCodeCaseSensitive;
 	
+	private String googleMapApiKey;
+	
+
+
 	private Set<Integer> giftDurations;
 	
 	public DataSetting() {
@@ -292,5 +296,12 @@ public class DataSetting {
 
 	public void setTempPwdLength(int tempPwdLength) {
 		this.tempPwdLength = tempPwdLength;
+	}
+	public String getGoogleMapApiKey() {
+		return googleMapApiKey;
+	}
+
+	public void setGoogleMapApiKey(String googleMapApiKey) {
+		this.googleMapApiKey = googleMapApiKey;
 	}
 }

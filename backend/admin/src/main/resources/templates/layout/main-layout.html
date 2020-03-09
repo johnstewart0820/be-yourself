@@ -37,7 +37,7 @@
 	<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/js/bootstrap.bundle.min.js}"></script>
 	<script type="text/javascript" th:src="@{/js/bootstrap-datepicker.min.js}"></script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0B8Cetv_xoqogsC5xn0enr6eZWeC8pBU&libraries=places"></script>
+	<script th:src="@{https://maps.googleapis.com/maps/api/js?key={key}&libraries=places(key=${GOOGLE_MAP_API_KEY})}"></script>
 	
 </head>
 <body>

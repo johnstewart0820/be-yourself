@@ -40,7 +40,7 @@
 						<!-- Card body -->
 						<div class="card-body px-lg-5 py-lg-5">
 							<form th:action="${writePermission ? baseURL + '/' + action : 'javascript:;'}"
-								th:object="${dto}" method="post" enctype="multipart/form-data">
+								th:object="${dto}" method="post" enctype="multipart/form-data" id="professional_form">
 								<fieldset th:disabled="${!writePermission}">
 									<input type="hidden" th:field="*{id}" />
 									<div class="row">
@@ -92,7 +92,7 @@
 												<input type="hidden" th:field="*{address.id}">
 												<input type="hidden" th:field="*{address.latitude}" id="latitude">
 												<input type="hidden" th:field="*{address.longitude}" id="longitude">
-												
+												<input type="hidden" id="searchAddrValue" value="">
 												<label for="address"
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.address|}"></label>
@@ -106,7 +106,7 @@
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.coordinates|}"></label>
 												<div class="col-md-8 col-sm-9 col-xs-12">
-													<label class="form-control"
+													<label class="form-control" id="coordinates"
 														th:text="${dto.address.latitude} + ', ' +${dto.address.longitude}" ></label>
 												</div>
 											</div>
@@ -120,8 +120,21 @@
 													 var lng = place.geometry.location.lng();
 													 document.getElementById('latitude').value=lat;
 													 document.getElementById('longitude').value=lng;
-
+													 document.getElementById('searchAddrValue').value = document.getElementById('address').value; 
+													 document.getElementById('coordinates').innerHTML=lat + ", " + lng;
 										     	 })
+										     	 
+										     	 $(document).ready(function() {
+										     		document.getElementById('searchAddrValue').value = document.getElementById('address').value;
+										     		 $("#professional_form" ).submit(function( event ) {
+										     			  // when we submit form, if search Value != address value then that means user did not select from suggestion
+										     			  if (document.getElementById('searchAddrValue').value != document.getElementById('address').value) {
+											     			 document.getElementById('latitude').value = null;
+											     			 document.getElementById('longitude').value = null;
+										     			  }
+										     		})
+										     	 });
+										     	 
 											</script>
 											<!-- Formation Type -->
 											<div class="form-group row" id="account_type_div">
@@ -134,7 +147,6 @@
 													 th:text="#{'formation.level.' + ${formation}}"></option>
 												</select>
 												</div>
-
 											</div>
 											<!-- Website -->
 											<div class="form-group row">
@@ -497,7 +509,6 @@
 											} else {
 												idsToRemoveTxt = idsToRemoveTxt + "," + mediaId;
 											}
-											//alert("ids media to remove = " + idsToRemoveTxt);
 											
 											document.getElementById('mediaIdsToRemove').value = idsToRemoveTxt;
 											var divToRemove = 'div_old_media_' + mediaId;
@@ -543,6 +554,11 @@
 															<span class="input-group-text"><i class="fas fa-calendar"></i></span>
 															</div>															
 													</div>
+													<input type="hidden" th:field="*{events[__${itemStats.index}__].address.id}" >
+													
+													<input type="hidden" th:field="*{events[__${itemStats.index}__].address.latitude}" >
+													<input type="hidden" th:field="*{events[__${itemStats.index}__].address.longitude}" >
+													
 													<textarea rows="1" class="form-control col-md-3 col-sm-4 col-xs-12" 
 															th:field="*{events[__${itemStats.index}__].address.address}" required></textarea>
 													<textarea rows="1" class="form-control col-md-3 col-sm-4 col-xs-12"
@@ -574,7 +590,10 @@
 												</div>											
 										</div>
 										<!-- Address -->
-										<div class="form-group row">										
+										<div class="form-group row">	
+												<input type="hidden" id="eventLatitude">
+												<input type="hidden" id="eventLongitude">
+												<input type="hidden" id="eventSearchAddrValue">										
 												<label for="eventAddress"
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.event.address|}"></label>
@@ -589,7 +608,6 @@
 												th:text="#{|${baseMessageKey}.detail.event.description|}"></label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<textarea class="form-control" rows="4" id="eventDescription"></textarea>
-													
 												<div class="invalid-feedback"></div>
 											</div>
 										</div>
@@ -615,7 +633,19 @@
 											
 											</div>
 										</div>
-										<script>
+										<script >
+									 	 var eventInput = document.getElementById('eventAddress');
+									 	 var eventAutocomplete = new google.maps.places.Autocomplete(eventInput);
+								     	 google.maps.event.addListener(eventAutocomplete, 'place_changed', function(){
+									         var place = eventAutocomplete.getPlace();
+											 var lat = place.geometry.location.lat();
+											 var lng = place.geometry.location.lng();
+											 document.getElementById('eventLatitude').value=lat;
+											 document.getElementById('eventLongitude').value=lng;
+											 document.getElementById('eventSearchAddrValue').value = document.getElementById('eventAddress').value; 
+								     	 })
+									     	 
+									     	 
 										function removeOldEvent(eventId){
 											var idsToRemoveTxt = document.getElementById('eventIdsToRemove').value;
 											if (idsToRemoveTxt == "") {
@@ -631,8 +661,18 @@
 										
 										var indexEvent = [[${#lists.size(dto.events)}]]; // Get the current number of price elements
 										$("#add_event").click(function() {
+											// when we add event, if search Value != address value then that means user did not select from suggestion
+							     			if (document.getElementById('eventSearchAddrValue').value != document.getElementById('eventAddress').value) {
+								     			document.getElementById('eventLatitude').value = null;
+								     			document.getElementById('eventLongitude').value = null;
+							     			} else {
+							     				alert(document.getElementById('eventLatitude').value + ", " + document.getElementById('eventLongitude').value );
+							     			}
 											var current_date=$("#eventDate").val();
 											var current_address=$("#eventAddress").val();
+											var current_latitude = document.getElementById('eventLatitude').value;
+											var current_longitude = document.getElementById('eventLongitude').value;
+
 											var current_description=$("#eventDescription").val();
 											var current_price=$("#eventPrice").val();
 
@@ -643,6 +683,14 @@
 
 											var id_new_address="events"+ indexEvent + ".address.address";
 											var name_new_address="events["+ indexEvent + "].address.address";
+											
+											var id_new_latitude="events"+ indexEvent + ".address.latitude";
+											var name_new_latitude="events["+ indexEvent + "].address.latitude";
+											
+											var id_new_longitude="events"+ indexEvent + ".address.longitude";
+											var name_new_longitude="events["+ indexEvent + "].address.longitude";
+
+											
 
 											var id_new_description="events"+ indexEvent + ".description";
 											var name_new_description="events["+ indexEvent + "].description";
@@ -656,6 +704,10 @@
 															+"' required><div class='input-group-prepend'> <span class='input-group-text'><i class='fas fa-calendar'></i></span></div></div>";
 											var new_address = "<input class='form-control  col-md-3  col-sm-4 col-xs-12' type='text' id='" + id_new_address 
 															+ "' name='" + name_new_address + "' value='"+current_address+"' required>";
+											var new_latitude = "<input  type='hidden' id='" + id_new_longitude 
+															+ "' name='" + name_new_longitude + "' value='"+current_latitude+"'>";
+											var new_longitude = "<input  type='hidden' id='" + id_new_latitude 
+															+ "' name='" + name_new_latitude + "' value='"+current_longitude+"'>";
 											var new_description = "<input class='form-control  col-md-3 col-sm-4 col-xs-12' type='text'  id='" + id_new_description 
 															+ "' name='" + name_new_description + "' value='"+current_description+"' required>";
 											var new_price = "<input class='form-control col-md-1 col-sm-4 col-xs-12' type='number' step='0.01' id='" + id_new_price 
@@ -666,7 +718,8 @@
 											var remove_btn = "<button class='btn btn-icon btn-2 btn-danger offset-md-1' type='button' onclick=removeElemById('" 
 																+ id_new_div + "')><span class='btn-inner--icon'><i class='fas fa-times'></i></span></button>";
 											
-											var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_date + new_address + new_description + new_price +  remove_btn +"</div>";
+											var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_date + new_address + new_latitude + new_longitude +
+																new_description + new_price +  remove_btn +"</div>";
 											//alert(new_inner_div);
 											$("#event_div").append(new_inner_div);
 											

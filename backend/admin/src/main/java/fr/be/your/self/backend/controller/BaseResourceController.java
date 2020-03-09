@@ -224,9 +224,12 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 
 		final String dateFormat = this.getMessage("locale.format.date", "dd-MM-yyyy");
 		final String dateTimeFormat = this.getMessage("locale.format.date.time", "dd-MM-yyyy HH:mm");
+		final String GOOGLE_MAP_API_KEY = this.dataSetting.getGoogleMapApiKey();
 
 		model.addAttribute("dateFormat", dateFormat);
 		model.addAttribute("dateTimeFormat", dateTimeFormat);
+		model.addAttribute("GOOGLE_MAP_API_KEY", GOOGLE_MAP_API_KEY);
+
 	}
 
 	@GetMapping(value = { "", "/search" })
