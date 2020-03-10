@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum UserStatus {
-	DRAFT(0),
+	INACTIVE(0),
 	ACTIVE(1),
-	INACTIVE(2),
 	UNKNOWN(-1);
 		
 	private final int value;
@@ -47,9 +46,8 @@ public enum UserStatus {
 	
 	public static String getStatusDescription(int val) {
 		switch (val) {
-			case 0: return "DRAFT";
+			case 0: return "INACTIVE";
 			case 1: return "ACTIVE";
-			case 2: return "INACTIVE";
 			default: return "UNKNOWN";	
 		}		
 	}

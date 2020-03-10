@@ -215,7 +215,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			user.setStatus(UserStatus.ACTIVE.getValue());
 		} else {
 			setActivateCodeAndTimeout(user);
-			user.setStatus(UserStatus.DRAFT.getValue());
+			user.setStatus(UserStatus.INACTIVE.getValue());
 		}
 		savedUser = userService.create(user);
 
@@ -231,7 +231,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		}
 		
 		if (!isAutoActivateAccount) {
-			if (savedUser.getStatus() == UserStatus.DRAFT.getValue()) {
+			if (savedUser.getStatus() == UserStatus.INACTIVE.getValue()) {
 				String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
 				sendVerificationEmailToUser(activateAccountUrl, savedUser);
 			}
@@ -400,7 +400,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		for (User user : users) {
 			String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
 
-			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
+			if (user.getStatus() == UserStatus.INACTIVE.getValue()) {
 				setActivateCodeAndTimeout(user);
 			}
 
@@ -409,7 +409,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			this.getPermissionService().saveAll(savedUser.getPermissions());
 
 			this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
-			if (user.getStatus() == UserStatus.DRAFT.getValue()) {
+			if (user.getStatus() == UserStatus.INACTIVE.getValue()) {
 				String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
 				sendVerificationEmailToUser(activateAccountUrl, user);
 			}

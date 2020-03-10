@@ -42,7 +42,9 @@
 												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.user|}"></label>
 											<div class="col-md-3 col-sm-8">
-												<select class="form-control" id="userId" th:field="*{userId}" required>
+												<select class="selectpicker show-tick" id="userId" th:field="*{userId}"
+												data-live-search="true"
+												data-actions-box="true" required>
 													<option th:each="user : ${users}" th:value="${user.id}"
 														th:text="${user.fullName}"></option>
 												</select>

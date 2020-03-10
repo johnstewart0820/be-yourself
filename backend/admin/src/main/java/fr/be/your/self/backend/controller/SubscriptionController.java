@@ -411,7 +411,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 				user.setEmail(email);
 				user.setLoginType(LoginType.PASSWORD.getValue());
 				user.setTitle(subCsv.getTitle());
-				user.setStatus(UserStatus.DRAFT.getValue());
+				user.setStatus(UserStatus.INACTIVE.getValue());
 				user.setUserType(UserType.B2C.getValue());
 				String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
 				setActivateCodeAndTimeout(user);

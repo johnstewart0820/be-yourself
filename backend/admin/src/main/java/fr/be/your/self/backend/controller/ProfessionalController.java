@@ -178,7 +178,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		//Set temporary password and activation code
 		String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
 		setActivateCodeAndTimeout(user);
-		user.setStatus(UserStatus.DRAFT.getValue());
+		user.setStatus(UserStatus.INACTIVE.getValue());
 
 		//Create Address
 		user.setAddress(dto.getAddress());
@@ -390,7 +390,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		List<MultipartFile> degrees = dto.getDegrees();
 		List<DegreeFile> uploadDegreeFileList = new ArrayList<>();
 		for (MultipartFile file : degrees) {
-			if (StringUtils.isNullOrEmpty(file.getOriginalFilename())){
+			if (file == null || StringUtils.isNullOrEmpty(file.getOriginalFilename())){
         		continue;
         	}
 			Path uploadFilePath = uploadFile(file, true);
@@ -405,7 +405,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		List<MultipartFile> medias = dto.getMedias();
 		List<MediaFile> uploadMediaFileList = new ArrayList<>();
 		for (MultipartFile file : medias) {
-			if (StringUtils.isNullOrEmpty(file.getOriginalFilename())){
+			if (file == null || StringUtils.isNullOrEmpty(file.getOriginalFilename())){
         		continue;
         	}
 			Path uploadFilePath = uploadFile(file, true);
