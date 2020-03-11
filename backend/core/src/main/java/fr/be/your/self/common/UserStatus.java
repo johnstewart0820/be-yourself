@@ -44,6 +44,16 @@ public enum UserStatus {
 		return res;
 	}
 	
+	public static List<String> getPossibleStrValues(){
+		List<String> res = new ArrayList<>();
+		for (UserStatus userStatus : UserStatus.values()) {
+			if (userStatus != UNKNOWN) {
+				res.add(String.valueOf(userStatus.getValue()));
+			}
+		}
+		return res;
+	}
+	
 	public static String getStatusDescription(int val) {
 		switch (val) {
 			case 0: return "INACTIVE";

@@ -139,7 +139,8 @@
 							</a>
 				  		</li>
 				  		
-				  		<li th:class="${'nav-item' + (currentFunction == '/users' ? ' active' : '')}">
+				  		<li th:if="${permission.hasPermission('/users')}"
+				  			th:class="${'nav-item' + (currentFunction == '/users' ? ' active' : '')}">
 							<a class="nav-link" th:href="@{/users}">
 					  			<i class="fas fa-user"></i> <span th:text="#{menu.user.management}"></span>
 							</a>

@@ -399,8 +399,8 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		final String baseMessageKey = this.getName().replace('-', '.');
 		final String titleKey = baseMessageKey + ".page.title";
 		model.addAttribute("formTitle", this.getMessage(titleKey));
-
-		final String search = searchParams.get("q");
+		
+		String search = searchParams != null ? searchParams.get("q") : null;
 		model.addAttribute("search", search == null ? "" : search);
 		model.addAttribute("sort", sortQuery == null ? "" : sortQuery);
 

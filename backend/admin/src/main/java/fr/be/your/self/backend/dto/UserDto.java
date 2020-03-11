@@ -111,11 +111,11 @@ public class UserDto implements Serializable {
 		domain.setId(this.id);
 		domain.setLastName(this.lastName);
 		domain.setLoginType(this.loginType);
-		//TODO TVA check why we need to comment here domain.setPermissions(this.permissions);
 		domain.setReferralCode(this.referralCode);
 		domain.setStatus(this.status);
 		domain.setTitle(this.title);
 		domain.setUserType(this.userType);
+		domain.setStatus(status);
 	}
 	
 	//Used in professional page

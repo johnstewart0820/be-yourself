@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionCsv;
-import fr.be.your.self.model.User;
-import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.SubscriptionRepository;
 import fr.be.your.self.service.SubscriptionService;

@@ -1,13 +1,19 @@
-package fr.be.your.self.model;
+package fr.be.your.self.backend.utils;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvBindByPosition;
 
 import fr.be.your.self.common.LoginType;
-import fr.be.your.self.common.UserUtils;
+import fr.be.your.self.common.UserStatus;
+import fr.be.your.self.common.Utils;
+import fr.be.your.self.model.Subscription;
+import fr.be.your.self.model.User;
 
-public class UserCSV {
+public class UserCsv {
 	@CsvBindByName(column = "Title")
     @CsvBindByPosition(position = 0)
 	private String title;
@@ -20,7 +26,7 @@ public class UserCSV {
     @CsvBindByPosition(position = 2)
 	private String firstName;
 	
-	@CsvBindByName(column = "Email")
+	@CsvBindByName(column = "Email", required = true)
     @CsvBindByPosition(position = 3)
 	private String email;
 	
@@ -30,7 +36,7 @@ public class UserCSV {
 	
 	@CsvBindByName(column = "Status")
     @CsvBindByPosition(position = 5)
-	private int status;
+	private String status;
 	
 	@CsvBindByName(column = "Referral Code")	
     @CsvBindByPosition(position = 6)
@@ -43,27 +49,10 @@ public class UserCSV {
 	@CsvBindByName(column = "Subscription Type")	
     @CsvBindByPosition(position = 8)
 	private String subscriptionType;
-
-
-	public UserCSV() {
+	
+	public UserCsv() {
 		
 	}
-	
-	public UserCSV(User user) {
-		this.title = user.getTitle();
-		this.lastName = user.getLastName();
-		this.firstName = user.getFirstName();
-		this.email = user.getEmail();
-		this.loginType = LoginType.toStrValue(user.getLoginType());
-		this.status = user.getStatus();
-		this.referralCode = user.getReferralCode();
-		this.userType = user.getUserType();
-		Subscription sub = UserUtils.findSubscriptionUser(user);
-		if (sub != null && sub.getSubtype() != null) {
-			this.subscriptionType = sub.getSubtype().getName();
-		}
-	}
-
 	
 	
 	public String getTitle() {
@@ -98,11 +87,12 @@ public class UserCSV {
 		this.email = email;
 	}
 
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

@@ -6,21 +6,44 @@
 <title>Upload file</title>
 </head>
 <body>
-	<div layout:fragment="content">
-		<h3>Users import</h3>
-		<form method="POST" th:action="${baseURL + '/importcsv'}"	enctype="multipart/form-data">			
-			 <table>
-		        <tr>
-		            <td><input type="file" name="file" /></td>
-		        </tr>
-		        <tr>
-		            <td><BR><input type="submit" value="Submit" /></td>
-		        </tr>
-		        <tr>
-		            <td><BR><i>Note: Make sure that the column names are correct. If you are not sure about columns names, you can make an CSV export to check.</i></td>
-		        </tr>
-		    </table>		    
-		</form>
-	</div>
+	<th:block layout:fragment="content">
+		<h3>Select users file to import</h3>
+
+				<form method="POST" th:action="${baseURL + '/importcsv'}"
+					enctype="multipart/form-data">
+					<div class="form-group row">
+						<div class="col-md-5 col-sm-8">
+							<div class="custom-file">
+								<input type="file" name="file" id="file"
+									class="custom-file-input" onchange="selectFile(this);" /> <label
+									class="custom-file-label" for="file" id="csvFileLabel"></label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group row">
+						<input class="form-control col-md-2 col-sm-4 col-xs-5 ml-3" type="submit"
+							th:value="#{action.submit}" />
+					</div>
+				</form>
+
+
+		<script type="text/javascript">
+			function selectFile(inputElement) {
+				if(inputElement.files[0].size > 1048576){
+				     alert("File is too big, max file size is 1MB!");
+				     inputElement.value = "";
+				};
+				    
+				var fileName = inputElement.files[0].name;
+				$("#csvFileLabel").text(fileName);
+			}
+		</script>
+		<BR>
+		<i>Note: Make sure that the column names are correct. If you are
+			not sure about columns names, you can make an CSV export to check.</i>
+
+
+	</th:block>
+
 </body>
 </html>

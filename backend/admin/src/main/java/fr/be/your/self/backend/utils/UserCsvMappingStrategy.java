@@ -1,4 +1,4 @@
-package fr.be.your.self.model;
+package fr.be.your.self.backend.utils;
 
 import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;

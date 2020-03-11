@@ -1,11 +1,15 @@
 package fr.be.your.self.backend.controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -33,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.hazelcast.util.StringUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -42,6 +47,7 @@ import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.MappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import fr.be.your.self.backend.cache.CacheManager;
 import fr.be.your.self.backend.dto.PermissionDto;
@@ -50,19 +56,19 @@ import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.utils.AdminUtils;
+import fr.be.your.self.backend.utils.UserCsv;
+import fr.be.your.self.backend.utils.UserCsvMappingStrategy;
+import fr.be.your.self.backend.utils.UserUtils;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
-import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
-import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
-import fr.be.your.self.model.UserCsvMappingStrategy;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.service.UserService;
@@ -202,8 +208,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			user.setStatus(UserStatus.ACTIVE.getValue());
 		} else {
 			setActivateCodeAndTimeout(user);
-			user.setStatus(UserStatus.INACTIVE.getValue());
 		}
+		
 		savedUser = userService.create(user);
 
 		//Error
@@ -327,11 +333,11 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + CSV_USERS_EXPORT_FILE + "\"");
-		final UserCsvMappingStrategy<UserCSV> mappingStrategy = new UserCsvMappingStrategy<>();
-		mappingStrategy.setType(UserCSV.class);
+		final UserCsvMappingStrategy<UserCsv> mappingStrategy = new UserCsvMappingStrategy<>();
+		mappingStrategy.setType(UserCsv.class);
 		
 		// create a csv writer
-		StatefulBeanToCsv<UserCSV> writer = new StatefulBeanToCsvBuilder<UserCSV>(response.getWriter())
+		StatefulBeanToCsv<UserCsv> writer = new StatefulBeanToCsvBuilder<UserCsv>(response.getWriter())
 				.withMappingStrategy(mappingStrategy)
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
 				.withSeparator(CSVWriter.DEFAULT_SEPARATOR)
@@ -339,35 +345,56 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 				.build();
 
 		// write all users to csv file
-		List<UserCSV> usersList = StreamSupport.stream(userService.extractUserCsv(userIds).spliterator(), false)
-				.collect(Collectors.toList());
+		List<UserCsv> usersList = StreamSupport.stream(UserUtils.extractUserCsv(userService.findAllById(userIds), this.messageSource).spliterator(), false)
+												.collect(Collectors.toList());
 	
 		writer.write(usersList);
 	}
 	@PostMapping(value = "/importcsv")
 	public String fileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, Model model)
-			throws IOException {
+			throws IOException, CsvRequiredFieldEmptyException {
 
 		SimpleResult result = new SimpleResult(ResultStatus.UNKNOWN.getValue(), "Unknown status");
 		result.setFunctionalityName("Upload users CSV file!");
-		
+		model.addAttribute("result", result);
+
 		if (file.isEmpty()) {
 			result.setResStatus(ResultStatus.ERROR.getValue());
 			result.setMessage("File is empty");
 			return this.getName() + "/simple_status";
 		}
+		
+		Reader reader = new InputStreamReader(file.getInputStream());
+		BufferedReader br = new BufferedReader(reader);
+        String line = br.readLine();
+        String[] elements = line.split(",");
+        Set<String> headers = new HashSet<>();
+        for (String header : elements) {
+        	headers.add(header.toUpperCase());
+        }
+        br.close();
+		MappingStrategy<UserCsv> strategy = new HeaderColumnNameMappingStrategy<>();
+		strategy.setType(UserCsv.class);
+		Set<String> originalHeaders = new HashSet<>();
+		originalHeaders.addAll(Arrays.asList(strategy.generateHeader(new UserCsv())));
+		
+		
+		if (!headers.equals(originalHeaders)) {
+			result.setResStatus(ResultStatus.ERROR.getValue());
+			result.setMessage("Header columns are not correct");
+			return this.getName() + "/simple_status";
+		}
 
-		List<UserCSV> usersCsv;
+		List<UserCsv> usersCsv;
 		try {
-			usersCsv = readCsvFile(file);
+			usersCsv = readCsvFile(file, strategy);
 		} catch (Exception e) {
 			result.setResStatus(ResultStatus.ERROR.getValue());
 			result.setMessage("Exception occured while reading CSV file: " + e.getMessage());
 			return this.getName() + "/simple_status";
 		}
-		List<User> users = UserUtils.convertUsersCsv(usersCsv);
+		List<User> users = UserUtils.convertUsersCsv(usersCsv, this.messageSource);
 				
-		model.addAttribute("result", result);
 		
 		for (User user : users) {
 			if (StringUtils.isNullOrEmpty(user.getEmail()) || !EmailValidator.getInstance().isValid(user.getEmail())) {
@@ -409,16 +436,16 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 
 	
-	private List<UserCSV> readCsvFile(MultipartFile file) throws Exception {
+	private List<UserCsv> readCsvFile(MultipartFile file, MappingStrategy<UserCsv> strategy) throws Exception {
 		Reader reader = new InputStreamReader(file.getInputStream());
 		CSVReader csvReader = new CSVReaderBuilder(reader).withSkipLines(0).build();
 
-		MappingStrategy<UserCSV> strategy = new HeaderColumnNameMappingStrategy<>();
-		strategy.setType(UserCSV.class);
-
-		CsvToBean<UserCSV> csvToBean = new CsvToBeanBuilder<UserCSV>(csvReader).withType(UserCSV.class)
-				.withMappingStrategy(strategy).build();
-		List<UserCSV> usersCsv = csvToBean.parse();
+		CsvToBean<UserCsv> csvToBean = new CsvToBeanBuilder<UserCsv>(csvReader)
+											.withType(UserCsv.class)
+											.withMappingStrategy(strategy)
+											.build();
+		List<UserCsv> usersCsv = csvToBean.parse();
+		reader.close();
 		return usersCsv;
 	}
 
@@ -486,8 +513,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		setActivateCodeAndTimeout(user);
 		userService.saveOrUpdate(user);
 		sendVerificationEmailToUser(activateAccountUrl, user);
-		//model.addAttribute("msg", "Resend verification email successfully");
-		//return this.getName() +  "/userform_result";
 		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
 	    redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
 	    String message = this.getMessage("users.resend.verification.email.success.message");					
@@ -521,7 +546,10 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	protected PageableResponse<User> pageableSearch(Map<String, String> searchParams, PageRequest pageable, Sort sort) {
 		final String search = searchParams.get("q");
 		final String filterRole = searchParams.get("filterRole");
-		final Integer filterStatus = NumberUtils.parseInt(searchParams.get("filterStatus"), fr.be.your.self.model.Constants.FIND_ALL);
+		Integer filterStatus = null;
+		if (!StringUtil.isNullOrEmpty(searchParams.get("filterStatus"))) {
+			filterStatus = NumberUtils.parseInt(searchParams.get("filterStatus"));
+		}
 		final List<Integer> filterSubscriptionTypesIds = NumberUtils.parseIntegers(searchParams.get("filterSubscriptionTypesIds"), ",");
 		
 		return this.userService.pageableSearch(search, filterRole, filterStatus, filterSubscriptionTypesIds, pageable, sort);

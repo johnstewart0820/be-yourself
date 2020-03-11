@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,7 +19,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.User;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.UserService;
@@ -31,21 +28,8 @@ import fr.be.your.self.util.StringUtils;
 @RequestMapping(Constants.PATH.WEB_ADMIN_PREFIX + "/" + AccountController.NAME)
 public class AccountController extends BaseResourceController<User, User, UserDto, Integer> {
 	public static final String NAME = "account";
-
 	@Autowired
 	private UserService userService;
-
-	private static final Map<String, String[]> SORTABLE_COLUMNS = new HashMap<>();
-
-	static {
-		SORTABLE_COLUMNS.put("email", new String[] { "email" });
-	}
-
-
-	@Override
-	protected BaseService<User, Integer> getService() {
-		return userService;
-	}
 
 	@Override
 	protected String getName() {
@@ -57,38 +41,42 @@ public class AccountController extends BaseResourceController<User, User, UserDt
 		return this.getMessage(baseMessageKey + ".page.title", "Account Settings");
 	}
 
-	@Override
-	protected String getUploadDirectoryName() {
-		return this.dataSetting.getUploadFolder() + Constants.FOLDER.MEDIA.SESSION;
-	}
 
 	@Override
 	protected User newDomain() {
 		return new User();
 	}
 
+
 	@Override
 	protected UserDto createDetailDto(User domain) {
-		UserDto userDto = new UserDto(domain);
-		if (domain == null) { // This is the case when we create new User, if we update user then domain !=
-								// null
-			addDefaultPermissions(userDto);
-		}
-
-		return userDto;
-
+		// Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	protected User createSimpleDto(User domain) {
-		return domain;
+		// Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected BaseService<User, Integer> getService() {
+		// Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected String getUploadDirectoryName() {
+		// Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	protected Map<String, String[]> getSortableColumns() {
-		return SORTABLE_COLUMNS;
+		// Auto-generated method stub
+		return null;
 	}
-
 	// save account settings
 	@PostMapping(value = "/settings/save")
 	public String saveAccountSettings(@ModelAttribute @Validated User user,

@@ -23,12 +23,10 @@
 						</div>
 
 						<div class="col-md-6 text-right d-md-none d-lg-block">
-							<div id="reset_pwd_email_div"
-								th:if="${writePermission && #strings.contains(action, 'update')}">
+							<div th:if="${writePermission && #strings.contains(action, 'update')}">
 								<h3 class="mb-0 form-title-label">Update User</h3>
 							</div>
-							<div id="reset_pwd_email_div"
-								th:unless="${writePermission && #strings.contains(action, 'update')}">
+							<div th:unless="${writePermission && #strings.contains(action, 'update')}">
 								<h3 class="mb-0 form-title-label">Add User</h3>
 							</div>
 						</div>
@@ -184,9 +182,8 @@
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<a
 												th:if="${dto.subscription != null && dto.subscription.id != 0}"
-												th:href="@{/subscription/edit/{id}(id=${dto.subscription.id})}">
-												<label class="form-control" id="subscription"
-												th:text="${dto.subtype}" style="cursor: pointer;"></label>
+												th:href="@{/subscription/edit/{id}(id=${dto.subscription.id})}"												
+												th:text="${dto.subtype}" >
 											</a> <label
 												th:if="${dto.subscription == null || dto.subscription.id == 0}"
 												class="form-control" id="subscription"> </label>
@@ -230,14 +227,15 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-4" id="reset_pwd_email_div"
+								<div class="col" id="reset_pwd_email_div"
 									th:if="${writePermission && #strings.contains(action, 'update')}">
 									<div class="card shadow border-0">
-										<div class="card-body px-lg-5 py-lg-5">
+										<div class="card-body">
 											<a th:href="@{/users/{id}/resetpassword(id=${dto.id})}"
-												class="btn btn-primary mt-4">Reset Password</a> <a
+												class="btn btn-primary mt-4 col">Reset Password</a> 
+											<a
 												th:href="@{/users/{id}/resendverifemail(id=${dto.id})}"
-												class="btn btn-primary mt-4">Resend Verification Email</a>
+												class="btn btn-primary mt-4 col">Resend Verification Email</a>
 										</div>
 									</div>
 								</div>

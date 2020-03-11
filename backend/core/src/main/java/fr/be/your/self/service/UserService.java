@@ -10,7 +10,6 @@ import org.springframework.data.domain.Sort;
 
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.model.User;
-import fr.be.your.self.model.UserCSV;
 
 public interface UserService extends BaseService<User, Integer> {
 	
@@ -39,9 +38,6 @@ public interface UserService extends BaseService<User, Integer> {
 	Iterable<User> findAllByUserType(String filterRole);
 	Iterable<User> findAllByStatus(int status);
 	Iterable<User> findAllBySubscriptionType(List<Integer> subscriptionTypesIds);
-
-
-	public List<UserCSV> extractUserCsv(List<Integer> ids);
 
 	public boolean activateUser(Integer userId);
 

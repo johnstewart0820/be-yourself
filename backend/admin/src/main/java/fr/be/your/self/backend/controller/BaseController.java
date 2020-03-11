@@ -29,7 +29,7 @@ public abstract class BaseController {
 			+ Constants.FOLDER.MEDIA.AVATAR;
 	
 	@Autowired
-	private MessageSource messageSource;
+	protected MessageSource messageSource;
 	
 	@Autowired
 	protected DataSetting dataSetting;

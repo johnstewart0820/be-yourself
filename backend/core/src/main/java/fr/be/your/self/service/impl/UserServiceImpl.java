@@ -16,9 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.dto.PageableResponse;
-import fr.be.your.self.model.Constants;
 import fr.be.your.self.model.User;
-import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.UserRepository;
 import fr.be.your.self.service.UserService;
@@ -238,18 +236,6 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	}
 
 	@Override
-	public List<UserCSV> extractUserCsv(List<Integer> ids) {
-		Iterable<User> users = this.repository.findAllById(ids);
-		List<UserCSV> returnList = new ArrayList<UserCSV>();
-		for (User user : users) {
-			UserCSV userCSV = new UserCSV(user);
-			returnList.add(userCSV);
-		}
-
-		return returnList;
-	}
-
-	@Override
 	public Page<User> findAllByUserType(String userType, Pageable pageable) {
 		return this.repository.findAllByUserType(userType, pageable);
 	}
@@ -276,12 +262,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 	@Override
 	public PageableResponse<User> pageableSearch(String text, String filterRole, Integer filterStatus,
 			List<Integer> filterSubscriptionTypesIds, PageRequest pageable, Sort sort) {
-		if (filterSubscriptionTypesIds == null || filterSubscriptionTypesIds.isEmpty()) {
-			if (filterStatus == Constants.FIND_ALL) {
-				if (StringUtils.isNullOrEmpty(filterRole)) {
+		if ( (filterSubscriptionTypesIds == null || filterSubscriptionTypesIds.isEmpty()) 
+			 && (filterStatus == null) 
+			 &&	 StringUtils.isNullOrEmpty(filterRole) ) {
 					return this.pageableSearch(text, pageable, sort);
-				}
-			}
 		}
 		
 		if (pageable == null) {
@@ -303,7 +287,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 			pageDomain = this.findAllBySubscriptionType(filterSubscriptionTypesIds, pageable);
 		} else 	if (!StringUtils.isNullOrEmpty(filterRole)) {
 			pageDomain = this.findAllByUserType(filterRole, pageable);
-		} else if (filterStatus != null && filterStatus != Constants.FIND_ALL) {
+		} else if (filterStatus != null) {
 			pageDomain = this.findAllByStatus(filterStatus, pageable);
 		} else {
 			pageDomain = this.getPaginatedObjects(pageable);
@@ -348,7 +332,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Integer> implements U
 			domains = this.findAllBySubscriptionType(filterSubscriptionTypesIds);
 		} else 	if (!StringUtils.isNullOrEmpty(filterRole)) {
 			domains = this.findAllByUserType(filterRole);
-		} else if (filterStatus != null && filterStatus != Constants.FIND_ALL) {
+		} else if (filterStatus != null) {
 			domains = this.findAllByStatus(filterStatus);
 		} 	else {
 			domains = this.findAll();

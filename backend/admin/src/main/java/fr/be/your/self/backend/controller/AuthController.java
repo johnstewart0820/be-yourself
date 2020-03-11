@@ -23,7 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.UserStatus;
-import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.engine.EmailSender;
 import fr.be.your.self.model.User;
 import fr.be.your.self.service.UserService;

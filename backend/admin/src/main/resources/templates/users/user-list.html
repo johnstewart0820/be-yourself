@@ -8,13 +8,13 @@
 </head>
 <body>
 	<th:block layout:fragment="content">
-
 		<div class="card shadow">
 			<div class="card-header border-0">
 				<form id="select_form" role="form"
 					th:action="${baseURL} + '/search'" method="get">
-					<div class="row mb-3">
-						<div class="col-md-6">
+					<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
+					<!--div class="row mb-3">
+						<div class="col-lg-6 col-md-5 col-sm-12 sm-form-group">
 							<th:block th:if="${writePermission}">
 								<a class="btn btn-icon btn-2 btn-primary"
 									th:href="${baseURL + '/create'}"> <span
@@ -24,7 +24,7 @@
 								</a>
 							</th:block>
 						</div>
-						<div class="col-md-6">
+						<div class="col-lg-6 col-md-7 col-sm-12 text-right">
 							<div class="form-group mb-0">
 								<div class="input-group input-group-alternative">
 									<th:block th:if="${baseURL != null && baseURL != ''}">
@@ -39,45 +39,45 @@
 								</div>
 							</div>
 						</div>
-					</div>
+					</div-->
 					<div class="row form-search-container">
-						<div class="col-md-3 text-right">
-
-							<select id="filter_subtype" class="selectpicker show-tick"
+						<div class="col text-left w-auto">
+							<select id="filter_status" name="filter_status"
+								class="selectpicker show-tick">
+								<option value="">FILTER BY STATUS</option>
+								<option th:each="userStatus : ${userStatuses}"
+									th:value="${userStatus}"
+									th:text="#{'user.status.' + ${userStatus}}"></option>
+							</select>
+						</div>
+						
+						<div class="col text-left">
+							<select id="filter_subtype" class="selectpicker show-tick w-auto"
 								multiple data-actions-box="true" data-live-search="true"
 								th:data-select-all-text="#{data.display.button.select.all}"
 								th:data-deselect-all-text="#{data.display.button.deselect.all}"
 								th:title="#{|${baseMessageKey}.option.filter.subtype.title|}"
 								th:data-none-selected-text="#{|${baseMessageKey}.option.filter.subtype.title|}"
 								data-selected-text-format="count > 2"
-								th:data-count-selected-text="#{|${baseMessageKey}.option.filter.subtype.many|}">
+								th:data-count-selected-text="#{|${baseMessageKey}.option.filter.subtype.many|}"
+								>
 								<option th:each="subtype: ${subtypes}" th:value="${subtype.id}"
 									th:text="${subtype.name}"
 									th:selected="${#arrays.contains(filteredSubscriptionTypesIds, subtype.id)}"></option>
 							</select>
-
 						</div>
-						<div class="col-md-3 text-right">
+						
+						<div class="col text-left">
 							<select id="filter_role" name="filter_role"
-								class="selectpicker show-tick">
+								class="selectpicker show-tick w-auto">
 								<option value="">FILTER BY ROLE</option>
 								<option th:each="userType : ${userTypes}" th:value="${userType}"
 									th:text="#{'user.type.' + ${userType}}"></option>
 							</select>
-
 						</div>
-						<div class="col-md-3 text-right">
-							<select id="filter_status" name="filter_status"
-								class="selectpicker show-tick">
-								<option value="-2">FILTER BY STATUS</option>
-								<option th:each="userStatus : ${userStatuses}"
-									th:value="${userStatus}"
-									th:text="#{'user.status.' + ${userStatus}}">></option>
-							</select>
 
-						</div>
-						<div class="col-md-3 text-right">
-							<select id="display-page-option" class="selectpicker show-tick"
+						<div class="col text-left">
+							<select id="display-page-option" class="selectpicker show-tick w-auto"
 								th:data-none-selected-text="#{data.display.page.option.title}">
 								<option th:each="pageSize: ${supportPageSizes}"
 									th:value="${pageSize}"
@@ -93,15 +93,13 @@
 
 				</form>
 				<div class="row  form-search-container">
-					<div class="col">
+					<div class="col mt-2">
 						<a href="#select_users" class="btn btn-sm btn-primary">Select
 							/ Deselect all</a> <a href="#" class="btn btn-sm btn-primary"
 							onclick="submitUserForm();">Export
 							CSV</a> <a th:href="${baseURL + '/upload_csv_form'}"
 							class="btn btn-sm btn-primary" th:if="${writePermission}">Import
-							CSV</a> <a th:href="${baseURL + '/resetpwdbyemail'}"
-							class="btn btn-sm btn-primary" th:if="${writePermission}">Reset
-							password by email</a>
+							CSV</a>
 					</div>
 				</div>
 			</div>
@@ -211,7 +209,7 @@
 	<section layout:fragment="scripts">
 		<script>
 			var filter_role = "";
-			var filter_status = -2;
+			var filter_status = "";
 			var filter_subtype = -2;
 			var search_box = "";
 		</script>

@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
-import fr.be.your.self.common.UserUtils;
+import fr.be.your.self.common.Utils;
 
 @Entity
 public class User extends PO<Integer> {
@@ -272,7 +272,7 @@ public class User extends PO<Integer> {
 	}
 
 	public Subscription getSubscription() {
-		Subscription sub = UserUtils.findSubscriptionUser(this);
+		Subscription sub = Utils.findSubscriptionUser(this);
 		return sub;
 	}
 
