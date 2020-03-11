@@ -55,6 +55,7 @@ import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.common.ErrorStatusCode;
+import fr.be.your.self.common.FormationType;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.engine.EmailSender;
@@ -157,8 +158,17 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, T domain, DetailDto dto) throws BusinessException {
+		
 	}
 
+	protected void loadPersonTitles(Model model){
+		String titleValues = this.getMessage("title.values");
+		String[] titlesVal = titleValues.split(",");
+		List<String> titles = Arrays.asList(titlesVal);
+		model.addAttribute("titles", titles);	
+	}
+	
+	
 	protected boolean isEditableDomain(Model model, T domain) {
 		return domain != null;
 	}
@@ -169,6 +179,9 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 
 	protected UserPermission getGlobalPermission(Model model, PermissionDto permission) {
 		final String pageName = this.getName();
+		if (pageName == AccountController.NAME) { //Everybody has access to his/her settings
+			return UserPermission.WRITE;
+		}
 		if (permission.hasWritePermission(pageName)) {
 			return UserPermission.WRITE;
 		}

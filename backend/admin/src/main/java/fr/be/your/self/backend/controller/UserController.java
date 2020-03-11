@@ -3,12 +3,9 @@ package fr.be.your.self.backend.controller;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -21,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -48,15 +44,11 @@ import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 
 import fr.be.your.self.backend.cache.CacheManager;
-import fr.be.your.self.backend.dto.IdNameDto;
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.ResultStatus;
-import fr.be.your.self.backend.dto.SessionSimpleDto;
 import fr.be.your.self.backend.dto.SimpleResult;
-import fr.be.your.self.backend.dto.SubscriptionDto;
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
-import fr.be.your.self.backend.setting.DataSetting;
 import fr.be.your.self.backend.utils.AdminUtils;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserPermission;
@@ -64,19 +56,14 @@ import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.common.UserUtils;
 import fr.be.your.self.dto.PageableResponse;
-import fr.be.your.self.engine.EmailSender;
 import fr.be.your.self.exception.BusinessException;
-import fr.be.your.self.model.Functionality;
 import fr.be.your.self.model.Permission;
-import fr.be.your.self.model.Session;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.model.UserCSV;
 import fr.be.your.self.model.UserConstants;
 import fr.be.your.self.model.UserCsvMappingStrategy;
 import fr.be.your.self.service.BaseService;
-import fr.be.your.self.service.FunctionalityService;
-import fr.be.your.self.service.PermissionService;
 import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.NumberUtils;
@@ -459,51 +446,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		message = this.getMessage("users.reset.password.with.email.success.message", new Object[] {userEmail});			
         redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
 		return "redirect:" + this.getBaseURL() + "/resetpwdbyemail";
-	}
-	
-	// save account settings
-	@PostMapping(value = "/settings/save")
-	public String saveAccountSettings(@ModelAttribute @Validated User user,
-			@RequestParam(name = "current_pwd") String current_pwd,
-			@RequestParam(name = "new_pwd") String new_pwd,
-			HttpServletRequest request, BindingResult result, Model model,
-			final RedirectAttributes redirectAttributes)  {
-			
-			int userId = user.getId();
-			User currentUser = userService.getById(userId);
-			
-			//The fields we want to change
-			currentUser.setFirstName(user.getFirstName());
-			currentUser.setLastName(user.getLastName());
-			currentUser.setEmail(user.getEmail());
-			currentUser.setTitle(user.getTitle());
-			
-			if (!StringUtils.isNullOrEmpty(new_pwd)) {
-				if (!getPasswordEncoder().matches(current_pwd, currentUser.getPassword())) {
-					String message = this.getMessage("settings.error.incorrectpwd");					
-					redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
-			        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-			        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-			        
-					return "redirect:" + this.getBaseURL() + "/settings"; 
-				}
-				String encoded_new_pwd = this.getPasswordEncoder().encode(new_pwd);
-				currentUser.setPassword(encoded_new_pwd);
-			}
-
-			userService.saveOrUpdate(currentUser);
-			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
-		    redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-		        
-			return "redirect:" + this.getBaseURL() + "/settings"; 
-	}
-
-	// show account settings
-	@GetMapping(value = "/settings")
-	public String showAccountSettings(Model model, final RedirectAttributes redirectAttributes) {
-		User loggedUser = userService.getById((int) model.getAttribute("userId"));
-		model.addAttribute("user", loggedUser);
-		return this.getName() + "/account_settings";
 	}
 		
 	// show reset password form

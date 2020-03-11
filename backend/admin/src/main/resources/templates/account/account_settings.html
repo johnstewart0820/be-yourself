@@ -8,19 +8,12 @@
 </head>
 <body>
 	<th:block layout:fragment="content">
-
 		<div class="container">
 			<div class="row justify-content-center">
-				<!--div class="col-lg-5 col-md-7"-->
-				<div class="col-lg-7 col-md-9">
+				<div class="col-lg-12 col-md-12">
 					<div class="card  shadow border-0">
 						<div class="card-header border-0">
-							<div class="row">
-
-								<div class="col-lg-6 text-right d-md-none d-lg-block">
-									<h3 class="mb-0 form-title-label">Account Settings</h3>
-								</div>
-							</div>
+							
 						</div>
 						<div class="card-body px-lg-5 py-lg-5">
 							<form id="user_form" th:action="${baseURL + '/settings/save'}"
@@ -30,49 +23,54 @@
 									<div class="col-md-9 col-sm-12">
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">Title</label>
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs"
+												th:text="#{|${baseMessageKey}.detail.title|}">Title</label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<select id="title" class="form-control" th:field="*{title}">
-													<option th:value="Mrs" th:text="Mrs"></option>
-													<option th:value="Mr" th:text="Mr"></option>
+													<option value=""></option>
+													<option th:each="title : ${titles}" th:value="${title}"
+														th:text="${title}"></option>
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">Last
-												Name</label>
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.lastname|}">Last
+												name</label>
+											<div class="col-md-8 col-sm-9 col-xs-12">
+												<input class="form-control" type="text"
+													th:field="*{lastName}" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="title"
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field" 
+												th:text="#{|${baseMessageKey}.detail.firstname|}">First
+												name</label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 
 												<input class="form-control" type="text"
-													th:field="*{lastName}">
+													th:field="*{firstName}" required>
 											</div>
 										</div>
+
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">First
-												Name</label>
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.email|}">
+												email</label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 
-												<input class="form-control" type="text"
-													th:field="*{firstName}">
+												<input class="form-control" type="email" th:field="*{email}" required>
 											</div>
 										</div>
 
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">
-												Email</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
-
-												<input class="form-control" type="email" th:field="*{email}">
-											</div>
-										</div>
-
-										<div class="form-group row">
-											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">
-												Current Password</label>
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs"
+												th:text="#{|${baseMessageKey}.detail.currentpwd|}">
+												Current password</label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<input class="form-control" name="current_pwd"
 													type="password">
@@ -82,7 +80,8 @@
 
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.newpwd|}">
 												New Password</label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<input class="form-control" id="new_pwd" name="new_pwd"
@@ -92,7 +91,8 @@
 
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field">Confirmed
+												class="label form-control-label col-md-4 col-sm-4 hidden-xs required-field"
+												th:text="#{|${baseMessageKey}.detail.confirmedpwd|}">Confirmed
 												New Password</label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<input class="form-control" id="confirmed_new_pwd"
@@ -101,7 +101,8 @@
 										</div>
 
 										<div class="text-center">
-											<button type="submit" class="btn btn-primary mt-4">
+											<button type="submit" class="btn btn-primary mt-4"
+											th:title="#{action.save.title}">
 												Save changes</button>
 										</div>
 									</div>
