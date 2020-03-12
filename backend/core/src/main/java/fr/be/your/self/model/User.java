@@ -24,6 +24,7 @@ import fr.be.your.self.common.UserType;
 import fr.be.your.self.common.Utils;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "email" }))
 public class User extends PO<Integer> {
 
 	@Id
@@ -38,7 +39,7 @@ public class User extends PO<Integer> {
 
 	private String title;
 
-	@Column(unique=true)
+	@Column(name = "email", length = 255)
 	private String email;
 
 	@JsonIgnore

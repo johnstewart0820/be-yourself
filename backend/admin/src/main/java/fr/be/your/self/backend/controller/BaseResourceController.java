@@ -1214,4 +1214,22 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		user.setActivateCode(activateCode);
 		user.setActivateTimeout(activateCodeTimeout);
 	}
+	
+
+	protected void setRedirectAttributes(RedirectAttributes redirectAttributes, String action, String status, String message) {
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, action);
+		redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, status);
+		redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	}
+	
+	protected void setRedirectAttributes(RedirectAttributes redirectAttributes, String action, String status) {
+		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, action);
+		redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, status);
+	}
+	
+	protected void setActionResultInModel(Model model, String message) {
+		model.addAttribute(TOAST_ACTION_KEY, "create");
+		model.addAttribute(TOAST_STATUS_KEY,  "warning");
+		model.addAttribute(TOAST_MESSAGE_KEY, message);
+	}
 }

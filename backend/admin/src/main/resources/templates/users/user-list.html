@@ -13,33 +13,6 @@
 				<form id="select_form" role="form"
 					th:action="${baseURL} + '/search'" method="get">
 					<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
-					<!--div class="row mb-3">
-						<div class="col-lg-6 col-md-5 col-sm-12 sm-form-group">
-							<th:block th:if="${writePermission}">
-								<a class="btn btn-icon btn-2 btn-primary"
-									th:href="${baseURL + '/create'}"> <span
-									class="btn-inner--icon"> <i class="fas fa-edit"></i> <span
-										th:text="#{action.create}"></span>
-								</span>
-								</a>
-							</th:block>
-						</div>
-						<div class="col-lg-6 col-md-7 col-sm-12 text-right">
-							<div class="form-group mb-0">
-								<div class="input-group input-group-alternative">
-									<th:block th:if="${baseURL != null && baseURL != ''}">
-										<div class="input-group-prepend">
-											<span class="input-group-text"> <i
-												class="fas fa-search"></i>
-											</span>
-										</div>
-										<input class="form-control" type="text" name="q"
-											th:placeholder="#{search.placeholder}" th:value="${search}">
-									</th:block>
-								</div>
-							</div>
-						</div>
-					</div-->
 					<div class="row form-search-container">
 						<div class="col text-left w-auto">
 							<select id="filter_status" name="filter_status"

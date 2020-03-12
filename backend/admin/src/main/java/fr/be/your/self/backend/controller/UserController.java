@@ -350,62 +350,53 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	
 		writer.write(usersList);
 	}
+	
 	@PostMapping(value = "/importcsv")
-	public String fileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, Model model)
-			throws IOException, CsvRequiredFieldEmptyException {
+	@Transactional
+	public String fileUpload(@RequestParam("file") MultipartFile file, 										
+										Model model, 
+										RedirectAttributes redirectAttributes,
+										HttpServletRequest request) throws IOException, CsvRequiredFieldEmptyException {
+		String message;
 
-		SimpleResult result = new SimpleResult(ResultStatus.UNKNOWN.getValue(), "Unknown status");
-		result.setFunctionalityName("Upload users CSV file!");
-		model.addAttribute("result", result);
-
+		//Check if file is empty
 		if (file.isEmpty()) {
-			result.setResStatus(ResultStatus.ERROR.getValue());
-			result.setMessage("File is empty");
-			return this.getName() + "/simple_status";
+			message = this.getMessage("common.file.upload.empty");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);			
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
 		}
 		
-		Reader reader = new InputStreamReader(file.getInputStream());
-		BufferedReader br = new BufferedReader(reader);
-        String line = br.readLine();
-        String[] elements = line.split(",");
-        Set<String> headers = new HashSet<>();
-        for (String header : elements) {
-        	headers.add(header.toUpperCase());
-        }
-        br.close();
 		MappingStrategy<UserCsv> strategy = new HeaderColumnNameMappingStrategy<>();
 		strategy.setType(UserCsv.class);
-		Set<String> originalHeaders = new HashSet<>();
-		originalHeaders.addAll(Arrays.asList(strategy.generateHeader(new UserCsv())));
 		
-		
-		if (!headers.equals(originalHeaders)) {
-			result.setResStatus(ResultStatus.ERROR.getValue());
-			result.setMessage("Header columns are not correct");
-			return this.getName() + "/simple_status";
+		//Check headers
+		boolean columnsMatch = verifyHeaderColumns(file, strategy);
+		if (!columnsMatch) {
+			message = this.getMessage("csv.error.headers");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
 		}
 
 		List<UserCsv> usersCsv;
 		try {
 			usersCsv = readCsvFile(file, strategy);
 		} catch (Exception e) {
-			result.setResStatus(ResultStatus.ERROR.getValue());
-			result.setMessage("Exception occured while reading CSV file: " + e.getMessage());
-			return this.getName() + "/simple_status";
+			message=this.getMessage("csv.error.readfile");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";		
 		}
-		List<User> users = UserUtils.convertUsersCsv(usersCsv, this.messageSource);
-				
 		
+		List<User> users = UserUtils.convertUsersCsv(usersCsv, this.messageSource);	
 		for (User user : users) {
 			if (StringUtils.isNullOrEmpty(user.getEmail()) || !EmailValidator.getInstance().isValid(user.getEmail())) {
-				result.setResStatus(ResultStatus.ERROR.getValue());
-				result.setMessage("ERROR: Email field of " + user.getFullName() + " is empty or not valid!");
-				return this.getName() + "/simple_status";
+				message=this.getMessage("csv.error.email.invalid", new Object[] {user.getFullName()});				
+				setRedirectAttributes(redirectAttributes, "update", "warning", message);
+				return "redirect:" + this.getBaseURL()  + "/upload_csv_form";		
 			} else {
 				if (userService.existsEmail(user.getEmail())) {
-					result.setResStatus(ResultStatus.ERROR.getValue());
-					result.setMessage("ERROR: Email of user " + user.getFullName() + " already exists!");
-					return this.getName() +  "/simple_status";
+					message=this.getMessage("csv.error.email.existed", new Object[] {user.getFullName()});	
+					setRedirectAttributes(redirectAttributes, "update", "warning", message);
+					return "redirect:" + this.getBaseURL()  + "/upload_csv_form";	
 				}
 			}
 		}
@@ -413,7 +404,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		
 		for (User user : users) {
 			String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
-
 			if (user.getStatus() == UserStatus.INACTIVE.getValue()) {
 				setActivateCodeAndTimeout(user);
 			}
@@ -429,11 +419,28 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 			}
 		}
 		
-		result.setResStatus(ResultStatus.SUCCESS.getValue());
-		result.setMessage("File imported successfully!");
-		return this.getName() + "/simple_status";
+		message = this.getMessage("csv.upload.sucess");
+		setRedirectAttributes(redirectAttributes, "update", "success", message);
+		return "redirect:" + this.getBaseURL() + "/upload_csv_form";
 	}
 
+
+	private boolean verifyHeaderColumns(MultipartFile file, MappingStrategy<UserCsv> strategy) throws IOException, CsvRequiredFieldEmptyException {
+		Reader reader = new InputStreamReader(file.getInputStream());
+		BufferedReader br = new BufferedReader(reader);
+        String line = br.readLine();
+        String[] elements = line.split(",");
+        Set<String> headers = new HashSet<>();
+        for (String header : elements) {
+        	headers.add(header.toUpperCase());
+        }
+        br.close();
+		
+		Set<String> originalHeaders = new HashSet<>();
+		originalHeaders.addAll(Arrays.asList(strategy.generateHeader(new UserCsv())));
+		
+		return headers.equals(originalHeaders);
+	}
 
 	
 	private List<UserCsv> readCsvFile(MultipartFile file, MappingStrategy<UserCsv> strategy) throws Exception {
@@ -447,38 +454,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		List<UserCsv> usersCsv = csvToBean.parse();
 		reader.close();
 		return usersCsv;
-	}
-
-	// reset password user by email
-	@PostMapping(value = "/password/resetbyemail")
-	public String resetPasswordByEmail(@RequestParam("user_email") String userEmail, 
-			Model model, final RedirectAttributes redirectAttributes) {
-		User user = userService.getByEmail(userEmail);
-		String message;
-		if (user == null) {
-			message = this.getMessage("users.reset.password.error.email.message",  new Object[] {userEmail});			
-			redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        return "redirect:" + this.getBaseURL() + "/resetpwdbyemail";
-		}
-		String tempPwd = UserUtils.generateRandomPassword(this.dataSetting.getTempPwdLength());
-		String encodedPwd = getPasswordEncoder().encode(tempPwd);
-		user.setPassword(encodedPwd);
-		userService.saveOrUpdate(user);
-		this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
-		
-		redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
-	    redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-		message = this.getMessage("users.reset.password.with.email.success.message", new Object[] {userEmail});			
-        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-		return "redirect:" + this.getBaseURL() + "/resetpwdbyemail";
-	}
-		
-	// show reset password form
-	@GetMapping(value = "/resetpwdbyemail")
-	public String showResetPassword(Model model) {
-		return this.getName() + "/reset_password_form";
 	}
 	
 	// show upload csv form

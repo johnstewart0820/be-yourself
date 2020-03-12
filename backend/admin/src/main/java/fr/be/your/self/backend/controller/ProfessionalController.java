@@ -27,37 +27,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.utils.AdminUtils;
 import fr.be.your.self.backend.utils.UserUtils;
-import fr.be.your.self.common.FileType;
 import fr.be.your.self.common.FormationType;
 import fr.be.your.self.common.LoginType;
-import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserStatus;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.exception.BusinessException;
-import fr.be.your.self.model.Address;
+import fr.be.your.self.model.DegreeFile;
+import fr.be.your.self.model.MediaFile;
 import fr.be.your.self.model.Permission;
 import fr.be.your.self.model.Price;
 import fr.be.your.self.model.ProfessionalEvent;
-import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.model.User;
-import fr.be.your.self.model.UserConstants;
-import fr.be.your.self.model.UserFile;
-import fr.be.your.self.model.DegreeFile;
-import fr.be.your.self.model.MediaFile;
-import fr.be.your.self.service.AddressService;
 import fr.be.your.self.service.BaseService;
 import fr.be.your.self.service.DegreeFileService;
 import fr.be.your.self.service.MediaFileService;
 import fr.be.your.self.service.PriceService;
 import fr.be.your.self.service.ProfessionalEventService;
 import fr.be.your.self.service.UserService;
-import fr.be.your.self.util.NumberUtils;
 import fr.be.your.self.util.StringUtils;
 
 @Controller
@@ -151,6 +142,15 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 			Model model, User domain, UserDto dto) throws BusinessException {
 		List<String> formations = FormationType.getPossibleStrValues();
 
+		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
+		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
+		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
+		
+		model.addAttribute("supportImageTypes", supportImageTypes);
+		model.addAttribute("supportImageExtensions", supportImageExtensions);
+		model.addAttribute("supportImageSize", supportImageSize);
+		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
+		
 		model.addAttribute("formations", formations);
 
 	}
@@ -172,6 +172,15 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 
 		final User user = this.newDomain();
 		dto.copyToDomainOfProfessional(user);
+		
+		//Check if email address already existed.
+		if (userService.existsEmail(user.getEmail())) {
+			String message = this.getMessage("professional.error.email.existed");
+			setActionResultInModel(model, message);
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+		}
+		
+		
 		user.setUserType(UserType.PROFESSIONAL.getValue());
 		user.setLoginType(LoginType.PASSWORD.getValue());
 
@@ -202,15 +211,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		
 		 //Validate image file
         final MultipartFile uploadImageFile = dto.getUploadImageFile();
-		/*
-		 * if (uploadImageFile == null || uploadImageFile.isEmpty()) { final ObjectError
-		 * error = this.createRequiredFieldError(result, "image", "Image required");
-		 * result.addError(error);
-		 * 
-		 * return this.redirectAddNewPage(session, request, response,
-		 * redirectAttributes, model, dto); }
-		 */
-        
+
         //Process upload image file
         if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
 	        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
@@ -271,6 +272,8 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
 		return "redirect:" + this.getBaseURL();
 	}
+
+	
 	
 	@PostMapping("/update/{id}")
 	@Transactional
