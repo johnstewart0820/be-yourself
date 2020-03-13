@@ -1,7 +1,10 @@
 package fr.be.your.self.backend.controller;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,6 +53,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.opencsv.bean.MappingStrategy;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.UserDto;
@@ -1231,5 +1238,22 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		model.addAttribute(TOAST_ACTION_KEY, "create");
 		model.addAttribute(TOAST_STATUS_KEY,  "warning");
 		model.addAttribute(TOAST_MESSAGE_KEY, message);
+	}
+	
+	protected <T> boolean verifyHeaderColumns(MultipartFile file, MappingStrategy<T> strategy, T sampleObject) throws IOException, CsvRequiredFieldEmptyException {
+		Reader reader = new InputStreamReader(file.getInputStream());
+		BufferedReader br = new BufferedReader(reader);
+        String line = br.readLine();
+        String[] elements = line.split(",");
+        Set<String> headers = new HashSet<>();
+        for (String header : elements) {
+        	headers.add(header.toUpperCase());
+        }
+        br.close();
+		
+		Set<String> originalHeaders = new HashSet<>();
+		originalHeaders.addAll(Arrays.asList(strategy.generateHeader(sampleObject)));
+		
+		return headers.equals(originalHeaders);
 	}
 }

@@ -24,15 +24,15 @@ public class SubscriptionCsv {
 	@CsvBindByPosition(position = 2)
 	private String firstName;
 	
-	@CsvBindByName(column = "Email")
+	@CsvBindByName(column = "Email", required = true)
 	@CsvBindByPosition(position = 3)
 	private String email;
 	
-	@CsvBindByName(column = "Subscription type")
+	@CsvBindByName(column = "Subscription type", required = true)
 	@CsvBindByPosition(position = 4)
 	private String subtype;
 	
-	@CsvBindByName(column = "canal")
+	@CsvBindByName(column = "canal", required = true)
 	@CsvBindByPosition(position = 5)
 	private String canal;
 	
@@ -48,11 +48,11 @@ public class SubscriptionCsv {
 	@CsvBindByPosition(position = 8)
 	private int duration;
 	
-	@CsvBindByName(column = "start date")
+	@CsvBindByName(column = "start date", required = true)
 	@CsvBindByPosition(position = 9)
 	private String startDate;
 	
-	@CsvBindByName(column = "end date")	
+	@CsvBindByName(column = "end date", required = true)	
 	@CsvBindByPosition(position = 10)
 	private String endDate;
 	
@@ -68,7 +68,7 @@ public class SubscriptionCsv {
 	@CsvBindByPosition(position = 13)
 	private boolean giftCard;
 	
-	@CsvBindByName(column = "payment gateway")
+	@CsvBindByName(column = "payment gateway", required = true)
 	@CsvBindByPosition(position = 14)
 	private String paymenGateway;
 	

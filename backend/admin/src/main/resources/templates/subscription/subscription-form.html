@@ -35,29 +35,30 @@
 							th:object="${dto}" method="post">
 							<fieldset th:disabled="${!writePermission}">
 								<div class="row">
-									<div class="col-md-11 col-sm-12">
+									<div class="col">
 										<!-- User -->
 										<div class="form-group row">
 											<label for="groupId"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3  required-field"
 												th:text="#{|${baseMessageKey}.detail.user|}"></label>
-											<div class="col-md-3 col-sm-8">
-												<select class="selectpicker show-tick" id="userId" th:field="*{userId}"
+											<div class="col-lg-6">
+												<select class="selectpicker show-tick w-auto" id="userId" th:field="*{userId}"
 												data-live-search="true"
 												data-actions-box="true" required>
 													<option th:each="user : ${users}" th:value="${user.id}"
-														th:text="${user.fullName}"></option>
+														th:text="${user.email}"></option>
 												</select>
 											</div>
 										</div>
 										<!-- IP Address -->
 										
-										<div class="form-group row" id="account_type_div">
+										<div th:if="${writePermission && #strings.contains(action, 'update')}" 
+												class="form-group row" id="account_type_div">
 											<label
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-lg-3 col-sm-3"
 												th:text="#{|${baseMessageKey}.detail.ip.address|}">
 											</label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-6">
 												<label class="label form-control-label"
 													th:text="${dto.ipAddress}">
 												</label>
@@ -66,9 +67,9 @@
 										<!-- Subscription type and canal -->
 										<div class="form-group row">
 											<label for="groupId"
-												class="label form-control-label  col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label  col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.subtype|}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<select class="form-control" id="subtypeId"
 													th:field="*{subtypeId}" required>
 													<option th:each="subtype : ${subtypes}"
@@ -77,9 +78,9 @@
 												</select>
 											</div>
 											<label for="groupId"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.canal|}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<select class="form-control" id="canal"
 													th:field="*{canal}" required>
 													<option th:each="canal : ${canals}"
@@ -92,10 +93,10 @@
 										<div class="form-group row">
 											<!-- Validity start date -->
 											<label for="validStartDate"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.validstartdate|}"></label>
 
-											<div class="col-md-3 col-sm-8 input-group">
+											<div class="col-lg-3 input-group">
 													<input type="text" class="form-control datepicker" 
 														th:field="*{validStartDate}" id="validStartDate" 
 														th:data-date-format="${dateFormat.toLowerCase()}" 
@@ -106,9 +107,9 @@
 											</div>
 											<!-- Validity end date -->
 											<label for="validEndDate"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.validenddate|}"></label>
-											<div class="col-md-3 col-sm-8 input-group">
+											<div class="col-lg-3 input-group">
 													<input type="text" class="form-control datepicker" 
 														th:field="*{validEndDate}" id="validEndDate" 													 
 														th:data-date-format="${dateFormat.toLowerCase()}" 
@@ -121,9 +122,9 @@
 										<!-- Duration -->
 										<div class="form-group row">
 											<label for="groupId"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3  required-field"
 												th:text="#{|${baseMessageKey}.detail.duration|}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<select class="form-control" id="duration"
 													th:field="*{duration}" required>
 													<option th:each="duration : ${durations}"
@@ -137,10 +138,10 @@
 										<div class="form-group row">
 											<!-- Subscription start date -->
 											 <label for="subscriptionStartDate"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.subscriptionstartdate|}"></label>
 
-											<div class="col-md-3 col-sm-8 input-group">
+											<div class="col-lg-3 input-group">
 													<input type="text" class="form-control datepicker" 
 														th:field="*{subscriptionStartDate}" id="subscriptionStartDate" 													
 														th:data-date-format="${dateFormat.toLowerCase()}" 
@@ -151,10 +152,10 @@
 												</div>
 											<!-- Subscription end date -->
 											<label for="subscriptionEndDate"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.subscriptionenddate|}"></label>
 
-											<div class="col-md-3 col-sm-8 input-group">
+											<div class="col-lg-3 input-group">
 													<input type="text" class="form-control datepicker" 
 														th:field="*{subscriptionEndDate}" id="subscriptionEndDate" 
 														th:data-date-format="${dateFormat.toLowerCase()}" 
@@ -167,9 +168,9 @@
 										<!-- Price -->
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.price|}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<input type="number" step="0.01" class="form-control"
 													id="price" th:field="*{price}"
 													th:placeholder="#{|${baseMessageKey}.detail.price.placeholder|}" required/>
@@ -180,27 +181,27 @@
 										<!-- Status -->
 										<div class="form-group row">
 											<label for="status"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-lg-3"
 												th:text="#{|${baseMessageKey}.detail.status|}"></label>
-											<div class="col-md-4 col-sm-8">
+											<div class="col-lg-3">
 												<input id="status" th:field="*{status}" type="checkbox">
 											</div>
 										</div>
 										<!-- Termination asked -->
 										<div class="form-group row">
 											<label for="terminationAsked"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-lg-3"
 												th:text="#{|${baseMessageKey}.detail.terminationasked|}"></label>
-											<div class="col-md-4 col-sm-8">
+											<div class="col-lg-3">
 												<input id="terminationAsked" th:field="*{terminationAsked}" type="checkbox">
 											</div>
 										</div>		
 										<!-- Payment status -->
 										<div class="form-group row">
 											<label for="groupId"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.paymentstatus|}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<select class="form-control" id="paymenstatus"
 													th:field="*{paymentStatus}" required>
 													<option th:each="paymentStatus : ${paymentStatuses}"
@@ -212,9 +213,9 @@
 										<!-- Payment Gateway -->
 										<div class="form-group row">
 											<label for="groupId"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.paymentgateway|}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<select class="form-control" id="gateway"
 													th:field="*{paymentGateway}" required>
 													<option th:each="paymentGateway : ${paymentGateways}"
@@ -228,9 +229,9 @@
 										
 										<div class="form-group row" th:each="type: ${codeTypes}" >
 											<label 
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-lg-3"
 												th:text="#{'discount.code.type.' + ${type}}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<select class="form-control" th:id="'select_code_' + ${type}" name="select_type">
 													<option value="-1"></option>
 													<option th:each="code : ${codeMap.get(type)}"
@@ -265,9 +266,9 @@
 										<!-- Buyer Email -->
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-lg-3"
 												th:text="#{|${baseMessageKey}.detail.buyer.email|}"></label>
-											<div class="col-md-3 col-sm-8">
+											<div class="col-lg-3">
 												<input type="email" class="form-control"
 													id="buyerEmail" th:field="*{buyerEmail}"
 													/>
@@ -278,9 +279,9 @@
 										<!-- Automatic renewal: -->
 										<div class="form-group row">
 											<label for="autoRenew"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-lg-3"
 												th:text="#{|${baseMessageKey}.detail.autorenew|}"></label>
-											<div class="col-md-4 col-sm-8">
+											<div class="col-lg-3">
 												<input id="autoRenew" th:field="*{autoRenew}" type="checkbox">
 											</div>
 										</div>

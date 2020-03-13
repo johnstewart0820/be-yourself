@@ -18,8 +18,8 @@ import fr.be.your.self.model.Subscription;
 @Repository
 public interface SubscriptionRepository extends BaseRepository<Subscription, Integer>   {
 	@Query(
-	    	"SELECT s FROM Subscription s WHERE lower(s.user.firstName) = lower(:text) "
-	    	+ " or lower(s.user.lastName) = lower(:text) or lower(s.user.email) = lower(:text)"
+	    	"SELECT s FROM Subscription s WHERE  lower(s.user.firstName) LIKE lower(concat('%', :text,'%')) "
+	    	+ " or lower(s.user.lastName) LIKE lower(concat('%', :text,'%')) or lower(s.user.email) LIKE lower(concat('%', :text,'%'))  or lower(s.subtype.name) LIKE lower(concat('%', :text,'%'))  "
 	    )
 	Page<Subscription> searchByFirstNameOrLastNameOrEmail(@Param("text") String text, Pageable pageable);
 	

@@ -59,6 +59,7 @@ import fr.be.your.self.backend.utils.AdminUtils;
 import fr.be.your.self.backend.utils.UserCsv;
 import fr.be.your.self.backend.utils.UserCsvMappingStrategy;
 import fr.be.your.self.backend.utils.UserUtils;
+import fr.be.your.self.common.CsvUtils;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserStatus;
@@ -370,16 +371,16 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		strategy.setType(UserCsv.class);
 		
 		//Check headers
-		boolean columnsMatch = verifyHeaderColumns(file, strategy);
+		boolean columnsMatch = verifyHeaderColumns(file, strategy, new UserCsv());
 		if (!columnsMatch) {
-			message = this.getMessage("csv.error.headers");
+			message = this.getMessage("csv.error.headers.or.file");
 			setRedirectAttributes(redirectAttributes, "update", "warning", message);
 			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
 		}
 
 		List<UserCsv> usersCsv;
 		try {
-			usersCsv = readCsvFile(file, strategy);
+			usersCsv = CsvUtils.SINGLETON.readCsvFile(file, strategy, UserCsv.class);
 		} catch (Exception e) {
 			message=this.getMessage("csv.error.readfile");
 			setRedirectAttributes(redirectAttributes, "update", "warning", message);
@@ -425,23 +426,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	}
 
 
-	private boolean verifyHeaderColumns(MultipartFile file, MappingStrategy<UserCsv> strategy) throws IOException, CsvRequiredFieldEmptyException {
-		Reader reader = new InputStreamReader(file.getInputStream());
-		BufferedReader br = new BufferedReader(reader);
-        String line = br.readLine();
-        String[] elements = line.split(",");
-        Set<String> headers = new HashSet<>();
-        for (String header : elements) {
-        	headers.add(header.toUpperCase());
-        }
-        br.close();
-		
-		Set<String> originalHeaders = new HashSet<>();
-		originalHeaders.addAll(Arrays.asList(strategy.generateHeader(new UserCsv())));
-		
-		return headers.equals(originalHeaders);
-	}
 
+/*
 	
 	private List<UserCsv> readCsvFile(MultipartFile file, MappingStrategy<UserCsv> strategy) throws Exception {
 		Reader reader = new InputStreamReader(file.getInputStream());
@@ -454,7 +440,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		List<UserCsv> usersCsv = csvToBean.parse();
 		reader.close();
 		return usersCsv;
-	}
+	}*/
 	
 	// show upload csv form
 	@GetMapping(value = "/upload_csv_form")

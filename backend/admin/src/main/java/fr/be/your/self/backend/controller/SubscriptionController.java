@@ -36,14 +36,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.api.client.util.Key;
 import com.opencsv.CSVWriter;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import com.opencsv.bean.MappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import fr.be.your.self.backend.dto.ResultStatus;
 import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.dto.SubscriptionDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.utils.AdminUtils;
+import fr.be.your.self.backend.utils.UserCsv;
 import fr.be.your.self.backend.utils.UserUtils;
 import fr.be.your.self.common.BusinessCodeStatus;
 import fr.be.your.self.common.BusinessCodeType;
@@ -350,50 +354,68 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 	
 	@PostMapping(value = "/importcsv")
 	@Transactional
-	public String fileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, Model model)
-			throws IOException, ParseException {
+	public String fileUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, 
+							RedirectAttributes redirectAttributes,Model model)
+			throws IOException, ParseException, CsvRequiredFieldEmptyException {
 
-		SimpleResult result = new SimpleResult(ResultStatus.UNKNOWN.getValue(), "Unknown status");
-		result.setFunctionalityName("Upload users CSV file!");
-		
+		String message;
+
+		//Check if file is empty
 		if (file.isEmpty()) {
-			result.setResStatus(ResultStatus.ERROR.getValue());
-			result.setMessage("File is empty");
-			return this.getName() + "/upload_csv_form";
+			message = this.getMessage("common.file.upload.empty");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);			
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
 		}
 
+		MappingStrategy<SubscriptionCsv> strategy = new HeaderColumnNameMappingStrategy<>();
+		strategy.setType(SubscriptionCsv.class);
+		
+		//Check headers
+		boolean columnsMatch = verifyHeaderColumns(file, strategy, new SubscriptionCsv());
+		if (!columnsMatch) {
+			message = this.getMessage("csv.error.headers.or.file");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
+		}
+
+		
 		List<SubscriptionCsv> subscriptionsCsv;
 		try {
-			subscriptionsCsv = CsvUtils.SINGLETON.readCsvFile(file, SubscriptionCsv.class);
+			subscriptionsCsv = CsvUtils.SINGLETON.readCsvFile(file, strategy, SubscriptionCsv.class);
 		} catch (Exception e) {
-			result.setResStatus(ResultStatus.ERROR.getValue());
-			result.setMessage("Exception occured while reading CSV file: " + e.getMessage());
-			return "/subscription/simple_status";
+			message=this.getMessage("csv.error.readfile");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";		
+		}
+		
+		if (subscriptionsCsv.size() > this.dataSetting.getCsvSubscriptionMaxNbLine()) {
+			message=this.getMessage("csv.error.max.nb.line", new Object[] {this.dataSetting.getCsvSubscriptionMaxNbLine(), 
+					subscriptionsCsv.size()});
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";		
 		}
 						
-		model.addAttribute("result", result);
 		
 		for (SubscriptionCsv subscription : subscriptionsCsv) {
 			if (StringUtils.isNullOrEmpty(subscription.getEmail()) || !EmailValidator.getInstance().isValid(subscription.getEmail())) {
-				result.setResStatus(ResultStatus.ERROR.getValue());
-				result.setMessage("ERROR: Email field of user " + subscription.getFullName() + " is empty or not valid!");
+				message=this.getMessage("csv.error.email.invalid", new Object[] {subscription.getFullName()});				
+				setRedirectAttributes(redirectAttributes, "update", "warning", message);
+				return "redirect:" + this.getBaseURL()  + "/upload_csv_form";	
 			}
-			if (StringUtils.isNullOrEmpty(subscription.getSubtype())) {
-				result.setResStatus(ResultStatus.ERROR.getValue());
-				result.setMessage("ERROR: Subscription type field of user " + subscription.getFullName() + " is empty or not valid!");
+			if (StringUtils.isNullOrEmpty(subscription.getSubtype())) {		
+				message=this.getMessage("csv.error.subscription.type.empty", new Object[] {subscription.getFullName()});				
+				setRedirectAttributes(redirectAttributes, "update", "warning", message);
+				return "redirect:" + this.getBaseURL()  + "/upload_csv_form";	
+				
 			} else {
 				if (!this.subtypeService.existsByName(subscription.getSubtype())) {
-					result.setResStatus(ResultStatus.ERROR.getValue());
-					result.setMessage("ERROR: Subscription type  '" + subscription.getSubtype() + "' does not exist");
+					message=this.getMessage("csv.error.subscription.type.inexistent", new Object[] {subscription.getSubtype()});				
+					setRedirectAttributes(redirectAttributes, "update", "warning", message);
+					return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
 				}
 			}
 		}
-		
-		if (result.getResStatus() == ResultStatus.ERROR.getValue()) {
-			return this.getName() + "/simple_status";
-			
-		}
-		
+
 		for (SubscriptionCsv subCsv : subscriptionsCsv) {
 			User user;
 			Subscription sub = CsvUtils.SINGLETON.createSubscriptionFromCsv(subCsv);
@@ -433,9 +455,9 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		}
 		
 		
-		result.setResStatus(ResultStatus.SUCCESS.getValue());
-		result.setMessage("File imported successfully!");
-		return this.getName() + "/simple_status";
+		message = this.getMessage("csv.upload.sucess");
+		setRedirectAttributes(redirectAttributes, "update", "success", message);
+		return "redirect:" + this.getBaseURL() + "/upload_csv_form";
 	}
 	
 	// show upload csv form

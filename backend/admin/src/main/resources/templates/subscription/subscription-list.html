@@ -12,7 +12,9 @@
 			<div class="col">
 				<div class="card shadow">
 					<div class="card-header border-0">
-						<div class="row">
+										<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
+					
+<!-- 						<div class="row">
 							<div class="col-6">
 								<th:block th:if="${writePermission}">
 									<a class="btn btn-icon btn-2 btn-primary"
@@ -24,11 +26,11 @@
 								</th:block>
 							</div>
 							
-						</div>
+						</div> -->
 						
 						<div class="row form-search-container">
-							<div class="offset-md-9 col-md-3 col-sm-12 text-right">
-								<select id="display-page-option" class="selectpicker show-tick"
+							<div class="col text-right">
+								<select id="display-page-option" class="selectpicker show-tick w-auto"
 									th:data-none-selected-text="#{data.display.page.option.title}">
 									<option th:each="pageSize: ${supportPageSizes}"
 										th:value="${pageSize}"
@@ -42,10 +44,12 @@
 						</div>
 						
 						<div class="row form-search-container">
-							<a href="#select_subscriptions" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
-							<a href="#" class="btn btn-sm btn-primary" onclick="submitSubscriptionForm();">Export
-							CSV</a> 
-							<a th:href="${writePermission ? baseURL + '/upload_csv_form' : 'javascript:;'}" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a> 
+							<div class="col mt-2">
+								<a href="#select_subscriptions" class="btn btn-sm btn-primary" >Select / Deselect all</a> 
+								<a href="#" class="btn btn-sm btn-primary" onclick="submitSubscriptionForm();">Export
+								CSV</a> 
+								<a th:href="${writePermission ? baseURL + '/upload_csv_form' : 'javascript:;'}" class="btn btn-sm btn-primary" th:if="${writePermission}">Import CSV</a>
+							</div> 
 						</div>
 						<script th:inline="javascript">
 							function submitSubscriptionForm(){
@@ -90,7 +94,7 @@
 										<input type="checkbox"  name="selected_id"  
 										id="selected_id" th:value="${item.id}"></input>
 									</td>
-									<td nowrap><span th:if="${item.user != null}" th:utext="${item.user.fullName}"></span></td>
+									<td nowrap><span th:if="${item.user != null}" th:utext="${item.user.email}"></span></td>
 									<td nowrap><span th:if="${item.subtype != null}" th:utext="${item.subtype.name}"></span></td>
 									<td nowrap><span th:if="${item != null}" th:utext="${#dates.format(item.subscriptionStartDate, dateFormat)}" ></span></td>
 									<td nowrap><span th:if="${item != null}" th:utext="${#dates.format(item.subscriptionEndDate, dateFormat)}"></span></td>
