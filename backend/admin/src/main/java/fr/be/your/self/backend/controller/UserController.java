@@ -1,15 +1,9 @@
 package fr.be.your.self.backend.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -38,11 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.hazelcast.util.StringUtil;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.MappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
@@ -51,15 +41,13 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import fr.be.your.self.backend.cache.CacheManager;
 import fr.be.your.self.backend.dto.PermissionDto;
-import fr.be.your.self.backend.dto.ResultStatus;
-import fr.be.your.self.backend.dto.SimpleResult;
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.utils.AdminUtils;
+import fr.be.your.self.backend.utils.CsvUtils;
 import fr.be.your.self.backend.utils.UserCsv;
 import fr.be.your.self.backend.utils.UserCsvMappingStrategy;
 import fr.be.your.self.backend.utils.UserUtils;
-import fr.be.your.self.common.CsvUtils;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.UserPermission;
 import fr.be.your.self.common.UserStatus;
@@ -97,7 +85,6 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 	static {
 		SORTABLE_COLUMNS.put("email", new String[] { "email" });
-		//TODO  add sortable columns
 	}
 	
 	@Override
@@ -334,7 +321,9 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 		response.setContentType("text/csv");
 		response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + CSV_USERS_EXPORT_FILE + "\"");
-		final UserCsvMappingStrategy<UserCsv> mappingStrategy = new UserCsvMappingStrategy<>();
+		
+		String headers[] = this.getMessage("csv.user.headers").split(",");
+		final UserCsvMappingStrategy<UserCsv> mappingStrategy = new UserCsvMappingStrategy<>(headers);
 		mappingStrategy.setType(UserCsv.class);
 		
 		// create a csv writer
@@ -382,7 +371,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		try {
 			usersCsv = CsvUtils.SINGLETON.readCsvFile(file, strategy, UserCsv.class);
 		} catch (Exception e) {
-			message=this.getMessage("csv.error.readfile");
+			message=this.getMessage("csv.error.user.readfile");
 			setRedirectAttributes(redirectAttributes, "update", "warning", message);
 			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";		
 		}

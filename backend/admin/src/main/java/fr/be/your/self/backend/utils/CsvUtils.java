@@ -1,9 +1,10 @@
-package fr.be.your.self.common;
+package fr.be.your.self.backend.utils;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +16,6 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.MappingStrategy;
 
 import fr.be.your.self.model.Subscription;
-import fr.be.your.self.model.SubscriptionCsv;
-
 
 public enum CsvUtils {
 	SINGLETON;
@@ -46,6 +45,16 @@ public enum CsvUtils {
 		sub.setTerminationAsked(subCsv.isTerminationAsked());
 		sub.setStatus(true);
 		return sub;
+	}
+	
+	public static List<SubscriptionCsv> extractSubscriptionCsv(Iterable<Subscription> subscriptions) {
+		List<SubscriptionCsv> returnList = new ArrayList<SubscriptionCsv>();
+		for (Subscription subscription : subscriptions) {
+			SubscriptionCsv subscriptionCsv = new SubscriptionCsv(subscription);
+			returnList.add(subscriptionCsv);
+		}
+		
+		return returnList;
 	}
 
 	private java.util.Date getDateFromStr(String dateStr) throws ParseException {

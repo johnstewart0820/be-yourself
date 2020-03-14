@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import fr.be.your.self.common.LoginType;
@@ -70,7 +71,7 @@ public final class UserUtils {
 		userCsv.setFirstName( user.getFirstName());
 		userCsv.setEmail(user.getEmail());
 		userCsv.setLoginType(LoginType.toStrValue(user.getLoginType()));
-		userCsv.setStatus(messageSource.getMessage("user.status." + user.getStatus(), null, null));
+		userCsv.setStatus(messageSource.getMessage("user.status." + user.getStatus(), null, LocaleContextHolder.getLocale()));
 		userCsv.setReferralCode(user.getReferralCode());
 		userCsv.setUserType(user.getUserType());
 		Subscription sub = Utils.findSubscriptionUser(user);
@@ -81,7 +82,7 @@ public final class UserUtils {
 	}
 
 	public static int findIntStatus(String status, MessageSource messageSource) {
-		String active = messageSource.getMessage("user.status." + UserStatus.ACTIVE.getValue(), null, null);
+		String active = messageSource.getMessage("user.status." + UserStatus.ACTIVE.getValue(), null, LocaleContextHolder.getLocale());
 		if (active.equalsIgnoreCase(status)) {
 			return UserStatus.ACTIVE.getValue();
 		}

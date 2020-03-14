@@ -2,7 +2,6 @@ package fr.be.your.self.repository;
 
 import org.springframework.stereotype.Repository;
 
-import fr.be.your.self.model.Address;
 import fr.be.your.self.model.Specialty;
 
 @Repository

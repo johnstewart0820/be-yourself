@@ -3,6 +3,7 @@ package fr.be.your.self.backend.setting;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,6 +64,10 @@ public class DataSetting {
 
 	private Set<Integer> giftDurations;
 	
+	private List<Integer> subscriptionDurations;
+
+
+
 	public DataSetting() {
 		this.defaultMimeTypeMappings = new HashMap<String, String>();
 	}
@@ -324,5 +329,14 @@ public class DataSetting {
 
 	public void setCsvUserMaxNbLine(int csvUserMaxNbLine) {
 		this.csvUserMaxNbLine = csvUserMaxNbLine;
+	}
+	
+	
+	public List<Integer> getSubscriptionDurations() {
+		return subscriptionDurations;
+	}
+
+	public void setSubscriptionDurations(List<Integer> subscriptionDurations) {
+		this.subscriptionDurations = subscriptionDurations;
 	}
 }

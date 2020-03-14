@@ -6,7 +6,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import fr.be.your.self.model.SubscriptionType;
-import fr.be.your.self.model.User;
 
 @Repository
 public interface SubscriptionTypeRepository extends BaseRepository<SubscriptionType, Integer>  {

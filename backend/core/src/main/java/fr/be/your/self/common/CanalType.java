@@ -3,15 +3,13 @@ package fr.be.your.self.common;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum PaymentGateway {
-	STRIPE("STRIPE"),
-	PAYPAL("PAYPAL"),
-	B2B("B2B"),
-	INAPP("INAPP");
+public enum CanalType {
+	WEB("WEB"),
+	APP("APP");
 	
 	private final String value;
 	
-	PaymentGateway(String value) {
+	CanalType(String value) {
 		this.value = value;
 	}
 
@@ -21,10 +19,9 @@ public enum PaymentGateway {
 	
 	public static List<String> getPossibleStrValues(){
 		List<String> res = new ArrayList<>();
-		for (PaymentGateway status : PaymentGateway.values()) {
-			res.add(status.getValue());
+		for (CanalType type : CanalType.values()) {
+			res.add(type.getValue());
 		}
-		
 		return res;
 	}
 }
