@@ -117,6 +117,11 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 	}
 
 	@Override
+	public SlideshowImage updateImage(SlideshowImage image) {
+		return this.imageRepository.save(image);
+	}
+
+	@Override
 	public boolean deleteImage(int imageId) {
 		this.imageRepository.deleteById(imageId);
 		return true;

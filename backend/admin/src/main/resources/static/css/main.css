@@ -50,10 +50,56 @@ label.disabled {
 	cursor: not-allowed;
 }
 
+select.selectpicker[disabled] + button {
+	background-color: #e9ecef;
+	border: 1px solid #ced4da;
+	box-shadow: none;
+	color: #a0a0a0;
+    opacity: 1;
+}
+
+.hidden {
+	visibility: hidden;
+	display: none;	
+}
+
+.form-control[disabled] {
+	color: #a0a0a0;
+}
+
+.form-control[disabled] + .input-group-prepend .input-group-text {
+	color: #a0a0a0;
+}
+
+.custom-file label {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.custom-control.custom-checkbox.label-left {
+	padding-left: 0;
+}
+
+.custom-control.custom-checkbox.label-left label.custom-control-label {
+  position: relative;
+  padding-right: 1.5rem;
+}
+
+.custom-control.custom-checkbox.label-left label.custom-control-label::before, 
+.custom-control.custom-checkbox.label-left label.custom-control-label::after{
+  right: 0;
+  left: auto;
+}
+
 @media (max-width: 575px) {
 	.sm-btn-block {
 		display: block;
     	width: 100%;
+    	
+    	white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	
 	.sm-btn-block.btn-above {
@@ -73,7 +119,12 @@ label.disabled {
 	}
 	
 	.pb-7, .py-7 {
-    	padding-bottom: 3rem !important;
+    	padding-bottom: 1rem !important;
+	}
+	
+	.main-content .navbar {
+		visibility: hidden;
+		display: none;
 	}
 }
 
@@ -87,20 +138,60 @@ label.disabled {
 	}
 }
 
-select.selectpicker[disabled] + button {
-	background-color: #e9ecef;
-	border: 1px solid #ced4da;
-	box-shadow: none;
-	color: #a0a0a0;
-    opacity: 1;
-}
-
-.form-control[disabled] {
-	color: #a0a0a0;
-}
-
-.form-control[disabled] + .input-group-prepend .input-group-text {
-	color: #a0a0a0;
+@media (min-width: 768px) and (max-width: 1150px) {
+	.col-smd-3 {
+		width: 25%;
+		flex: 0 0 25%;
+		max-width: 25%;
+	}
+	
+	.col-smd-6 {
+		width: 50%;
+		flex: 0 0 50%;
+		max-width: 50%;
+	}
+	
+	.col-smd-9 {
+		width: 75%;
+		flex: 0 0 75%;
+		max-width: 75%;
+	}
+	
+	.col-smd-12 {
+		width: 100%;
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+	
+	.offset-smd-0 {
+    	margin-left: 0px;
+	}
+	
+	.hidden-smd {
+		visibility: hidden;
+		display: none;
+	}
+	
+	.smd-text-left {
+		text-align: left;
+	}
+	
+	.smd-new-form-group-row {
+		margin-bottom: 1rem;
+	}
+	
+	.smd-btn-block {
+		display: block;
+    	width: 100%;
+    	
+    	white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	
+	.smd-btn-block.btn-above {
+		margin-bottom: 1rem;
+	}
 }
 
 /********* Modal *************/
@@ -124,6 +215,15 @@ select.selectpicker[disabled] + button {
 	color: #fff;
 }
 
+.modal-header.modal-header-primary {
+	background-color: #5e72e4; 
+	color: #fff;
+}
+
+.modal-header.modal-header-primary button,
+.modal-header.modal-header-primary .modal-title {
+	color: #fff;
+}
 /********* Toast *************/
 .toast-primary .toast-header {
 	background-color: #5e72e4; 

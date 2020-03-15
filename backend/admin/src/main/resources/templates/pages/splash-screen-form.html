@@ -22,9 +22,9 @@
 					th:object="${dto}" method="post" enctype="multipart/form-data">
 					<fieldset th:disabled="${!writePermission}">
 						<div class="form-group row">
-							<label for="text" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+							<label for="text" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs" 
 								th:text="#{|${baseMessageKey}.detail.text|}"></label>
-							<div class="col-md-10 col-sm-9 col-xs-12">
+							<div class="col-lg-10 col-md-9 col-smd-12 col-sm-9 col-xs-12">
 								<textarea class="form-control" rows="10" 
 									th:field="*{text}" id="text"
 									th:placeholder="#{|${baseMessageKey}.detail.text.placeholder|}"
@@ -34,9 +34,9 @@
 						</div>
 
 						<div th:if="${writePermission}" class="form-group row">
-							<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+							<div class="offset-lg-2 col-lg-10 offset-md-3 col-md-9 offset-smd-0 col-smd-12 offset-sm-3 col-sm-9 col-xs-12">
 								<div class="form-action-buttons-row">
-									<button type="submit" class="btn btn-primary sm-btn-block" th:title="#{action.save.title}">
+									<button type="submit" class="btn btn-primary sm-btn-block smd-btn-block btn-above" th:title="#{action.save.title}">
 										<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
 									</button>
 								</div>

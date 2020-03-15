@@ -71,8 +71,8 @@
 	
 	<th:block th:fragment="list-filter">
 		<div class="row form-search-container">
-			<div class="col-md-12 col-sm-12 text-right">
-				<select id="display-page-option" class="selectpicker show-tick" 
+			<div class="offset-lg-9 col-lg-3 offset-md-6 col-md-6 col-sm-12 text-right">
+				<select id="display-page-option" class="form-control selectpicker show-tick" 
 					th:data-none-selected-text="#{data.display.page.option.title}">
 					<option th:each="pageSize: ${supportPageSizes}" 
 						th:value="${pageSize}" 
@@ -104,13 +104,32 @@
 	
 	<th:block th:fragment="form-action">
 		<div th:if="${writePermission}" class="form-group row">
-			<div class="offset-md-2 col-md-10 offset-sm-3 col-sm-9 col-xs-12">
+			<div class="offset-lg-3 col-lg-9 offset-md-0 col-md-12 offset-smd-0 col-smd-12 offset-sm-3 col-sm-9 col-xs-12">
 				<div class="form-action-buttons-row">
-					<button type="submit" class="btn btn-primary sm-btn-block btn-above" th:title="#{action.save.title}">
+					<button type="submit" class="btn btn-primary sm-btn-block smd-btn-block btn-above" th:title="#{action.save.title}">
 						<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
 					</button>
 					
-					<a class="btn btn-outline-warning sm-btn-block" th:href="${baseURL + '/current-page'}"
+					<a class="btn btn-outline-warning sm-btn-block smd-btn-block" th:href="${baseURL + '/current-page'}"
+						th:title="#{action.go.to.list.title}">
+						<span class="btn-inner--icon">
+							<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>
+						</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</th:block>
+	
+	<th:block th:fragment="form-action-lg-2">
+		<div th:if="${writePermission}" class="form-group row">
+			<div class="offset-lg-2 col-lg-10 offset-md-3 col-md-9 offset-smd-0 col-smd-12 offset-sm-3 col-sm-9 col-xs-12">
+				<div class="form-action-buttons-row">
+					<button type="submit" class="btn btn-primary sm-btn-block smd-btn-block btn-above" th:title="#{action.save.title}">
+						<i class="fas fa-save"></i> <span class="hidden-xs" th:text="#{action.save}"></span>
+					</button>
+					
+					<a class="btn btn-outline-warning sm-btn-block smd-btn-block" th:href="${baseURL + '/current-page'}"
 						th:title="#{action.go.to.list.title}">
 						<span class="btn-inner--icon">
 							<i class="fas fa-arrow-left"></i> <span th:text="#{action.go.to.list}"></span>

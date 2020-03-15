@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -27,6 +29,9 @@ public class SessionCategory extends PO<Integer> {
 	@Column(name = "Image", length = 255)
 	private String image;
 
+	@Column(name = "SessionCount")
+	private int sessionCount;
+	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
     private List<Session> sessions;
 	
@@ -66,5 +71,23 @@ public class SessionCategory extends PO<Integer> {
 
 	public void setSessions(List<Session> sessions) {
 		this.sessions = sessions;
+	}
+	
+	public int getSessionCount() {
+		return sessionCount;
+	}
+
+	public void setSessionCount(int sessionCount) {
+		this.sessionCount = sessionCount;
+	}
+
+	@PrePersist
+	protected void onCreate() {
+		this.sessionCount = this.sessions == null ? 0 : this.sessions.size();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.sessionCount = this.sessions == null ? 0 : this.sessions.size();
 	}
 }

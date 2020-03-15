@@ -34,6 +34,7 @@
 			</div>
 
 			<!-- Navbar items -->
+			<!-- 
 			<ul class="navbar-nav ml-auto">
 				<li class="nav-item">
 					<a class="nav-link nav-link-icon" th:href="@{/}">
@@ -41,7 +42,7 @@
 						<span class="nav-link-inner--text" th:text="#{menu.home}">Home</span>
 					</a>
 				</li>
-
+				
 				<th:block sec:authorize="!isAuthenticated()">
 					<li th:if="${allowRegister}" class="nav-item">
 						<a class="nav-link nav-link-icon" th:href="@{/oauth/register}">
@@ -49,6 +50,7 @@
 							<span class="nav-link-inner--text" th:text="#{menu.register}">Register</span>
 						</a>
 					</li>
+					
 					<li class="nav-item">
 						<a class="nav-link nav-link-icon" th:href="@{/oauth/login}">
 							<i class="fas fa-sign-in-alt"></i>
@@ -66,6 +68,7 @@
 					</li>
 				</th:block>
 			</ul>
+			-->
 		</div>
 	</div>
 </body>

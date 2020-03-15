@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,6 +42,7 @@ import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.common.UserType;
 import fr.be.your.self.security.oauth2.DefaultAccessDeniedHandler;
 import fr.be.your.self.security.oauth2.DefaultAuthenticationEntryPoint;
+import fr.be.your.self.security.oauth2.DefaultLoginFailureHandler;
 import fr.be.your.self.security.oauth2.DefaultLoginSuccessHandler;
 import fr.be.your.self.security.oauth2.DefaultLogoutSuccessHandler;
 import fr.be.your.self.security.oauth2.DefaultUserDetailsService;
@@ -101,10 +104,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
+ 		return super.authenticationManagerBean();
 	}
 	
 	/********************* URL Configuration ********************/
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+	    DaoAuthenticationProvider impl = new DaoAuthenticationProvider();
+	    impl.setUserDetailsService(userDetailsService());
+	    impl.setHideUserNotFoundExceptions(false);
+	    impl.setPasswordEncoder(this.passwordEncoder());
+	    
+	    return impl ;
+	}
+	
 	@Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
     	return new DefaultLoginSuccessHandler();
@@ -127,11 +140,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		// @formatter:off
-		auth
-			.userDetailsService(this.userDetailsService())
-			.passwordEncoder(this.passwordEncoder());
-		// @formatter:on
+		auth.authenticationProvider(this.authenticationProvider());
 	}
 	
 	/********************* Security Configuration **************/
@@ -181,7 +190,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		        .formLogin()
 					.loginPage(LOGIN_URL)
 					.defaultSuccessUrl(this.defaultRedirectUrl)
-					.failureUrl(LOGIN_URL + "?authentication_error=true")
+					.failureHandler(new DefaultLoginFailureHandler(LOGIN_URL + "?authentication_error=true"))
 					.permitAll()
 			.and()
 				.rememberMe()

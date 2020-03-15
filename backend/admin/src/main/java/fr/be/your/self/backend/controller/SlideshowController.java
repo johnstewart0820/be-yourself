@@ -143,6 +143,10 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		final SlideshowDto editScheduleDto = new SlideshowDto();
 		editScheduleDto.setStartDate(today);
 		model.addAttribute("editScheduleDto", editScheduleDto);
+		
+		final SlideshowDto slideShowItemDto = new SlideshowDto();
+		slideShowItemDto.setStartDate(today);
+		model.addAttribute("slideShowItemDto", slideShowItemDto);
 	}
 	
 	@Override
@@ -276,92 +280,6 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 		}
     }
 	
-	/*
-	@PostMapping("/update-main/{id}")
-	@Transactional
-    public String updateDomain(
-    		@PathVariable("id") Integer id, 
-    		@ModelAttribute("mainDto") @Validated SlideshowDto dto, 
-    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
-    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
-		
-        Slideshow domain = this.mainService.getById(id);
-        if (domain == null) {
-        	final String message = this.getIdNotFoundMessage(id);
-        	
-        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
-        }
-        
-        // ====> Validate image file
-        final MultipartFile uploadImageFile = dto.getUploadImageFile();
-        if (uploadImageFile == null || uploadImageFile.isEmpty()) {
-        	final String message = this.getRequiredFieldMessage("image", "Image required");
-        	
-        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
-        }
-        
-        // ====> Process upload image file
-        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
-        if (uploadImageFilePath == null) {
-        	final FieldError fieldError = result.getFieldError();
-        	final String message = fieldError == null 
-        			? this.getInvalidFieldMessage("image", "Image is invalid")
-        			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
-        	
-        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
-        }
-        
-        // ====> Create new image
-        try {
-	        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
-	        
-	        final SlideshowImage newImage = new SlideshowImage();
-	        newImage.setSlideshow(domain);
-	        newImage.setImage(uploadImageFileName);
-	        newImage.setIndex(this.mainService.getMaxImageIndex(id) + 1);
-	        
-	        final SlideshowImage savedImage = this.mainService.createImage(newImage);
-	        
-	        // ====> Error
-	        if (savedImage == null || result.hasErrors()) {
-	        	this.deleteUploadFile(uploadImageFilePath);
-	        	
-	        	final FieldError fieldError = result.getFieldError();
-            	final String message = fieldError == null 
-            			? this.getProcessingError()
-            			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
-            	
-            	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
-    	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
-    	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
-    	        
-    	        return "redirect:" + this.getBaseURL() + "/current-page";
-	        }
-	        
-	        // ====> Success
-	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
-	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-	        
-	        return "redirect:" + this.getBaseURL() + "/current-page";
-        } catch (Exception ex) {
-        	this.deleteUploadFile(uploadImageFilePath);
-        	
-        	throw ex;
-		}
-    }
-	*/
 	@PostMapping("/update/{id}")
 	@Transactional
     public String updateScheduleDomain(
@@ -445,6 +363,103 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
     	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
     	        
     	        return "redirect:" + this.getBaseURL() + "/current-page";
+	        }
+	        
+	        // ====> Success
+	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.main");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + id;
+        } catch (Exception ex) {
+        	this.deleteUploadFile(uploadImageFilePath);
+        	
+        	throw ex;
+		}
+    }
+	
+	@PostMapping("/update-item/{id}/{imageId}")
+	@Transactional
+    public String updateSlideshowItem(
+    		@PathVariable("id") Integer id,
+    		@PathVariable("imageId") Integer imageId, 
+    		@ModelAttribute("slideShowItemDto") @Validated SlideshowDto dto,
+    		HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+    		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
+		
+        if (result.hasErrors()) {
+        	final FieldError fieldError = result.getFieldError();
+        	final String message = this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + id;
+        }
+        
+        final SlideshowImage domain = this.mainService.getImage(imageId);
+        if (domain == null) {
+        	final String message = this.getIdNotFoundMessage(imageId);
+        	
+        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + id;
+        }
+        
+        // ====> Validate image file
+        Path uploadImageFilePath = null;
+        
+        final MultipartFile uploadImageFile = dto.getUploadImageFile();
+        if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
+	        // ====> Process upload image file
+	        uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
+	        if (uploadImageFilePath == null) {
+	        	final FieldError fieldError = result.getFieldError();
+	        	final String message = fieldError == null 
+	        			? this.getInvalidFieldMessage("image", "Image is invalid")
+	        			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+	        	
+	        	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+		        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+		        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+		        
+		        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + id;
+	        }
+        }
+        
+        // ====> Create new image
+        try {
+        	final String deleteImageFileName = domain.getImage();
+        	
+        	domain.setLink(dto.getLink());
+        	
+        	if (uploadImageFilePath != null) {
+        		final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+        		domain.setImage(uploadImageFileName);
+        	}
+	        
+	        final SlideshowImage savedImage = this.mainService.updateImage(domain);
+	        
+	        // ====> Error
+	        if (savedImage == null || result.hasErrors()) {
+	        	this.deleteUploadFile(uploadImageFilePath);
+	        	
+	        	final FieldError fieldError = result.getFieldError();
+            	final String message = fieldError == null 
+            			? this.getProcessingError()
+            			: this.getMessage(fieldError.getCode(), fieldError.getDefaultMessage());
+            	
+            	redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update.schedule");
+    	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "warning");
+    	        redirectAttributes.addFlashAttribute(TOAST_MESSAGE_KEY, message);
+    	        
+    	        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + id;
+	        }
+	        
+	        if (uploadImageFilePath != null) {
+	        	this.deleteUploadFile(deleteImageFileName);
 	        }
 	        
 	        // ====> Success

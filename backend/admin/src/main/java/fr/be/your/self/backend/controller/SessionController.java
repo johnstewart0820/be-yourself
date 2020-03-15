@@ -309,34 +309,51 @@ public class SessionController extends BaseResourceController<Session, SessionSi
         final String uploadContentFileName = uploadContentFilePath.getFileName().toString();
         final String contentFileContentType = this.getFileContentType(uploadContentFilePath, this.dataSetting.getMediaMimeTypes());
         
-        final Session domain = this.newDomain();
-        dto.copyToDomain(domain);
-        
-        domain.setVoice(voice);
-        domain.setCategories(categories);
-        domain.setImage(uploadImageFileName);
-        domain.setContentFile(uploadContentFileName);
-        domain.setContentMimeType(contentFileContentType);
-        
-        final Session savedDomain = this.mainService.create(domain);
-        
-        // ====> Error, delete upload file
-        if (savedDomain == null || result.hasErrors()) {
+        try {
+	        final Session domain = this.newDomain();
+	        dto.copyToDomain(domain);
+	        
+	        domain.setVoice(voice);
+	        domain.setCategories(categories);
+	        domain.setImage(uploadImageFileName);
+	        domain.setContentFile(uploadContentFileName);
+	        domain.setContentMimeType(contentFileContentType);
+	        
+	        final Session savedDomain = this.mainService.create(domain);
+	        
+	        // ====> Error, delete upload file
+	        if (savedDomain == null || result.hasErrors()) {
+	        	this.deleteUploadFile(uploadImageFilePath);
+	        	this.deleteUploadFile(uploadContentFilePath);
+	        	
+	        	if (!result.hasErrors()) {
+		        	final ObjectError error = this.createProcessingError(result);
+		        	result.addError(error);
+	        	}
+	        	
+	        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+	        }
+	        
+	        if (categories != null && !categories.isEmpty()) {
+	        	final List<Integer> updateCategoryIds = new ArrayList<Integer>();
+	        	
+	        	for (SessionCategory category : categories) {
+	        		updateCategoryIds.add(category.getId());
+				}
+	        	
+	        	this.sessionCategoryService.updateSessionCount(updateCategoryIds);
+	        }
+	        
+	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	        
+	        return "redirect:" + this.getBaseURL();
+        } catch (Exception ex) {
         	this.deleteUploadFile(uploadImageFilePath);
         	this.deleteUploadFile(uploadContentFilePath);
         	
-        	if (!result.hasErrors()) {
-	        	final ObjectError error = this.createProcessingError(result);
-	        	result.addError(error);
-        	}
-        	
-        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
-        }
-        
-        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "create");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-        
-        return "redirect:" + this.getBaseURL();
+			throw ex;
+		}
     }
 	
 	@PostMapping("/update/{id}")
@@ -364,9 +381,24 @@ public class SessionController extends BaseResourceController<Session, SessionSi
         
         dto.copyToDomain(domain);
         
+        final List<Integer> updateCategoryIds = new ArrayList<Integer>();
+        
+        final List<SessionCategory> currentCategories = domain.getCategories();
+        if (currentCategories != null) {
+        	for (SessionCategory category : currentCategories) {
+        		updateCategoryIds.add(category.getId());
+			}
+        }
+        
         // ====> Session category
         final List<SessionCategory> categories = this.sessionCategoryService.getByIds(categoryIds);
         domain.setCategories(categories);
+        
+        if (categories != null) {
+        	for (SessionCategory category : categories) {
+        		updateCategoryIds.add(category.getId());
+			}
+        }
         
         // ====> Session voice 
         final Integer voiceId = dto.getVoiceId();
@@ -397,62 +429,77 @@ public class SessionController extends BaseResourceController<Session, SessionSi
         String deleteContentFileName = null;
         Path uploadContentFilePath = null;
         
-        final MultipartFile uploadImageFile = dto.getUploadImageFile();
-        if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
-        	deleteImageFileName = domain.getImage();
-        	
-        	// ====> Process upload image file
-        	uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
-            if (uploadImageFilePath == null) {
-            	dto.setId(id);
-            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
-            }
-            
-            final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
-        	domain.setImage(uploadImageFileName);
-        }
-        
-        final MultipartFile uploadContentFile = dto.getUploadContentFile();
-        if (uploadContentFile != null && !uploadContentFile.isEmpty()) {
-        	deleteContentFileName = domain.getContentFile();
-        	
-        	// ====> Process upload content file
-        	uploadContentFilePath = this.processUploadContentFile(uploadContentFile, result);
-        	if (uploadContentFilePath == null) {
-    			this.deleteUploadFile(uploadImageFilePath);
-    			
-            	dto.setId(id);
-            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
-        	}
-        	
-        	final String uploadContentFileName = uploadContentFilePath.getFileName().toString();
-        	domain.setContentFile(uploadContentFileName);
-        }
-        
-        final Session savedDomain = this.mainService.update(domain);
-        
-        // ====> Error, delete upload file
-        if (savedDomain == null || result.hasErrors()) {
+        try {
+	        final MultipartFile uploadImageFile = dto.getUploadImageFile();
+	        if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
+	        	deleteImageFileName = domain.getImage();
+	        	
+	        	// ====> Process upload image file
+	        	uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
+	            if (uploadImageFilePath == null) {
+	            	dto.setId(id);
+	            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+	            }
+	            
+	            final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+	        	domain.setImage(uploadImageFileName);
+	        }
+	        
+	        final MultipartFile uploadContentFile = dto.getUploadContentFile();
+	        if (uploadContentFile != null && !uploadContentFile.isEmpty()) {
+	        	deleteContentFileName = domain.getContentFile();
+	        	
+	        	// ====> Process upload content file
+	        	uploadContentFilePath = this.processUploadContentFile(uploadContentFile, result);
+	        	if (uploadContentFilePath == null) {
+	    			this.deleteUploadFile(uploadImageFilePath);
+	    			
+	            	dto.setId(id);
+	            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+	        	}
+	        	
+	        	final String uploadContentFileName = uploadContentFilePath.getFileName().toString();
+	        	final String contentFileContentType = this.getFileContentType(uploadContentFilePath, this.dataSetting.getMediaMimeTypes());
+	        	
+	        	domain.setContentFile(uploadContentFileName);
+	        	domain.setContentMimeType(contentFileContentType);
+	        }
+	        
+	        final Session savedDomain = this.mainService.update(domain);
+	        
+	        // ====> Error, delete upload file
+	        if (savedDomain == null || result.hasErrors()) {
+	        	this.deleteUploadFile(uploadImageFilePath);
+	        	this.deleteUploadFile(uploadContentFilePath);
+	        	
+	        	if (!result.hasErrors()) {
+		        	final ObjectError error = this.createProcessingError(result);
+		        	result.addError(error);
+	        	}
+	        	
+	        	dto.setId(id);
+	        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+	        }
+	        
+	        if (!updateCategoryIds.isEmpty()) {
+	        	this.sessionCategoryService.updateSessionCount(updateCategoryIds);
+	        }
+	        
+	        // ====> Success, delete old image file
+	        this.deleteUploadFile(deleteImageFileName);
+	        this.deleteUploadFile(deleteContentFileName);
+	        
+	        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
+	        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+	        
+	        return "redirect:" + this.getBaseURL() + "/current-page";
+	        
+        } catch (Exception ex) {
         	this.deleteUploadFile(uploadImageFilePath);
         	this.deleteUploadFile(uploadContentFilePath);
         	
-        	if (!result.hasErrors()) {
-	        	final ObjectError error = this.createProcessingError(result);
-	        	result.addError(error);
-        	}
-        	
-        	dto.setId(id);
-        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
-        }
-        
-        // ====> Success, delete old image file
-        this.deleteUploadFile(deleteImageFileName);
-        this.deleteUploadFile(deleteContentFileName);
-        
-        redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
-        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-        
-        return "redirect:" + this.getBaseURL() + "/current-page";
+			throw ex;
+		}
     }
 	
 	@PostMapping(value = { "/delete/{id}" })
@@ -479,6 +526,19 @@ public class SessionController extends BaseResourceController<Session, SessionSi
 		final boolean result = this.mainService.delete(id);
 		if (result) {
 			// Success, delete old media files
+			final List<SessionCategory> categories = domain.getCategories();
+			if (categories != null && categories.isEmpty()) {
+				final List<Integer> updateCategoryIds = new ArrayList<Integer>();
+				
+				for (SessionCategory category : categories) {
+					updateCategoryIds.add(category.getId());
+				}
+				
+				if (!updateCategoryIds.isEmpty()) {
+		        	this.sessionCategoryService.updateSessionCount(updateCategoryIds);
+		        }
+			}
+			
 			this.deleteUploadFile(deleteImageFileName);
 			this.deleteUploadFile(deleteContentFileName);
 	        

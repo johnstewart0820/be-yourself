@@ -210,7 +210,7 @@ public class BusinessCode extends PO<Integer> {
 		pricePerUser = BigDecimal.ZERO;
 		
 		if (dealPrice != null && dealPrice.signum() > 0 && maxUserAmount > 0) {
-			pricePerUser = dealPrice.divide(new BigDecimal(maxUserAmount));
+			pricePerUser = dealPrice.divide(new BigDecimal(maxUserAmount), 2, BigDecimal.ROUND_HALF_UP);
 		}
 	}
 }

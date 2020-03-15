@@ -57,6 +57,7 @@ public final class Constants {
 		
 		public static interface WEB_ADMIN {
 			public static final String MEDIA = "/media";
+			public static final String SESSION = "/session";
 		}
 	}
 	

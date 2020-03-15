@@ -112,11 +112,13 @@
 			
 			<!-- Navigation -->
 			<ul class="navbar-nav">
+				<!-- 
 		  		<li th:class="${'nav-item' + (currentFunction == '' || currentFunction == '/' ? ' active' : '')}">
 					<a class="nav-link" th:href="@{/}">
 			  			<i class="fas fa-home"></i> <span th:text="#{menu.home}">Home</span>
 					</a>
 		  		</li>
+		  		-->
 		  		
 		  		<th:block sec:authorize="hasAnyRole('ROLE_ADM')">
 		  			<th:block th:if="${permission != null}">

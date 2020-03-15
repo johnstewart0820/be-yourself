@@ -24,6 +24,8 @@ public interface SlideshowService extends BaseService<Slideshow, Integer> {
 	
 	public SlideshowImage createImage(SlideshowImage image);
 	
+	public SlideshowImage updateImage(SlideshowImage image);
+	
 	public boolean deleteImage(int imageId);
 	
 	public boolean updateImageIndex(int imageId, int index);

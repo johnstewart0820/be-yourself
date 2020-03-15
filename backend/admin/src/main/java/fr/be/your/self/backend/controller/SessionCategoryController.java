@@ -45,6 +45,8 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	
 	static {
 		SORTABLE_COLUMNS.put("name", new String[] { "name" });
+		SORTABLE_COLUMNS.put("sessionCount", new String[] { "sessionCount" });
+		//SORTABLE_COLUMNS.put("sessionCount", new String[] { "(SELECT COUNT(s) FROM a.sessions)" });
 	}
 	
 	@Autowired
@@ -94,6 +96,26 @@ public class SessionCategoryController extends BaseResourceController<SessionCat
 	protected String getBaseMediaURL() {
 		return BASE_MEDIA_URL;
 	}
+	
+	/*
+	@Override
+	protected PageableResponse<SessionCategory> pageableSearch(Map<String, String> searchParams, PageRequest pageable,
+			Sort sort) {
+		if (sort == null || sort.getOrderFor("(SELECT COUNT(s) FROM a.sessions)") == null) {
+			return super.pageableSearch(searchParams, pageable, sort);
+		}
+		
+		String search = "";
+		if (searchParams != null ) {
+			search = searchParams.get("q");
+		}
+		
+		final JpaSort newSort = JpaSort.unsafe(sort.getOrderFor("(SELECT COUNT(s) FROM a.sessions)").getDirection(), "(SELECT COUNT(s) FROM a.sessions)");
+		final PageRequest newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
+		
+		return this.mainService.pageableSearchSortSessionCount(search, newPageable);
+	}
+	*/
 	
 	@Override
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
