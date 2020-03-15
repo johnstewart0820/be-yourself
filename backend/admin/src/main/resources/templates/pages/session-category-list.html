@@ -19,7 +19,7 @@
 					<thead class="thead-light">
 						<tr>
 							<th scope="col" width="80%" th:text="#{|${baseMessageKey}.detail.name|}"></th>
-							<th scope="col" class="no-sort" width="10%" th:text="#{|${baseMessageKey}.detail.session.count|}"></th>
+							<th scope="col" width="10%" th:text="#{|${baseMessageKey}.detail.session.count|}"></th>
 							<th scope="col" class="no-sort" th:if="${readPermission}"></th>
 						</tr>
 					</thead>
@@ -78,7 +78,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
-			const sortableColumnMaps = { 'name': 0, 'created': -1 };
+			const sortableColumnMaps = { 'name': 0, 'sessionCount': 1 };
 			
 			function confirmDelete(id) {
 				const deleteUrl = '[[${baseURL}]]/delete/' + id;

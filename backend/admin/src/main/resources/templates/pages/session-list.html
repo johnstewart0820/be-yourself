@@ -11,73 +11,55 @@
 			<div class="card-header border-0">
 				<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
 				
-				<div class="row form-search-container">
-					<div class="col-md-9 col-sm-12">
-						<form role="form" th:action="${baseURL} + '/search'" method="get">
-							<div class="form-group mb-0">
-								<div class="input-group">
-									<span style="padding-right: 12px;">
-										<select id="category-filter" class="selectpicker show-tick" multiple 
-											data-actions-box="true" data-live-search="true" 
-											th:data-select-all-text="#{data.display.button.select.all}"
-											th:data-deselect-all-text="#{data.display.button.deselect.all}"
-											th:title="#{|${baseMessageKey}.option.filter.category.title|}"
-											th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}"
-											data-selected-text-format="count > 2" 
-											th:data-count-selected-text="#{|${baseMessageKey}.option.filter.category.many|}">
-											<option th:each="sessionCategory: ${sessionCategories}" 
-												th:value="${sessionCategory.id}" 
-												th:text="${sessionCategory.name}"
-												th:selected="${#arrays.contains(filteredCategoryIds, sessionCategory.id)}"></option>
-										</select>
-									</span>
-									
-									<span style="padding-right: 12px;">
-										<select id="voice-filter" class="voice-selectpicker show-tick" multiple
-											data-actions-box="false" data-live-search="true" 
-											th:data-select-all-text="#{data.display.button.select.all}"
-											th:data-deselect-all-text="#{data.display.button.deselect.all}"
-											th:title="#{|${baseMessageKey}.option.filter.voice.title|}"
-											th:data-none-selected-text="#{|${baseMessageKey}.option.filter.voice.title|}"
-											data-selected-text-format="count > 2" 
-											th:data-count-selected-text="#{|${baseMessageKey}.option.filter.voice.many|}">
-											<option th:each="filteredVoice: ${filteredVoices}" 
-												th:value="${filteredVoice.id}" 
-												th:text="${filteredVoice.name}"
-												th:selected="${#arrays.contains(filteredVoiceIds, filteredVoice.id)}"></option>
-										</select>
-									</span>
-									
-									<!-- 
-									<th:block th:if="${baseURL != null && baseURL != ''}">
-										<div class="input-group-prepend">
-											<span class="input-group-text">
-												<i class="fas fa-search"></i>
-											</span>
-										</div>
-										<input class="form-control" type="text" name="q" 
-											th:placeholder="#{search.placeholder}" th:value="${search}">
-									</th:block>
-									-->
-								</div>
-							</div>
-							<input type="hidden" name="action" value="update-filter">
-							<input type="submit" style="display: none" />
-						</form>
+				<form role="form" th:action="${baseURL} + '/search'" method="get">
+					<div class="row form-search-container">
+						<div class="col-lg-4 col-md-6 col-sm-12">
+							<select id="category-filter" class="form-control selectpicker show-tick" multiple 
+								data-actions-box="true" data-live-search="true" 
+								th:data-select-all-text="#{data.display.button.select.all}"
+								th:data-deselect-all-text="#{data.display.button.deselect.all}"
+								th:title="#{|${baseMessageKey}.option.filter.category.title|}"
+								th:data-none-selected-text="#{|${baseMessageKey}.option.filter.category.title|}"
+								data-selected-text-format="count > 2" 
+								th:data-count-selected-text="#{|${baseMessageKey}.option.filter.category.many|}">
+								<option th:each="sessionCategory: ${sessionCategories}" 
+									th:value="${sessionCategory.id}" 
+									th:text="${sessionCategory.name}"
+									th:selected="${#arrays.contains(filteredCategoryIds, sessionCategory.id)}"></option>
+							</select>
+						</div>
+						<div class="col-lg-4 col-md-6 col-sm-12">
+							<select id="voice-filter" class="form-control voice-selectpicker show-tick" multiple
+								data-actions-box="false" data-live-search="true" 
+								th:data-select-all-text="#{data.display.button.select.all}"
+								th:data-deselect-all-text="#{data.display.button.deselect.all}"
+								th:title="#{|${baseMessageKey}.option.filter.voice.title|}"
+								th:data-none-selected-text="#{|${baseMessageKey}.option.filter.voice.title|}"
+								data-selected-text-format="count > 2" 
+								th:data-count-selected-text="#{|${baseMessageKey}.option.filter.voice.many|}">
+								<option th:each="filteredVoice: ${filteredVoices}" 
+									th:value="${filteredVoice.id}" 
+									th:text="${filteredVoice.name}"
+									th:selected="${#arrays.contains(filteredVoiceIds, filteredVoice.id)}"></option>
+							</select>
+						</div>
+						
+						<div class="offset-lg-1 col-lg-3 col-md-12 col-sm-12 text-right">
+							<select id="display-page-option" class="form-control selectpicker show-tick" 
+								th:data-none-selected-text="#{data.display.page.option.title}">
+								<option th:each="pageSize: ${supportPageSizes}" 
+									th:value="${pageSize}" 
+									th:text="#{data.display.page.option.item(${pageSize}, ${pageSizeName})}"
+									th:selected="${size != null && size == pageSize}"></option>
+								<option value="-1" th:text="#{data.display.page.option.all(${pageSizeName})}"
+									th:selected="${size == null || size <= 0}"></option>
+							</select>
+						</div>
 					</div>
 					
-					<div class="col-md-3 col-sm-12 text-right">
-						<select id="display-page-option" class="selectpicker show-tick" 
-							th:data-none-selected-text="#{data.display.page.option.title}">
-							<option th:each="pageSize: ${supportPageSizes}" 
-								th:value="${pageSize}" 
-								th:text="#{data.display.page.option.item(${pageSize}, ${pageSizeName})}"
-								th:selected="${size != null && size == pageSize}"></option>
-							<option value="-1" th:text="#{data.display.page.option.all(${pageSizeName})}"
-								th:selected="${size == null || size <= 0}"></option>
-						</select>
-					</div>
-				</div>
+					<input type="hidden" name="action" value="update-filter">
+					<input type="submit" style="display: none" />
+				</form>
 			</div>
 			
 			<div class="table-responsive">

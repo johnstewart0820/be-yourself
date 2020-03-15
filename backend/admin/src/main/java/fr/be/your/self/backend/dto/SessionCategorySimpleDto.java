@@ -1,11 +1,8 @@
 package fr.be.your.self.backend.dto;
 
-import java.util.List;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import fr.be.your.self.model.Session;
 import fr.be.your.self.model.SessionCategory;
 
 public class SessionCategorySimpleDto extends BaseDto {
@@ -38,8 +35,9 @@ public class SessionCategorySimpleDto extends BaseDto {
 			this.name = domain.getName();
 			this.image = domain.getImage();
 			
-			final List<Session> sessions = domain.getSessions();
-			this.sessionCount = sessions == null ? 0 : sessions.size();
+			this.sessionCount = domain.getSessionCount();
+			//final List<Session> sessions = domain.getSessions();
+			//this.sessionCount = sessions == null ? 0 : sessions.size();
 		}
 	}
 	

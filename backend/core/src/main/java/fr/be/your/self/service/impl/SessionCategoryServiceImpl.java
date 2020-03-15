@@ -1,5 +1,7 @@
 package fr.be.your.self.service.impl;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.be.your.self.dto.PageableResponse;
 import fr.be.your.self.model.SessionCategory;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.SessionCategoryRepository;
@@ -51,5 +54,21 @@ public class SessionCategoryServiceImpl extends BaseServiceImpl<SessionCategory,
 		return StringUtils.isNullOrSpace(text) 
 				? this.repository.findAll(pageable)
 				: this.repository.findAllByNameContainsIgnoreCase(text, pageable);
+	}
+
+	@Override
+	public int updateSessionCount(Collection<Integer> ids) {
+		if (ids == null || ids.isEmpty()) {
+			return 0;
+		}
+		
+		return this.repository.updateSessionCount(ids);
+	}
+
+	@Override
+	public PageableResponse<SessionCategory> pageableSearchSortSessionCount(String text, Pageable pageable) {
+		final Page<SessionCategory> page = this.repository.findAllSortBySessionCount(text, pageable);
+		
+		return new PageableResponse<>(page);
 	}
 }

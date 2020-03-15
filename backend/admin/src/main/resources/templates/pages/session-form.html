@@ -36,9 +36,9 @@
 						<div class="row">
 							<div class="col-md-8 col-sm-12">
 								<div class="form-group row">
-									<label for="title" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+									<label for="title" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs required-field" 
 										th:text="#{|${baseMessageKey}.detail.title|}"></label>
-									<div class="col-md-10 col-sm-9 col-xs-12">
+									<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 										<input type="text" class="form-control" 
 											th:field="*{title}" id="title"
 											th:placeholder="#{|${baseMessageKey}.detail.title.placeholder|}" 
@@ -49,9 +49,9 @@
 								
 								<th:block th:switch="${action}">
 									<div th:case="create" class="form-group row">
-										<label for="uploadImageFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+										<label for="uploadImageFile" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs required-field" 
 											th:text="#{|${baseMessageKey}.detail.image|}"></label>
-										<div class="col-md-10 col-sm-9 col-xs-12">
+										<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 											<div class="custom-file">
 												<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 													th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" required="required"
@@ -65,9 +65,9 @@
 										</div>
 									</div>
 									<div th:case="*" class="form-group row">
-										<label for="uploadImageFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+										<label for="uploadImageFile" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs" 
 											th:text="#{|${baseMessageKey}.detail.image|}"></label>
-										<div class="col-md-10 col-sm-9 col-xs-12">
+										<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 											<div class="custom-file">
 												<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 													th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
@@ -84,9 +84,9 @@
 								
 								<th:block th:switch="${action}">
 									<div th:case="create" class="form-group row">
-										<label for="uploadContentFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
+										<label for="uploadContentFile" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs required-field" 
 											th:text="#{|${baseMessageKey}.detail.content.file|}"></label>
-										<div class="col-md-10 col-sm-9 col-xs-12">
+										<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 											<div class="custom-file">
 												<input type="file" class="custom-file-input" th:field="*{uploadContentFile}" id="uploadContentFile" 
 													th:placeholder="#{|${baseMessageKey}.detail.content.file.placeholder|}" required="required"
@@ -99,9 +99,9 @@
 										</div>
 									</div>
 									<div th:case="*" class="form-group row">
-										<label for="uploadContentFile" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
+										<label for="uploadContentFile" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs" 
 											th:text="#{|${baseMessageKey}.detail.content.file|}"></label>
-										<div class="col-md-10 col-sm-9 col-xs-12">
+										<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 											<div class="custom-file">
 												<input type="file" class="custom-file-input" th:field="*{uploadContentFile}" id="uploadContentFile" 
 													th:placeholder="#{|${baseMessageKey}.detail.content.file.placeholder|}" 
@@ -118,41 +118,51 @@
 								</th:block>
 								
 								<div class="form-group row">
-									<label for="duration" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
-										th:text="#{|${baseMessageKey}.detail.duration|}"></label>
-									<div class="col-md-7 col-sm-6 col-xs-12 sm-form-group">
-										<input type="text" class="form-control" 
-											th:field="*{duration}" id="duration"
-											th:placeholder="#{|${baseMessageKey}.detail.duration.placeholder|}" 
-											required="required" />
-										<div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
-									</div>
+									<input type="hidden" th:field="*{duration}" id="duration" />
 									
-									<div class="col-md-3 col-sm-3 col-xs-12">
-										<div class="custom-control custom-control-alternative custom-checkbox" style="padding-top: 8px;">
+									<th:block th:switch="${action}">
+										<div th:case="create" class="col-lg-3 col-md-9 hidden-smd col-sm-3"></div>
+										<th:block th:case="*">
+											<label for="durationValue" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs required-field sm-form-group" 
+												th:text="#{|${baseMessageKey}.detail.duration|}"></label>
+											<div class="col-lg-6 col-md-9 col-smd-9 col-sm-6 col-xs-12 sm-form-group">
+												<input type="text" class="form-control" 
+													id="durationValue" th:value="${duration}"
+													th:placeholder="#{|${baseMessageKey}.detail.duration.placeholder|}" 
+													readonly="readonly" />
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
+											</div>
+										</th:block>
+									</th:block>
+									
+									<div class="col-lg-3 col-md-3 col-smd-3 col-sm-3 col-xs-12">
+										
+										<div class="custom-control custom-control-alternative custom-checkbox label-left" style="padding-top: 8px;">
 											<input class="custom-control-input" th:field="*{free}" id="free" type="checkbox">
-											<label class="custom-control-label" for="free" th:text="#{|${baseMessageKey}.detail.free|}">Free</label>
+											<label class="custom-control-label label form-control-label" for="free" th:text="#{|${baseMessageKey}.detail.free|}">Free</label>
 										</div>
 									</div>
 								</div>
 								
 								<div class="form-group row">
-									<label for="description" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-										th:text="#{|${baseMessageKey}.detail.description|}"></label>
-									<div class="col-md-10 col-sm-9 col-xs-12">
+									<label for="description" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs">
+										<span class="required-field" th:text="#{|${baseMessageKey}.detail.description|}"></span>
+									</label>
+									<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 										<textarea class="form-control" rows="10"
-											th:field="*{description}" id="description"
+											th:field="*{description}" id="description" required="required"
 											th:placeholder="#{|${baseMessageKey}.detail.description.placeholder|}"></textarea>
 										<div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
 									</div>
 								</div>
 								
 								<div class="form-group row">
-									<label for="categoryIds" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
-										th:text="#{|${baseMessageKey}.detail.categories|}"></label>
-									<div class="col-md-10 col-sm-9 col-xs-12">
+									<label for="categoryIds" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs">
+										<span class="required-field" th:text="#{|${baseMessageKey}.detail.categories|}"></span>
+									</label>
+									<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 										<div class="row">
-											<div th:each="sessionCategory: ${sessionCategories}" class="col-lg-4 col-md-6 col-sm-12">
+											<div th:each="sessionCategory: ${sessionCategories}" class="col-lg-4 col-smd-6 col-md-6 col-sm-12">
 												<div class="custom-control custom-control-alternative custom-checkbox mb-3">
 													<input class="custom-control-input" type="checkbox" 
 														name="categoryIds" th:id="${'category_' + sessionCategory.id}"
@@ -169,12 +179,13 @@
 								</div>
 								
 								<div class="form-group row">
-									<label for="voiceId" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-										th:text="#{|${baseMessageKey}.detail.voice.id|}"></label>
+									<label for="voiceId" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs">
+										<span class="required-field" th:text="#{|${baseMessageKey}.detail.voice.id|}"></span>
+									</label>
 									<th:block th:switch="${writePermission}">
-										<div th:case="true" class="col-md-10 col-sm-9 col-xs-12">
+										<div th:case="true" class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 											<select class="form-control voice-selectpicker show-tick" 
-												th:field="*{voiceId}" id="voiceId"  
+												th:field="*{voiceId}" id="voiceId" required="required"
 												data-actions-box="false" data-live-search="true" 
 												th:title="#{|${baseMessageKey}.detail.voice.id.placeholder|}"
 												th:data-none-selected-text="#{|${baseMessageKey}.detail.voice.id.placeholder|}">
@@ -185,7 +196,7 @@
 											</select>
 											<div class="invalid-feedback" th:if="${#fields.hasErrors('voiceId')}" th:errors="*{voiceId}"></div>
 										</div>
-										<div th:case="*" class="col-md-10 col-sm-9 col-xs-12">
+										<div th:case="*" class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
 											<span th:utext="${voiceName}"></span>
 										</div>
 									</th:block>
@@ -342,7 +353,10 @@
 		    	    const duration = Math.round(instance.duration);
 		    	    
 		    	    if (duration > 0) {
-		    	    	$('#duration').val(formatDuration(duration));
+		    	    	const durationValue = formatDuration(duration);
+		    	    	$('#duration').val(durationValue);
+		    	    	$('#durationValue').val(durationValue);
+		    	    	
 		    	    }
 		    	});
 		    	
@@ -351,7 +365,9 @@
 		    	    const duration = Math.round(instance.duration);
 		    	    
 		    	    if (duration > 0) {
-		    	    	$('#duration').val(formatDuration(duration));
+		    	    	const durationValue = formatDuration(duration);
+		    	    	$('#duration').val(durationValue);
+		    	    	$('#durationValue').val(durationValue);
 		    	    }
 		    	});
 		    	

@@ -36,9 +36,10 @@
 						<div class="row">
 							<div class="col-md-12 col-sm-12">
 								<div class="form-group row">
-									<label for="name" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field" 
-										th:text="#{|${baseMessageKey}.detail.name|}"></label>
-									<div class="col-md-10 col-sm-9 col-xs-12">
+									<label for="name" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs">
+										<span class="required-field" th:text="#{|${baseMessageKey}.detail.name|}"></span>
+									</label>
+									<div class="col-lg-10 col-md-9 col-smd-12 col-sm-9 col-xs-12">
 										<input type="text" class="form-control" 
 											th:field="*{name}" id="name"
 											th:placeholder="#{|${baseMessageKey}.detail.name.placeholder|}" 
@@ -48,9 +49,10 @@
 								</div>
 								
 								<div class="form-group row">
-									<label for="description" class="label form-control-label col-md-2 col-sm-3 hidden-xs" 
-										th:text="#{|${baseMessageKey}.detail.description|}"></label>
-									<div class="col-md-10 col-sm-9 col-xs-12">
+									<label for="description" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs">
+										<span th:text="#{|${baseMessageKey}.detail.description|}"></span>
+									</label>
+									<div class="col-lg-10 col-md-9 col-smd-12 col-sm-9 col-xs-12">
 										<textarea class="form-control" rows="10"
 											th:field="*{description}" id="description"
 											th:placeholder="#{|${baseMessageKey}.detail.description.placeholder|}"></textarea>
@@ -59,9 +61,10 @@
 								</div>
 								
 								<div class="form-group row">
-									<label for="duration" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field sm-form-group" 
-										th:text="#{|${baseMessageKey}.detail.duration|}"></label>
-									<div class="col-md-4 col-sm-9 col-xs-12 sm-form-group">
+									<label for="duration" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs sm-form-group smd-new-form-group-row">
+										<span class="required-field" th:text="#{|${baseMessageKey}.detail.duration|}"></span>
+									</label>
+									<div class="col-lg-4 col-md-3 col-smd-12 col-sm-9 col-xs-12 sm-form-group smd-new-form-group-row">
 										<select class="form-control selectpicker show-tick"
 											th:field="*{duration}" id="duration" required="required" 
 											th:data-none-selected-text="#{|${baseMessageKey}.detail.duration.type.placeholder|}">
@@ -77,9 +80,10 @@
 										<div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
 									</div>
 									
-									<label for="price" class="label form-control-label col-md-2 col-sm-3 hidden-xs required-field md-text-right" 
-										th:text="#{|${baseMessageKey}.detail.price|}"></label>
-									<div class="col-md-4 col-sm-9 col-xs-12">
+									<label for="price" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs md-text-right smd-text-left">
+										<span class="required-field" th:text="#{|${baseMessageKey}.detail.price|}"></span>
+									</label>
+									<div class="col-lg-4 col-md-3 col-smd-12 col-sm-9 col-xs-12">
 										<div class="input-group">
 											<input type="number" class="form-control" 
 												th:field="*{price}" id="price"
