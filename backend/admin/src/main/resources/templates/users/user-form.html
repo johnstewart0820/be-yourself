@@ -268,9 +268,6 @@
 		<script>
 
 
-	toastAction = '[[${toastAction}]]';
-	toastStatus = '[[${toastStatus}]]';
-	
 	function selectLoginType() {
 		var selectedLoginType = $("select#loginType").children("option:selected").val();
 		if (selectedLoginType == 0) {
@@ -284,7 +281,7 @@
 
 	function selectUserType() {
 		var selectedUserType = $("select#userType").children("option:selected").val();
-		if (selectedUserType == "ADM" || selectedUserType == "SAM") {
+		if (selectedUserType == "ADM") {
 			$("#admin_permissions_div").show();
 		} else {
 			$("#admin_permissions_div").hide();

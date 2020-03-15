@@ -1,8 +1,5 @@
 package fr.be.your.self.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +7,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fr.be.your.self.model.Subscription;
-import fr.be.your.self.model.SubscriptionCsv;
 import fr.be.your.self.repository.BaseRepository;
 import fr.be.your.self.repository.SubscriptionRepository;
 import fr.be.your.self.service.SubscriptionService;
@@ -68,16 +64,5 @@ public class SubscriptionServiceImpl extends BaseServiceImpl<Subscription, Integ
 		return this.subscriptionRepo.findAll(pageable);
 	}
 
-	@Override
-	public List<SubscriptionCsv> extractSubscriptionCsv(List<Integer> subscriptionIds) {
-		Iterable<Subscription> users= this.subscriptionRepo.findAllById(subscriptionIds);
-		List<SubscriptionCsv> returnList = new ArrayList<SubscriptionCsv>();
-		for (Subscription subscription : users) {
-			SubscriptionCsv subscriptionCsv = new SubscriptionCsv(subscription);
-			returnList.add(subscriptionCsv);
-		}
-		
-		return returnList;
-	}
-
+	
 }

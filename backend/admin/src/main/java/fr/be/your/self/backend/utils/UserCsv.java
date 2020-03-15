@@ -1,28 +1,22 @@
 package fr.be.your.self.backend.utils;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvBindByPosition;
 
-import fr.be.your.self.common.LoginType;
-import fr.be.your.self.common.UserStatus;
-import fr.be.your.self.common.Utils;
-import fr.be.your.self.model.Subscription;
-import fr.be.your.self.model.User;
-
 public class UserCsv {
-	@CsvBindByName(column = "Title")
+	//CsvBindByName => Used when we import CSV file
+	//CsvBindByPosition => Used when we export CSV file
+	
+	@CsvBindByName(column = "Title", required = true)
     @CsvBindByPosition(position = 0)
 	private String title;
 	
-	@CsvBindByName(column = "Last Name")
+	@CsvBindByName(column = "Last Name", required = true)
     @CsvBindByPosition(position = 1)
 	private String lastName;
 	
-	@CsvBindByName(column = "First Name")
+	@CsvBindByName(column = "First Name", required = true)
     @CsvBindByPosition(position = 2)
 	private String firstName;
 	
@@ -30,11 +24,11 @@ public class UserCsv {
     @CsvBindByPosition(position = 3)
 	private String email;
 	
-	@CsvBindByName(column = "Login Type")	
+	@CsvBindByName(column = "Login Type", required = true)	
     @CsvBindByPosition(position = 4)
 	private String loginType;
 	
-	@CsvBindByName(column = "Status")
+	@CsvBindByName(column = "Status", required = true)
     @CsvBindByPosition(position = 5)
 	private String status;
 	
@@ -42,7 +36,7 @@ public class UserCsv {
     @CsvBindByPosition(position = 6)
 	private String referralCode;
 	
-	@CsvBindByName(column = "Account Type")	
+	@CsvBindByName(column = "Account Type", required = true)	
     @CsvBindByPosition(position = 7)
 	private String userType;
 

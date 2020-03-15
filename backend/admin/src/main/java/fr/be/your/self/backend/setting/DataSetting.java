@@ -3,8 +3,11 @@ package fr.be.your.self.backend.setting;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Value;
 
 public class DataSetting {
 	
@@ -53,10 +56,18 @@ public class DataSetting {
 	
 	private String googleMapApiKey;
 	
+	private int csvSubscriptionMaxNbLine;
+
+
+	private int csvUserMaxNbLine;
 
 
 	private Set<Integer> giftDurations;
 	
+	private List<Integer> subscriptionDurations;
+
+
+
 	public DataSetting() {
 		this.defaultMimeTypeMappings = new HashMap<String, String>();
 	}
@@ -303,5 +314,29 @@ public class DataSetting {
 
 	public void setGoogleMapApiKey(String googleMapApiKey) {
 		this.googleMapApiKey = googleMapApiKey;
+	}
+	public int getCsvSubscriptionMaxNbLine() {
+		return csvSubscriptionMaxNbLine;
+	}
+
+	public void setCsvSubscriptionMaxNbLine(int csvSubscriptionMaxNbLine) {
+		this.csvSubscriptionMaxNbLine = csvSubscriptionMaxNbLine;
+	}
+
+	public int getCsvUserMaxNbLine() {
+		return csvUserMaxNbLine;
+	}
+
+	public void setCsvUserMaxNbLine(int csvUserMaxNbLine) {
+		this.csvUserMaxNbLine = csvUserMaxNbLine;
+	}
+	
+	
+	public List<Integer> getSubscriptionDurations() {
+		return subscriptionDurations;
+	}
+
+	public void setSubscriptionDurations(List<Integer> subscriptionDurations) {
+		this.subscriptionDurations = subscriptionDurations;
 	}
 }

@@ -12,36 +12,11 @@
 			<div class="card-header border-0">
 				<form id="select_form" role="form"
 					th:action="${baseURL} + '/search'" method="get">
-					<div class="row">
-						<div class="col-md-6">
-							<th:block th:if="${writePermission}">
-								<a class="btn btn-icon btn-2 btn-primary"
-									th:href="${baseURL + '/create'}"> <span
-									class="btn-inner--icon"> <i class="fas fa-edit"></i> <span
-										th:text="#{action.create}"></span>
-								</span>
-								</a>
-							</th:block>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group mb-0">
-								<div class="input-group input-group-alternative">
-									<th:block th:if="${baseURL != null && baseURL != ''}">
-										<div class="input-group-prepend">
-											<span class="input-group-text"> <i
-												class="fas fa-search"></i>
-											</span>
-										</div>
-										<input class="form-control" type="text" name="q"
-											th:placeholder="#{search.placeholder}" th:value="${search}">
-									</th:block>
-								</div>
-							</div>
-						</div>
-					</div>
+					<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
+					
 					<div class="row form-search-container">
-						<div class="offset-md-9 col-md-3 text-right">
-							<select id="display-page-option" class="selectpicker show-tick"
+						<div class="col text-right">
+							<select id="display-page-option" class="selectpicker show-tick w-auto"
 								th:data-none-selected-text="#{data.display.page.option.title}">
 								<option th:each="pageSize: ${supportPageSizes}"
 									th:value="${pageSize}"

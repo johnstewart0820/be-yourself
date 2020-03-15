@@ -125,6 +125,35 @@
 				</div>
 			</div>
 		</div>
+		
+		<!-- WARNING MODAL-->
+		<div class="modal fade" id="general-warning-modal" tabindex="-1" role="dialog" 
+			aria-labelledby="onLoadModal" aria-hidden="true" data-backdrop="true">
+			<div class="modal-dialog modal-dialog-centered modal-7 modal-warning" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title" id="on-load-modal-title">
+							<svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+								<rect fill="#007aff" width="100%" height="100%"></rect>
+							</svg>
+							<span  class="mr-auto" id="general-warning-modal-title" th:utext="#{|modal.warning.title|}">Warning Title</span>
+						</h3>
+						
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div  class="toast-body" id="general-warning-modal-message">message</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link text-white ml-auto" 
+							data-dismiss="modal" th:text="#{modal.button.close}">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 	</th:block>
 </body>
 </html>

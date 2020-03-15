@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fr.be.your.self.backend.dto.SubscriptionTypeDto;
 import fr.be.your.self.backend.setting.Constants;
+import fr.be.your.self.common.CanalType;
 import fr.be.your.self.exception.BusinessException;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.service.BaseService;
@@ -72,8 +73,8 @@ public class SubscriptionTypeController
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, SubscriptionType domain, SubscriptionTypeDto dto) throws BusinessException {
 
-		final List<String> canals = Arrays.asList("WEB", "APP");
-		final List<Integer> durations = Arrays.asList(1, 3, 6, 12, 24);
+		final List<String> canals = CanalType.getPossibleStrValues();
+		final List<Integer> durations = dataSetting.getSubscriptionDurations();
 
 		model.addAttribute("canals", canals);
 		model.addAttribute("durations", durations);

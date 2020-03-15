@@ -32,7 +32,7 @@ public enum PaymentStatus {
 		return UNKNOWN;
 	}
 	
-	public static List<Integer> getPossibleIntValue(){
+	public static List<Integer> getPossibleIntValues(){
 		List<Integer> res = new ArrayList<>();
 		for (PaymentStatus status : PaymentStatus.values()) {
 			if (status != UNKNOWN) {
