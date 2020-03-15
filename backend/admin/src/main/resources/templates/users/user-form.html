@@ -24,10 +24,10 @@
 
 						<div class="col-md-6 text-right d-md-none d-lg-block">
 							<div th:if="${writePermission && #strings.contains(action, 'update')}">
-								<h3 class="mb-0 form-title-label">Update User</h3>
+								<h3 class="mb-0 form-title-label" th:text="#{users.action.update}">Update User</h3>
 							</div>
 							<div th:unless="${writePermission && #strings.contains(action, 'update')}">
-								<h3 class="mb-0 form-title-label">Add User</h3>
+								<h3 class="mb-0 form-title-label" th:text="#{users.action.add}">Add User</h3>
 							</div>
 						</div>
 
@@ -45,20 +45,20 @@
 									<!-- Title -->
 									<div class="form-group row">
 										<label for="title"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+											class="label form-control-label col-md-3 col-sm-3 required-field"
 											th:text="#{|${baseMessageKey}.detail.title|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="title" class="form-control" th:field="*{title}"
 												required>
-												<option th:value="Mrs" th:text="Mrs"></option>
-												<option th:value="Mr" th:text="Mr"></option>
+												<option th:each="title : ${titles}" th:value="${title}"
+														th:text="${title}"></option>
 											</select>
 										</div>
 									</div>
 									<!-- Last Name -->
 									<div class="form-group row">
 										<label for="lastname"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+											class="label form-control-label col-md-3 col-sm-3 required-field"
 											th:text="#{|${baseMessageKey}.detail.lastname|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" id="lastname" type="text"
@@ -68,7 +68,7 @@
 									<!-- First Name -->
 									<div class="form-group row">
 										<label for="firstname"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+											class="label form-control-label col-md-3 col-sm-3 required-field"
 											th:text="#{|${baseMessageKey}.detail.firstname|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" type="text" id="firstname"
@@ -78,7 +78,7 @@
 									<!-- Email -->
 									<div class="form-group row">
 										<label for="email"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+											class="label form-control-label col-md-3 col-sm-3 required-field"
 											th:text="#{|${baseMessageKey}.detail.email|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" type="email" id="email"
@@ -88,21 +88,22 @@
 									<!-- Login type -->
 									<div class="form-group row">
 										<label for="loginType"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+											class="label form-control-label col-md-3 col-sm-3 required-field"
 											th:text="#{|${baseMessageKey}.detail.logintype|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="loginType" class="form-control"
-												th:field="*{loginType}" required>
-												<option th:value="0" th:text="Password"></option>
-												<option th:value="1" th:text="Facebook"></option>
-												<option th:value="2" th:text="Google"></option>
+												th:field="*{loginType}" required>				
+												<option th:each="loginType : ${loginTypes}"
+													th:value="${loginType}"
+													th:text="#{'user.logintype.' + ${loginType}}">
+												</option>
 											</select>
 										</div>
 									</div>
 									<!-- Password -->
 									<div class="form-group row" id="password_div">
 										<input type="hidden" /> <label for="pwd"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+											class="label form-control-label col-md-3 col-sm-3"
 											th:text="#{|${baseMessageKey}.detail.password|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" id="pwd" type="password"
@@ -112,20 +113,22 @@
 									<!-- Status -->
 									<div class="form-group row">
 										<label for="pwd"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+											class="label form-control-label col-md-3 col-sm-3 required-field"
 											th:text="#{|${baseMessageKey}.detail.status|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="status" class="form-control" th:field="*{status}"
 												required>
-												<option th:value="0" th:text="Inactive"></option>
-												<option th:value="1" th:text="Active"></option>
+												<option th:each="userStatus : ${userStatuses}"
+													th:value="${userStatus}"
+													th:text="#{'user.status.' + ${userStatus}}">
+												</option>
 											</select>
 										</div>
 									</div>
 									<!-- Referral Code -->
 									<div class="form-group row">
 										<label for="refcode"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+											class="label form-control-label col-md-3 col-sm-3"
 											th:text="#{|${baseMessageKey}.detail.refcode|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" type="text" id="refcode"
@@ -135,38 +138,33 @@
 									<!-- User Type -->
 									<div class="form-group row" id="account_type_div">
 										<label for="userType"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+											class="label form-control-label col-md-3 col-sm-3 required-field"
 											th:text="#{|${baseMessageKey}.detail.usertype|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="userType" class="form-control"
 												th:field="*{userType}" required>
-												<option th:value="B2B">Customer B2B</option>
-												<option th:value="B2C">Customer B2C</option>
-												<option th:value="PRO">Professional</option>
-												<option th:value="ADM">Admin</option>
+												<option th:each="userType : ${userTypes}" th:value="${userType}"
+													th:text="#{'user.type.' + ${userType}}"></option>
 											</select>
 										</div>
 
 									</div>
 									<div id="admin_permissions_div">
 										<div class="form-group row"
-											th:each="permission, itemStats : ${dto.permissions}">
+											th:each="permission, itemStats : ${dto.permissions}"> <!-- .replaceAll('\', '') -->
 											<label
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
-												th:text="${permission.functionality.name}"></label> <input
-												type="hidden"
-												th:field="*{permissions[__${itemStats.index}__].user}" /> <input
-												type="hidden"
-												th:field="*{permissions[__${itemStats.index}__].functionality}" />
-											<input type="hidden"
-												th:field="*{permissions[__${itemStats.index}__].id}" />
+												class="label form-control-label col-md-3 col-sm-3 required-field"
+													th:text="#{'permission' + ${permission.functionality.path}}"></label> 
+												<input 	type="hidden" th:field="*{permissions[__${itemStats.index}__].user}" /> 
+												<input type="hidden" th:field="*{permissions[__${itemStats.index}__].functionality}" />
+												<input type="hidden" th:field="*{permissions[__${itemStats.index}__].id}" />
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<select class="form-control"
 													th:field="*{permissions[__${itemStats.index}__].userPermission}"
 													th:value="${permission.userPermission}">
-													<option th:value="0">Denied</option>
-													<option th:value="1">View Only</option>
-													<option th:value="2">Edit</option>
+													<option th:each="userPermission : ${userPermissions}" 
+														th:value="${userPermission}"
+														th:text="#{'permission.' + ${userPermission}}"></option>
 												</select>
 											</div>
 										</div>
@@ -177,16 +175,14 @@
 									<div class="form-group row"
 										th:if="${#strings.contains(action, 'update')}">
 										<label for="subscription"
-											class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+											class="label form-control-label col-md-3 col-sm-3"
 											th:text="#{|${baseMessageKey}.detail.subscription|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<a
 												th:if="${dto.subscription != null && dto.subscription.id != 0}"
 												th:href="@{/subscription/edit/{id}(id=${dto.subscription.id})}"												
 												th:text="${dto.subtype}" >
-											</a> <label
-												th:if="${dto.subscription == null || dto.subscription.id == 0}"
-												class="form-control" id="subscription"> </label>
+											</a> 
 										</div>
 									</div>
 									<!-- Code -->
@@ -194,12 +190,12 @@
 										th:if="${dto.subscription != null && dto.subscription.businessCode != null}">
 										<div class="form-group row" id="account_type_div">
 											<label for="subscription"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-md-3 col-sm-3"
 												th:text="#{'discount.code.type.' + ${dto.subscription.businessCode.type}}">
 											</label>
 											<div class="col-md-8 col-sm-9 col-xs-12">
 												<label for="subscription"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													class="label form-control-label col-md-3 col-sm-3"
 													th:text="${dto.subscription.businessCode.name}"> </label>
 											</div>
 										</div>
@@ -232,10 +228,10 @@
 									<div class="card shadow border-0">
 										<div class="card-body">
 											<a th:href="@{/users/{id}/resetpassword(id=${dto.id})}"
-												class="btn btn-primary mt-4 col">Reset Password</a> 
+												class="btn btn-primary mt-4 col" th:text="#{users.action.reset.password}">Reset Password</a> 
 											<a
 												th:href="@{/users/{id}/resendverifemail(id=${dto.id})}"
-												class="btn btn-primary mt-4 col">Resend Verification Email</a>
+												class="btn btn-primary mt-4 col" th:text="#{users.action.resend.verification.email}">Resend Verification Email</a>
 										</div>
 									</div>
 								</div>

@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/main-layout.html}">
 <head>
-<title>Home</title>
+<title th:text="#{|${baseMessageKey}.page.title|}"></title>
 
 </head>
 <body>
@@ -16,8 +16,10 @@
 					<div class="row form-search-container">
 						<div class="col text-left">
 							<select id="filter_status" name="filter_status w-auto"
-								class="selectpicker show-tick">
-								<option value="">FILTER BY STATUS</option>
+								class="selectpicker show-tick"
+								th:title="#{|${baseMessageKey}.option.filter.status.title|}">
+								<option value="" th:text="#{|${baseMessageKey}.option.filter.status.title|}">FILTER BY STATUSES</option>
+								
 								<option th:each="userStatus : ${userStatuses}"
 									th:value="${userStatus}"
 									th:text="#{'user.status.' + ${userStatus}}"></option>
@@ -43,7 +45,7 @@
 						<div class="col text-left">
 							<select id="filter_role" name="filter_role"
 								class="selectpicker show-tick w-auto">
-								<option value="">FILTER BY ROLE</option>
+								<option value="" th:text="#{|${baseMessageKey}.option.filter.role.title|}">FILTER BY ROLES</option>
 								<option th:each="userType : ${userTypes}" th:value="${userType}"
 									th:text="#{'user.type.' + ${userType}}"></option>
 							</select>
@@ -67,12 +69,13 @@
 				</form>
 				<div class="row  form-search-container">
 					<div class="col mt-2">
-						<a href="#select_users" class="btn btn-sm btn-primary">Select
-							/ Deselect all</a> <a href="#" class="btn btn-sm btn-primary"
-							onclick="submitUserForm();">Export
-							CSV</a> <a th:href="${baseURL + '/upload_csv_form'}"
-							class="btn btn-sm btn-primary" th:if="${writePermission}">Import
-							CSV</a>
+						<a href="#select_users" class="btn btn-sm btn-primary"><span
+								th:text="#{data.display.button.select.deselect.all}"></span></a> 
+						<a href="#" class="btn btn-sm btn-primary"
+							onclick="submitUserForm();"><span
+								th:text="#{csv.action.export}"></span></a> 
+						<a th:href="${baseURL + '/upload_csv_form'}"
+							class="btn btn-sm btn-primary" th:if="${writePermission}" th:text="#{csv.action.import}"></a>
 					</div>
 				</div>
 			</div>
@@ -95,11 +98,11 @@
 						<thead class="thead-light">
 							<tr>
 								<th scope="col"></th>
-								<th scope="col">Email</th>
-								<th scope="col">FullName</th>
-								<th scope="col">Status</th>
-								<th scope="col">Subscription Type</th>
-								<th scope="col">Role</th>
+								<th scope="col"><span th:utext=#{users.list.email}></span></th>
+								<th scope="col"><span th:utext=#{users.list.fullname}></span></th>
+								<th scope="col"><span th:utext=#{users.list.status}></span></th>
+								<th scope="col"><span th:utext=#{users.list.subtype}></span></th>
+								<th scope="col"><span th:utext=#{users.list.role}></span></th>
 								<th scope="col" th:if="${writePermission}"></th>
 							</tr>
 						</thead>
@@ -308,25 +311,19 @@
 								$('a[href="#select_users"]').click(
 										function() {
 											if (select_all == false) {
-												$("[name='selected_id']").prop(
-														'checked', true);
+												$("[name='selected_id']").prop('checked', true);
 												select_all = true;
 											} else {
-												$("[name='selected_id']").prop(
-														'checked', false);
+												$("[name='selected_id']").prop('checked', false);
 												select_all = false;
 											}
 										});
 
-								$('#display-page-option')
-										.on(
-												'changed.bs.select',
+								$('#display-page-option').on('changed.bs.select',
 												function(e, clickedIndex,
 														isSelected,
 														previousValue) {
-													const selectedPageSize = $(
-															'#display-page-option')
-															.val();
+													const selectedPageSize = $('#display-page-option').val();
 													window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size='
 															+ selectedPageSize;
 												});

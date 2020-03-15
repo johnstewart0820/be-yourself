@@ -1,5 +1,8 @@
 package fr.be.your.self.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum LoginType {
 	PASSWORD(0),
 	GOOGLE(1),
@@ -40,4 +43,15 @@ public enum LoginType {
 		}
 		return "UNKNOWN";
 	}
+	
+	public static List<Integer> getPossibleIntValues(){
+		List<Integer> res = new ArrayList<>();
+		for (LoginType loginType : LoginType.values()) {
+			if (loginType != UNKNOWN) {
+				res.add(loginType.getValue());
+			}
+		}
+		return res;
+	}
+	
 }

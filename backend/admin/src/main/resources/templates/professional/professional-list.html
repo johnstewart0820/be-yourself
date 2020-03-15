@@ -42,16 +42,16 @@
 					<table class="table align-items-center table-flush" id="user_table">
 						<thead class="thead-light">
 							<tr>
-								<th scope="col">Email</th>
-								<th scope="col">FullName</th>
-								<th scope="col">Address</th>
-								<th scope="col">Supervised</th>
+								<th scope="col"><span th:text="#{professional.list.email}"> </span></th>
+								<th scope="col"><span th:text="#{professional.list.fullname}"></span></th>
+								<th scope="col"><span th:text="#{professional.list.email}"></span></th>
+								<th scope="col"><span th:text="#{professional.list.supervised}"></span></th>
 								<th scope="col" th:if="${writePermission}"></th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr th:each="item : ${result.items}">
-								<td><span th:text="${item.email}"> Email </span></td>
+								<td><span th:text="${item.email}"> </span></td>
 								<td><span th:if="${item != null}"
 									th:utext="${item.fullName}"></span></td>
 								<td><span th:if="${item != null && item.address != null}"

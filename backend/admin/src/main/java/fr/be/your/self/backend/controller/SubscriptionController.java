@@ -361,7 +361,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		MappingStrategy<SubscriptionCsv> strategy = new HeaderColumnNameMappingStrategy<>();
 		strategy.setType(SubscriptionCsv.class);
 		
-		if (!checkFileAndHeader(file, redirectAttributes, strategy)) {
+		if (!checkFileAndHeader(file, redirectAttributes, strategy, new SubscriptionCsv())) {
 			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
 		}
 
@@ -386,33 +386,17 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 			if (this.userService.existsEmail(email)) {
 				user = this.userService.getByEmail(email);
 			} else {
-				// Create a new user with login type pwd;
-				user = new User();
-				user.setFirstName(subCsv.getFirstName());
-				user.setLastName(subCsv.getLastName());
-				user.setEmail(email);
-				user.setLoginType(LoginType.PASSWORD.getValue());
-				user.setTitle(subCsv.getTitle());
-				user.setStatus(UserStatus.INACTIVE.getValue());
-				user.setUserType(UserType.B2C.getValue());
-				String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
-				setActivateCodeAndTimeout(user);
-				user = this.userService.create(user);
-				addDefaultPermissions(user);
-				this.getPermissionService().saveAll(user.getPermissions());
-				this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
-				String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
-				sendVerificationEmailToUser(activateAccountUrl, user);
-				
+				user = createNewUser(request, subCsv);
 			}
-			SubscriptionType subtype = this.subtypeService.findAllByNameContainsIgnoreCase(subCsv.getSubtype()).iterator().next();
 			sub.setUser(user);
-			if (!StringUtils.isNullOrEmpty(subCsv.getCode())) {
-				BusinessCode code = this.codeService.findAllByNameContainsIgnoreCase(subCsv.getCode()).iterator().next();
-				//TODO TVA if code not found?
-				sub.setBusinessCode(code);
-			}
+			SubscriptionType subtype = this.subtypeService.findAllByNameContainsIgnoreCase(subCsv.getSubtype()).iterator().next();
 			sub.setSubtype(subtype);
+			if (!StringUtils.isNullOrEmpty(subCsv.getCode())) {
+				Iterable<BusinessCode> codes = this.codeService.findAllByNameContainsIgnoreCase(subCsv.getCode());
+				if (codes != null && codes.iterator().hasNext()) {
+					sub.setBusinessCode(codes.iterator().next());
+				}
+			}
 			this.subscriptionService.create(sub);
 		}
 		
@@ -422,26 +406,35 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 		return "redirect:" + this.getBaseURL() + "/upload_csv_form";
 	}
 
-	private boolean checkFileAndHeader(MultipartFile file, RedirectAttributes redirectAttributes,
-			MappingStrategy<SubscriptionCsv> strategy) throws IOException, CsvRequiredFieldEmptyException {
-		String message;
-		//Check if file is empty
-		if (file.isEmpty()) {
-			message = this.getMessage("common.file.upload.empty");
-			setRedirectAttributes(redirectAttributes, "update", "warning", message);	
-			return false;
-		}
-	
-		//Check headers
-		boolean columnsMatch = verifyHeaderColumns(file, strategy, new SubscriptionCsv());
-		if (!columnsMatch) {
-			message = this.getMessage("csv.error.headers.or.file");
-			setRedirectAttributes(redirectAttributes, "update", "warning", message);
-			return false;
-
-		}
-		return true;
+	private User createNewUser(HttpServletRequest request, SubscriptionCsv subCsv) {
+		User user;
+		// Create a new user with login type pwd;
+		user = newUserFromSubscriptionCsv(subCsv);
+		String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
+		setActivateCodeAndTimeout(user);
+		addDefaultPermissions(user);
+		user = this.userService.create(user);
+		//send verification email
+		this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
+		String activateAccountUrl = AdminUtils.buildActivateAccountUrl(request);
+		sendVerificationEmailToUser(activateAccountUrl, user);
+		return user;
 	}
+
+	private User newUserFromSubscriptionCsv(SubscriptionCsv subCsv) {
+		User user;
+		user = new User();
+		user.setFirstName(subCsv.getFirstName());
+		user.setLastName(subCsv.getLastName());
+		user.setEmail(subCsv.getEmail());
+		user.setLoginType(LoginType.PASSWORD.getValue());
+		user.setTitle(subCsv.getTitle());
+		user.setStatus(UserStatus.INACTIVE.getValue());
+		user.setUserType(UserType.B2C.getValue());
+		return user;
+	}
+
+	
 
 	private boolean validateData(RedirectAttributes redirectAttributes, List<SubscriptionCsv> subscriptionsCsv) {
 		String message;
@@ -476,6 +469,14 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 			} else {
 				if (!this.subtypeService.existsByName(subscription.getSubtype())) {
 					message=this.getMessage("csv.error.subscription.type.inexistent", new Object[] {subscription.getSubtype()});				
+					setRedirectAttributes(redirectAttributes, "update", "warning", message);
+					return false;
+				}
+			}
+			if (!StringUtils.isNullOrEmpty(subscription.getCode())) {
+				Iterable<BusinessCode> codes = this.codeService.findAllByNameContainsIgnoreCase(subscription.getCode());
+				if (codes == null || !codes.iterator().hasNext() ) {
+					message=this.getMessage("csv.error.code.inexistent", new Object[] {subscription.getCode()});				
 					setRedirectAttributes(redirectAttributes, "update", "warning", message);
 					return false;
 				}

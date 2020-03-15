@@ -61,6 +61,7 @@ import fr.be.your.self.backend.dto.PermissionDto;
 import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.setting.DataSetting;
+import fr.be.your.self.backend.utils.SubscriptionCsv;
 import fr.be.your.self.common.ErrorStatusCode;
 import fr.be.your.self.common.FormationType;
 import fr.be.your.self.common.UserPermission;
@@ -1240,7 +1241,7 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		model.addAttribute(TOAST_MESSAGE_KEY, message);
 	}
 	
-	protected <T> boolean verifyHeaderColumns(MultipartFile file, MappingStrategy<T> strategy, T sampleObject) throws IOException, CsvRequiredFieldEmptyException {
+	protected <T1> boolean verifyHeaderColumns(MultipartFile file, MappingStrategy<T1> strategy, T1 sampleObject) throws IOException, CsvRequiredFieldEmptyException {
 		Reader reader = new InputStreamReader(file.getInputStream());
 		BufferedReader br = new BufferedReader(reader);
         String line = br.readLine();
@@ -1255,5 +1256,26 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		originalHeaders.addAll(Arrays.asList(strategy.generateHeader(sampleObject)));
 		
 		return headers.equals(originalHeaders);
+	}
+	
+	protected <T1> boolean checkFileAndHeader(MultipartFile file, RedirectAttributes redirectAttributes,
+			MappingStrategy<T1> strategy, T1 sampleObject) throws IOException, CsvRequiredFieldEmptyException {
+		String message;
+		//Check if file is empty
+		if (file.isEmpty()) {
+			message = this.getMessage("common.file.upload.empty");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);	
+			return false;
+		}
+	
+		//Check headers
+		boolean columnsMatch = verifyHeaderColumns(file, strategy, sampleObject);
+		if (!columnsMatch) {
+			message = this.getMessage("csv.error.headers.or.file");
+			setRedirectAttributes(redirectAttributes, "update", "warning", message);
+			return false;
+
+		}
+		return true;
 	}
 }

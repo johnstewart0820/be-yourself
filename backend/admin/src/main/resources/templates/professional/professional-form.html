@@ -90,11 +90,11 @@
 								<div class="col-md-6 text-right d-md-none d-lg-block">
 									<div  id="reset_pwd_email_div"
 										th:if="${writePermission && #strings.contains(action, 'update')}">
-										<h3 class="mb-0 form-title-label">Update Professional</h3>
+										<h3 class="mb-0 form-title-label" th:text="#{professional.action.update}">Update Professional</h3>
 									</div>
 									<div  id="reset_pwd_email_div"
 										th:unless="${writePermission && #strings.contains(action, 'update')}">
-										<h3 class="mb-0 form-title-label">Add Professional</h3>
+										<h3 class="mb-0 form-title-label" th:text="#{professional.action.add}">Add Professional</h3>
 									</div>
 								</div>
 
@@ -109,7 +109,7 @@
 									<div class="row">
 										<div class="col-md-12 col-sm-12">
 											<!-- INFORMATION SECTION -->
-											<h2>Information</h2><br>
+											<h2 th:text="#{professional.section.information}">Information</h2><br>
 											<!-- Last Name -->
 											<div class="form-group row">
 												<label for="lastname"
@@ -131,7 +131,6 @@
 												</div>
 											</div>
 											<!-- Email -->
-											<h1 th:text="${toastMessage}">sdfsdf</h1>
 											<div class="form-group row">
 												<label for="email"
 													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
@@ -308,7 +307,7 @@
 											</div>
 											
 											<!-- PROFILE SECTION -->
-											<h2>Profile</h2><br>
+											<h2 th:text="#{professional.section.profile}"></h2><br>
 											
 											<!-- Profile picture -->
 											<div class="form-group row" th:if="${dto.profilePicture != null}">
@@ -384,7 +383,7 @@
 										</div>
 										
 										<!-- PRICE SECTION -->
-										<h2>Price</h2><br>
+										<h2 th:text="#{professional.section.prices}">Price</h2><br>
 											
 										
 										<!-- Prices -->
@@ -487,7 +486,7 @@
 										</script>
 										
 										<!-- DEGREE SECTION -->
-										<h2>Degrees</h2><br>
+										<h2 th:text="#{professional.section.degrees}">Degrees</h2><br>
 										
 										<div  id="degrees_div">
 											<input type="hidden" id="degreeIdsToRemove" name="degreeIdsToRemove" value="">
@@ -602,7 +601,7 @@
 										</div>
 										
 										<!-- MEDIAS SECTION -->
-										<h3>Medias</h3>	<BR>
+										<h3 th:text="#{professional.section.medias}">Medias</h3>	<BR>
 																			
 										<div  id="medias_div">
 											<input type="hidden" id="mediaIdsToRemove" name="mediaIdsToRemove" value="">
@@ -689,7 +688,7 @@
 										</script>
 										
 										<!-- PROFESSIONAL EVENTS SECTION-->
-										<h3>Events</h3>	<BR>
+										<h3 th:text="#{professional.section.events}">Events</h3>	<BR>
 										
 										<div  id="event_div">
 											<input type="hidden" id="eventIdsToRemove" name="eventIdsToRemove" value="">

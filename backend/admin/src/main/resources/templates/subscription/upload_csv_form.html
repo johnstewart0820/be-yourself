@@ -36,10 +36,10 @@
 	<th:block layout:fragment="scripts">
 		<script type="text/javascript">
 			function selectFile(inputElement) {
-				if (inputElement.files[0].size > 1048576) {
-					alert("File is too big, max file size is 1MB!");
-					inputElement.value = "";
-				};
+				//if (inputElement.files[0].size > 1048576) {
+				//	alert("File is too big, max file size is 1MB!");
+				//	inputElement.value = "";
+				//};
 
 				var fileName = inputElement.files[0].name;
 				$("#csvFileLabel").text(fileName);

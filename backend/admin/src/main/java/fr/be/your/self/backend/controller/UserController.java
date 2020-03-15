@@ -45,6 +45,7 @@ import fr.be.your.self.backend.dto.UserDto;
 import fr.be.your.self.backend.setting.Constants;
 import fr.be.your.self.backend.utils.AdminUtils;
 import fr.be.your.self.backend.utils.CsvUtils;
+import fr.be.your.self.backend.utils.SubscriptionCsv;
 import fr.be.your.self.backend.utils.UserCsv;
 import fr.be.your.self.backend.utils.UserCsvMappingStrategy;
 import fr.be.your.self.backend.utils.UserUtils;
@@ -146,6 +147,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 	@Override
 	protected void loadDetailFormOptions(HttpSession session, HttpServletRequest request, HttpServletResponse response,
 			Model model, User domain, UserDto dto) throws BusinessException {
+		super.loadPersonTitles(model);
+
 		int editAccType = UserPermission.DENIED.getValue();
 		int editPermissions = UserPermission.DENIED.getValue();
 				
@@ -153,6 +156,17 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		
 		editAccType = permission.getPermission(UserConstants.EDIT_ACCOUNT_TYPE_PATH);
 		editPermissions = permission.getPermission(UserConstants.EDIT_PERMISSIONS_PATH);
+		
+		List<Integer> loginTypes = LoginType.getPossibleIntValues();
+		List<String> userTypes = UserType.getPossibleStrValues();
+		List<Integer> userStatuses = UserStatus.getPossibleIntValues();
+		List<Integer> userPermissions = UserPermission.getPossibleIntValues();
+
+		model.addAttribute("loginTypes", loginTypes);
+		model.addAttribute("userTypes", userTypes);
+		model.addAttribute("userStatuses", userStatuses);
+		model.addAttribute("userPermissions", userPermissions);
+
 		
 		model.addAttribute("editAccType", editAccType);
 		model.addAttribute("editPermissions", editPermissions);
@@ -349,21 +363,10 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 										HttpServletRequest request) throws IOException, CsvRequiredFieldEmptyException {
 		String message;
 
-		//Check if file is empty
-		if (file.isEmpty()) {
-			message = this.getMessage("common.file.upload.empty");
-			setRedirectAttributes(redirectAttributes, "update", "warning", message);			
-			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
-		}
-		
 		MappingStrategy<UserCsv> strategy = new HeaderColumnNameMappingStrategy<>();
 		strategy.setType(UserCsv.class);
 		
-		//Check headers
-		boolean columnsMatch = verifyHeaderColumns(file, strategy, new UserCsv());
-		if (!columnsMatch) {
-			message = this.getMessage("csv.error.headers.or.file");
-			setRedirectAttributes(redirectAttributes, "update", "warning", message);
+		if (!checkFileAndHeader(file, redirectAttributes, strategy, new UserCsv())) {
 			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";
 		}
 
@@ -377,30 +380,18 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		}
 		
 		List<User> users = UserUtils.convertUsersCsv(usersCsv, this.messageSource);	
-		for (User user : users) {
-			if (StringUtils.isNullOrEmpty(user.getEmail()) || !EmailValidator.getInstance().isValid(user.getEmail())) {
-				message=this.getMessage("csv.error.email.invalid", new Object[] {user.getFullName()});				
-				setRedirectAttributes(redirectAttributes, "update", "warning", message);
-				return "redirect:" + this.getBaseURL()  + "/upload_csv_form";		
-			} else {
-				if (userService.existsEmail(user.getEmail())) {
-					message=this.getMessage("csv.error.email.existed", new Object[] {user.getFullName()});	
-					setRedirectAttributes(redirectAttributes, "update", "warning", message);
-					return "redirect:" + this.getBaseURL()  + "/upload_csv_form";	
-				}
-			}
-		}
 		
+		if (!validateData(redirectAttributes, users)) {
+			return "redirect:" + this.getBaseURL()  + "/upload_csv_form";	
+		}
 		
 		for (User user : users) {
 			String tempPwd = UserUtils.assignPassword(user, getPasswordEncoder(), this.dataSetting.getTempPwdLength());
 			if (user.getStatus() == UserStatus.INACTIVE.getValue()) {
 				setActivateCodeAndTimeout(user);
 			}
-
+			addDefaultPermissions(user);
 			User savedUser = userService.saveOrUpdate(user);
-			addDefaultPermissions(savedUser);
-			this.getPermissionService().saveAll(savedUser.getPermissions());
 
 			this.getEmailSender().sendTemporaryPassword(user.getEmail(), tempPwd);
 			if (user.getStatus() == UserStatus.INACTIVE.getValue()) {
@@ -414,22 +405,25 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		return "redirect:" + this.getBaseURL() + "/upload_csv_form";
 	}
 
+	private boolean validateData(RedirectAttributes redirectAttributes, List<User> users) {
+		String message;
+		for (User user : users) {
+			if (StringUtils.isNullOrEmpty(user.getEmail()) || !EmailValidator.getInstance().isValid(user.getEmail())) {
+				message=this.getMessage("csv.error.email.invalid", new Object[] {user.getFullName()});				
+				setRedirectAttributes(redirectAttributes, "update", "warning", message);
+				return false;
+			} else {
+				if (userService.existsEmail(user.getEmail())) {
+					message=this.getMessage("csv.error.email.existed", new Object[] {user.getFullName()});	
+					setRedirectAttributes(redirectAttributes, "update", "warning", message);
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
 
-
-/*
-	
-	private List<UserCsv> readCsvFile(MultipartFile file, MappingStrategy<UserCsv> strategy) throws Exception {
-		Reader reader = new InputStreamReader(file.getInputStream());
-		CSVReader csvReader = new CSVReaderBuilder(reader).withSkipLines(0).build();
-
-		CsvToBean<UserCsv> csvToBean = new CsvToBeanBuilder<UserCsv>(csvReader)
-											.withType(UserCsv.class)
-											.withMappingStrategy(strategy)
-											.build();
-		List<UserCsv> usersCsv = csvToBean.parse();
-		reader.close();
-		return usersCsv;
-	}*/
 	
 	// show upload csv form
 	@GetMapping(value = "/upload_csv_form")
