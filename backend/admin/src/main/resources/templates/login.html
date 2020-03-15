@@ -70,7 +70,11 @@
 							
 							<form role="form" th:action="@{/oauth/login}" method="post">
 								<fieldset>
-									<div th:if="${param.authentication_error}">
+									<div th:if="${session.disabledUsername}">
+				                        <div class="alert alert-danger" th:utext="#{login.error.inactive.user.message}">Your account is inactive.</div>
+				                    </div>
+				                    
+									<div th:if="${session.disabledUsername == null && param.authentication_error}">
 				                        <div class="alert alert-danger" th:utext="#{login.error.bad.credentials.message}">Bad credentials</div>
 				                    </div>
 				                    

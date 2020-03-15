@@ -41,7 +41,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
 		if (user.getStatus() != UserStatus.ACTIVE.getValue()) {
 			logger.error("The user " + username + " is not active", exception);
 			
-			throw exception;
+		    throw new DisabledUsernameException("User is disabled: " + username);
 		}
 		
 		final String userType = user.getUserType();
