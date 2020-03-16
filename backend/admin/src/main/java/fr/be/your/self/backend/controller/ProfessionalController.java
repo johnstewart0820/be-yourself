@@ -175,7 +175,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		
 		//Check if email address already existed.
 		if (userService.existsEmail(user.getEmail())) {
-			String message = this.getMessage("professional.error.email.existed");
+			String message = this.getMessage("users.error.email.existed");
 			setActionResultInModel(model, message);
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
 		}

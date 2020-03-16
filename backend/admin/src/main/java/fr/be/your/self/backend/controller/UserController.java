@@ -183,6 +183,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
         if (result.hasErrors()) {
+        	String message = this.getMessage("users.error.save");
+			setActionResultInModel(model, message);
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
                 
@@ -200,8 +202,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		}
 
 		if (userService.existsEmail(user.getEmail())) {
-			final ObjectError error = this.createRequiredFieldError(result, "Email", "E-mail already exists!");
-        	result.addError(error);
+        	String message = this.getMessage("users.error.email.existed");
+			setActionResultInModel(model, message);
         	
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
 		}
@@ -216,6 +218,8 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 		//Error
         if (savedUser == null || result.hasErrors()) {
+        	String message = this.getMessage("users.error.save");
+			setActionResultInModel(model, message);
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
@@ -252,8 +256,10 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
     		BindingResult result, RedirectAttributes redirectAttributes, Model model) {
 		
         if (result.hasErrors()) {
+        	String message = this.getMessage("users.error.save");
+			setActionResultInModel(model, message);
         	dto.setId(id);
-        	return this.getFormView();
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
        
         User domain = this.userService.getById(id);
@@ -269,6 +275,15 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
         dto.copyToDomain(domain);
         
         final User updatedDomain = this.userService.update(domain);
+        
+        if (updatedDomain == null) {
+        	String message = this.getMessage("users.error.save");
+			setActionResultInModel(model, message);
+        	dto.setId(id);
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        }
+        
+        
         if (dto.getPermissions() != null) {
 	        for (Permission permission : dto.getPermissions()) {
 				permission.setUser(domain);

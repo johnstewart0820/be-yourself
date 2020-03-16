@@ -10,14 +10,24 @@
 	<style type="text/css">
 			
 			
-			.col-image img {
+			/* .col-image img {
 				height: 60px;
 				width: 60px;
 				max-height: 60px;
 				min-height: 60px;
 				min-width: 60px;
 				max-width: 60px;
-			}
+			} */
+			
+			 .col-image .symbol {
+				/* height: 60px; */
+				width: 60px;
+				/* max-height: 60px; */
+				/* min-height: 60px; */
+				min-width: 60px;
+				max-width: 60px;
+				height:auto;
+			} 
 			
 			.col-image  .closes {
 				position: absolute;
@@ -38,20 +48,20 @@
 
 			}
 			
-			.i-circle {
-			position: absolute;
+			.col-image .red-circle {
+				position: absolute;
 				top: -10px;
 				left: 80px;
-			    background: #ff0000;
-			    
-			    color: #000;
-			    font-weight: bold;
+				width: 20px;
+				height: auto;
 				cursor: pointer;
-				text-align: center;
-			    padding: 1px 10px;
-			    border-radius: 50%;
-			    font-size: 20px;
 			}
+			
+			.col-image:hover .red-circle {
+				opacity: 1;
+			}
+			
+
 			.col-image:hover .closes {
 				opacity: 1;
 			}
@@ -499,11 +509,13 @@
 													<input type="hidden"
 														th:field="*{degreeFiles[__${itemStats.index}__].id}" />
 													<figure class="mr-20">
-														<span class="closes" title="Delete"						 									
-						 									th:onclick="'javascript:removeOldDegree(' + ${degree.id} + ');'">&times;</span>
+															<img class="red-circle" th:title="#{action.delete}"
+															th:src="@{/images/red-circle.png}"					 									
+						 									th:onclick="'javascript:removeOldDegree(' + ${degree.id} + ');'">
+													
 						 									<a th:href="${baseMediaURL + '/image/download/' + degree.filePath}" 
 						 										th:title="${degree.filePath}" target="_blank">																										
-													  			<img th:src="@{/images/document-symbol.png}" >
+													  			<img class="symbol" th:src="@{/images/document-symbol.png}" >
 													  		</a>
 													  	<script>
 													  		var degreeName="[[${degree.filePath}]]";
@@ -521,11 +533,6 @@
 												</div>
 											</div>
 										</div>
-										<script>
-											function test1(val) {
-												return val + "...";
-											}
-										</script>
 										
 										<div  class="form-group row">
 													<label for="degrees" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
@@ -614,9 +621,10 @@
 													<input type="hidden"
 														th:field="*{mediaFiles[__${itemStats.index}__].id}" />
 													<figure>
-														<span class="closes" title="Delete"
-						 									th:title="#{slideshow.action.delete.image.title}"
-						 									th:onclick="'javascript:removeOldMedia(' + ${media.id} + ');'">&times;</span>
+															<img class="red-circle"  th:title="#{action.delete}"
+															th:src="@{/images/red-circle.png}"					 									
+						 									th:onclick="'javascript:removeOldMedia(' + ${media.id} + ');'">
+													
 						 									<a th:href="${baseMediaURL + '/image/download/' + media.filePath}" th:title="${media.filePath}" target="_blank">		
 						 										<th:block >
 						 											<!-- Images -->
@@ -625,7 +633,7 @@
 						 														|| #strings.contains(#strings.toLowerCase(media.filePath), '.png')
 						 														|| #strings.contains(#strings.toLowerCase(media.filePath), '.gif')
 						 														}">
-														  					<img th:src="${baseMediaURL + '/image/download/' + media.filePath}">					
+														  					<img class="symbol" th:src="${baseMediaURL + '/image/download/' + media.filePath}">					
 													  				</div>
 													  				<!-- Videos -->
 													  				<div th:if="${#strings.contains(#strings.toLowerCase(media.filePath), '.avi')
@@ -649,7 +657,7 @@
 												  							|| #strings.contains(#strings.toLowerCase(media.filePath), '.mpeg')
 												  							|| #strings.contains(#strings.toLowerCase(media.filePath), '.ogg')
 												  							|| #strings.contains(#strings.toLowerCase(media.filePath), '.wmv')}">
-														  					<img th:src="@{/images/document-symbol.png}" >					
+														  					<img class="symbol" th:src="@{/images/document-symbol.png}" >					
 													  				</div>
 													  			</th:block>
 													  		</a>
