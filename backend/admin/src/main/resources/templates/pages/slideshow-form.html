@@ -39,7 +39,17 @@
 				border: 2px solid #28a745;
 			}
 			
-			.col-image img {
+			.col-image .red-circle {
+				position: absolute;
+				top: 6px;
+				right: 10px;
+				z-index: 10;
+				width: 20px;
+				height: auto;
+				cursor: pointer;
+			}
+			
+			.col-image .symbol {
 				height: 120px;
 				width: 120px;
 				max-height: 120px;
@@ -94,14 +104,17 @@
  						<th:block th:if="${mainDto.images != null}">
  							<div th:each="item : ${mainDto.images}" 
  								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
- 								<span class="closes" title="Delete"
+ 								<img class="red-circle" th:title="#{slideshow.action.delete.image.title}"	
+											th:src="@{/images/red-circle.png}"					 									
+						 					th:onclick="confirmDeleteMainImage([[${ item.id }]])">
+ 								<!-- <span class="closes" title="Delete"
  									th:title="#{slideshow.action.delete.image.title}"
- 									th:onclick="confirmDeleteMainImage([[${ item.id }]])">&times;</span>
+ 									th:onclick="confirmDeleteMainImage([[${ item.id }]])">&times;</span> -->
  								<a href="javascript:;" th:onclick="showModelEditItemForm([[${mainDto.id}]], [[${ item.id }]])">
-	                   				<img th:id="${'slide-show-item-' + item.id}"
+	                   				<img  th:id="${'slide-show-item-' + item.id}"
  										th:link-url="${item.link}" 
  										th:src="${baseMediaURL + '/image/view/' + item.image}" 
-	                   					class="img-fluid mx-auto d-block">
+	                   					class="img-fluid mx-auto d-block symbol">
                    				</a>
  							</div>
  						</th:block>
@@ -184,14 +197,17 @@
 	 						<th:block th:if="${schedule.images != null}">
 	 							<div th:each="item : ${schedule.images}" 
 	 								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-	 								<span class="closes" title="Delete"
+	 								<img class="red-circle" th:title="#{slideshow.action.delete.image.title}"	
+											th:src="@{/images/red-circle.png}"					 									
+						 					th:onclick="confirmDeleteScheduleImage([[${ item.id }]])">	 					
+	 								<!-- <span class="closes" title="Delete"
 	 									th:title="#{slideshow.action.delete.image.title}"
-	 									th:onclick="confirmDeleteScheduleImage([[${ item.id }]])">&times;</span>
+	 									th:onclick="confirmDeleteScheduleImage([[${ item.id }]])">&times;</span> -->
 	 								<a href="javascript:;" th:onclick="showModelEditItemForm([[${schedule.id}]], [[${ item.id }]])">
 		                   				<img th:id="${'slide-show-item-' + item.id}"
 	 										th:link-url="${item.link}" 
 	 										th:src="${baseMediaURL + '/image/view/' + item.image}" 
-		                   					class="img-fluid mx-auto d-block">
+		                   					class="img-fluid mx-auto d-block symbol">
 	                   				</a>
 	 							</div>
 	 						</th:block>
