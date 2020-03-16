@@ -25,7 +25,7 @@ public class SlideshowImage {
 	@JoinColumn(name = "SlideshowId")
 	private Slideshow slideshow;
 
-	@Column(name = "Index", nullable = false)
+	@Column(name = "Idx", nullable = false)
 	private int index;
 
 	public int getId() {
