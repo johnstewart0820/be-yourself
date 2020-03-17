@@ -190,7 +190,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		        .formLogin()
 					.loginPage(LOGIN_URL)
 					.defaultSuccessUrl(this.defaultRedirectUrl)
-					.failureHandler(new DefaultLoginFailureHandler(LOGIN_URL + "?authentication_error=true"))
+					.failureHandler(new DefaultLoginFailureHandler(LOGIN_URL)) // + "?authentication_error=true"))
 					.permitAll()
 			.and()
 				.rememberMe()

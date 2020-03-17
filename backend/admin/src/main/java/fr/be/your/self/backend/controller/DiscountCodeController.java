@@ -50,7 +50,7 @@ public class DiscountCodeController extends BaseCodeController {
 		SORTABLE_COLUMNS.put("startDate", new String[] { "startDate" });
 		SORTABLE_COLUMNS.put("endDate", new String[] { "endDate" });
 		SORTABLE_COLUMNS.put("maxUserAmount", new String[] { "maxUserAmount" });
-		//SORTABLE_COLUMNS.put("usedAmount", new String[] { "usedAmount" });
+		SORTABLE_COLUMNS.put("beneficiary", new String[] { "beneficiary" });
 		SORTABLE_COLUMNS.put("dealPrice", new String[] { "dealPrice" });
 		SORTABLE_COLUMNS.put("pricePerUser", new String[] { "pricePerUser" });
 		SORTABLE_COLUMNS.put("discountType", new String[] { "discountType" });
@@ -163,6 +163,9 @@ public class DiscountCodeController extends BaseCodeController {
 		
 		model.addAttribute("availableCodeTypes", availableCodeTypes);
 		
+		final String beneficiary = searchParams.get("beneficiary");
+		model.addAttribute("beneficiary", beneficiary == null ? "" : beneficiary.trim());
+		
 		final List<Integer> filteredCodeTypes = NumberUtils.parseIntegers(searchParams.get("filterCodeTypes"), ",");
 		model.addAttribute("filteredCodeTypes", filteredCodeTypes);
 	}
@@ -170,9 +173,10 @@ public class DiscountCodeController extends BaseCodeController {
 	@Override
 	protected PageableResponse<BusinessCode> pageableSearch(Map<String, String> searchParams, PageRequest pageable, Sort sort) {
 		final String search = searchParams.get("q");
+		final String beneficiary = searchParams.get("beneficiary");
 		final List<Integer> filteredTypes = NumberUtils.parseIntegers(searchParams.get("filterCodeTypes"), ",");
 		
-		return this.mainService.pageableSearch(search, filteredTypes, pageable, sort);
+		return this.mainService.pageableSearch(search, beneficiary, filteredTypes, pageable, sort);
 	}
 	
 	@Override

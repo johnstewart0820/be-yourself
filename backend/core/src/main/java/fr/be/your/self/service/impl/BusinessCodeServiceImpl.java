@@ -98,52 +98,36 @@ public class BusinessCodeServiceImpl extends BaseServiceImpl<BusinessCode, Integ
 
 	@Override
 	@Transactional(readOnly = true)
-	public long count(String text, Collection<Integer> types) {
+	public long count(String text, String beneficiary, Collection<Integer> types) {
 		if (types == null || types.isEmpty()) {
-			return this.count(text);
+			return this.repository.count(text, beneficiary);
 		}
 		
-		if (StringUtils.isNullOrSpace(text)) {
-			return this.repository.countByTypeIn(types);
-		}
-		
-		return this.repository.countByNameContainsIgnoreCaseAndTypeIn(text, types);
+		return this.repository.count(text, beneficiary, types);
 	}
 
 	@Override
-	public PageableResponse<BusinessCode> pageableSearch(String text, Collection<Integer> types, 
+	public PageableResponse<BusinessCode> pageableSearch(String text, String beneficiary, Collection<Integer> types, 
 			Pageable pageable, Sort sort) {
-		if (types == null || types.isEmpty()) {
-			return this.pageableSearch(text, pageable, sort);
-		}
-		
 		if (pageable == null) {
-			final List<BusinessCode> items = this.search(text, types, sort);
+			final List<BusinessCode> items = this.search(text, beneficiary, types, sort);
 			return new PageableResponse<>(items);
 		}
 		
-		if (StringUtils.isNullOrSpace(text)) {
-			final Page<BusinessCode> page = this.repository.findAllByTypeIn(types, pageable);
-			return new PageableResponse<>(page);
-		}
+		final Page<BusinessCode> page = (types == null || types.isEmpty())
+				? this.repository.findAll(text, beneficiary, pageable)
+				: this.repository.findAll(text, beneficiary, types, pageable);
 		
-		final Page<BusinessCode> page = this.repository.findAllByNameContainsIgnoreCaseAndTypeIn(text, types, pageable);
 		return new PageableResponse<>(page);
 	}
 
 	@Override
-	public List<BusinessCode> search(String text, Collection<Integer> types, Sort sort) {
-		if (types == null || types.isEmpty()) {
-			return this.search(text, sort);
-		}
-		
+	public List<BusinessCode> search(String text, String beneficiary, Collection<Integer> types, Sort sort) {
 		final Sort domainSort = sort == null ? Sort.unsorted() : sort;
-		if (StringUtils.isNullOrSpace(text)) {
-			final Iterable<BusinessCode> domains = this.repository.findAllByTypeIn(types, domainSort);
-			return this.toList(domains);
-		}
+		final Iterable<BusinessCode> domains = (types == null || types.isEmpty()) 
+				? this.repository.findAll(text, beneficiary, domainSort)
+				: this.repository.findAll(text, beneficiary, types, domainSort);
 		
-		final Iterable<BusinessCode> domains = this.repository.findAllByNameContainsIgnoreCaseAndTypeIn(text, types, domainSort);
 		return this.toList(domains);
 	}
 

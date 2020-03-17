@@ -100,7 +100,7 @@
 							
 							<div class="col-md-4 col-sm-12 text-center" th:switch="${action}">
 								<img th:case="create" id="imagePreview" class="image-fit image-preview" 
-									th:src="@{/images/default/{pageName}.png(pageName=${pageName})}">
+									src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
 								<a th:case="*" th:href="${baseMediaURL + '/image/download/' + dto.image}" 
 									th:title="#{session.category.detail.image.link.title}" target="_blank">
 									<img id="imagePreview" class="image-fit image-preview" 

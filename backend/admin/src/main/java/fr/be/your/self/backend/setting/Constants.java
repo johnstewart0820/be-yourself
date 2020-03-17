@@ -57,7 +57,25 @@ public final class Constants {
 		
 		public static interface WEB_ADMIN {
 			public static final String MEDIA = "/media";
+			
 			public static final String SESSION = "/session";
+			public static final String SESSION_CATEGORY = "/session-category";
+			public static final String USERS = "/users";
+			public static final String PROFESSIONAL = "/professional";
+			public static final String SUBSCRIPTION_TYPE = "/subtype";
+			public static final String SUBSCRIPTION = "/subscription";
+			public static final String DISCOUNT_CODE = "/discount-code";
+			public static final String GIFT = "/gift";
+			public static final String SLIDESHOW = "/slideshow";
+			public static final String SPLASH_SCREEN = "/splash-screen";
+			
+			public static final String[] PATHS = new String[] {
+				SESSION, SESSION_CATEGORY, 
+				USERS, PROFESSIONAL,
+				SUBSCRIPTION_TYPE, SUBSCRIPTION,
+				DISCOUNT_CODE, GIFT, 
+				SLIDESHOW, SPLASH_SCREEN
+			};
 		}
 	}
 	

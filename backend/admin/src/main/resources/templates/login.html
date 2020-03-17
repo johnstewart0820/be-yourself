@@ -70,13 +70,14 @@
 							
 							<form role="form" th:action="@{/oauth/login}" method="post">
 								<fieldset>
-									<div th:if="${session.disabledUsername}">
-				                        <div class="alert alert-danger" th:utext="#{login.error.inactive.user.message}">Your account is inactive.</div>
-				                    </div>
-				                    
-									<div th:if="${!session.containsKey('disabledUsername') && param.authentication_error}">
-				                        <div class="alert alert-danger" th:utext="#{login.error.bad.credentials.message}">Bad credentials</div>
-				                    </div>
+									<th:block th:switch="${session.errorType}">
+										<div th:case="disabled">
+					                        <div class="alert alert-danger" th:utext="#{login.error.inactive.user.message}">Your account is inactive.</div>
+					                    </div>
+					                    <div th:case="credentials">
+					                        <div class="alert alert-danger" th:utext="#{login.error.bad.credentials.message}">Bad credentials</div>
+					                    </div>
+									</th:block>
 				                    
 				                    <div th:if="${param.logout}">
 				                        <div class="alert alert-info" th:utext="#{login.logged.out.message}">You have been logged out.</div>

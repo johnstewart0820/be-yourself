@@ -24,9 +24,9 @@ public class DefaultLoginFailureHandler extends SimpleUrlAuthenticationFailureHa
 			AuthenticationException exception) throws IOException, ServletException {
 		
 		if (exception instanceof DisabledUsernameException) {
-			request.getSession().setAttribute("disabledUsername", true);
+			request.getSession().setAttribute("errorType", "disabled");
 		} else {
-			request.getSession().removeAttribute("disabledUsername");
+			request.getSession().setAttribute("errorType", "credentials");
 		}
 		
 		super.onAuthenticationFailure(request, response, exception);

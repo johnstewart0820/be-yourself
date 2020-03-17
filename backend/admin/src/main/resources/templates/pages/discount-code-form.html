@@ -47,25 +47,32 @@
 										<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 									</div>
 									
-									<label for="type" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs md-text-right smd-text-left">
-										<span class="required-field" th:utext="#{|${baseMessageKey}.detail.type|}"></span>
-									</label>
 									<th:block th:switch="${action}">
-										<div th:case="create" class="col-lg-4 col-md-3 col-smd-12 col-sm-9 col-xs-12">
-											<select class="form-control selectpicker show-tick" 
-												th:field="*{type}" id="type" required="required" 
-												data-actions-box="false" data-live-search="false" 
-												th:title="#{|${baseMessageKey}.detail.type.placeholder|}"
-												th:data-none-selected-text="#{|${baseMessageKey}.detail.type.placeholder|}">
-												<option th:each="codeType: ${availableCodeTypes}" 
-													th:value="${codeType}" 
-													th:text="#{|discount.code.type.${codeType}|}"></option>
-											</select>
-											<div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
-										</div>
-										<div th:case="*" class="col-lg-4 col-md-3 col-smd-12 col-sm-9 col-xs-12">
-											<span th:utext="#{|${baseMessageKey}.type.${dto.type}|}"></span>
-										</div>
+										<th:block th:case="create">
+											<label for="type" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs md-text-right smd-text-left">
+												<span class="required-field" th:utext="#{|${baseMessageKey}.detail.type|}"></span>
+											</label>
+											<div class="col-lg-4 col-md-3 col-smd-12 col-sm-9 col-xs-12">
+												<select class="form-control selectpicker show-tick" 
+													th:field="*{type}" id="type" required="required" 
+													data-actions-box="false" data-live-search="false" 
+													th:title="#{|${baseMessageKey}.detail.type.placeholder|}"
+													th:data-none-selected-text="#{|${baseMessageKey}.detail.type.placeholder|}">
+													<option th:each="codeType: ${availableCodeTypes}" 
+														th:value="${codeType}" 
+														th:text="#{|discount.code.type.${codeType}|}"></option>
+												</select>
+												<div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+											</div>
+										</th:block>
+										<th:block th:case="*">
+											<label for="type" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs md-text-right smd-text-left">
+												<span th:utext="#{|${baseMessageKey}.detail.type|}"></span>
+											</label>
+											<div class="col-lg-4 col-md-3 col-smd-12 col-sm-9 col-xs-12">
+												<span th:utext="#{|${baseMessageKey}.type.${dto.type}|}"></span>
+											</div>
+										</th:block>
 									</th:block>
 								</div>
 								
@@ -178,10 +185,10 @@
 									</div>
 								</div>
 								
-								<div class="form-group row">
+								<div id="usedAmountAndPriceContainer" class="form-group row">
 									<th:block th:if="${action != 'create'}">
 										<label for="usedAmount" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs sm-form-group smd-new-form-group-row">
-											<span id="usedAmountLabel" class="required-field" th:text="#{|${baseMessageKey}.detail.used.amount|}"></span>
+											<span id="usedAmountLabel" th:text="#{|${baseMessageKey}.detail.used.amount|}"></span>
 										</label>
 										<div class="col-lg-4 col-md-3 col-smd-12 col-sm-9 col-xs-12 sm-form-group smd-new-form-group-row" 
 											th:title="#{|${baseMessageKey}.detail.used.amount.placeholder|}">
@@ -189,13 +196,13 @@
 										</div>
 										
 										<label id="pricePerUserLabelContainer" for="pricePerUser" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs md-text-right smd-text-left">
-											<span id="pricePerUserLabel" class="required-field" th:text="#{|${baseMessageKey}.detail.price.per.user|}"></span>
+											<span id="pricePerUserLabel" th:text="#{|${baseMessageKey}.detail.price.per.user|}"></span>
 										</label>
 									</th:block>
 									
 									<th:block th:if="${action == 'create'}">
 										<label id="pricePerUserLabelContainer" for="pricePerUser" class="label form-control-label col-lg-2 col-md-3 col-smd-12 col-sm-3 hidden-xs">
-											<span id="pricePerUserLabel" class="required-field" th:text="#{|${baseMessageKey}.detail.price.per.user|}"></span>
+											<span id="pricePerUserLabel" th:text="#{|${baseMessageKey}.detail.price.per.user|}"></span>
 										</label>
 									</th:block>
 									
@@ -256,6 +263,7 @@
 				// B2B Multiple 100%
 				if (codeType == 0) {
 					$('#b2b100EditableContainer').show();
+					$('#usedAmountAndPriceContainer').show();
 					$('#pricePerUserLabelContainer').show();
 					$('#pricePerUserContainer').show();
 					
@@ -265,6 +273,10 @@
 					$('#b2b100EditableContainer').hide();
 					$('#pricePerUserLabelContainer').hide();
 					$('#pricePerUserContainer').hide();
+					
+					if (createMode) {
+						$('#usedAmountAndPriceContainer').hide();
+					}
 					
 					$('#dealPrice').prop('required', false);
 					$('#maxUserAmount').prop('required', false);
