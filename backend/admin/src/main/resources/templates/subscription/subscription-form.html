@@ -66,7 +66,7 @@
 										</div>
 										<!-- Subscription type and canal -->
 										<div class="form-group row">
-											<label for="groupId"
+											<label for="subtypeId"
 												class="label form-control-label  col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.subtype|}"></label>
 											<div class="col-lg-3">
@@ -77,7 +77,7 @@
 													</option>
 												</select>
 											</div>
-											<label for="groupId"
+											<label for="canal"
 												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.canal|}"></label>
 											<div class="col-lg-3">
@@ -121,7 +121,7 @@
 										</div>
 										<!-- Duration -->
 										<div class="form-group row">
-											<label for="groupId"
+											<label for="duration"
 												class="label form-control-label col-lg-3  required-field"
 												th:text="#{|${baseMessageKey}.detail.duration|}"></label>
 											<div class="col-lg-3">
@@ -167,7 +167,7 @@
 										</div>
 										<!-- Price -->
 										<div class="form-group row">
-											<label for="title"
+											<label for="price"
 												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.price|}"></label>
 											<div class="col-lg-3">
@@ -181,24 +181,24 @@
 										<!-- Status -->
 										<div class="form-group row">
 											<label for="status"
-												class="label form-control-label col-lg-3"
+												class="label form-control-label col-lg-3  col-md-6 col-sm-7 col-8 "
 												th:text="#{|${baseMessageKey}.detail.status|}"></label>
-											<div class="col-lg-3">
+											<div class="col-lg-3 col-md-2 col-sm-5 col-4">
 												<input id="status" th:field="*{status}" type="checkbox">
 											</div>
 										</div>
 										<!-- Termination asked -->
 										<div class="form-group row">
 											<label for="terminationAsked"
-												class="label form-control-label col-lg-3"
+												class="label form-control-label col-lg-3  col-md-6 col-sm-7 col-8"
 												th:text="#{|${baseMessageKey}.detail.terminationasked|}"></label>
-											<div class="col-lg-3">
+											<div class="col-lg-3 col-md-2 col-sm-5 col-4">
 												<input id="terminationAsked" th:field="*{terminationAsked}" type="checkbox">
 											</div>
 										</div>		
 										<!-- Payment status -->
 										<div class="form-group row">
-											<label for="groupId"
+											<label for="paymenstatus"
 												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.paymentstatus|}"></label>
 											<div class="col-lg-3">
@@ -212,7 +212,7 @@
 										</div>		
 										<!-- Payment Gateway -->
 										<div class="form-group row">
-											<label for="groupId"
+											<label for="gateway"
 												class="label form-control-label col-lg-3 required-field"
 												th:text="#{|${baseMessageKey}.detail.paymentgateway|}"></label>
 											<div class="col-lg-3">
@@ -265,7 +265,7 @@
 										
 										<!-- Buyer Email -->
 										<div class="form-group row">
-											<label for="title"
+											<label for="buyerEmail"
 												class="label form-control-label col-lg-3"
 												th:text="#{|${baseMessageKey}.detail.buyer.email|}"></label>
 											<div class="col-lg-3">
@@ -279,9 +279,9 @@
 										<!-- Automatic renewal: -->
 										<div class="form-group row">
 											<label for="autoRenew"
-												class="label form-control-label col-lg-3"
+												class="label form-control-label col-lg-3 col-md-6 col-sm-7 col-8"
 												th:text="#{|${baseMessageKey}.detail.autorenew|}"></label>
-											<div class="col-lg-3">
+											<div class="col-lg-3 col-md-2 col-sm-5 col-4">
 												<input id="autoRenew" th:field="*{autoRenew}" type="checkbox">
 											</div>
 										</div>

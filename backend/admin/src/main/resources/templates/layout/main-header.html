@@ -31,7 +31,7 @@
 		-->
 		
 		<!-- User -->
-		<ul sec:authorize="isAuthenticated()" class="navbar-nav align-items-center d-none d-md-flex">
+		<ul sec:authorize="isAuthenticated()" class="navbar-nav align-items-center d-none d-md-flex" id="user_dropdown">
 	  		<li class="nav-item dropdown">
 				<a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		  			<div class="media align-items-center">
@@ -56,7 +56,7 @@
 		  			</a-->
 		  			<a th:href="@{/account/settings}" class="dropdown-item">
 						<i class="fas fa-calendar-alt"></i>
-						<span>Account settings</span>
+						<span th:text="#{menu.account.settings}">Account setting</span>
 		  			</a>
 	  			
 		  			<div class="dropdown-divider"></div>

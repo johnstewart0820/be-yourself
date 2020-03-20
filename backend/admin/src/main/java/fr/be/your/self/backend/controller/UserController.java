@@ -184,7 +184,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		
         if (result.hasErrors()) {
         	String message = this.getMessage("users.error.save");
-			setActionResultInModel(model, message);
+			setActionResultInModel(model, "create", "warning", message);
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
                 
@@ -203,7 +203,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 		if (userService.existsEmail(user.getEmail())) {
         	String message = this.getMessage("users.error.email.existed");
-			setActionResultInModel(model, message);
+			setActionResultInModel(model, "create", "warning", message);
         	
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
 		}
@@ -219,7 +219,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		//Error
         if (savedUser == null || result.hasErrors()) {
         	String message = this.getMessage("users.error.save");
-			setActionResultInModel(model, message);
+			setActionResultInModel(model, "create", "warning", message);
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
@@ -257,7 +257,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 		
         if (result.hasErrors()) {
         	String message = this.getMessage("users.error.save");
-			setActionResultInModel(model, message);
+			setActionResultInModel(model, "update", "warning", message);
         	dto.setId(id);
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
@@ -278,7 +278,7 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
         
         if (updatedDomain == null) {
         	String message = this.getMessage("users.error.save");
-			setActionResultInModel(model, message);
+			setActionResultInModel(model, "update", "warning", message);
         	dto.setId(id);
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }

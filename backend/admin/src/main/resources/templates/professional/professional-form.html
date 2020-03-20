@@ -282,14 +282,14 @@
 													th:text="#{|${baseMessageKey}.detail.specialty.group|}"></label>												
 													<input id="sp_group" th:field="*{specialty.grp}" type="checkbox">
 												</div>
+											</div>
+											<div class="form-group row">
 												<div class="col">
 												<label for="sp_children"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.children|}"></label>												
 													<input id="sp_children" th:field="*{specialty.children}" type="checkbox">
 												</div>
-											</div>
-											<div class="form-group row">
 												<div class="col">
 												<label for="sp_adult"
 													class="label form-control-label"
@@ -297,23 +297,33 @@
 													<input id="sp_adult" th:field="*{specialty.adult}" type="checkbox">
 												</div>
 												<div class="col">
+												<label for="sp_teenager"
+													class="label form-control-label"
+													th:text="#{|${baseMessageKey}.detail.specialty.teenager|}"></label>												
+													<input id="sp_teenager" th:field="*{specialty.teenager}" type="checkbox">
+												</div>
+
+											</div>
+											<div class="form-group row">
+												<div class="col">
 												<label for="sp_pregnancy"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.pregnancy|}"></label>												
 													<input id="sp_pregnancy" th:field="*{specialty.pregnancy}" type="checkbox">
-													</div>
+												</div>
 												<div class="col">
 												<label for="sp_sport"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.sport|}"></label>												
 													<input id="sp_sport" th:field="*{specialty.sport}" type="checkbox">
-													</div>
+												</div>
 												<div class="col">
 												<label for="sp_enterprise"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.enterprise|}"></label>												
 													<input id="sp_enterprise" th:field="*{specialty.enterprise}" type="checkbox">
-													</div>
+												</div>
+												
 											</div>
 											
 											<!-- PROFILE SECTION -->
@@ -400,10 +410,10 @@
 										<div  id="price_div" >
 											<input type="hidden" id="priceIdsToRemove" name="priceIdsToRemove" value="">
 											<div class="form-group row">
-												<div class="col-md-4 col-sm-5 col-xs-12">
+												<div class="col-md-4 col-sm-5 col-xs-12 required-field">
 														<span>Label</span>
 												</div>
-												<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
+												<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12 required-field">
 														<span>Price (&euro;)</span>
 												</div>
 												
@@ -416,7 +426,7 @@
 														
 													<input class="form-control col-md-4 col-sm-5 col-xs-12"
 														th:field="*{prices[__${itemStats.index}__].label}" />
-													<input class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12"
+													<input type="number" step="0.01" class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12"
 														th:field="*{prices[__${itemStats.index}__].price}" />
 													<button type="button"  class="btn btn-icon btn-2 btn-danger offset-md-1" th:title="#{action.delete.title}" 
 													th:onclick="'javascript:removeOldPrice(' + ${price.id} + ');'"><span class="btn-inner--icon">
@@ -429,10 +439,10 @@
 													<input class="form-control" type="text" id="price_label">
 											</div>
 											<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
-													<input class="form-control" type="text" id="price_value">
+													<input class="form-control" type="number" step="0.01" id="price_value">
 											</div>
 											<div class="offset-md-1">
-													<a class="btn btn-icon btn-2 btn-primary" style="background-color: #fff; color: purple;	border-color: purple;" title="#{action.add.title}" id="add_price"> 
+													<a class="btn btn-icon btn-2 btn-primary" style="background-color: #fff; color: #5e72e4; border-color: #5e72e4;" title="#{action.add.title}" id="add_price"> 
 														<span class="btn-inner--icon"> 
 														<i class="fas fa-edit"></i> <span th:text="#{action.add}"></span>
 														</span>
@@ -673,9 +683,8 @@
 											<div class="col-sm-5 col-xs-12">
 												<div class="custom-file" id="div_custom_file_medias">
 													<input type="file" multiple="multiple" name="medias[0]" id="medias0" class="custom-file-input"  
-														accept="video/*,image/*" onChange="updateList(this, 'medias')" 	 />
-													<label class="custom-file-label" for="medias" id="mediaFileLabel" 
-														th:data-browse="#{action.select.image}"></label>
+														th:accept="${supportMediaFileTypes}" onChange="updateList(this, 'medias')" 	 />
+													<label class="custom-file-label" for="medias" id="mediaFileLabel" ></label>													
 												</div>
 											</div>
 										</div>
@@ -794,13 +803,16 @@
 											</div>
 										</div>
 										<div class="form-group row">
+											<input type="hidden" id="eventElementRequired" th:value="#{|professional.error.event.element.required|}">
+										
 											<div class="col-md-3  col-sm-3 col-xs-12">								
-													<a class="btn btn-icon btn-2 btn-primary" style="background-color: #fff; color: purple;	border-color: purple;" title="#{action.add.title}" id="add_event"> 
+													<a class="btn btn-icon btn-2 btn-primary" style="background-color: #fff; color: #5e72e4; border-color: #5e72e4;" title="#{action.add.title}" id="add_event"> 
 													<span class="btn-inner--icon"> 		<i class="fas fa-edit"></i> <span th:text="#{action.add}"></span>
 													</span>
 													</a>
 											
 											</div>
+											
 										</div>
 										<script >
 									 	 var eventInput = document.getElementById('eventAddress');
@@ -829,19 +841,19 @@
 										}
 										
 										var indexEvent = [[${#lists.size(dto.events)}]]; // Get the current number of price elements
+										
 										$("#add_event").click(function() {
-											if(!$("#eventDate").val() ) {
-												$("#eventDate").addClass('eventwarning'); return;
+											
+											var msg = $("#eventElementRequired").val();
+											if(!$("#eventDate").val() 
+													|| !$("#eventAddress").val()
+													|| !$("#eventDescription").val()
+													|| !$("#eventPrice").val() ) {
+												$('#general-warning-modal-message').html(msg);
+												showModal("general-warning-modal");
+												return;
 									     	}
-											if(!$("#eventAddress").val()  ) {
-												$("#eventAddress").addClass('eventwarning'); return;
-									     	}
-											if(!$("#eventDescription").val()  ) {
-												$("#eventDescription").addClass('eventwarning'); return;
-									     	}
-											if(!$("#eventPrice").val() ) {
-												$("#eventPrice").addClass('eventwarning'); return;
-									     	}
+											
 											
 											// when we add event, if search Value != address value then that means user did not select from suggestion
 							     			if (document.getElementById('eventSearchAddrValue').value != document.getElementById('eventAddress').value) {
@@ -902,12 +914,7 @@
 											$("#event_div").append(new_inner_div);
 											
 											indexEvent++;
-											
-											$("#eventDate").removeClass('eventwarning');									     	
-											$("#eventAddress").removeClass('eventwarning');									     	
-											$("#eventDescription").removeClass('eventwarning');									     	
-											$("#eventPrice").removeClass('eventwarning'); 
-									     	
+																															     	
 										})
 										</script>
 											
