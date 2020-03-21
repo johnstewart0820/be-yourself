@@ -557,7 +557,8 @@
 													</div>
 										</div>
 										<script>
-										
+											var totalDegreeNb = [[${#lists.size(dto.degreeFiles)}]]; // Get the current number of degrees
+
 											function removeOldDegree(degreeId){
 												var idsToRemoveTxt = document.getElementById('degreeIdsToRemove').value;
 												if (idsToRemoveTxt == "") {
@@ -568,23 +569,32 @@
 												
 												document.getElementById('degreeIdsToRemove').value = idsToRemoveTxt;
 												var divToRemove = 'div_old_degree_' + degreeId;
+												totalDegreeNb--;
 												document.getElementById(divToRemove).remove();
 											}
 
-											var indexDegree = 0;
-											
+											var indexDegree = 0; //Index of new degrees (not include the existing degrees)
+
 											updateList = function(inputElement, type) { //type = 'degrees' or 'medias'
 												
 												var fileName = inputElement.files[0].name;
 												var newDiv = document.createElement('div');
 												var index;
 												if (type == 'degrees') {
+													if (totalDegreeNb == [[${maxDegreesNumber}]]) {
+														var msg = '[[${maxDegreesMsg}]]'
+														inputElement.value = "";
+														$('#general-warning-modal-message').html(msg);
+														showModal("general-warning-modal");														
+														return;
+													}
 													index = indexDegree;
 													indexDegree++;
+													totalDegreeNb++;
 												} else {
 													index = indexMedia;
 													indexMedia++;
-												}												
+												}
 												newDiv.id = 'new_div_' + type +index;
 												$(inputElement).appendTo(newDiv);
 												$(inputElement).hide();

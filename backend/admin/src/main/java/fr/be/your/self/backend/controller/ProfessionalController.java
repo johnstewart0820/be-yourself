@@ -59,6 +59,8 @@ import fr.be.your.self.util.StringUtils;
 public class ProfessionalController extends BaseResourceController<User, User, UserDto, Integer> {
 	public static final String NAME = "professional";
 
+	public static final int MAX_DEGREES_NB = 3;
+	
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
 			+ Constants.FOLDER.MEDIA.PROFESSIONAL;
@@ -169,7 +171,9 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
 		
 		model.addAttribute("formations", formations);
-
+		model.addAttribute("maxDegreesNumber", MAX_DEGREES_NB);
+		String maxDegreesMsg = this.getMessage("professional.error.max.degrees", new Object[] {MAX_DEGREES_NB});
+		model.addAttribute("maxDegreesMsg", maxDegreesMsg);
 	}
 	
 	@Override
