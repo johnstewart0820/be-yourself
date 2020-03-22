@@ -235,6 +235,20 @@ public abstract class BaseCodeController extends BaseResourceController<Business
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
         
+        final int maxUserAmount = dto.getMaxUserAmount();
+        if (maxUserAmount < domain.getMaxUserAmount()) {
+        	final Map<Integer, Integer> subscriptionUsedAmounts = this.mainService.getUsedAmountByIds(Collections.singletonList(domain.getId()));
+        	final Integer usedAmount = subscriptionUsedAmounts.get(domain.getId());
+        	
+        	if (usedAmount != null && usedAmount > maxUserAmount) {
+        		String message = this.getMessage("discount.code.error.subscription.max.amount", new Object[] { usedAmount });
+        		setActionResultInModel(model, "update", "warning", message);
+        		
+        		dto.setId(id);
+            	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+        	}
+        }
+        
         dto.copyToDomain(domain, false);
         
         if (this.dataSetting.isUppercaseDiscountCode()) {
