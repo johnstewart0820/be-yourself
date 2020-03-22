@@ -31,7 +31,7 @@ import nz.net.ultraq.thymeleaf.LayoutDialect;
 @ComponentScan(basePackages = { "fr.be.your.self.backend.controller" })
 public class WebMvcConfig implements WebMvcConfigurer {
 
-	private static final String DEFAULT_LOCALE = "en";
+	private static final String DEFAULT_LOCALE = "fr";
 
 	@Autowired
 	private MessageSource messageSource;

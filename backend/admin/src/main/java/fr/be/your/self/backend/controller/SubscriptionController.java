@@ -252,15 +252,19 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 				return false;
         	}
 
-        	//Check that if we add new subscription using this code, we will not pass the maximum number of usage.
-        	if (code.getType() == BusinessCodeType.B2B_MULTIPLE.getValue() 
-        			&& isAddingNewUsage(domain, action, code) ) { 
+        	//Check that if we add new subscription using this code, we will not pass the maximum number of usage.      	
+        	if ( code.isB2B() && isAddingNewUsage(domain, action, code) ) { 
         		final List<Integer> codeIds = Collections.singletonList(code.getId());
         		final Map<Integer, Integer> usedAmounts = this.businessCodeService.getUsedAmountByIds(codeIds);
-    			
+        		int maxAmount;
+    			if (code.isB2B_unique()) {
+    				maxAmount = 1;
+    			} else {
+    				maxAmount = code.getMaxUserAmount();
+    			}
     			if (usedAmounts != null) {
     				final Integer usedAmount = usedAmounts.get(code.getId());
-    				if (usedAmount!= null && usedAmount >= code.getMaxUserAmount()) {
+    				if (usedAmount!= null && usedAmount >= maxAmount) {
     					String message = this.getMessage("subscription.error.code.max.amount", new Object[] {code.getName()});
     					setActionResultInModel(model, action, "warning", message);
     					return false;
@@ -313,7 +317,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
         User user = this.userService.getById(dto.getUserId());
         if (codeId != null && codeId != SubscriptionDto.UNDEFINED_CODE) {
         	BusinessCode code = codeService.getById(dto.getCodeId());
-        	if (!validateData(dto, code, redirectAttributes, model, domain, "create")) {
+        	if (!validateData(dto, code, redirectAttributes, model, domain, "update")) {
 	        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
 	        } else {
 	        	domain.setBusinessCode(code);

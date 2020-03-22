@@ -4,6 +4,39 @@
 	layout:decorate="~{layout/main-layout.html}">
 <head>
 <title th:text="#{|${baseMessageKey}.page.title|}"></title>
+<style>
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 599px) {
+	.custom-xs-mg-top{
+		margin-top:20px;
+		/* margin-bottom:15px; */
+	}
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen  and (min-width: 600px) and (max-width: 767px) {
+	.custom-sm-mg-top{
+			margin-top:20px;
+			/* margin-bottom:15px; */
+		}
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px)  and (max-width: 991px) {
+	.custom-md-mg-top{
+		margin-top:20px;
+		/* margin-bottom:15px; */
+	}
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px)  and (max-width: 1199px) {
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+}
+</style>
 </head>
 <body>
 	<th:block layout:fragment="content">
@@ -78,7 +111,7 @@
 												</select>
 											</div>
 											<label for="canal"
-												class="label form-control-label col-lg-3 required-field"
+												class="label form-control-label col-lg-3 custom-md-mg-top custom-sm-mg-top custom-xs-mg-top required-field"
 												th:text="#{|${baseMessageKey}.detail.canal|}"></label>
 											<div class="col-lg-3">
 												<select class="form-control" id="canal"
@@ -107,7 +140,7 @@
 											</div>
 											<!-- Validity end date -->
 											<label for="validEndDate"
-												class="label form-control-label col-lg-3 required-field"
+												class="label form-control-label col-lg-3 custom-md-mg-top custom-sm-mg-top custom-xs-mg-top required-field"
 												th:text="#{|${baseMessageKey}.detail.validenddate|}"></label>
 											<div class="col-lg-3 input-group">
 													<input type="text" class="form-control datepicker" 
@@ -152,11 +185,11 @@
 												</div>
 											<!-- Subscription end date -->
 											<label for="subscriptionEndDate"
-												class="label form-control-label col-lg-3 required-field"
+												class="label form-control-label col-lg-3 custom-md-mg-top custom-sm-mg-top custom-xs-mg-top required-field"
 												th:text="#{|${baseMessageKey}.detail.subscriptionenddate|}"></label>
 
 											<div class="col-lg-3 input-group">
-													<input type="text" class="form-control datepicker" 
+													<input type="text" class="form-control  datepicker" 
 														th:field="*{subscriptionEndDate}" id="subscriptionEndDate" 
 														th:data-date-format="${dateFormat.toLowerCase()}" 
 														autocomplete="off" required />

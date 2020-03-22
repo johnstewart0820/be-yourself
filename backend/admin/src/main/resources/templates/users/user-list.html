@@ -67,7 +67,7 @@
 					<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
 					<div class="row form-search-container">
 						<div class="custom-col-lg-3 custom-col-md-4 custom-col-sm-12"  style=" text-align: left">
-							<select id="filter_status" name="filter_status "
+							<select id="filter_status" name="filter_status"
 								class="selectpicker show-tick">
 								<option value="" th:text="#{|${baseMessageKey}.option.filter.status.title|}">FILTER BY STATUSES</option>
 								
@@ -240,7 +240,7 @@
 			var filter_role = "";
 			var filter_status = "";
 			var filter_subtype = -2;
-			var search_box = "";
+			
 		</script>
 
 		<script th:if="${filterSubtype != null}">
@@ -263,11 +263,9 @@
 				showModal('confirm-delete-modal');
 			}
 
-
 			
 			$(document).ready(function() {
 								showOnLoadedModal();
-								$('.selectpicker').selectpicker();
 								if ([[${writePermission}]]) {
 								 	$('#users-data-table').dataTable({
 										"sDom" : 't',
@@ -298,10 +296,10 @@
 								}
 								
 								 
-								$('#filter_role').val(filter_role);
-								$("#filter_status").val(filter_status);
-								$("#search_box").val("[[${search_box}]]");
-
+								//$('#filter_role').val(filter_role);
+								//$("#filter_status").val(filter_status);
+								$('#filter_role').selectpicker('val', filter_role);
+								$('#filter_status').selectpicker('val', filter_status);
 								$("select#filter_subtype")
 										.change(function() {
 													$("#filter_role").val($("#filter_role option:first").val());

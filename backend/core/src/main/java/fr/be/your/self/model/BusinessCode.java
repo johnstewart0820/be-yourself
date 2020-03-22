@@ -213,4 +213,14 @@ public class BusinessCode extends PO<Integer> {
 			pricePerUser = dealPrice.divide(new BigDecimal(maxUserAmount), 2, BigDecimal.ROUND_HALF_UP);
 		}
 	}
+	
+	public boolean isB2B() {
+		return this.getType() == BusinessCodeType.B2B_MULTIPLE.getValue()
+				|| this.getType() == BusinessCodeType.B2B_UNIQUE.getValue();
+	}
+	
+	public boolean isB2B_unique() {
+		return this.getType() == BusinessCodeType.B2B_UNIQUE.getValue();
+	}
+			
 }
