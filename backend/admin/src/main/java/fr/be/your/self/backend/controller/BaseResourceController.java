@@ -1233,9 +1233,9 @@ public abstract class BaseResourceController<T extends PO<K>, SimpleDto, DetailD
 		redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, status);
 	}
 	
-	protected void setActionResultInModel(Model model, String message) {
-		model.addAttribute(TOAST_ACTION_KEY, "create");
-		model.addAttribute(TOAST_STATUS_KEY,  "warning");
+	protected void setActionResultInModel(Model model, String action, String status, String message) {
+		model.addAttribute(TOAST_ACTION_KEY, action);
+		model.addAttribute(TOAST_STATUS_KEY,  status);
 		model.addAttribute(TOAST_MESSAGE_KEY, message);
 	}
 	

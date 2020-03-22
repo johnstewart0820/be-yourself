@@ -41,11 +41,11 @@
 						<fieldset th:disabled="${!writePermission}">
 							<input type="hidden" th:field="*{id}" />
 							<div class="row">
-								<div class="col-md-8 col-sm-12">
+								<div class="col-lg-8">
 									<!-- Title -->
 									<div class="form-group row">
 										<label for="title"
-											class="label form-control-label col-md-3 col-sm-3 required-field"
+											class="label form-control-label col-lg-4 col-md-12  required-field"
 											th:text="#{|${baseMessageKey}.detail.title|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="title" class="form-control" th:field="*{title}"
@@ -58,7 +58,7 @@
 									<!-- Last Name -->
 									<div class="form-group row">
 										<label for="lastname"
-											class="label form-control-label col-md-3 col-sm-3 required-field"
+											class="label form-control-label col-lg-4  col-md-12 required-field"
 											th:text="#{|${baseMessageKey}.detail.lastname|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" id="lastname" type="text"
@@ -68,7 +68,7 @@
 									<!-- First Name -->
 									<div class="form-group row">
 										<label for="firstname"
-											class="label form-control-label col-md-3 col-sm-3 required-field"
+											class="label form-control-label col-lg-4 col-md-12 required-field"
 											th:text="#{|${baseMessageKey}.detail.firstname|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" type="text" id="firstname"
@@ -78,7 +78,7 @@
 									<!-- Email -->
 									<div class="form-group row">
 										<label for="email"
-											class="label form-control-label col-md-3 col-sm-3 required-field"
+											class="label form-control-label col-lg-4 col-md-12 required-field"
 											th:text="#{|${baseMessageKey}.detail.email|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" type="email" id="email"
@@ -88,7 +88,7 @@
 									<!-- Login type -->
 									<div class="form-group row">
 										<label for="loginType"
-											class="label form-control-label col-md-3 col-sm-3 required-field"
+											class="label form-control-label col-lg-4 col-md-12 required-field"
 											th:text="#{|${baseMessageKey}.detail.logintype|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="loginType" class="form-control"
@@ -103,7 +103,7 @@
 									<!-- Password -->
 									<div class="form-group row" id="password_div">
 										<input type="hidden" /> <label for="pwd"
-											class="label form-control-label col-md-3 col-sm-3"
+											class="label form-control-label col-lg-4 col-md-12"
 											th:text="#{|${baseMessageKey}.detail.password|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" id="pwd" type="password"
@@ -113,7 +113,7 @@
 									<!-- Status -->
 									<div class="form-group row">
 										<label for="pwd"
-											class="label form-control-label col-md-3 col-sm-3 required-field"
+											class="label form-control-label col-lg-4 col-md-12 required-field"
 											th:text="#{|${baseMessageKey}.detail.status|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="status" class="form-control" th:field="*{status}"
@@ -128,7 +128,7 @@
 									<!-- Referral Code -->
 									<div class="form-group row">
 										<label for="refcode"
-											class="label form-control-label col-md-3 col-sm-3"
+											class="label form-control-label col-lg-4 col-md-12"
 											th:text="#{|${baseMessageKey}.detail.refcode|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<input class="form-control" type="text" id="refcode"
@@ -138,7 +138,7 @@
 									<!-- User Type -->
 									<div class="form-group row" id="account_type_div">
 										<label for="userType"
-											class="label form-control-label col-md-3 col-sm-3 required-field"
+											class="label form-control-label col-lg-4 col-md-12 required-field"
 											th:text="#{|${baseMessageKey}.detail.usertype|}"></label>
 										<div class="col-md-8 col-sm-9 col-xs-12">
 											<select id="userType" class="form-control"
@@ -153,7 +153,7 @@
 										<div class="form-group row"
 											th:each="permission, itemStats : ${dto.permissions}"> <!-- .replaceAll('\', '') -->
 											<label
-												class="label form-control-label col-md-3 col-sm-3 required-field"
+												class="label form-control-label col-lg-4 col-md-12 required-field"
 													th:text="#{'permission' + ${permission.functionality.path}}"></label> 
 												<input 	type="hidden" th:field="*{permissions[__${itemStats.index}__].user}" /> 
 												<input type="hidden" th:field="*{permissions[__${itemStats.index}__].functionality}" />
@@ -175,9 +175,9 @@
 									<div class="form-group row"
 										th:if="${#strings.contains(action, 'update')}">
 										<label for="subscription"
-											class="label form-control-label col-md-3 col-sm-3"
+											class="label form-control-label col-lg-4 col-md-5"
 											th:text="#{|${baseMessageKey}.detail.subscription|}"></label>
-										<div class="col-md-8 col-sm-9 col-xs-12">
+										<div class="col-md-2">
 											<a
 												th:if="${dto.subscription != null && dto.subscription.id != 0}"
 												th:href="@{/subscription/edit/{id}(id=${dto.subscription.id})}"												
@@ -190,12 +190,12 @@
 										th:if="${dto.subscription != null && dto.subscription.businessCode != null}">
 										<div class="form-group row" id="account_type_div">
 											<label for="subscription"
-												class="label form-control-label col-md-3 col-sm-3"
+												class="label form-control-label col-lg-4 col-md-5"
 												th:text="#{'discount.code.type.' + ${dto.subscription.businessCode.type}}">
 											</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-3">
 												<label for="subscription"
-													class="label form-control-label col-md-3 col-sm-3"
+													class="label form-control-label"
 													th:text="${dto.subscription.businessCode.name}"> </label>
 											</div>
 										</div>

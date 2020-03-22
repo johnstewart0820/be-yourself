@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import fr.be.your.self.backend.utils.SubscriptionCsv;
 import fr.be.your.self.backend.utils.SubscriptionCsvMappingStrategy;
 import fr.be.your.self.backend.utils.UserUtils;
 import fr.be.your.self.common.BusinessCodeStatus;
+import fr.be.your.self.common.BusinessCodeType;
 import fr.be.your.self.common.CanalType;
 import fr.be.your.self.common.LoginType;
 import fr.be.your.self.common.PaymentGateway;
@@ -61,6 +63,7 @@ import fr.be.your.self.model.Subscription;
 import fr.be.your.self.model.SubscriptionType;
 import fr.be.your.self.model.User;
 import fr.be.your.self.service.BaseService;
+import fr.be.your.self.service.BusinessCodeService;
 import fr.be.your.self.service.SubscriptionService;
 import fr.be.your.self.service.SubscriptionTypeService;
 import fr.be.your.self.service.UserService;
@@ -79,6 +82,9 @@ public class SubscriptionController extends BaseResourceController<Subscription,
 	
 	@Autowired
 	SubscriptionTypeService subtypeService;
+	
+	@Autowired
+	protected BusinessCodeService businessCodeService;
 	
 	public static String CSV_SUBSCRIPTION_EXPORT_FILE = "subscription.csv";
 
@@ -208,13 +214,17 @@ public class SubscriptionController extends BaseResourceController<Subscription,
                 
         final Subscription domain = this.newDomain();
         dto.copyToDomain(domain);
-        if (codeId != null && codeId != SubscriptionDto.UNDEFINED_CODE) {
+        
+        if (codeId != null && codeId != SubscriptionDto.UNDEFINED_CODE) { 
         	BusinessCode code = codeService.getById(dto.getCodeId());
-        	if (code == null) {
-        		//TODO TVA if code not found.
-        	}
-        	domain.setBusinessCode(code);
+	        if (!validateData(dto, code, redirectAttributes, model, domain, "create")) {
+	        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+	        } else {
+	        	domain.setBusinessCode(code);
+	        }
         }
+        
+        
         User user = userService.getById(dto.getUserId());
         SubscriptionType subtype = subtypeService.getById(dto.getSubtypeId());
         domain.setUser(user);
@@ -225,7 +235,6 @@ public class SubscriptionController extends BaseResourceController<Subscription,
         
         //Error
         if (savedDomain == null || result.hasErrors()) {
-        	
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
         }
         
@@ -234,6 +243,43 @@ public class SubscriptionController extends BaseResourceController<Subscription,
         
         return "redirect:" + this.getBaseURL();
     }
+
+	private boolean validateData(SubscriptionDto dto, BusinessCode code, RedirectAttributes redirectAttributes,
+			Model model, Subscription domain, String action) {
+        	if (code == null) {
+        		String message = this.getMessage("subscription.error.code.not.found");
+        		setActionResultInModel(model, action, "warning", message);
+				return false;
+        	}
+
+        	//Check that if we add new subscription using this code, we will not pass the maximum number of usage.
+        	if (code.getType() == BusinessCodeType.B2B_MULTIPLE.getValue() 
+        			&& isAddingNewUsage(domain, action, code) ) { 
+        		final List<Integer> codeIds = Collections.singletonList(code.getId());
+        		final Map<Integer, Integer> usedAmounts = this.businessCodeService.getUsedAmountByIds(codeIds);
+    			
+    			if (usedAmounts != null) {
+    				final Integer usedAmount = usedAmounts.get(code.getId());
+    				if (usedAmount!= null && usedAmount >= code.getMaxUserAmount()) {
+    					String message = this.getMessage("subscription.error.code.max.amount", new Object[] {code.getName()});
+    					setActionResultInModel(model, action, "warning", message);
+    					return false;
+    				}
+    			}
+        	}
+       
+		return true;
+	}
+
+	private boolean isAddingNewUsage(Subscription domain, String action, BusinessCode code) {
+		if ("create".equals(action)) {
+			return true;
+		}
+		if (domain.getBusinessCode()  == null || domain.getBusinessCode().getId() != code.getId()) { //Currently we are not using a business code OR the code we are using is not this one
+			return true;
+		}
+		return false;
+	}
 	
 	
 	@PostMapping("/update/{id}")
@@ -250,6 +296,7 @@ public class SubscriptionController extends BaseResourceController<Subscription,
         	return this.getFormView();
         }
         
+
         Subscription domain = this.subscriptionService.getById(id);
         
         if (domain == null) {
@@ -266,11 +313,14 @@ public class SubscriptionController extends BaseResourceController<Subscription,
         User user = this.userService.getById(dto.getUserId());
         if (codeId != null && codeId != SubscriptionDto.UNDEFINED_CODE) {
         	BusinessCode code = codeService.getById(dto.getCodeId());
-        	if (code == null) {
-        		//TODO TVA if code not found.
-        	}
-        	domain.setBusinessCode(code);
+        	if (!validateData(dto, code, redirectAttributes, model, domain, "create")) {
+	        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
+	        } else {
+	        	domain.setBusinessCode(code);
+	        }
         }
+                   
+        
         if (codeId == SubscriptionDto.UNDEFINED_CODE) {
         	domain.setBusinessCode(null);
         }

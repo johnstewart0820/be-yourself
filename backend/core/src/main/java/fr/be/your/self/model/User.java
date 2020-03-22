@@ -89,11 +89,10 @@ public class User extends PO<Integer> {
 	@JoinColumn(name = "address_id")
 	private Address address;
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(fetch = FetchType.LAZY, cascade =  {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
 	@JoinColumn(name = "specialty_id")
 	private Specialty specialty;
 	
-
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<Price> prices;
 

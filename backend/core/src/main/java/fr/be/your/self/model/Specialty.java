@@ -13,7 +13,7 @@ public class Specialty {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "address")
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "specialty")
 	private User user;
 	
 	private boolean domicile;
@@ -24,6 +24,8 @@ public class Specialty {
 	private boolean pregnancy;
 	private boolean sport;
 	private boolean enterprise;
+	private boolean teenager;
+
 	
 	public int getId() {
 		return id;
@@ -87,5 +89,10 @@ public class Specialty {
 		this.enterprise = enterprise;
 	}
 	
-	
+	public boolean isTeenager() {
+		return teenager;
+	}
+	public void setTeenager(boolean teenager) {
+		this.teenager = teenager;
+	}
 }

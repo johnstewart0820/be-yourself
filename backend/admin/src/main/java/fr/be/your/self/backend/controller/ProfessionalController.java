@@ -3,8 +3,10 @@ package fr.be.your.self.backend.controller;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -56,6 +59,8 @@ import fr.be.your.self.util.StringUtils;
 public class ProfessionalController extends BaseResourceController<User, User, UserDto, Integer> {
 	public static final String NAME = "professional";
 
+	public static final int MAX_DEGREES_NB = 3;
+	
 	private static final String BASE_MEDIA_URL = Constants.PATH.WEB_ADMIN_PREFIX 
 			+ Constants.PATH.WEB_ADMIN.MEDIA 
 			+ Constants.FOLDER.MEDIA.PROFESSIONAL;
@@ -142,17 +147,33 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 			Model model, User domain, UserDto dto) throws BusinessException {
 		List<String> formations = FormationType.getPossibleStrValues();
 
+		Set<String> supportMediaTypes = new HashSet<>();
+		supportMediaTypes.addAll(this.dataSetting.getImageMimeTypes());
+		supportMediaTypes.addAll(this.dataSetting.getVideoMimeTypes());
+		final String supportMediaFileTypes = String.join(",", supportMediaTypes);
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
+		final String supportVideoTypes = String.join(",", this.dataSetting.getVideoMimeTypes());
+		final String supportVideoExtensions = String.join(",", this.dataSetting.getVideoFileExtensions());
+
 		final long supportImageSize = this.dataSetting.getImageMaxFileSize();
 		
 		model.addAttribute("supportImageTypes", supportImageTypes);
 		model.addAttribute("supportImageExtensions", supportImageExtensions);
+		
+		model.addAttribute("supportVideoTypes", supportVideoTypes);
+		model.addAttribute("supportVideoExtensions", supportVideoExtensions);
+		
+		model.addAttribute("supportMediaFileTypes", supportMediaFileTypes);
+
+		
 		model.addAttribute("supportImageSize", supportImageSize);
 		model.addAttribute("supportImageSizeLabel", StringUtils.formatFileSize(supportImageSize));
 		
 		model.addAttribute("formations", formations);
-
+		model.addAttribute("maxDegreesNumber", MAX_DEGREES_NB);
+		String maxDegreesMsg = this.getMessage("professional.error.max.degrees", new Object[] {MAX_DEGREES_NB});
+		model.addAttribute("maxDegreesMsg", maxDegreesMsg);
 	}
 	
 	@Override
@@ -169,14 +190,23 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		if (result.hasErrors()) {
 			return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
 		}
-
+		
+        final MultipartFile uploadProfilePictureFile = dto.getUploadImageFile();
+        Path profilePictureFilePath = null;
+        String profilePictureFileName = null;
+        
+		//Validate Input
+		if (!validateInput(dto, model, uploadProfilePictureFile, "create")) {
+			return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+		}
+			
 		final User user = this.newDomain();
 		dto.copyToDomainOfProfessional(user);
 		
 		//Check if email address already existed.
 		if (userService.existsEmail(user.getEmail())) {
 			String message = this.getMessage("users.error.email.existed");
-			setActionResultInModel(model, message);
+			setActionResultInModel(model, "create", "warning", message);
         	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
 		}
 		
@@ -209,18 +239,16 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 			user.setEvents(dto.getEvents());
 		}
 		
-		 //Validate image file
-        final MultipartFile uploadImageFile = dto.getUploadImageFile();
 
         //Process upload image file
-        if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
-	        final Path uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
-	        if (uploadImageFilePath == null) {
+        if (uploadProfilePictureFile != null && !uploadProfilePictureFile.isEmpty()) {
+        	profilePictureFilePath = this.processUploadImageFile(uploadProfilePictureFile, result);
+	        if (profilePictureFilePath == null) {
 	        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
 	        }
 	      //Set profile picture
-	        final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
-	        user.setProfilePicture(uploadImageFileName);
+	        profilePictureFileName = profilePictureFilePath.getFileName().toString();
+	        user.setProfilePicture(profilePictureFileName);
         }
         
         
@@ -255,6 +283,18 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         
 		User savedUser = userService.create(user);
 		
+		//Error, delete upload file
+        if (savedUser == null || result.hasErrors()) {
+        	deleteUploadFiles(profilePictureFilePath, profilePictureFileName, degreesList, mediasList);
+        	
+        	if (!result.hasErrors()) {
+	        	final ObjectError error = this.createProcessingError(result);
+	        	result.addError(error);
+        	}
+        	
+        	return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        }
+        
 
 		//Add default permission value = "Denied" to professionals
 		addDefaultPermissions(savedUser);
@@ -273,7 +313,64 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		return "redirect:" + this.getBaseURL();
 	}
 
-	
+	private boolean validateInput(UserDto dto, Model model, final MultipartFile uploadProfilePictureFile, String action) {
+		String profilePictureContentType = uploadProfilePictureFile.getContentType();
+		//Check profile picture
+        if (uploadProfilePictureFile != null && !uploadProfilePictureFile.isEmpty()) {
+			if (!this.dataSetting.getImageMimeTypes().contains(profilePictureContentType)) {
+				final String supportImageExtensions = String.join(", ", this.dataSetting.getImageFileExtensions());
+				final Object[] messageArguments = new String[] { supportImageExtensions };
+				String message = this.getMessage("professional.error.profile.picture.invalid", messageArguments);
+				setActionResultInModel(model, action, "warning", message);
+				return false;
+			}
+        }
+		
+		
+		//Check media files
+		Set<String> supportMediaTypes = new HashSet<>();
+		supportMediaTypes.addAll(this.dataSetting.getImageMimeTypes());
+		supportMediaTypes.addAll(this.dataSetting.getVideoMimeTypes());
+				
+		for (MultipartFile file : dto.getMedias()) {
+			if (StringUtils.isNullOrEmpty(file.getOriginalFilename())){
+				continue;
+			}
+			String mediaContentType = file.getContentType();
+
+			if (! (supportMediaTypes.contains(mediaContentType)) ) {
+				Set<String> supportMediaExtensions = new HashSet<>();
+				supportMediaExtensions.addAll(this.dataSetting.getImageFileExtensions());
+				supportMediaExtensions.addAll(this.dataSetting.getVideoFileExtensions());
+				String mediaExtensions = String.join(",", supportMediaExtensions);
+				final Object[] messageArguments = new String[] { mediaExtensions };
+				
+				String message = this.getMessage("professional.error.media.invalid", messageArguments);
+				setActionResultInModel(model, action, "warning", message);
+				return false;
+			}
+        }
+		
+		return true;
+	}
+
+	private void deleteUploadFiles(Path profilePictureFilePath, String profilePictureFileName,
+			List<DegreeFile> degreesList, List<MediaFile> mediasList) {
+		//Delete profile picture
+		if (!StringUtils.isNullOrEmpty(profilePictureFileName)) {
+			this.deleteUploadFile(profilePictureFilePath);
+		}
+		//Delete degree files
+		for (DegreeFile degree : degreesList) {
+			this.deleteUploadFile(degree.getFilePath());
+		}
+		//delete media files
+		for (MediaFile media : mediasList) {
+			this.deleteUploadFile(media.getFilePath());
+		}
+	}
+
+
 	
 	@PostMapping("/update/{id}")
 	@Transactional
@@ -291,6 +388,14 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         	dto.setId(id);
         	return this.getFormView();
         }
+        
+        final MultipartFile newProfilePictureFile = dto.getUploadImageFile();
+
+        
+		//Validate Input
+		if (!validateInput(dto, model, newProfilePictureFile, "update")) {
+			return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+		}
        
         User domain = this.userService.getById(id);
                 
@@ -307,20 +412,19 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         
         // Process upload image and content file
         String oldPictureToDelete = null;
-        Path uploadImageFilePath = null;
+        Path newProfilePicturePath = null;
         
-        final MultipartFile uploadImageFile = dto.getUploadImageFile();
-        if (uploadImageFile != null && !uploadImageFile.isEmpty()) {
+        if (newProfilePictureFile != null && !newProfilePictureFile.isEmpty()) {
         	oldPictureToDelete = domain.getProfilePicture();
         	
         	//Process upload image file
-        	uploadImageFilePath = this.processUploadImageFile(uploadImageFile, result);
-            if (uploadImageFilePath == null) {
+        	newProfilePicturePath = this.processUploadImageFile(newProfilePictureFile, result);
+            if (newProfilePicturePath == null) {
             	dto.setId(id);
             	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
             }
             
-            final String uploadImageFileName = uploadImageFilePath.getFileName().toString();
+            final String uploadImageFileName = newProfilePicturePath.getFileName().toString();
         	domain.setProfilePicture(uploadImageFileName);
         }
 
@@ -328,7 +432,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         final User updatedDomain = this.userService.update(domain);
        //Error, delete upload file
         if (updatedDomain == null || result.hasErrors()) {
-        	this.deleteUploadFile(uploadImageFilePath);
+        	this.deleteUploadFile(newProfilePicturePath);
         	
         	if (!result.hasErrors()) {
 	        	final ObjectError error = this.createProcessingError(result);
@@ -338,6 +442,10 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         	dto.setId(id);
         	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
         }
+        
+        
+        //Success, delete old profile picture
+        this.deleteUploadFile(oldPictureToDelete);
         
        
 		// Update prices
@@ -379,9 +487,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         
         List<Integer> eventIdList = parseFromString(eventIdsToRemove);
         removeIds(professionalEventService, eventIdList); 
-        
-        //Success, delete old profile picture
-        this.deleteUploadFile(oldPictureToDelete);
+
 
         redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "update");
         redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");

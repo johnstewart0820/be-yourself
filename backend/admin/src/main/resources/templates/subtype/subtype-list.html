@@ -159,9 +159,35 @@
 				const defaultSort = '[[${sort}]]';
 				const sortUrl = '[[${baseURL}]]/current-page?sort=';
 
-				buildDataTable(dataTableId, sortableColumnMaps, defaultSort,
-						sortUrl);
-
+				//buildDataTable(dataTableId, sortableColumnMaps, defaultSort,	sortUrl);
+				if ([[${writePermission}]]) {
+							 	$('#subtype-data-table').dataTable({
+									"sDom" : 't',
+									"order": [],
+									 "aoColumns": [
+										 	null,
+										    null,
+										    null,
+										    null,
+										    {  "sType": "string" },
+										    {  "sType": "string" },
+										    {  "orderable": false },
+									  ]
+								}); 
+							} else {
+								$('#subtype-data-table').dataTable({
+									"sDom" : 't',
+									"order": [],
+									"aoColumns": [
+										    null,
+										    null,
+										    null,
+										    null,
+										    { "sType": "string" },
+										    {  "sType": "string" },
+									  ]
+								}); 
+							}
 				$('select').selectpicker();
 
 				$('#display-page-option')

@@ -39,7 +39,7 @@
 			<div class="table-responsive">
 				<form id="select_user_form" th:action="${baseURL + '/exportcsv'}"
 					method="post">
-					<table class="table align-items-center table-flush" id="user_table">
+					<table class="table align-items-center table-flush"  th:id="${pageName + '-data-table'}">
 						<thead class="thead-light">
 							<tr>
 								<th scope="col"><span th:text="#{professional.list.email}"> </span></th>
@@ -123,24 +123,7 @@
 
 
 	<section layout:fragment="scripts">
-		<script>
-			var filter_role = "";
-			var filter_status = -2;
-			var filter_subtype = -2;
-			var search_box = "";
-		</script>
-
-		<script th:if="${filterSubtype != null}">
-			filter_subtype = "[[${filterSubtype}]]";
-		</script>
-
-		<script th:if="${filterRole != null}">
-			filter_role = "[[${filterRole}]]";
-		</script>
-
-		<script th:if="${filterStatus != null}">
-			filter_status = "[[${filterStatus}]]";
-		</script>
+		
 		<script>
 			var select_all = false;
 			function confirmDelete(id) {
@@ -154,141 +137,46 @@
 				
 			showOnLoadedModal();
 
-			
-			$('#user_table').DataTable({
-									"sDom" : 't'
-								});
+			if ([[${writePermission}]]) {
+			 	$('#professional-data-table').dataTable({
+					"sDom" : 't',
+					"order": [],
+					 "aoColumns": [
+						 	null,
+						    null,
+						    null,
+						    {  "sType": "string" },
+						    {  "orderable": false },
+					  ]
+				}); 
+			} else {
+				$('#professional-data-table').dataTable({
+					"sDom" : 't',
+					"order": [],
+					"aoColumns": [
+						    null,
+						    null,
+						    null,
+						    null,
+						    { "sType": "string" },
+					  ]
+				}); 
+			}
 
-								$('#filter_role').val(filter_role);
-								$("#filter_status").val(filter_status);
-								$("#search_box").val("[[${search_box}]]");
+								
 
-								$("select#filter_subtype")
-										.change(
-												function() {
-													$("#filter_role")
-															.val(
-																	$(
-																			"#filter_role option:first")
-																			.val());
-													$("#filter_status")
-															.val(
-																	$(
-																			"#filter_status option:first")
-																			.val());
+			$('#display-page-option')
+					.on(
+							'changed.bs.select',
+							function(e, clickedIndex,
+									isSelected,
+									previousValue) {
+								const selectedPageSize = $('#display-page-option').val();
 
-													const selectedStatus = $(
-															'#filter_status')
-															.val();
-													const selectedRole = $(
-															'#filter_role')
-															.val();
-													const selectedSubtype = $(
-															'#filter_subtype')
-															.val();
-													encodedSelectedSubtypeIds = encodeURIComponent(selectedSubtype
-															.join(','));
-
-													window.location = '[[${baseURL}]]/search?action=update-filter&filterRole='
-															+ selectedRole
-															+ '&filterStatus='
-															+ selectedStatus
-															+ '&filterSubscriptionTypesIds='
-															+ encodedSelectedSubtypeIds;
-												});
-
-								$("select#filter_status")
-										.change(
-												function() {
-													$("#filter_role")
-															.val(
-																	$(
-																			"#filter_role option:first")
-																			.val());
-													$('#filter_subtype')
-															.selectpicker(
-																	'val', '');
-
-													const selectedStatus = $(
-															'#filter_status')
-															.val();
-													const selectedRole = $(
-															'#filter_role')
-															.val();
-													const selectedSubtype = $(
-															'#filter_subtype')
-															.val();
-													encodedSelectedSubtypeIds = encodeURIComponent(selectedSubtype
-															.join(','));
-
-													window.location = '[[${baseURL}]]/search?action=update-filter&filterRole='
-															+ selectedRole
-															+ '&filterStatus='
-															+ selectedStatus
-															+ '&filterSubscriptionTypesIds='
-															+ encodedSelectedSubtypeIds;
-												});
-
-								$("select#filter_role")
-										.change(
-												function() {
-													$("#filter_status")
-															.val(
-																	$(
-																			"#filter_status option:first")
-																			.val());
-													$('#filter_subtype')
-															.selectpicker(
-																	'val', '');
-
-													const selectedRole = $(
-															'#filter_role')
-															.val();
-													const selectedStatus = $(
-															'#filter_status')
-															.val()
-													const selectedSubtype = $(
-															'#filter_subtype')
-															.val();
-													encodedSelectedSubtypeIds = encodeURIComponent(selectedSubtype
-															.join(','));
-
-													window.location = '[[${baseURL}]]/search?action=update-filter&filterRole='
-															+ selectedRole
-															+ '&filterStatus='
-															+ selectedStatus
-															+ '&filterSubscriptionTypesIds='
-															+ encodedSelectedSubtypeIds;
-
-												});
-
-								$('a[href="#select_users"]').click(
-										function() {
-											if (select_all == false) {
-												$("[name='selected_id']").prop(
-														'checked', true);
-												select_all = true;
-											} else {
-												$("[name='selected_id']").prop(
-														'checked', false);
-												select_all = false;
-											}
-										});
-
-								$('#display-page-option')
-										.on(
-												'changed.bs.select',
-												function(e, clickedIndex,
-														isSelected,
-														previousValue) {
-													const selectedPageSize = $(
-															'#display-page-option')
-															.val();
-
-													window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size='
-															+ selectedPageSize;
-												});
+								window.location = '[[${baseURL}]]/search?action=update-filter&page=1&size='
+										+ selectedPageSize;
 							});
+		});
 		</script>
 
 	</section>
