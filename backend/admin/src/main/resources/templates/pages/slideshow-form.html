@@ -13,7 +13,7 @@
 				padding-left: 12px;
 			}
 			
-			.testimonial-group > .row {
+			.testimonial-group > .slide-row {
 				display: inline-block;
 				overflow-x: auto;
 				white-space: nowrap;
@@ -21,12 +21,12 @@
 				padding-bottom: 8px;
 			}
 			
-			.testimonial-group > .row > .col-image {
+			.testimonial-group > .slide-row > .col-image {
 				display: inline-block;
 				float: none;
 				
-				padding-bottom: 12px;
-				padding-top: 12px;
+				padding-bottom: 6px;
+				padding-top: 6px;
 				padding-left: 6px;
 				padding-right: 6px;
 				
@@ -35,10 +35,15 @@
 				vertical-align: top;
 			}
 			
+			/*
 			.col-image {
 				border: 2px solid #28a745;
 			}
 			
+			.col-preview-image {
+				border: 2px dotted #d3d3d3;
+			}
+			*/
 			.col-image .red-circle {
 				position: absolute;
 				top: 6px;
@@ -56,6 +61,13 @@
 				min-height: 120px;
 				min-width: 120px;
 				max-width: 120px;
+				
+				border: 2px solid #28a745;
+				padding: 6px;
+			}
+			
+			.col-preview-image .symbol {
+				border: 2px dotted #d3d3d3;
 			}
 			
 			.col-image .closes {
@@ -81,10 +93,6 @@
 			.col-image:hover .closes {
 				opacity: 1;
 			}
-			
-			.col-preview-image {
-				border: 2px dotted #d3d3d3;
-			}
 		</style>
 	</th:block>
 	
@@ -100,10 +108,9 @@
 			
 			<div class="card-body border-0">
 				<div class="testimonial-group">
- 					<div class="row">
+ 					<div class="slide-row">
  						<th:block th:if="${mainDto.images != null}">
- 							<div th:each="item : ${mainDto.images}" 
- 								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+ 							<div th:each="item : ${mainDto.images}" class="col-image">
  								<img class="red-circle" th:title="#{slideshow.action.delete.image.title}"	
 											th:src="@{/images/red-circle.png}"					 									
 						 					th:onclick="confirmDeleteMainImage([[${ item.id }]])">
@@ -119,10 +126,10 @@
  							</div>
  						</th:block>
  						
- 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image col-preview-image">
+ 						<div class="col-image col-preview-image">
                				<img id="image-preview-main" 
                					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
-               					class="img-fluid mx-auto d-block">
+               					class="img-fluid mx-auto d-block symbol">
 						</div>
   					</div>
   				</div>
@@ -193,10 +200,9 @@
 				
 				<div class="card-body border-0">
 					<div class="testimonial-group">
-	 					<div class="row">
+	 					<div class="slide-row">
 	 						<th:block th:if="${schedule.images != null}">
-	 							<div th:each="item : ${schedule.images}" 
-	 								class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
+	 							<div th:each="item : ${schedule.images}" class="col-image">
 	 								<img class="red-circle" th:title="#{slideshow.action.delete.image.title}"	
 											th:src="@{/images/red-circle.png}"					 									
 						 					th:onclick="confirmDeleteScheduleImage([[${ item.id }]])">	 					
@@ -212,10 +218,10 @@
 	 							</div>
 	 						</th:block>
 	 						
-	 						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image col-preview-image">
+	 						<div class="col-image col-preview-image">
 	               				<img th:id="${'image-preview-schedule-' + schedule.id}" 
 	               					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
-	               					class="img-fluid mx-auto d-block">
+	               					class="img-fluid mx-auto d-block symbol">
 							</div>
 	 					</div>
 	 				</div>
@@ -285,11 +291,11 @@
 			
 			<div class="card-body border-0">
 	 			<div class="testimonial-group">
- 					<div class="row">
-						<div class="col-12 col-sm-6 col-md-4 col-lg-2 col-image col-preview-image">
+ 					<div class="slide-row">
+						<div class="col-image col-preview-image">
                				<img id="image-preview-new-schedule" 
                					th:src="@{/images/default/{pageName}.png(pageName=${pageName})}" 
-               					class="img-fluid mx-auto d-block">
+               					class="img-fluid mx-auto d-block symbol">
 						</div>
  					</div>
  				</div>

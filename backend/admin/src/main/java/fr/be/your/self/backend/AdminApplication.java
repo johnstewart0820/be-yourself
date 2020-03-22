@@ -1,10 +1,7 @@
 package fr.be.your.self.backend;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,12 +112,9 @@ public class AdminApplication implements CommandLineRunner {
 		final String adminEmail = "admin@gmail.com";
 		
 		try {
-			final Date today = DateUtils.truncate(new Date(), Calendar.DATE);
-			final Optional<Slideshow> currentSlideshow = slideshowRepository.findFirstByStartDateLessThanEqualOrderByStartDateDesc(today);
+			final Optional<Slideshow> currentSlideshow = slideshowRepository.findFirstByStartDateIsNull();
 			if (!currentSlideshow.isPresent()) {
 				final Slideshow defaultSlideshow = new Slideshow();
-				defaultSlideshow.setStartDate(today);
-				
 				slideshowRepository.save(defaultSlideshow);
 			}
 			

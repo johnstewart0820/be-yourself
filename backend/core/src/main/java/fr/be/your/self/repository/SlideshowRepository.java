@@ -13,7 +13,7 @@ import fr.be.your.self.model.Slideshow;
 @Repository
 public interface SlideshowRepository extends BaseRepository<Slideshow, Integer> {
 	
-	Optional<Slideshow> findFirstByStartDateLessThanEqualOrderByStartDateDesc(Date date);
+	Optional<Slideshow> findFirstByStartDateIsNullOrStartDateLessThanEqualOrderByStartDateDesc(Date date);
 	
 	long countByStartDateGreaterThan(Date date);
 	
@@ -27,5 +27,5 @@ public interface SlideshowRepository extends BaseRepository<Slideshow, Integer> 
     
     //Page<Slideshow> findAllByStartDateIsNotNull(Pageable pageable);
     
-    //Iterable<Slideshow> findAllByStartDateIsNull();
+    Optional<Slideshow> findFirstByStartDateIsNull();
 }
