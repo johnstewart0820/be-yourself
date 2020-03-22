@@ -46,7 +46,7 @@ public class UserDto implements Serializable {
 	private String profilePicture;
 	private String description;
 	private Address address;
-	private List<DegreeFile> degreeFiles;
+	private List<DegreeFile> degreeFiles = new ArrayList<>();
 	
 	private List<MediaFile> mediaFiles;
 

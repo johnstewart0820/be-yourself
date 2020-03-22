@@ -4,7 +4,59 @@
 	layout:decorate="~{layout/main-layout.html}">
 <head>
 <title th:text="#{|${baseMessageKey}.page.title|}"></title>
+<style>
+/* For mobile phones: */
+/* [class*="custom-col-"] {
+  width: 100%;
+} */
 
+@media only screen and (max-width: 1049px) {
+  /* For tablets: */
+  .custom-col-sm-1 {width: 8.33%;}
+  .custom-col-sm-2 {width: 16.66%;}
+  .custom-col-sm-3 {width: 25%;}
+  .custom-col-sm-4 {width: 33.33%;}
+  .custom-col-sm-5 {width: 41.66%;}
+  .custom-col-sm-6 {width: 50%;}
+  .custom-col-sm-7 {width: 58.33%;}
+  .custom-col-sm-8 {width: 66.66%;}
+  .custom-col-sm-9 {width: 75%;}
+  .custom-col-sm-10 {width: 83.33%;}
+  .custom-col-sm-11 {width: 91.66%;}
+  .custom-col-sm-12 {width: 100%;margin-top: 3px}
+}
+
+@media only screen  and (min-width: 1050px) and (max-width: 1299px) {
+  .custom-col-md-1 {width: 8.33%;}
+  .custom-col-md-2 {width: 16.66%;}
+  .custom-col-md-3 {width: 25%;}
+  .custom-col-md-4 {width: 33.33%; margin-top: 3px}
+  .custom-col-md-5 {width: 41.66%;}
+  .custom-col-md-6 {width: 50%;}
+  .custom-col-md-7 {width: 58.33%;}
+  .custom-col-md-8 {width: 66.66%;}
+  .custom-col-md-9 {width: 75%;}
+  .custom-col-md-10 {width: 83.33%;}
+  .custom-col-md-11 {width: 91.66%;}
+  .custom-col-md-12 {width: 100%;margin-top: 5px}
+}
+
+@media only screen and (min-width: 1300px) {
+  /* For desktop: */
+  .custom-col-lg-1 {width: 8.33%;}
+  .custom-col-lg-2 {width: 16.66%;}
+  .custom-col-lg-3 {width: 25%; text-align: right}
+  .custom-col-lg-4 {width: 33.33%;}
+  .custom-col-lg-5 {width: 41.66%;}
+  .custom-col-lg-6 {width: 50%;}
+  .custom-col-lg-7 {width: 58.33%;}
+  .custom-col-lg-8 {width: 66.66%;}
+  .custom-col-lg-9 {width: 75%;}
+  .custom-col-lg-10 {width: 83.33%;}
+  .custom-col-lg-11 {width: 91.66%;}
+  .custom-col-lg-12 {width: 100%;}
+}
+</style>
 </head>
 <body>
 	<th:block layout:fragment="content">
@@ -14,19 +66,19 @@
 					th:action="${baseURL} + '/search'" method="get">
 					<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
 					<div class="row form-search-container">
-						<div class="col-lg-3 col-md-6 ">
+						<div class="custom-col-lg-3 custom-col-md-4 custom-col-sm-12"  style=" text-align: left">
 							<select id="filter_status" name="filter_status "
-								class="selectpicker show-tick"
-								th:title="#{|${baseMessageKey}.option.filter.status.title|}">
+								class="selectpicker show-tick">
 								<option value="" th:text="#{|${baseMessageKey}.option.filter.status.title|}">FILTER BY STATUSES</option>
 								
 								<option th:each="userStatus : ${userStatuses}"
 									th:value="${userStatus}"
-									th:text="#{'user.status.' + ${userStatus}}"></option>
+									th:text="#{'user.status.' + ${userStatus}}"
+									></option>
 							</select>
 						</div>
 						
-						<div class="col-lg-3 col-md-6">
+						<div class="custom-col-lg-3 custom-col-md-4 custom-col-sm-12" style=" text-align: left">
 							<select id="filter_subtype" class="selectpicker show-tick "
 								multiple data-actions-box="true" data-live-search="true"
 								th:data-select-all-text="#{data.display.button.select.all}"
@@ -42,7 +94,7 @@
 							</select>
 						</div>
 						
-						<div class="col-lg-3 col-md-6">
+						<div class="custom-col-lg-3 custom-col-md-4 custom-col-sm-12" style=" text-align: left">
 							<select id="filter_role" name="filter_role"
 								class="selectpicker show-tick ">
 								<option value="" th:text="#{|${baseMessageKey}.option.filter.role.title|}">FILTER BY ROLES</option>
@@ -51,7 +103,7 @@
 							</select>
 						</div>
 
-						<div class="col-lg-3 col-md-6">
+						<div class="custom-col-lg-3 custom-col-md-12 custom-col-sm-12">
 							<select id="display-page-option" class="selectpicker show-tick"
 								th:data-none-selected-text="#{data.display.page.option.title}">
 								<option th:each="pageSize: ${supportPageSizes}"
@@ -94,7 +146,7 @@
 			<div class="table-responsive">
 				<form id="select_user_form" th:action="${baseURL + '/exportcsv'}"
 					method="post">
-					<table class="table align-items-center table-flush" id="user_table">
+					<table class="table align-items-center table-flush" th:id="${pageName + '-data-table'}">
 						<thead class="thead-light">
 							<tr>
 								<th scope="col"></th>
@@ -138,6 +190,7 @@
 										</span>
 									</button></td>
 							</tr>
+
 						</tbody>
 					</table>
 				</form>
@@ -210,41 +263,54 @@
 				showModal('confirm-delete-modal');
 			}
 
-			$(document).ready(function() {
-				showOnLoadedModal();
-								$('#user_table').DataTable({
-									"sDom" : 't'
-								});
 
+			
+			$(document).ready(function() {
+								showOnLoadedModal();
+								$('.selectpicker').selectpicker();
+								if ([[${writePermission}]]) {
+								 	$('#users-data-table').dataTable({
+										"sDom" : 't',
+										"order": [],
+										 "aoColumns": [
+											 {  "orderable": false },
+											    null,
+											    null,
+											    null,
+											    null,
+											    null,
+										    { "orderable": false  }
+										  ]
+									}); 
+								} else {
+									$('#users-data-table').dataTable({
+										"sDom" : 't',
+										"order": [],
+										"aoColumns": [
+											 {"orderable": false },
+											    null,
+											    null,
+											    null,
+											    null,
+											    null,
+										  ]
+									}); 
+								}
+								
+								 
 								$('#filter_role').val(filter_role);
 								$("#filter_status").val(filter_status);
 								$("#search_box").val("[[${search_box}]]");
 
 								$("select#filter_subtype")
-										.change(
-												function() {
-													$("#filter_role")
-															.val(
-																	$(
-																			"#filter_role option:first")
-																			.val());
-													$("#filter_status")
-															.val(
-																	$(
-																			"#filter_status option:first")
-																			.val());
+										.change(function() {
+													$("#filter_role").val($("#filter_role option:first").val());
+													$("#filter_status").val($("#filter_status option:first").val());
 
-													const selectedStatus = $(
-															'#filter_status')
-															.val();
-													const selectedRole = $(
-															'#filter_role')
-															.val();
-													const selectedSubtype = $(
-															'#filter_subtype')
-															.val();
-													encodedSelectedSubtypeIds = encodeURIComponent(selectedSubtype
-															.join(','));
+													const selectedStatus = $('#filter_status').val();
+													const selectedRole = $('#filter_role').val();
+													const selectedSubtype = $('#filter_subtype').val();
+													encodedSelectedSubtypeIds = encodeURIComponent(selectedSubtype.join(','));
 
 													window.location = '[[${baseURL}]]/search?action=update-filter&filterRole='
 															+ selectedRole
@@ -255,26 +321,14 @@
 												});
 
 								$("select#filter_status")
-										.change(
-												function() {
-													$("#filter_role")
-															.val(
-																	$(
-																			"#filter_role option:first")
-																			.val());
-													$('#filter_subtype')
-															.selectpicker(
-																	'val', '');
+										.change(function() {
+													$("#filter_role").val($("#filter_role option:first").val());
+													$('#filter_subtype').selectpicker('val', '');
 
 													const selectedStatus = $('#filter_status').val();
-													const selectedRole = $(
-															'#filter_role')
-															.val();
-													const selectedSubtype = $(
-															'#filter_subtype')
-															.val();
-													encodedSelectedSubtypeIds = encodeURIComponent(selectedSubtype
-															.join(','));
+													const selectedRole = $('#filter_role').val();
+													const selectedSubtype = $('#filter_subtype').val();
+													encodedSelectedSubtypeIds = encodeURIComponent(selectedSubtype.join(','));
 
 													window.location = '[[${baseURL}]]/search?action=update-filter&filterRole='
 															+ selectedRole

@@ -86,6 +86,11 @@ public class UserController extends BaseResourceController<User, User, UserDto, 
 
 	static {
 		SORTABLE_COLUMNS.put("email", new String[] { "email" });
+		SORTABLE_COLUMNS.put("fullName", new String[] { "fullName" });
+		SORTABLE_COLUMNS.put("status", new String[] { "status" });
+		SORTABLE_COLUMNS.put("subtype", new String[] { "subtype" });
+		SORTABLE_COLUMNS.put("userType", new String[] { "userType" });
+
 	}
 	
 	@Override

@@ -185,7 +185,37 @@
 				const defaultSort = '[[${sort}]]';
 				const sortUrl = '[[${baseURL}]]/current-page?sort=';
 				
-				buildDataTable(dataTableId, sortableColumnMaps, defaultSort, sortUrl);
+				//buildDataTable(dataTableId, sortableColumnMaps, defaultSort, sortUrl);
+				if ([[${writePermission}]]) {
+							 	$('#subscription-data-table').dataTable({
+									"sDom" : 't',
+									"order": [],
+									 "aoColumns": [
+											{  "orderable": false },
+										 	null,
+										    null,
+										    null,
+										    null,
+										    null,
+										    {  "sType": "string" },
+										    {  "orderable": false }
+									  ]
+								}); 
+							} else {
+								$('#subscription-data-table').dataTable({
+									"sDom" : 't',
+									"order": [],
+									"aoColumns": [
+											{  "orderable": false },
+										    null,
+										    null,
+										    null,
+										    null,
+										    null,
+										    {  "sType": "string" }
+									  ]
+								}); 
+							}
 				
 				$('select').selectpicker();
 				
