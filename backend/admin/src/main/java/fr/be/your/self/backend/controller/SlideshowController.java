@@ -299,7 +299,10 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 	        return "redirect:" + this.getBaseURL() + "/current-page";
         }
         
-        Slideshow domain = this.mainService.getById(id);
+        Slideshow domain = id == 0 
+        		? this.mainService.create(new Slideshow())
+        		: this.mainService.getById(id);
+        
         if (domain == null) {
         	final String message = this.getIdNotFoundMessage(id);
         	
@@ -499,15 +502,18 @@ public class SlideshowController extends BaseResourceController<Slideshow, Slide
 			
 			try {
 				final Slideshow slideshow = domain.getSlideshow();
+				
+				/*
 				if (slideshow.getStartDate() != null 
 						&& this.mainService.countImage(slideshow.getId()) == 0) {
 					this.mainService.delete(slideshow.getId());
-					
-					redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete." + slideshowType + ".image");
-			        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
-					
-			        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + slideshow.getId();
 				}
+				*/
+				
+				redirectAttributes.addFlashAttribute(TOAST_ACTION_KEY, "delete." + slideshowType + ".image");
+		        redirectAttributes.addFlashAttribute(TOAST_STATUS_KEY, "success");
+				
+		        return "redirect:" + this.getBaseURL() + "/current-page#schedule-link-" + slideshow.getId();
 			} catch (Exception ex) {
 				this.logger.error("Cannot delete slideshow", ex);
 			}

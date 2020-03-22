@@ -13,7 +13,7 @@
 				
 				<form role="form" th:action="${baseURL} + '/search'" method="get">
 					<div class="row form-search-container">
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-4 col-md-6 col-sm-12 xs-filter-group">
 							<select id="category-filter" class="form-control selectpicker show-tick" multiple 
 								data-actions-box="true" data-live-search="true" 
 								th:data-select-all-text="#{data.display.button.select.all}"
@@ -28,7 +28,7 @@
 									th:selected="${#arrays.contains(filteredCategoryIds, sessionCategory.id)}"></option>
 							</select>
 						</div>
-						<div class="col-lg-4 col-md-6 col-sm-12">
+						<div class="col-lg-4 col-md-6 col-sm-12 xs-filter-group">
 							<select id="voice-filter" class="form-control voice-selectpicker show-tick" multiple
 								data-actions-box="false" data-live-search="true" 
 								th:data-select-all-text="#{data.display.button.select.all}"

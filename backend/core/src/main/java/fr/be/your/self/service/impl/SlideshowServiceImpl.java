@@ -58,7 +58,7 @@ public class SlideshowServiceImpl extends BaseServiceImpl<Slideshow, Integer> im
 
 	@Override
 	public Slideshow getCurrentSlideshow() {
-		final Optional<Slideshow> domain = this.repository.findFirstByStartDateLessThanEqualOrderByStartDateDesc(new Date());
+		final Optional<Slideshow> domain = this.repository.findFirstByStartDateIsNullOrStartDateLessThanEqualOrderByStartDateDesc(new Date());
 		
 		if (domain.isPresent()) {
 			return domain.get();
