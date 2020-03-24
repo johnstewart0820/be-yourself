@@ -39,6 +39,7 @@
   .custom-col-md-10 {width: 83.33%;}
   .custom-col-md-11 {width: 91.66%;}
   .custom-col-md-12 {width: 100%;margin-top: 5px}
+  .custom-col-md-32 {width: 32%;}
 }
 
 @media only screen and (min-width: 1300px) {
@@ -66,9 +67,9 @@
 					th:action="${baseURL} + '/search'" method="get">
 					<th:block th:replace="fragments/data-page-options :: list-header"></th:block>
 					<div class="row form-search-container">
-						<div class="custom-col-lg-3 custom-col-md-4 custom-col-sm-12"  style=" text-align: left">
+						<div class="custom-col-lg-9 custom-col-md-12 custom-col-sm-12" >
 							<select id="filter_status" name="filter_status"
-								class="selectpicker show-tick">
+								class="selectpicker show-tick custom-col-md-4 custom-col-sm-12">
 								<option value="" th:text="#{|${baseMessageKey}.option.filter.status.title|}">FILTER BY STATUSES</option>
 								
 								<option th:each="userStatus : ${userStatuses}"
@@ -76,10 +77,8 @@
 									th:text="#{'user.status.' + ${userStatus}}"
 									></option>
 							</select>
-						</div>
 						
-						<div class="custom-col-lg-3 custom-col-md-4 custom-col-sm-12" style=" text-align: left">
-							<select id="filter_subtype" class="selectpicker show-tick "
+							<select id="filter_subtype" class="selectpicker show-tick custom-col-md-4 custom-col-sm-12"
 								multiple data-actions-box="true" data-live-search="true"
 								th:data-select-all-text="#{data.display.button.select.all}"
 								th:data-deselect-all-text="#{data.display.button.deselect.all}"
@@ -92,19 +91,15 @@
 									th:text="${subtype.name}"
 									th:selected="${#arrays.contains(filteredSubscriptionTypesIds, subtype.id)}"></option>
 							</select>
-						</div>
-						
-						<div class="custom-col-lg-3 custom-col-md-4 custom-col-sm-12" style=" text-align: left">
 							<select id="filter_role" name="filter_role"
-								class="selectpicker show-tick ">
+								class="selectpicker show-tick custom-col-md-32 custom-col-sm-12" style="text-align: right">
 								<option value="" th:text="#{|${baseMessageKey}.option.filter.role.title|}">FILTER BY ROLES</option>
 								<option th:each="userType : ${userTypes}" th:value="${userType}"
 									th:text="#{'user.type.' + ${userType}}"></option>
 							</select>
 						</div>
-
-						<div class="custom-col-lg-3 custom-col-md-12 custom-col-sm-12">
-							<select id="display-page-option" class="selectpicker show-tick"
+						<!-- <div class="custom-col-lg-3 custom-col-md-12 custom-col-sm-12"> -->
+							<select id="display-page-option" class="selectpicker show-tick custom-col-lg-3 custom-col-md-12 custom-col-sm-12"
 								th:data-none-selected-text="#{data.display.page.option.title}">
 								<option th:each="pageSize: ${supportPageSizes}"
 									th:value="${pageSize}"
@@ -114,7 +109,7 @@
 									th:text="#{data.display.page.option.all(${pageSizeName})}"
 									th:selected="${size == null || size <= 0}"></option>
 							</select>
-						</div>
+						<!-- </div> -->
 					</div>
 					<input type="submit" style="display: none" />
 

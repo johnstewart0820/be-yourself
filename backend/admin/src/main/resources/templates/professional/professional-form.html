@@ -123,9 +123,9 @@
 											<!-- Last Name -->
 											<div class="form-group row">
 												<label for="lastname"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.lastname|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<input class="form-control" id="lastname" type="text"
 														th:field="*{lastName}" required>
 												</div>
@@ -133,9 +133,9 @@
 											<!-- First Name -->
 											<div class="form-group row">
 												<label for="firstname"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.firstname|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<input class="form-control" type="text" id="firstname"
 														th:field="*{firstName}" required>
 												</div>
@@ -143,9 +143,9 @@
 											<!-- Email -->
 											<div class="form-group row">
 												<label for="email"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xsrequired-field"
 													th:text="#{|${baseMessageKey}.detail.email|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12 ">
 													<input class="form-control" type="email" id="email"
 														th:field="*{email}" required>
 												</div>
@@ -153,9 +153,9 @@
 											<!-- Phone Number -->
 											<div class="form-group row">
 												<label for="phoneNumber"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.phonenumber|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<input class="form-control" type="tel" id="phoneNumber"
 														th:field="*{phoneNumber}" required>
 												</div>
@@ -167,18 +167,18 @@
 												<input type="hidden" th:field="*{address.longitude}" id="longitude">
 												<input type="hidden" id="searchAddrValue" value="">
 												<label for="address"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.address|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12 ">
 													<input class="form-control" type="text" id="address"
 														th:field="*{address.address}" required>
 												</div>
 											</div>
 											<div class="form-group row" th:if="${#strings.contains(action, 'update')}">											
 												<label for="address"
-													class="label form-control-label disabled col-md-3 col-sm-3 hidden-xs"
+													class="label form-control-label disabled col-lg-3 col-md-4 col-sm-12 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.coordinates|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<label class="form-control disabled" id="coordinates"
 														th:text="${dto.address.latitude} + ', ' +${dto.address.longitude}" ></label>
 												</div>
@@ -212,9 +212,9 @@
 											<!-- Formation Type -->
 											<div class="form-group row" id="account_type_div">
 												<label for="formation"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.formation|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<select class="form-control" id="userId" th:field="*{formation}">
 													<option th:each="formation : ${formations}" th:value="${formation}"
 													 th:text="#{'formation.level.' + ${formation}}"></option>
@@ -224,9 +224,9 @@
 											<!-- Website -->
 											<div class="form-group row">
 												<label for="website"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.website|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<input class="form-control" type="text" id="website"
 														th:field="*{website}">
 												</div>
@@ -234,9 +234,9 @@
 											<!-- Linkedin -->
 											<div class="form-group row">
 												<label for="linkedin"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.linkedin|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
 													<input class="form-control" type="text" id="linkedin"
 														th:field="*{linkedin}">
 												</div>
@@ -244,80 +244,81 @@
 											<!-- Facebook -->
 											<div class="form-group row">
 												<label for="facebook"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.facebook|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<input class="form-control" type="text" id="facebook"
 														th:field="*{facebook}">
 												</div>
 											</div>
 											<!-- Is supervised? -->
 											<div class="form-group row">
-												<label for="supervised"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
-													th:text="#{|${baseMessageKey}.detail.supervised|}"></label>
-												<div class="col-sm-5 col-xs-10">
-													<input id="supervised" th:field="*{supervised}"
-														type="checkbox">
+												<div class=" col-lg-3 col-md-4 col-4 hidden-xs">											
+													<label for="supervised"
+														class="label form-control-label"
+														th:text="#{|${baseMessageKey}.detail.supervised|}"></label>
+												</div>
+												<div class="col-lg-1 col-md-1 col-2">
+													<input id="supervised"  th:field="*{supervised}"		type="checkbox">
 												</div>
 											</div>
 											<input type="hidden" th:field="*{specialty.id}">
 											
 											<div class="form-group row">
-												<div class="col">
+												<div class="col-sm-4 col-6">
 												<label for="sp_domicile"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.domicile|}"></label>												
-													<input id="sp_domicile" style="position:" th:field="*{specialty.domicile}" type="checkbox">
+													<input id="sp_domicile"  th:field="*{specialty.domicile}" type="checkbox">
 												</div>
-												<div class="col">
+												<div class="col-sm-4 col-6">
 												<label for="sp_individual"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.individual|}"></label>												
 													<input id="sp_individual" th:field="*{specialty.individual}" type="checkbox">
 												</div>
-												<div class="col">
+												<div class="col-sm-4 col-6">
 												<label for="sp_group"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.group|}"></label>												
 													<input id="sp_group" th:field="*{specialty.grp}" type="checkbox">
 												</div>
-											</div>
-											<div class="form-group row">
-												<div class="col">
+											<!-- </div>
+											<div class="form-group row"> -->
+												<div class="col-sm-4 col-6">
 												<label for="sp_children"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.children|}"></label>												
 													<input id="sp_children" th:field="*{specialty.children}" type="checkbox">
 												</div>
-												<div class="col">
+												<div class="col-sm-4 col-6">
 												<label for="sp_adult"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.adult|}"></label>												
 													<input id="sp_adult" th:field="*{specialty.adult}" type="checkbox">
 												</div>
-												<div class="col">
-												<label for="sp_teenager"
-													class="label form-control-label"
-													th:text="#{|${baseMessageKey}.detail.specialty.teenager|}"></label>												
-													<input id="sp_teenager" th:field="*{specialty.teenager}" type="checkbox">
+												<div class="col-sm-4 col-6">
+													<label for="sp_teenager"
+														class="label form-control-label"
+														th:text="#{|${baseMessageKey}.detail.specialty.teenager|}" ></label>												
+														<input id="sp_teenager" th:field="*{specialty.teenager}" type="checkbox">
 												</div>
 
-											</div>
-											<div class="form-group row">
-												<div class="col">
+											<!-- </div>
+											<div class="form-group row"> -->
+												<div class="col-sm-4 col-6">
 												<label for="sp_pregnancy"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.pregnancy|}"></label>												
 													<input id="sp_pregnancy" th:field="*{specialty.pregnancy}" type="checkbox">
 												</div>
-												<div class="col">
+												<div class="col-sm-4 col-6">
 												<label for="sp_sport"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.sport|}"></label>												
 													<input id="sp_sport" th:field="*{specialty.sport}" type="checkbox">
 												</div>
-												<div class="col">
+												<div class="col-sm-4 col-6">
 												<label for="sp_enterprise"
 													class="label form-control-label"
 													th:text="#{|${baseMessageKey}.detail.specialty.enterprise|}"></label>												
@@ -342,9 +343,9 @@
 											
 										 	<th:block th:switch="${action}">
 												<div th:case="create" class="form-group row">
-													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
+													<label for="uploadImageFile" class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs" 
 														th:text="#{|${baseMessageKey}.detail.image|}"></label>
-													<div class="col-sm-5 col-xs-12">
+													<div class="col-lg-9 col-md-8 col-sm-12">
 														<div class="custom-file">
 															<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
@@ -357,9 +358,9 @@
 												</div>
 	
 												<div th:case="*" class="form-group row">
-													<label for="uploadImageFile" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
+													<label for="uploadImageFile" class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs" 
 														th:text="#{|${baseMessageKey}.detail.image|}"></label>
-													<div class="col-md-8 col-sm-9 col-xs-12">
+													<div class="col-lg-9 col-md-8 col-sm-12">
 														<div class="custom-file">
 															<input type="file" class="custom-file-input" th:field="*{uploadImageFile}" id="uploadImageFile" 
 																th:placeholder="#{|${baseMessageKey}.detail.image.placeholder|}" 
@@ -393,9 +394,9 @@
 										<!-- Description -->
 										<div class="form-group row">
 											<label for="description"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+												class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs"
 												th:text="#{|${baseMessageKey}.detail.description|}"></label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-lg-9 col-md-8 col-sm-12">
 												<textarea class="form-control" rows="4" id="description"
 													th:field="*{description}"> </textarea>
 												<div class="invalid-feedback"></div>
@@ -410,12 +411,13 @@
 										<div  id="price_div" >
 											<input type="hidden" id="priceIdsToRemove" name="priceIdsToRemove" value="">
 											<div class="form-group row">
-												<div class="col-md-4 col-sm-5 col-xs-12 required-field">
-														<span>Label</span>
+												<div class="col-lg-4 col-md-3 col-sm-5 col-xs-12 required-field">
+														<span th:utext="#{|${baseMessageKey}.detail.price.label|}">Label</span>
 												</div>
-												<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12 required-field">
-														<span>Price (&euro;)</span>
+												<div class="col-lg-4 col-md-3 offset-sm-1 col-sm-4 col-xs-12 required-field">
+														<span th:utext="#{|${baseMessageKey}.detail.price.price|}">Prix (&euro;)</span>
 												</div>
+												<div class="offset-lg-3 offset-md-5"></div>
 												
 											</div>
 											<div class="form-group row" th:each="price, itemStats : ${dto.prices}" th:id="'div_old_price_' + ${price.id}">
@@ -424,25 +426,33 @@
 													<input type="hidden"
 														th:field="*{prices[__${itemStats.index}__].id}" />
 														
-													<input class="form-control col-md-4 col-sm-5 col-xs-12"
-														th:field="*{prices[__${itemStats.index}__].label}" />
-													<input type="number" step="0.01" class="form-control offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12"
-														th:field="*{prices[__${itemStats.index}__].price}" />
-													<button type="button"  class="btn btn-icon btn-2 btn-danger offset-md-1" th:title="#{action.delete.title}" 
-													th:onclick="'javascript:removeOldPrice(' + ${price.id} + ');'"><span class="btn-inner--icon">
-													<i class="fas fa-times"></i></span> </button>
+													<div class=" col-lg-5 col-md-4 col-sm-12">
+														<input class="form-control "
+															th:field="*{prices[__${itemStats.index}__].label}" />
+													</div>
+													<div class=" col-lg-4 col-md-3  col-sm-12">
+														<input type="number" step="0.01" class="form-control"
+															th:field="*{prices[__${itemStats.index}__].price}" />
+													</div>
+													<div class="col-lg-2  col-md-3 col-sm-12">													
+														<button type="button"  class="btn btn-icon btn-2 btn-danger offset-md-1" th:title="#{action.delete.title}" 
+														th:onclick="'javascript:removeOldPrice(' + ${price.id} + ');'"><span class="btn-inner--icon">
+														<i class="fas fa-times"></i></span> </button>
+													</div>
 											
 											</div>
 										</div>
 										<div class="form-group row">
-											<div class="col-md-4 col-sm-5 col-xs-12">
+											<div class="col-lg-5 col-md-4 col-sm-12">
 													<input class="form-control" type="text" id="price_label">
 											</div>
-											<div class="offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12">
+											<div class="col-lg-4 col-md-3  col-sm-12">
 													<input class="form-control" type="number" step="0.01" id="price_value">
 											</div>
-											<div class="offset-md-1">
-													<a class="btn btn-icon btn-2 btn-primary" style="background-color: #fff; color: #5e72e4; border-color: #5e72e4;" title="#{action.add.title}" id="add_price"> 
+											<div class=" col-lg-2  col-md-3 col-sm-12">
+													<a class="btn btn-icon btn-2 btn-primary" 
+															style="background-color: #fff; color: #5e72e4; border-color: #5e72e4;" 
+															title="#{action.add.title}" id="add_price"> 
 														<span class="btn-inner--icon"> 
 														<i class="fas fa-edit"></i> <span th:text="#{action.add}"></span>
 														</span>
@@ -489,12 +499,12 @@
 													var name_new_price="prices["+ index + "].price";
 
 													
-													var new_label = "<input class='form-control col-md-4 col-sm-5 col-xs-12' type='text' id='" + id_new_label 
-																+ "' name='" + name_new_label + "' value='"+current_label+"' required>";
-													var new_price = "<input class='form-control offset-md-1 col-md-3 offset-sm-1 col-sm-3 col-xs-12' type='number' step='0.01' id='" 
-																+ id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required>";
-													var remove_btn = "<button class='btn btn-icon btn-2 btn-danger offset-md-1' type='button' onclick=removeElemById('" 
-																+ id_new_div + "')><span class='btn-inner--icon'><i class='fas fa-times'></i></span></button>";
+													var new_label = "<div class='col-lg-5 col-md-4 col-sm-12'><input class='form-control ' type='text' id='" + id_new_label 
+																+ "' name='" + name_new_label + "' value='"+current_label+"' required></div>";
+													var new_price = "<div class=' col-lg-4 col-md-3 col-sm-12'><input class='form-control' type='number' step='0.01' id='" 
+																+ id_new_price + "' name='" + name_new_price + "' value='"+current_price+"' required></div>";
+													var remove_btn = "<div class='col-lg-2  col-md-3 col-sm-12'><button class='btn btn-icon btn-2 btn-danger offset-md-1' type='button' onclick=removeElemById('" 
+																+ id_new_div + "')><span class='btn-inner--icon'><i class='fas fa-times'></i></span></button></div>";
 																
 																													
 													var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_label + new_price + remove_btn + "</div>";
@@ -545,9 +555,9 @@
 										</div>
 										
 										<div  class="form-group row">
-													<label for="degrees" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
+													<label for="degrees" class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs" 
 														th:text="#{|${baseMessageKey}.detail.degree|}"></label>
-													<div class="col-sm-5 col-xs-12" >
+													<div class="col-lg-9 col-md-8 col-sm-12" >
 														<div class="custom-file" id="div_custom_file_degrees">
 															<input type="file" name="degrees[0]" id="degrees0" class="custom-file-input"  
 																onChange="javascript:updateList(this, 'degrees')" 	 />
@@ -591,7 +601,18 @@
 													index = indexDegree;
 													indexDegree++;
 													totalDegreeNb++;
-												} else {
+												} else { // media
+													//Check media file type
+													var supportMediaFileTypes = '[[${supportMediaFileTypes}]]';
+													var fileType = inputElement.files[0].type;
+													if ((supportMediaFileTypes && supportMediaFileTypes.indexOf(fileType) < 0) || !(fileType)) {
+														var msg = '[[${invalidMediaExtensions}]]';
+														inputElement.value = "";
+														$('#general-warning-modal-message').html(msg);
+														showModal("general-warning-modal");	
+														return;												
+												    }
+													
 													index = indexMedia;
 													indexMedia++;
 												}
@@ -619,9 +640,9 @@
 										
 										<div class="form-group row">
 												<label for="school"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.school|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<input class="form-control" type="text" id="school"
 														th:field="*{school}">
 												</div>
@@ -636,16 +657,16 @@
 												<div th:each="media, itemStats : ${dto.mediaFiles}" 
 																	th:id="'div_old_media_' + ${media.id}"
 																	class="col-12 col-sm-6 col-md-4 col-lg-2 col-image">
-													<input	type="hidden"
-														th:field="*{mediaFiles[__${itemStats.index}__].user}" />
-													<input type="hidden"
-														th:field="*{mediaFiles[__${itemStats.index}__].id}" />
+													<input	type="hidden" th:field="*{mediaFiles[__${itemStats.index}__].user}" />
+													<input type="hidden" th:field="*{mediaFiles[__${itemStats.index}__].id}" />
+													<input type="hidden" th:field="*{mediaFiles[__${itemStats.index}__].filePath}" />
+													
 													<figure>
 															<img class="red-circle"  th:title="#{action.delete}"
 															th:src="@{/images/red-circle.png}"					 									
 						 									th:onclick="'javascript:removeOldMedia(' + ${media.id} + ');'">
 													
-						 									<a th:href="${baseMediaURL + '/image/download/' + media.filePath}" th:title="${media.filePath}" target="_blank">		
+						 									<a th:if="${media.filePath != null}" th:href="${baseMediaURL + '/image/download/' + media.filePath}" th:title="${media.filePath}" target="_blank">		
 						 										<th:block >
 						 											<!-- Images -->
 						 											<div th:if="${#strings.contains(#strings.toLowerCase(media.filePath), '.jpg') 
@@ -688,9 +709,9 @@
 										</div>
 
 										<div  class="form-group row">
-											<label for="medias" class="label form-control-label col-md-3 col-sm-3 hidden-xs" 
+											<label for="medias" class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs" 
 												th:text="#{|${baseMessageKey}.detail.media|}"></label>
-											<div class="col-sm-5 col-xs-12">
+											<div class="col-lg-9 col-md-8 col-sm-12">
 												<div class="custom-file" id="div_custom_file_medias">
 													<input type="file" multiple="multiple" name="medias[0]" id="medias0" class="custom-file-input"  
 														th:accept="${supportMediaFileTypes}" onChange="updateList(this, 'medias')" 	 />
@@ -720,11 +741,10 @@
 										<div  id="event_div">
 											<input type="hidden" id="eventIdsToRemove" name="eventIdsToRemove" value="">
 											<div class="form-group row">
-												<div class="col-md-3"><span>Date</span></div>
-												<div class="col-md-3"><span>Address</span></div>
-												<div class="col-md-3"><span>Description</span></div>
-												<div class="col-md-3"><span>Price</span></div>
-												
+												<div class="col-lg-3"><span th:text="#{|${baseMessageKey}.detail.event.date|}">Date</span></div>
+												<div class="col-lg-3"><span th:text="#{|${baseMessageKey}.detail.event.address|}">Address</span></div>
+												<div class="col-lg-3"><span th:text="#{|${baseMessageKey}.detail.event.description|}">Description</span></div>
+												<div class="col-lg-3"><span th:text="#{|${baseMessageKey}.detail.event.price|}">Price</span></div>												
 											</div> 
 											<div class="row mb-2" th:each="event, itemStats : ${dto.events}" 
 																		th:id="'div_old_event_' + ${event.id}">
@@ -733,7 +753,7 @@
 													<input type="hidden"
 														th:field="*{events[__${itemStats.index}__].id}" />
 													
-													<div class="col-xl-2 col-lg-12 input-group">
+													<div class="col-lg-3  input-group">
 														<input type="text" class="form-control datepicker"
 															th:field="*{events[__${itemStats.index}__].date}" 
 															th:data-date-format="${dateFormat.toLowerCase()}" 
@@ -746,19 +766,23 @@
 													<input type="hidden" th:field="*{events[__${itemStats.index}__].address.id}" >													
 													<input type="hidden" th:field="*{events[__${itemStats.index}__].address.latitude}" >
 													<input type="hidden" th:field="*{events[__${itemStats.index}__].address.longitude}" >
-													
-													<input type ="text" class="form-control col-xl-3 col-lg-12  mr-1" 
-															th:field="*{events[__${itemStats.index}__].address.address}" required>
-													<input type ="text" class="form-control col-xl-4 col-lg-12  mr-1"
-														th:field="*{events[__${itemStats.index}__].description}" required> 
-													
-													
-													<input type="number" step="0.01" class="form-control  col-xl-1 col-lg-12 mr-1"
-													th:field="*{events[__${itemStats.index}__].price}" 	required/>
-													
-													<button type="button"  class="btn btn-icon btn-2 btn-danger  col-xl-1 col-lg-4 col-md-6" th:title="#{action.delete.title}" 
-													th:onclick="'javascript:removeOldEvent(' + ${event.id} + ');'"><span class="btn-inner--icon">
-													<i class="fas fa-times"></i></span> </button>
+													<div class="col-lg-3  ">
+														<input type ="text" class="form-control " 
+																th:field="*{events[__${itemStats.index}__].address.address}" required>
+													</div>
+													<div class="col-lg-3  ">
+														<input type ="text" class="form-control "
+															th:field="*{events[__${itemStats.index}__].description}" required> 
+													</div>
+													<div class="col-lg-2  ">
+														<input type="number" step="0.01" class="form-control    "
+														th:field="*{events[__${itemStats.index}__].price}" 	required/>
+													</div>
+													<div class="col-lg-1">
+														<button type="button"  class=" btn btn-icon btn-2 btn-danger " th:title="#{action.delete.title}" 
+														th:onclick="'javascript:removeOldEvent(' + ${event.id} + ');'"><span class="btn-inner--icon">
+														<i class="fas fa-times"></i></span> </button>
+													</div>
 													
 											</div>
 										</div>
@@ -766,10 +790,10 @@
 										<!-- Date -->
 										<div class="form-group row">
 											 <label for="eventDate"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.event.date|}"></label>
 
-												<div class="col-md-3 col-sm-8 input-group">						
+												<div class="col-lg-9 col-md-8 col-sm-12 input-group">						
 													<input type="text" class="form-control datepicker" 
 													   id="eventDate" 													
 														th:data-date-format="${dateFormat.toLowerCase()}" 
@@ -785,18 +809,18 @@
 												<input type="hidden" id="eventLongitude">
 												<input type="hidden" id="eventSearchAddrValue">										
 												<label for="eventAddress"
-													class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+													class="label form-control-label col-lg-3 col-md-4 col-sm-12  hidden-xs required-field"
 													th:text="#{|${baseMessageKey}.detail.event.address|}"></label>
-												<div class="col-md-8 col-sm-9 col-xs-12">
+												<div class="col-lg-9 col-md-8 col-sm-12">
 													<input class="form-control" type="text" id="eventAddress">
 												</div>
 											</div>
 										<!-- Description -->
 										<div class="form-group row">
 											<label for="eventDescription"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.event.description|}"></label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-lg-9 col-md-8 col-sm-12">
 												<textarea class="form-control" rows="4" id="eventDescription"></textarea>
 												<div class="invalid-feedback"></div>
 											</div>
@@ -804,9 +828,9 @@
 										<!-- Price -->
 										<div class="form-group row">
 											<label for="eventPrice"
-												class="label form-control-label col-md-3 col-sm-3 hidden-xs required-field"
+												class="label form-control-label col-lg-3 col-md-4 col-sm-12 hidden-xs required-field"
 												th:text="#{|${baseMessageKey}.detail.event.price|}"></label>
-											<div class="col-md-8 col-sm-9 col-xs-12s">
+											<div class="col-lg-9 col-md-8 col-sm-12">
 												<input type="number" step="0.01" class="form-control"
 													id="eventPrice" />
 												<div class="invalid-feedback"></div>
@@ -900,24 +924,24 @@
 											var id_new_price="events"+ indexEvent + ".price";
 											var name_new_price="events["+ indexEvent + "].price";
 											
-											var new_date = "<div class='input-group col-xl-2 col-lg-12 '>" 
+											var new_date = "<div class='input-group col-lg-3  '>" 
 															+" <input class='form-control datepicker' data-date-format='dd-mm-yyyy' type='text' autocomplete='off' id='" 
 															+ id_new_date + "' name='" + name_new_date + "' value='"+current_date
 															+"' required><div class='input-group-prepend'> <span class='input-group-text'><i class='fas fa-calendar'></i></span></div></div>";
-											var new_address = "<input class='form-control  col-xl-3 col-lg-12  mr-1' type='text' id='" + id_new_address 
-															+ "' name='" + name_new_address + "' value='"+current_address+"' required>";
+											var new_address = "<div class='input-group col-lg-3'><input class='form-control' type='text' id='" + id_new_address 
+															+ "' name='" + name_new_address + "' value='"+current_address+"' required></div>";
 											var new_latitude = "<input  type='hidden' id='" + id_new_longitude 
 															+ "' name='" + name_new_longitude + "' value='"+current_latitude+"'>";
 											var new_longitude = "<input  type='hidden' id='" + id_new_latitude 
 															+ "' name='" + name_new_latitude + "' value='"+current_longitude+"'>";
-											var new_description = "<input class='form-control  col-xl-4 col-lg-12  mr-1' type='text'  id='" + id_new_description 
-															+ "' name='" + name_new_description + "' value='"+current_description+"' required>";
-											var new_price = "<input class='form-control   col-xl-1 col-lg-12 mr-1' type='number' step='0.01' id='" + id_new_price 
-															+ "' name='" + name_new_price + "' value='"+current_price+"' required>";
+											var new_description = "<div class='input-group col-lg-3'><input class='form-control' type='text'  id='" + id_new_description 
+															+ "' name='" + name_new_description + "' value='"+current_description+"' required></div>";
+											var new_price = "<div class='input-group col-lg-2'><input class='form-control ' type='number' step='0.01' id='" + id_new_price 
+															+ "' name='" + name_new_price + "' value='"+current_price+"' required></div>";
 																												
 																
-											var remove_btn = "<button class='btn btn-icon btn-2 btn-danger col-xl-1 col-lg-4 col-md-6' type='button' onclick=removeElemById('" 
-																+ id_new_div + "')><span class='btn-inner--icon'><i class='fas fa-times'></i></span></button>";
+											var remove_btn = "<div class='input-group col-lg-1'><button class='btn btn-icon btn-2 btn-danger' type='button' onclick=removeElemById('" 
+																+ id_new_div + "')><span class='btn-inner--icon'><i class='fas fa-times'></i></span></button></div>";
 											
 											var new_inner_div = "<div class='form-group row' id='"+ id_new_div + "'>" + new_date + new_address + new_latitude + new_longitude +
 																new_description + new_price +  remove_btn +"</div>";

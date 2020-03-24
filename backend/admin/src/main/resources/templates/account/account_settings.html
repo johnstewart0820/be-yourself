@@ -20,9 +20,9 @@
 									<div class="col-md-12 col-sm-12">
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4"
+												class="label form-control-label col-md-4 col-sm-12"
 												th:text="#{|${baseMessageKey}.detail.title|}">Title</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-8 col-sm-9 col-sm-12">
 												<select id="title" class="form-control" th:field="*{title}">
 													<option th:each="title : ${titles}" th:value="${title}"
 														th:text="${title}"></option>
@@ -31,20 +31,20 @@
 										</div>
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 required-field" 
+												class="label form-control-label col-md-4 col-sm-12 required-field" 
 												th:text="#{|${baseMessageKey}.detail.lastname|}">Last
 												name</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-8 col-sm-12">
 												<input class="form-control" type="text"
 													th:field="*{lastName}" required>
 											</div>
 										</div>
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 required-field" 
+												class="label form-control-label col-md-4 col-sm-12 required-field" 
 												th:text="#{|${baseMessageKey}.detail.firstname|}">First
 												name</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-8 col-sm-12">
 
 												<input class="form-control" type="text"
 													th:field="*{firstName}" required>
@@ -53,10 +53,10 @@
 
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4 required-field"
+												class="label form-control-label col-md-4 col-sm-12 required-field"
 												th:text="#{|${baseMessageKey}.detail.email|}">
 												email</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-8 col-sm-12">
 
 												<input class="form-control" type="email" th:field="*{email}" required>
 											</div>
@@ -64,10 +64,10 @@
 
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4"
+												class="label form-control-label col-md-4 col-sm-12"
 												th:text="#{|${baseMessageKey}.detail.currentpwd|}">
 												Current password</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-8 col-sm-12">
 												<input class="form-control" name="current_pwd"
 													type="password">
 											</div>
@@ -76,10 +76,10 @@
 
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4"
+												class="label form-control-label col-md-4 col-sm-12"
 												th:text="#{|${baseMessageKey}.detail.newpwd|}">
 												New Password</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-8 col-sm-12">
 												<input class="form-control" id="new_pwd" name="new_pwd"
 													type="password">
 											</div>
@@ -87,10 +87,10 @@
 
 										<div class="form-group row">
 											<label for="title"
-												class="label form-control-label col-md-4 col-sm-4"
+												class="label form-control-label col-md-4 col-sm-12"
 												th:text="#{|${baseMessageKey}.detail.confirmedpwd|}">Confirmed
 												New Password</label>
-											<div class="col-md-8 col-sm-9 col-xs-12">
+											<div class="col-md-8 col-sm-12">
 												<input class="form-control" id="confirmed_new_pwd"
 													name="confirmed_new_pwd" type="password">
 											</div>
