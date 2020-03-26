@@ -139,5 +139,33 @@
 			</div>
 		</div>
 	</th:block>
+	
+	<th:block th:fragment="form-action-no-offset">
+		<div class="row" th:if="${writePermission}">
+								<div class="col">
+									<div class="form-group row">
+										<div class="col-xl-3 col-lg-4 col-md-6  col-12"> 
+											<button type="submit" class="form-control btn btn-primary  "
+												th:title="#{action.save.title}">
+												<i class="fas fa-save"></i> <span class="hidden-xs"
+													th:text="#{action.save}"></span>
+											</button>
+										</div>
+										
+										<div class="col-xl-3 col-lg-5 col-md-6   col-12 custom-sm-mg-top custom-xs-mg-top"> 
+											<a class="form-control btn btn-outline-warning"
+												th:href="${baseURL + '/current-page'}"
+												th:title="#{action.go.to.list.title}"> <span
+												class="btn-inner--icon" > <i class="fas fa-arrow-left"></i>
+													<span th:text="#{action.go.to.list}"></span>
+											</span>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+	</th:block>
+	
+	
 </body>
 </html>

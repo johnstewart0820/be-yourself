@@ -953,9 +953,8 @@
 										</script>
 											
 										<!-- Save or go back -->
-										<div th:if="${writePermission}" class="form-group row">
-											<!-- <div
-												class="offset-md-2 col-md-8 offset-sm-3 col-sm-9 col-xs-12"> -->
+										<!-- <div th:if="${writePermission}" class="form-group row">
+
 												<div class="form-action-buttons-row">
 													<button type="submit" class="btn btn-primary"
 														th:title="#{action.save.title}">
@@ -972,11 +971,11 @@
 													</span>
 													</a>
 												</div>
-											<!-- </div> -->
-										</div>
+										</div> -->
 										</div>
 									</div>
 								</fieldset>
+								<th:block th:replace="fragments/data-page-options :: form-action-no-offset"></th:block>
 							</form>
 
 						</div>

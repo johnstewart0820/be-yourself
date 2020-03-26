@@ -65,29 +65,8 @@
 			<div class="card  shadow">
 				<!-- Card header -->
 				<div class="card-header border-0">
-								<th:block th:replace="fragments/data-page-options :: form-header"></th:block>
-				
-<!-- 					<div class="row">
-						<div class="col-md-5 col-sm-5">
-							<a class="btn btn-icon btn-2 btn-primary"
-								th:href="${baseURL+ '/current-page'}"
-								th:title="#{action.go.to.list.title}"> <span
-								class="btn-inner--icon"> <i class="fas fa-arrow-left"></i>
-									<span th:text="#{action.go.to.list}"></span>
-							</span>
-							</a>
-						</div>
+					<th:block th:replace="fragments/data-page-options :: form-header"></th:block>
 
-						<div class="col-md-6 col-sm-12 text-right  d-lg-block">
-							<div th:if="${writePermission && #strings.contains(action, 'update')}">
-								<h3 class="mb-0 form-title-label" th:text="#{users.action.update}">Update User</h3>
-							</div>
-							<div th:unless="${writePermission && #strings.contains(action, 'update')}">
-								<h3 class="mb-0 form-title-label" th:text="#{users.action.add}">Add User</h3>
-							</div>
-						</div>
-
-					</div> -->
 				</div>
 				<!-- Card body -->
 				<div class="card-body px-lg-5">
@@ -269,27 +248,32 @@
 										</div>
 									</div>
 									<!-- Save or Back actions -->
-									<div th:if="${writePermission}" class="form-group row">
-										<div class="form-action-buttons-row">
-											<button type="submit" class="btn btn-primary"
+									<!-- <th:block th:replace="fragments/data-page-options :: form-action-no-offset"></th:block> -->
+
+									<!-- <div class="form-group row" th:if="${writePermission}">
+											<button type="submit" class="btn btn-primary  custom-col-lg-4 custom-col-md-4 custom-col-sm-6"
 												th:title="#{action.save.title}">
 												<i class="fas fa-save"></i> <span class="hidden-xs"
 													th:text="#{action.save}"></span>
 											</button>
 
-											<a class="btn btn-outline-warning"
-												th:href="${baseURL + '/current-page'}"
-												th:title="#{action.go.to.list.title}"> <span
-												class="btn-inner--icon"> <i
-													class="fas fa-arrow-left"></i> <span
-													th:text="#{action.go.to.list}"></span>
-											</span>
-											</a>
-										</div>
-									</div>
+											<div class="custom-col-lg-4 custom-col-md-4 custom-col-sm-6"> 
+												<a class="btn btn-outline-warning"
+													th:href="${baseURL + '/current-page'}"
+													th:title="#{action.go.to.list.title}"> <span
+													class="btn-inner--icon"> <i
+														class="fas fa-arrow-left"></i> <span
+														th:text="#{action.go.to.list}"></span>
+												</span>
+												</a>
+											</div>
+									</div>  -->	
 								</div>
 							</div>
 						</fieldset>
+						<th:block th:replace="fragments/data-page-options :: form-action-no-offset"></th:block>
+						
+
 					</form>
 
 				</div>
