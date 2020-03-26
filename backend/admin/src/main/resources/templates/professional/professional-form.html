@@ -86,7 +86,8 @@
 					<div class="card  shadow">
 						<!-- Card header -->
 						<div class="card-header border-0">
-							<div class="row">
+							<th:block th:replace="fragments/data-page-options :: form-header"></th:block>
+							<!-- <div class="row">
 								<div class="col-md-6">
 									<a class="btn btn-icon btn-2 btn-primary"
 										th:href="${baseURL+ '/current-page'}"
@@ -108,7 +109,7 @@
 									</div>
 								</div>
 
-							</div>
+							</div> -->
 						</div>
 						<!-- Card body -->
 						<div class="card-body px-lg-5 py-lg-5">
