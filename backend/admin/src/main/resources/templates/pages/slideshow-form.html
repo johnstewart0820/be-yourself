@@ -151,6 +151,7 @@
 									th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
 								<label class="custom-file-label" for="upload-image-file-main" id="image-file-label-main" 
 									th:data-browse="#{action.select.image}" 
+									th:data-browse-short-label="#{action.select.image.short.label}"
 									th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 							</div>
 						</div>
@@ -245,6 +246,7 @@
 										th:for="${'upload-image-file-schedule-' + schedule.id}" 
 										th:id="${'image-file-label-schedule-' + schedule.id}" 
 										th:data-browse="#{action.select.image}" 
+										th:data-browse-short-label="#{action.select.image.short.label}"
 										th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 								</div>
 							</div>
@@ -337,6 +339,7 @@
 								<label class="custom-file-label" for="upload-image-file-new-schedule" 
 									id="image-file-label-new-schedule" 
 									th:data-browse="#{action.select.image}" 
+									th:data-browse-short-label="#{action.select.image.short.label}"
 									th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 							</div>
 						</div>
@@ -445,6 +448,7 @@
 										<label class="custom-file-label" for="upload-image-file-edit-item" 
 											id="image-file-label-edit-item" 
 											th:data-browse="#{action.select.image}" 
+											th:data-browse-short-label="#{action.select.image.short.label}"
 											th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 									</div>
 								</div>

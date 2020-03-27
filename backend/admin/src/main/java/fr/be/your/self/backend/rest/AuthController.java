@@ -1,10 +1,13 @@
 package fr.be.your.self.backend.rest;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +26,7 @@ import fr.be.your.self.model.User;
 import fr.be.your.self.service.UserService;
 import fr.be.your.self.util.StringUtils;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping(Constants.PATH.AUTHENTICATION_PREFIX)
 public class AuthController {
@@ -45,6 +48,11 @@ public class AuthController {
 
     @Autowired
     private GoogleIdTokenVerifier googleIdTokenVerifier;
+    
+    @GetMapping("/me")
+	public ResponseEntity<?> profile(final Principal principal) throws Exception {
+    	return ResponseEntity.ok(principal);
+    }
     
     @PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody UserCreateRequest body) throws Exception {
