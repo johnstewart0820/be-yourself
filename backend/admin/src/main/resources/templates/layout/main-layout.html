@@ -39,10 +39,32 @@
 	<script type="text/javascript" th:src="@{/js/bootstrap-datepicker.min.js}"></script>
 	<script th:src="@{https://maps.googleapis.com/maps/api/js?key={key}&libraries=places(key=${GOOGLE_MAP_API_KEY})}"></script>
 	
+	<style>
+	@media  (min-width: 1268px){
+    .navbar-expand-custom {
+        flex-direction: col;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+     .navbar-expand-custom .navbar-nav {
+        flex-direction: row;
+    }
+    .navbar-expand-custom .navbar-nav .nav-link {
+        padding-right: .5rem;
+        padding-left: .5rem;
+    }
+    .navbar-expand-custom .navbar-collapse {
+        display: flex!important;
+    }
+    .navbar-expand-custom .navbar-toggler {
+        display: none;
+    } 
+}
+	</style>
 </head>
 <body>
 	<nav th:insert="layout/main-side-nav :: side-nav" 
-		class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light bg-white" id="sidenav-main">
+		class="navbar navbar-vertical fixed-left navbar-expand-md  navbar-light bg-white" id="sidenav-main">
 	</nav>
 
 	<div class="main-content">
@@ -52,12 +74,35 @@
 		
 		<div class="pb-7"></div>
 				
-		<div class="container-fluid">
+		<div class="container-fluid" id="main-content">
 			<th:block layout:fragment="content"></th:block>		
 			
 			<footer th:insert="layout/main-footer :: footer" class="footer"></footer>
 		</div>
 	</div>
+	<script> 
+			function checkSize() {
+				var windowsize = $(window).width();
+            	if (windowsize == 768) {
+            		$("#sidenav-main").removeClass("navbar-expand-md");
+            		$("#sidenav-main").addClass("navbar-expand-lg");
+            		$("#main-content").css({top: '-15px', left:'-5px', position:'relative'});
+            		/* $("#user_dropdown").removeClass("d-md-flex");
+            		$("#user_dropdown").addClass("d-lg-flex"); */
+            	} else {
+            		$("#sidenav-main").removeClass("navbar-expand-lg");
+            		$("#sidenav-main").addClass("navbar-expand-md");
+            		$("#main-content").css({top: '0px', left: '0px', position:'relative'});
+            	}
+			}
+			
+            $(document).ready(function() { 
+            	//checkSize();
+                $(window).resize(function() { 
+                	//checkSize();
+                }); 
+            });
+        </script> 
 
 	<script type="text/javascript" th:src="@{/js/argon.min.js}"></script>
 	<script type="text/javascript" th:src="@{/js/media.player.min.js}"></script>

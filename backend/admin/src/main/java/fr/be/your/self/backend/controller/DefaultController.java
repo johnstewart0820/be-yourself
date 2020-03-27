@@ -54,6 +54,8 @@ public class DefaultController extends BaseController {
 						return "redirect:" + functionPath;		
 					}
 				}
+				//If don't have permission to any functionality
+				return hello();
 			}
 		}
 		
@@ -67,6 +69,11 @@ public class DefaultController extends BaseController {
     @GetMapping("/about")
     public String about() {
         return "about";
+    }
+    
+    @GetMapping("/hello")
+    public String hello() {
+        return "home";
     }
 
     @GetMapping(Constants.PATH.ACCESS_DENIED)

@@ -124,27 +124,25 @@
 									</div>
 								</div>
 							</fieldset>
+							<th:block th:replace="fragments/data-page-options :: form-action-no-offset"></th:block>
 
-							<div class="form-group row">
-								<div
-									class="offset-md-1 col-md-11 offset-sm-3 col-sm-9 col-xs-12">
-									<div class="form-action-buttons-row">
-										<button type="submit" class="btn btn-primary"
-											th:title="#{action.save.title}">
-											<i class="fas fa-save"></i> <span class="hidden-xs"
-												th:text="#{action.save}"></span>
-										</button>
+							<!-- <div class="form-group row ml-1">
+								<div class="form-action-buttons-row">
+									<button type="submit" class="btn btn-primary"
+										th:title="#{action.save.title}">
+										<i class="fas fa-save"></i> <span class="hidden-xs"
+											th:text="#{action.save}"></span>
+									</button>
 
-										<a class="btn btn-outline-warning"
-											th:href="${baseURL + '/current-page'}"
-											th:title="#{action.go.to.list.title}"> <span
-											class="btn-inner--icon"> <i class="fas fa-arrow-left"></i>
-												<span th:text="#{action.go.to.list}"></span>
-										</span>
-										</a>
-									</div>
+									<a class="btn btn-outline-warning"
+										th:href="${baseURL + '/current-page'}"
+										th:title="#{action.go.to.list.title}"> <span
+										class="btn-inner--icon"> <i class="fas fa-arrow-left"></i>
+											<span th:text="#{action.go.to.list}"></span>
+									</span>
+									</a>
 								</div>
-							</div>
+							</div> -->
 						</form>
 					</div>
 				</div>

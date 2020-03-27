@@ -151,6 +151,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		supportMediaTypes.addAll(this.dataSetting.getImageMimeTypes());
 		supportMediaTypes.addAll(this.dataSetting.getVideoMimeTypes());
 		final String supportMediaFileTypes = String.join(",", supportMediaTypes);
+		
 		final String supportImageTypes = String.join(",", this.dataSetting.getImageMimeTypes());
 		final String supportImageExtensions = String.join(",", this.dataSetting.getImageFileExtensions());
 		final String supportVideoTypes = String.join(",", this.dataSetting.getVideoMimeTypes());
@@ -174,6 +175,15 @@ public class ProfessionalController extends BaseResourceController<User, User, U
 		model.addAttribute("maxDegreesNumber", MAX_DEGREES_NB);
 		String maxDegreesMsg = this.getMessage("professional.error.max.degrees", new Object[] {MAX_DEGREES_NB});
 		model.addAttribute("maxDegreesMsg", maxDegreesMsg);
+		
+		Set<String> supportMediaExtensions = new HashSet<>();
+		supportMediaExtensions.addAll(this.dataSetting.getImageFileExtensions());
+		supportMediaExtensions.addAll(this.dataSetting.getVideoFileExtensions());
+		String mediaExtensions = String.join(",", supportMediaExtensions);
+		final Object[] messageArguments = new String[] { mediaExtensions };
+		
+		String invalidMediaExtensions = this.getMessage("professional.error.media.invalid", messageArguments);
+		model.addAttribute("invalidMediaExtensions", invalidMediaExtensions);
 	}
 	
 	@Override
@@ -394,7 +404,7 @@ public class ProfessionalController extends BaseResourceController<User, User, U
         
 		//Validate Input
 		if (!validateInput(dto, model, newProfilePictureFile, "update")) {
-			return this.redirectAddNewPage(session, request, response, redirectAttributes, model, dto);
+        	return this.redirectEditPage(session, request, response, redirectAttributes, model, id, dto);
 		}
        
         User domain = this.userService.getById(id);
