@@ -16,7 +16,7 @@
 				-->
 				<form role="form" th:action="${baseURL} + '/search'" method="get">
 					<div class="row form-search-container">
-						<div class="col-lg-8 col-md-12 col-sm-12 xs-filter-group">
+						<div class="col-lg-5 col-md-12 col-sm-12 xs-filter-group">
 							<div class="input-group">
 								<!-- 
 								<div class="input-group-prepend">
@@ -37,7 +37,7 @@
 							</div>
 						</div>
 						
-						<div class="offset-lg-1 col-lg-3 col-md-12 col-sm-12 custom-md-mg-top-5 custom-sm-mg-top-5 custom-xs-mg-top-5 text-right">
+						<div class="offset-lg-2 col-lg-5 col-md-12 col-sm-12 custom-md-mg-top-5 custom-sm-mg-top-5 custom-xs-mg-top-5 text-right">
 							<select id="display-page-option" class="form-control selectpicker show-tick" 
 								th:data-none-selected-text="#{data.display.page.option.title}">
 								<option th:each="pageSize: ${supportPageSizes}" 
