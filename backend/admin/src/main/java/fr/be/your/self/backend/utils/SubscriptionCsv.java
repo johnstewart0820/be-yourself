@@ -15,15 +15,15 @@ public class SubscriptionCsv {
 	//CsvBindByName => Used when we import CSV file
 	//CsvBindByPosition => Used when we export CSV file
 	
-	@CsvBindByName(column = "Title", required = true)
+	@CsvBindByName(column = "Civilité", required = true)
     @CsvBindByPosition(position = 0)
 	private String title;
 
-	@CsvBindByName(column = "Last name", required = true)
+	@CsvBindByName(column = "Nom", required = true)
     @CsvBindByPosition(position = 1)
 	private String lastName;
 	
-	@CsvBindByName(column = "First name", required = true)
+	@CsvBindByName(column = "Prénom", required = true)
 	@CsvBindByPosition(position = 2)
 	private String firstName;
 	
@@ -31,47 +31,47 @@ public class SubscriptionCsv {
 	@CsvBindByPosition(position = 3)
 	private String email;
 	
-	@CsvBindByName(column = "Subscription type", required = true)
+	@CsvBindByName(column = "Type d'abonnement", required = true)
 	@CsvBindByPosition(position = 4)
 	private String subtype;
 	
-	@CsvBindByName(column = "canal", required = true)
+	@CsvBindByName(column = "Canal", required = true)
 	@CsvBindByPosition(position = 5)
 	private String canal;
 	
-	@CsvBindByName(column = "code")
+	@CsvBindByName(column = "Code")
 	@CsvBindByPosition(position = 6)
 	private String code;
 	
-	@CsvBindByName(column = "code type")	
+	@CsvBindByName(column = "Code type")	
 	@CsvBindByPosition(position = 7)
 	private String codeType;
 	
-	@CsvBindByName(column = "duration", required = true)
+	@CsvBindByName(column = "Durée", required = true)
 	@CsvBindByPosition(position = 8)
 	private int duration;
 	
-	@CsvBindByName(column = "start date", required = true)
+	@CsvBindByName(column = "Date de début", required = true)
 	@CsvBindByPosition(position = 9)
 	private String startDate;
 	
-	@CsvBindByName(column = "end date", required = true)	
+	@CsvBindByName(column = "Date de fin", required = true)	
 	@CsvBindByPosition(position = 10)
 	private String endDate;
 	
-	@CsvBindByName(column = "termination asked", required = true)
+	@CsvBindByName(column = "Résiliation demandée", required = true)
 	@CsvBindByPosition(position = 11)
 	private boolean terminationAsked;
 	
-	@CsvBindByName(column = "price", required = true)
+	@CsvBindByName(column = "Prix", required = true)
 	@CsvBindByPosition(position = 12)
 	private BigDecimal price;
 	
-	@CsvBindByName(column = "gift card", required = true)
+	@CsvBindByName(column = "Cadeau", required = true)
 	@CsvBindByPosition(position = 13)
 	private boolean giftCard;
 	
-	@CsvBindByName(column = "payment gateway", required = true)
+	@CsvBindByName(column = "Payment gateway", required = true)
 	@CsvBindByPosition(position = 14)
 	private String paymenGateway;
 	

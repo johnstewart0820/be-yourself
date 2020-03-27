@@ -51,9 +51,9 @@
 												</select>
 											</div>
 										</div>
-										<!-- IP Address -->
 										
-										<div th:if="${writePermission && #strings.contains(action, 'update')}" 
+										<!-- IP Address -->										
+										<div th:if="${!#strings.contains(action, 'create')}" 
 												class="form-group row" id="account_type_div">
 											<label
 												class="label form-control-label col-xl-3 col-lg-4 col-md-5 col-sm-12"

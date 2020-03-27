@@ -80,9 +80,6 @@
 		</style>
 	</th:block>
 	<th:block layout:fragment="content">
-		<div class="container">
-			<div class="row">
-				<div class="col">
 					<div class="card  shadow">
 						<!-- Card header -->
 						<div class="card-header border-0">
@@ -175,7 +172,7 @@
 														th:field="*{address.address}" required>
 												</div>
 											</div>
-											<div class="form-group row" th:if="${#strings.contains(action, 'update')}">											
+											<div class="form-group row" th:if="!${#strings.contains(action, 'create')}">											
 												<label for="address"
 													class="label form-control-label disabled col-lg-3 col-md-4 col-sm-12 hidden-xs"
 													th:text="#{|${baseMessageKey}.detail.coordinates|}"></label>
@@ -987,9 +984,7 @@
 						</div>
 
 					</div>
-				</div>
-			</div>
-		</div>
+
 		<th:block th:replace="fragments/data-form-modals :: modals"></th:block>
 	</th:block>
 

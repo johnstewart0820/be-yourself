@@ -8,15 +8,15 @@ public class UserCsv {
 	//CsvBindByName => Used when we import CSV file
 	//CsvBindByPosition => Used when we export CSV file
 	
-	@CsvBindByName(column = "Title", required = true)
+	@CsvBindByName(column = "Civilité", required = true)
     @CsvBindByPosition(position = 0)
 	private String title;
 	
-	@CsvBindByName(column = "Last Name", required = true)
+	@CsvBindByName(column = "Nom", required = true)
     @CsvBindByPosition(position = 1)
 	private String lastName;
 	
-	@CsvBindByName(column = "First Name", required = true)
+	@CsvBindByName(column = "Prénom", required = true)
     @CsvBindByPosition(position = 2)
 	private String firstName;
 	
@@ -24,23 +24,23 @@ public class UserCsv {
     @CsvBindByPosition(position = 3)
 	private String email;
 	
-	@CsvBindByName(column = "Login Type", required = true)	
+	@CsvBindByName(column = "Login type", required = true)	
     @CsvBindByPosition(position = 4)
 	private String loginType;
 	
-	@CsvBindByName(column = "Status", required = true)
+	@CsvBindByName(column = "Statut", required = true)
     @CsvBindByPosition(position = 5)
 	private String status;
 	
-	@CsvBindByName(column = "Referral Code")	
+	@CsvBindByName(column = "Code parainnage")	
     @CsvBindByPosition(position = 6)
 	private String referralCode;
 	
-	@CsvBindByName(column = "Account Type", required = true)	
+	@CsvBindByName(column = "Role", required = true)	
     @CsvBindByPosition(position = 7)
 	private String userType;
 
-	@CsvBindByName(column = "Subscription Type")	
+	@CsvBindByName(column = "Abonnement")	
     @CsvBindByPosition(position = 8)
 	private String subscriptionType;
 	

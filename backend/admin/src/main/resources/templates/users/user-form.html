@@ -220,7 +220,7 @@
 
 									<!-- Subscription -->
 									<div class="form-group row"
-										th:if="${#strings.contains(action, 'update')}">
+										th:if="!${#strings.contains(action, 'create')}">
 										<label for="subscription"
 											class="label form-control-label custom-col-lg-4 custom-col-md-4 custom-col-sm-6"
 											th:text="#{|${baseMessageKey}.detail.subscription|}"></label>
