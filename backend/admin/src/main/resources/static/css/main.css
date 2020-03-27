@@ -136,7 +136,7 @@ select.selectpicker[disabled] + button {
 	}
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
 	.sm-form-group {
     	margin-bottom: 1rem;
 	}
@@ -163,7 +163,7 @@ select.selectpicker[disabled] + button {
 	}
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
 	.md-text-right {
 		text-align: right;
 	}
@@ -183,7 +183,7 @@ select.selectpicker[disabled] + button {
 	}	
 }
 
-@media (min-width: 768px) and (max-width: 1150px) {
+@media (min-width: 769px) and (max-width: 1150px) {
 	.col-smd-3 {
 		width: 25%;
 		flex: 0 0 25%;
@@ -424,7 +424,7 @@ table.dataTable thead .sorting_desc_disabled:after {
     code by Iatek LLC 2018 - CC 2.0 License - Attribution required
     code customized by Azmind.com
 */
-@media (min-width: 768px) and (max-width: 991px) {
+@media (min-width: 769px) and (max-width: 991px) {
     /* Show 4th slide on md if col-md-4*/
     .carousel-inner .active.col-md-4.carousel-item + .carousel-item + .carousel-item + .carousel-item {
         position: absolute;
@@ -435,7 +435,7 @@ table.dataTable thead .sorting_desc_disabled:after {
         visibility: visible;
     }
 }
-@media (min-width: 576px) and (max-width: 768px) {
+@media (min-width: 576px) and (max-width: 769px) {
     /* Show 3rd slide on sm if col-sm-6*/
     .carousel-inner .active.col-sm-6.carousel-item + .carousel-item + .carousel-item {
         position: absolute;
@@ -491,7 +491,7 @@ table.dataTable thead .sorting_desc_disabled:after {
     }
 }
 /* MD */
-@media (min-width: 768px) {
+@media (min-width: 769px) {
     /* show 3rd of 3 item slide */
     .carousel-inner .active + .carousel-item + .carousel-item {
         display: block;
@@ -566,7 +566,7 @@ table.dataTable thead .sorting_desc_disabled:after {
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
-@media only screen  and (min-width: 600px) and (max-width: 767px) {
+@media only screen  and (min-width: 600px) and (max-width: 768px) {
 	.custom-sm-mg-top{
 			margin-top:20px;
 			/* margin-bottom:15px; */
@@ -576,8 +576,8 @@ table.dataTable thead .sorting_desc_disabled:after {
 	}
 }
 
-/* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (min-width: 768px)  and (max-width: 991px) {
+/* Medium devices (landscape tablets, 769px and up) */
+@media only screen and (min-width: 769px)  and (max-width: 991px) {
 	.custom-md-mg-top{
 		margin-top:20px;
 	}
