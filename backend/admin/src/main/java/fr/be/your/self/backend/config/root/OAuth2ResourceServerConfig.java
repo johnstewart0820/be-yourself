@@ -133,7 +133,7 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
 
 					// All other endpoint
 					.regexMatchers("/.*")
-						.access("#oauth2.isUser() and hasRole('ROLE_USR')")
+						.access("hasRole('ROLE_USR')")
 			.and()
 				.addFilterAfter(this.csrfFilter(), FilterSecurityInterceptor.class)
 				.addFilterAfter(new CsrfGrantingFilter(), CsrfFilter.class)

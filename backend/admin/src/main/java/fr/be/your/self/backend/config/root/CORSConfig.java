@@ -113,7 +113,7 @@ public class CORSConfig {
 			}
 			
 			for (String allowedOrigin : this.allowedOrigins) {
-				if (allowedOrigin.equalsIgnoreCase(origin)) {
+				if ("*".equals(allowedOrigin) || allowedOrigin.equalsIgnoreCase(origin)) {
 					return true;
 				}
 			}
