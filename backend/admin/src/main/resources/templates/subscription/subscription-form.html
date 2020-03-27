@@ -12,7 +12,8 @@
 			<div class="col">
 				<div class="card shadow">
 					<div class="card-header border-0">
-						<div class="row">
+					<th:block th:replace="fragments/data-page-options :: form-header"></th:block>
+						<!-- <div class="row">
 							<div class="col-6">
 								<a class="btn btn-icon btn-2 btn-primary"
 									th:href="${baseURL + '/current-page'}"
@@ -26,7 +27,7 @@
 							<div class="col-6 text-right">
 								<h3 class="mb-0" th:text="${formTitle}"></h3>
 							</div>
-						</div>
+						</div> -->
 					</div>
 
 					<div class="card-body border-0">

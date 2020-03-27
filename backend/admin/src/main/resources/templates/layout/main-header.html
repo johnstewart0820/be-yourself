@@ -36,7 +36,7 @@
 				<a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		  			<div class="media align-items-center">
 						<span class="avatar avatar-sm rounded-circle">
-			  				<img th:if="${userAvatar == null || userAvatar == ''}" alt="Avatar" th:src="@{/images/default/avatar.png}">
+			  				<img th:if="${userAvatar == null || userAvatar == ''}" alt="Avatar" th:src="@{/images/default/Profile_avatar_placeholder_large.png}">
 			  				<img th:if="${userAvatar != null && userAvatar != ''}" alt="Avatar" th:src="@{|${baseAvatarURL}/image/view/${userAvatar}|}">
 						</span>
 						<div class="media-body ml-2 d-none d-lg-block">

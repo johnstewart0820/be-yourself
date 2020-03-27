@@ -178,8 +178,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             		.authenticationEntryPoint(this.authenticationEntryPoint())
     		// XXX: put CSRF protection back into this endpoint
             .and()
-	        //	.csrf()
-	        //    	.requireCsrfProtectionMatcher(new AntPathRequestMatcher(AUTHORIZE_URL)).disable()
+	        	.csrf()
+	            	.requireCsrfProtectionMatcher(new AntPathRequestMatcher(AUTHORIZE_URL)).disable()
 	        .logout()
 	            .logoutSuccessUrl(LOGIN_URL)
 	            .logoutUrl(LOGOUT_URL)

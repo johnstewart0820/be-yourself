@@ -7,6 +7,6 @@ public class DefaultLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 	public DefaultLogoutSuccessHandler() {
 	    super();
 	    
-	    this.setUseReferer(true);
+	    this.setUseReferer(false);
     }
 }
