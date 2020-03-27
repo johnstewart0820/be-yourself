@@ -61,6 +61,7 @@
 													th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
 												<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 													th:data-browse="#{action.select.image}" 
+													th:data-browse-short-label="#{action.select.image.short.label}"
 													th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 											</div>
 											<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
@@ -78,6 +79,7 @@
 													th:default-src="${baseMediaURL + '/image/view/' + dto.image}" />
 												<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 													th:data-browse="#{action.select.image}" 
+													th:data-browse-short-label="#{action.select.image.short.label}"
 													th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 											</div>
 											<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>

@@ -59,6 +59,7 @@
 													th:default-src="@{/images/default/{pageName}.png(pageName=${pageName})}" />
 												<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 													th:data-browse="#{action.select.image}" 
+													th:data-browse-short-label="#{action.select.image.short.label}"
 													th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 											</div>
 											<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
@@ -75,6 +76,7 @@
 													th:default-src="${baseMediaURL + '/image/view/' + dto.image}" />
 												<label class="custom-file-label" for="uploadImageFile" id="imageFileLabel" 
 													th:data-browse="#{action.select.image}" 
+													th:data-browse-short-label="#{action.select.image.short.label}"
 													th:text="#{|${baseMessageKey}.detail.image.placeholder|}"></label>
 											</div>
 											<div class="invalid-feedback" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
@@ -93,6 +95,7 @@
 													th:accept="${supportMediaTypes}" onChange="selectMedia(this)"/>
 												<label class="custom-file-label" for="uploadContentFile" id="contentFileLabel" 
 													th:data-browse="#{action.select.media}" 
+													th:data-browse-short-label="#{action.select.media.short.label}"
 													th:text="#{|${baseMessageKey}.detail.content.file.placeholder|}"></label>
 											</div>
 											<div class="invalid-feedback" th:if="${#fields.hasErrors('contentFile')}" th:errors="*{contentFile}"></div>
@@ -110,6 +113,7 @@
 													th:default-mime-type="${dto.contentMimeType}"/>
 												<label class="custom-file-label" for="uploadContentFile" id="contentFileLabel" 
 													th:data-browse="#{action.select.media}" 
+													th:data-browse-short-label="#{action.select.media.short.label}"
 													th:text="#{|${baseMessageKey}.detail.content.file.placeholder|}"></label>
 											</div>
 											<div class="invalid-feedback" th:if="${#fields.hasErrors('contentFile')}" th:errors="*{contentFile}"></div>

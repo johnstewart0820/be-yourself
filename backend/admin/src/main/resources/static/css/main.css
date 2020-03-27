@@ -92,6 +92,13 @@ select.selectpicker[disabled] + button {
   left: auto;
 }
 
+.custom-checkbox .custom-control-input~.custom-control-label:before {
+    /*border: 1px solid #5e72e4;*/
+    border: 1px solid #cad1d7;
+    border-radius: .375rem;
+    box-shadow: none;
+}
+
 .page-header {
 	white-space: nowrap;
 	overflow: hidden;
@@ -164,6 +171,16 @@ select.selectpicker[disabled] + button {
 	.sm-form-group {
     	margin-bottom: 0rem;
 	}
+}
+
+@media (max-width: 1024px) {
+	.custom-file-input~.custom-file-label[data-browse]::after {
+		/*white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 100px;*/
+		content: attr(data-browse-short-label)
+	}	
 }
 
 @media (min-width: 768px) and (max-width: 1150px) {
