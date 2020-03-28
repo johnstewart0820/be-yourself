@@ -34,7 +34,7 @@
 						</div>
 						
 						<div class="row">
-							<div class="col-lg-8 col-md-12 col-sm-12">
+							<div class="col-xl-8 col-lg-12 col-md-12 col-sm-12">
 								<div class="form-group row">
 									<label for="title" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs required-field" 
 										th:text="#{|${baseMessageKey}.detail.title|}"></label>
@@ -135,9 +135,9 @@
 								</div>
 								
 								<div class="form-group row">
-									<label for="free" class="label form-control-label col-lg-3 col-md-12 col-smd-12 col-sm-3 hidden-xs" 
+									<label for="free" class="label form-control-label col-lg-3 col-md-3 col-smd-3 col-sm-3 col-4" 
 										th:text="#{|${baseMessageKey}.detail.free|}"></label>
-									<div class="col-lg-9 col-md-12 col-smd-12 col-sm-9 col-xs-12">
+									<div class="col-1">
 										<div class="custom-control custom-control-alternative custom-checkbox label-left">
 											<input class="custom-control-input" th:field="*{free}" id="free" type="checkbox">
 											<label class="custom-control-label label form-control-label" for="free"></label>
@@ -206,7 +206,7 @@
 								<th:block th:replace="fragments/data-page-options :: form-action"></th:block>
 							</div>
 							
-							<div class="col-lg-4 col-md-12 col-sm-12">
+							<div class="col-xl-4 col-lg-12 col-md-12 col-sm-12">
 								<div class="form-group row">
 									<div class="col-12 text-center" th:switch="${action}">
 										<img th:case="create" id="imagePreview" class="image-fit image-preview" 
